@@ -40,7 +40,7 @@ class NewsController extends Controller
 
         $article = new NewsArticle();
         $article->title = $request->title;
-        $article->slug = \Str::slug($request->title);
+        $article->slug = $this->createUniqueSlug($request->title);
         $article->content = $request->content;
         $article->excerpt = $request->excerpt;
         $article->category_id = $request->category_id;
@@ -84,7 +84,7 @@ class NewsController extends Controller
 
         $article = NewsArticle::findOrFail($id);
         $article->title = $request->title;
-        $article->slug = \Str::slug($request->title);
+        $article->slug = $this->createUniqueSlug($request->title, $article->id);
         $article->content = $request->content;
         $article->excerpt = $request->excerpt;
         $article->category_id = $request->category_id;
@@ -103,5 +103,25 @@ class NewsController extends Controller
         $article->delete();
 
         return redirect()->route('admin.news.index')->with('success', 'News article deleted successfully.');
+    }
+
+    /**
+     * Create a unique slug for the article.
+     */
+    private function createUniqueSlug($title, $excludeId = null)
+    {
+        $slug = \Str::slug($title);
+        $originalSlug = $slug;
+        $count = 1;
+
+        // Check if slug exists, and if so, append a number to make it unique
+        while (NewsArticle::where('slug', $slug)
+            ->where('id', '!=', $excludeId)
+            ->exists()) {
+            $slug = $originalSlug . '-' . $count;
+            $count++;
+        }
+
+        return $slug;
     }
 }
