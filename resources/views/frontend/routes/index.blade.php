@@ -16,24 +16,18 @@
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 class="text-xl font-bold mb-4">All Routes</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @forelse($routes as $route)
             <div class="border rounded-lg p-4">
-                <h3 class="text-lg font-bold">Jakarta - Bandung</h3>
-                <p class="text-gray-600">Distance: 180 km</p>
-                <p class="text-gray-600">Duration: 4 hours</p>
-                <a href="#" class="text-blue-500 hover:underline mt-2 inline-block">View Schedule</a>
+                <h3 class="text-lg font-bold">{{ $route->name ?? $route->origin . ' - ' . $route->destination }}</h3>
+                <p class="text-gray-600">Distance: {{ $route->distance }} km</p>
+                <p class="text-gray-600">Duration: {{ $route->duration }} hours</p>
+                <a href="{{ route('frontend.routes.show', $route->id) }}" class="text-blue-500 hover:underline mt-2 inline-block">View Schedule</a>
             </div>
-            <div class="border rounded-lg p-4">
-                <h3 class="text-lg font-bold">Surabaya - Malang</h3>
-                <p class="text-gray-600">Distance: 100 km</p>
-                <p class="text-gray-600">Duration: 2.5 hours</p>
-                <a href="#" class="text-blue-500 hover:underline mt-2 inline-block">View Schedule</a>
+            @empty
+            <div class="col-span-3">
+                <p class="text-gray-600 text-center">No routes available at the moment.</p>
             </div>
-            <div class="border rounded-lg p-4">
-                <h3 class="text-lg font-bold">Yogyakarta - Solo</h3>
-                <p class="text-gray-600">Distance: 60 km</p>
-                <p class="text-gray-600">Duration: 1.5 hours</p>
-                <a href="#" class="text-blue-500 hover:underline mt-2 inline-block">View Schedule</a>
-            </div>
+            @endforelse
         </div>
     </div>
 </div>

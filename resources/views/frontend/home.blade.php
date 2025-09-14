@@ -27,18 +27,18 @@
     <!-- Quick Booking Form -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8" x-data="{ origin: '', destination: '', date: '' }">
         <h2 class="text-2xl font-bold mb-4">Quick Booking</h2>
-        <form class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form method="GET" action="{{ route('frontend.booking.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label for="origin" class="block text-sm font-medium text-gray-700">Origin</label>
-                <input type="text" id="origin" x-model="origin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                <input type="text" id="origin" name="origin" x-model="origin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
             </div>
             <div>
                 <label for="destination" class="block text-sm font-medium text-gray-700">Destination</label>
-                <input type="text" id="destination" x-model="destination" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                <input type="text" id="destination" name="destination" x-model="destination" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
             </div>
             <div>
                 <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
-                <input type="date" id="date" x-model="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                <input type="date" id="date" name="date" x-model="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
             </div>
             <div class="flex items-end">
                 <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">

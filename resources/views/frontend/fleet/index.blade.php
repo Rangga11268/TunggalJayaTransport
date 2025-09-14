@@ -8,27 +8,20 @@
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 class="text-xl font-bold mb-4">Bus Gallery</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @forelse($buses as $bus)
             <div class="border rounded-lg overflow-hidden">
                 <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
                 <div class="p-4">
-                    <h3 class="text-lg font-bold">Executive Class</h3>
-                    <p class="text-gray-600">Luxury seating with extra legroom</p>
+                    <h3 class="text-lg font-bold">{{ $bus->name ?? $bus->bus_type }}</h3>
+                    <p class="text-gray-600">Capacity: {{ $bus->capacity }} seats</p>
+                    <p class="text-gray-600">{{ $bus->description ?? 'No description available.' }}</p>
                 </div>
             </div>
-            <div class="border rounded-lg overflow-hidden">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
-                <div class="p-4">
-                    <h3 class="text-lg font-bold">Business Class</h3>
-                    <p class="text-gray-600">Comfortable seating with reclining</p>
-                </div>
+            @empty
+            <div class="col-span-3">
+                <p class="text-gray-600 text-center">No buses available at the moment.</p>
             </div>
-            <div class="border rounded-lg overflow-hidden">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
-                <div class="p-4">
-                    <h3 class="text-lg font-bold">Economy Class</h3>
-                    <p class="text-gray-600">Affordable travel with basic comfort</p>
-                </div>
-            </div>
+            @endforelse
         </div>
     </div>
 

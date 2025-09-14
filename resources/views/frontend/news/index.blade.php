@@ -17,34 +17,31 @@
 
     <!-- News List -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        @forelse($articles as $article)
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
             <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
             <div class="p-4">
-                <div class="text-sm text-gray-500 mb-2">September 10, 2025</div>
-                <h3 class="text-xl font-bold mb-2">New Route Added</h3>
-                <p class="text-gray-600">We're excited to announce a new route connecting Jakarta and Bali.</p>
-                <a href="#" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
+                <div class="text-sm text-gray-500 mb-2">{{ $article->published_at->format('F j, Y') }}</div>
+                <h3 class="text-xl font-bold mb-2">{{ $article->title }}</h3>
+                <p class="text-gray-600">{{ $article->excerpt ?? Str::limit(strip_tags($article->content), 100) }}</p>
+                <a href="{{ route('frontend.news.show', $article->slug) }}" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
-            <div class="p-4">
-                <div class="text-sm text-gray-500 mb-2">September 5, 2025</div>
-                <h3 class="text-xl font-bold mb-2">Fleet Expansion</h3>
-                <p class="text-gray-600">Our fleet has expanded with 10 new buses for better service.</p>
-                <a href="#" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
+        @empty
+        <div class="col-span-3">
+            <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                <p class="text-gray-600">No news articles available at the moment.</p>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
-            <div class="p-4">
-                <div class="text-sm text-gray-500 mb-2">September 1, 2025</div>
-                <h3 class="text-xl font-bold mb-2">Safety First</h3>
-                <p class="text-gray-600">All our buses now have enhanced safety features for your peace of mind.</p>
-                <a href="#" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
-            </div>
-        </div>
+        @endforelse
     </div>
+
+    <!-- Pagination -->
+    @if($articles->hasPages())
+    <div class="mt-8 flex justify-center">
+        {{ $articles->links() }}
+    </div>
+    @endif
 
     <!-- Newsletter Subscription -->
     <div class="bg-white rounded-lg shadow-md p-6">
