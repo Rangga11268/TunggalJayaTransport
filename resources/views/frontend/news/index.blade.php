@@ -8,10 +8,12 @@
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 class="text-xl font-bold mb-4">Filter by Category</h2>
         <div class="flex flex-wrap gap-2">
-            <a href="#" class="px-4 py-2 bg-blue-500 text-white rounded-full">All</a>
-            <a href="#" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300">Announcements</a>
-            <a href="#" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300">Promotions</a>
-            <a href="#" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300">Events</a>
+            <a href="{{ route('frontend.news.index') }}" class="px-4 py-2 {{ !request()->get('category') ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300' }} rounded-full">All</a>
+            @isset($categories)
+                @foreach($categories as $category)
+                    <a href="{{ route('frontend.news.index', ['category' => $category->id]) }}" class="px-4 py-2 {{ request()->get('category') == $category->id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300' }} rounded-full">{{ $category->name }}</a>
+                @endforeach
+            @endisset
         </div>
     </div>
 
@@ -22,6 +24,11 @@
             <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
             <div class="p-4">
                 <div class="text-sm text-gray-500 mb-2">{{ $article->published_at ? $article->published_at->format('F j, Y') : 'N/A' }}</div>
+                @if($article->category)
+                <div class="text-sm text-blue-500 mb-1">
+                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">{{ $article->category->name }}</span>
+                </div>
+                @endif
                 <h3 class="text-xl font-bold mb-2">{{ $article->title }}</h3>
                 <p class="text-gray-600">{{ $article->excerpt ?? Str::limit(strip_tags($article->content), 100) }}</p>
                 <a href="{{ route('frontend.news.show', $article->slug) }}" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>

@@ -4,22 +4,33 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\NewsArticle;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $articles = NewsArticle::where('is_published', true)
-            ->latest()
-            ->paginate(9);
+        $categoryId = $request->get('category');
+        
+        $query = NewsArticle::with(['category', 'author'])
+            ->where('is_published', true);
             
-        return view('frontend.news.index', compact('articles'));
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        
+        $articles = $query->latest()->paginate(9)->appends(['category' => $categoryId]);
+        
+        $categories = Category::all();
+            
+        return view('frontend.news.index', compact('articles', 'categories'));
     }
     
     public function show($slug)
     {
-        $article = NewsArticle::where('slug', $slug)
+        $article = NewsArticle::with(['category', 'author'])
+            ->where('slug', $slug)
             ->where('is_published', true)
             ->firstOrFail();
             
