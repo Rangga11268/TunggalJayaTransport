@@ -22,7 +22,8 @@ class NewsController extends Controller
      */
     public function create()
     {
-        return view('admin.news.create');
+        $categories = \App\Models\Category::all();
+        return view('admin.news.create', compact('categories'));
     }
 
     /**
@@ -34,6 +35,7 @@ class NewsController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required',
             'excerpt' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $article = new NewsArticle();
@@ -41,6 +43,7 @@ class NewsController extends Controller
         $article->slug = \Str::slug($request->title);
         $article->content = $request->content;
         $article->excerpt = $request->excerpt;
+        $article->category_id = $request->category_id;
         $article->is_published = $request->has('is_published');
         $article->author_id = auth()->id();
         $article->save();
@@ -63,7 +66,8 @@ class NewsController extends Controller
     public function edit(string $id)
     {
         $article = NewsArticle::findOrFail($id);
-        return view('admin.news.edit', compact('article'));
+        $categories = \App\Models\Category::all();
+        return view('admin.news.edit', compact('article', 'categories'));
     }
 
     /**
@@ -75,6 +79,7 @@ class NewsController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required',
             'excerpt' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $article = NewsArticle::findOrFail($id);
@@ -82,6 +87,7 @@ class NewsController extends Controller
         $article->slug = \Str::slug($request->title);
         $article->content = $request->content;
         $article->excerpt = $request->excerpt;
+        $article->category_id = $request->category_id;
         $article->is_published = $request->has('is_published');
         $article->save();
 
