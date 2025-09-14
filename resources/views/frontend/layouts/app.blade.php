@@ -34,5 +34,7 @@
 
         <!-- Alpine.js for interactivity -->
         <script src="//unpkg.com/alpinejs" defer></script>
+        
+        @yield('scripts')
     </body>
 </html>
