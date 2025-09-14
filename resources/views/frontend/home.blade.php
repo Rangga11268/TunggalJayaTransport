@@ -1,5 +1,9 @@
 @extends('frontend.layouts.app')
 
+@php
+use Illuminate\Support\Str;
+@endphp
+
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Hero Slider -->
@@ -52,27 +56,17 @@
     <div class="mb-8">
         <h2 class="text-2xl font-bold mb-4">Featured Routes</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @foreach($featuredRoutes as $route)
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
                 <div class="p-4">
-                    <h3 class="text-xl font-bold">Jakarta - Bandung</h3>
-                    <p class="text-gray-600">Starting from Rp. 150,000</p>
+                    <h3 class="text-xl font-bold">{{ $route->origin }} - {{ $route->destination }}</h3>
+                    @if($route->distance)
+                        <p class="text-gray-600">{{ $route->distance }} km</p>
+                    @endif
                 </div>
             </div>
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
-                <div class="p-4">
-                    <h3 class="text-xl font-bold">Surabaya - Malang</h3>
-                    <p class="text-gray-600">Starting from Rp. 100,000</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
-                <div class="p-4">
-                    <h3 class="text-xl font-bold">Yogyakarta - Solo</h3>
-                    <p class="text-gray-600">Starting from Rp. 80,000</p>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 
@@ -132,30 +126,20 @@
             <a href="{{ route('frontend.news.index') }}" class="text-blue-500 hover:underline">View All</a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @foreach($latestNews as $article)
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
+                @if($article->getFirstMediaUrl('featured_images'))
+                    <img src="{{ $article->getFirstMediaUrl('featured_images') }}" alt="{{ $article->title }}" class="w-full h-48 object-cover">
+                @else
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
+                @endif
                 <div class="p-4">
-                    <h3 class="text-xl font-bold">New Route Added</h3>
-                    <p class="text-gray-600 text-sm">September 10, 2025</p>
-                    <p class="mt-2">We're excited to announce a new route connecting Jakarta and Bali.</p>
+                    <h3 class="text-xl font-bold">{{ $article->title }}</h3>
+                    <p class="text-gray-600 text-sm">{{ $article->created_at->format('F j, Y') }}</p>
+                    <p class="mt-2">{{ Str::limit($article->excerpt ?? strip_tags($article->content), 100) }}</p>
                 </div>
             </div>
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
-                <div class="p-4">
-                    <h3 class="text-xl font-bold">Fleet Expansion</h3>
-                    <p class="text-gray-600 text-sm">September 5, 2025</p>
-                    <p class="mt-2">Our fleet has expanded with 10 new buses for better service.</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
-                <div class="p-4">
-                    <h3 class="text-xl font-bold">Safety First</h3>
-                    <p class="text-gray-600 text-sm">September 1, 2025</p>
-                    <p class="mt-2">All our buses now have enhanced safety features for your peace of mind.</p>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 
@@ -169,9 +153,9 @@
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        this.animateValue('fleetCount', 0, 50, 2000);
-                        this.animateValue('routeCount', 0, 30, 2000);
-                        this.animateValue('customerCount', 0, 10000, 2000);
+                        this.animateValue('fleetCount', 0, {{ $fleetCount }}, 2000);
+                        this.animateValue('routeCount', 0, {{ $routeCount }}, 2000);
+                        this.animateValue('customerCount', 0, {{ $customerCount }}, 2000);
                     }
                 });
             });

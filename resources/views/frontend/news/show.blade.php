@@ -3,6 +3,10 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <article class="bg-white rounded-lg shadow-md p-6 mb-8">
+        @if($article->getFirstMediaUrl('featured_images'))
+            <img src="{{ $article->getFirstMediaUrl('featured_images') }}" alt="{{ $article->title }}" class="w-full h-64 object-cover rounded-lg mb-6">
+        @endif
+        
         <h1 class="text-3xl font-bold mb-4">{{ $article->title }}</h1>
         
         <div class="flex items-center text-gray-600 mb-6">

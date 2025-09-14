@@ -36,6 +36,7 @@ class NewsController extends Controller
             'content' => 'required',
             'excerpt' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $article = new NewsArticle();
@@ -47,6 +48,11 @@ class NewsController extends Controller
         $article->is_published = $request->has('is_published');
         $article->author_id = auth()->id();
         $article->save();
+
+        // Handle image upload
+        if ($request->hasFile('featured_image')) {
+            $article->addMediaFromRequest('featured_image')->toMediaCollection('featured_images');
+        }
 
         return redirect()->route('admin.news.index')->with('success', 'News article created successfully.');
     }
@@ -80,6 +86,7 @@ class NewsController extends Controller
             'content' => 'required',
             'excerpt' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $article = NewsArticle::findOrFail($id);
@@ -90,6 +97,14 @@ class NewsController extends Controller
         $article->category_id = $request->category_id;
         $article->is_published = $request->has('is_published');
         $article->save();
+
+        // Handle image upload
+        if ($request->hasFile('featured_image')) {
+            // Delete existing featured image if it exists
+            $article->clearMediaCollection('featured_images');
+            // Add new featured image
+            $article->addMediaFromRequest('featured_image')->toMediaCollection('featured_images');
+        }
 
         return redirect()->route('admin.news.index')->with('success', 'News article updated successfully.');
     }

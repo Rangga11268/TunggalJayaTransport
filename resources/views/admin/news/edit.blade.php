@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <form action="{{ route('admin.news.update', $article) }}" method="POST">
+                    <form action="{{ route('admin.news.update', $article) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         
@@ -54,6 +54,26 @@
                                     Publish this article
                                 </label>
                             </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="featured_image" class="block text-sm font-medium text-gray-700">Featured Image</label>
+                            <input type="file" name="featured_image" id="featured_image" class="mt-1 block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-md file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-indigo-50 file:text-indigo-700
+                                hover:file:bg-indigo-100">
+                            <p class="mt-1 text-sm text-gray-500">Upload a featured image for this article (JPEG, PNG, JPG, GIF, max 2MB)</p>
+                            @if($article->getFirstMediaUrl('featured_images'))
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-600">Current image:</p>
+                                    <img src="{{ $article->getFirstMediaUrl('featured_images') }}" alt="Featured Image" class="mt-1 h-32 w-32 object-cover rounded-md">
+                                </div>
+                            @endif
+                            @error('featured_image')
+                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <div class="flex items-center justify-between">

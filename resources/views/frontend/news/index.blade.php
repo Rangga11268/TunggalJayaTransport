@@ -21,7 +21,11 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         @forelse($articles as $article)
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
+            @if($article->getFirstMediaUrl('featured_images'))
+                <img src="{{ $article->getFirstMediaUrl('featured_images') }}" alt="{{ $article->title }}" class="w-full h-48 object-cover">
+            @else
+                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
+            @endif
             <div class="p-4">
                 <div class="text-sm text-gray-500 mb-2">{{ $article->published_at ? $article->published_at->format('F j, Y') : 'N/A' }}</div>
                 @if($article->category)

@@ -28,6 +28,7 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
@@ -38,6 +39,15 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($articles as $article)
                                     <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if($article->getFirstMediaUrl('featured_images'))
+                                                <img src="{{ $article->getFirstMediaUrl('featured_images') }}" alt="Featured Image" class="h-10 w-10 object-cover rounded-md">
+                                            @else
+                                                <div class="h-10 w-10 bg-gray-200 rounded-md flex items-center justify-center">
+                                                    <span class="text-xs text-gray-500">No Image</span>
+                                                </div>
+                                            @endif
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">{{ $article->title }}</div>
                                         </td>

@@ -9,6 +9,12 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
+                    @if($article->getFirstMediaUrl('featured_images'))
+                        <div class="mb-6">
+                            <img src="{{ $article->getFirstMediaUrl('featured_images') }}" alt="Featured Image" class="w-full h-64 object-cover rounded-md">
+                        </div>
+                    @endif
+                    
                     <div class="mb-4">
                         <h1 class="text-2xl font-bold">{{ $article->title }}</h1>
                         <div class="mt-2 text-sm text-gray-500">
