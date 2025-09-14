@@ -1,6 +1,5 @@
 *.log
 .DS_Store
-.bacaini.md
 .env
 .env.backup
 .env.production
@@ -23,3 +22,4 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+bacaini.md
