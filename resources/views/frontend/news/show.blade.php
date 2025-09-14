@@ -8,7 +8,7 @@
         <div class="flex items-center text-gray-600 mb-6">
             <span>By {{ $article->author->name ?? 'Admin' }}</span>
             <span class="mx-2">•</span>
-            <span>{{ $article->published_at->format('F j, Y') }}</span>
+            <span>{{ $article->published_at ? $article->published_at->format('F j, Y') : 'N/A' }}</span>
             @if($article->category)
             <span class="mx-2">•</span>
             <span class="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">{{ $article->category->name }}</span>

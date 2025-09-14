@@ -22,6 +22,36 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
+                                <label for="user_id" class="block text-sm font-medium text-gray-700">User</label>
+                                <select name="user_id" id="user_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                    <option value="">Select User</option>
+                                    @foreach(App\Models\User::all() as $user)
+                                        <option value="{{ $user->id }}" {{ old('user_id', $booking->user_id) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('user_id')
+                                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            
+                            <div>
+                                <label for="schedule_id" class="block text-sm font-medium text-gray-700">Schedule</label>
+                                <select name="schedule_id" id="schedule_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                    <option value="">Select Schedule</option>
+                                    @foreach(App\Models\Schedule::with('route', 'bus')->get() as $schedule)
+                                        <option value="{{ $schedule->id }}" {{ old('schedule_id', $booking->schedule_id) == $schedule->id ? 'selected' : '' }}>
+                                            {{ $schedule->route->origin }} → {{ $schedule->route->destination }} ({{ $schedule->bus->name ?? 'Bus' }}) - {{ $schedule->departure_time->format('d M Y H:i') }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('schedule_id')
+                                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
                                 <label for="passenger_name" class="block text-sm font-medium text-gray-700">Passenger Name</label>
                                 <input type="text" name="passenger_name" id="passenger_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('passenger_name', $booking->passenger_name) }}" required>
                                 @error('passenger_name')

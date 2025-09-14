@@ -36,7 +36,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'roles' => 'array|exists:roles,id',
+            'roles' => 'array',
+            'roles.*' => 'exists:roles,id',
         ]);
 
         $user = User::create([
@@ -82,7 +83,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
-            'roles' => 'array|exists:roles,id',
+            'roles' => 'array',
+            'roles.*' => 'exists:roles,id',
         ]);
 
         $user->name = $request->name;

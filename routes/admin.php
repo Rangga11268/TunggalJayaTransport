@@ -45,6 +45,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
     Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('reports.occupancy');
     
+    // Category Management
+    Route::resource('categories', CategoryController::class);
+    
     // Settings
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');

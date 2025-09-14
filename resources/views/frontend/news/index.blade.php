@@ -21,7 +21,7 @@
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
             <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
             <div class="p-4">
-                <div class="text-sm text-gray-500 mb-2">{{ $article->published_at->format('F j, Y') }}</div>
+                <div class="text-sm text-gray-500 mb-2">{{ $article->published_at ? $article->published_at->format('F j, Y') : 'N/A' }}</div>
                 <h3 class="text-xl font-bold mb-2">{{ $article->title }}</h3>
                 <p class="text-gray-600">{{ $article->excerpt ?? Str::limit(strip_tags($article->content), 100) }}</p>
                 <a href="{{ route('frontend.news.show', $article->slug) }}" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
