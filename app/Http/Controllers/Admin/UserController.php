@@ -46,8 +46,10 @@ class UserController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        if ($request->roles) {
-            $user->syncRoles($request->roles);
+        // Sync roles properly
+        if ($request->has('roles')) {
+            $roleIds = array_map('intval', $request->roles);
+            $user->syncRoles($roleIds);
         }
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
@@ -96,8 +98,12 @@ class UserController extends Controller
         
         $user->save();
 
-        if ($request->roles) {
-            $user->syncRoles($request->roles);
+        // Sync roles properly
+        if ($request->has('roles')) {
+            $roleIds = array_map('intval', $request->roles);
+            $user->syncRoles($roleIds);
+        } else {
+            $user->syncRoles([]);
         }
 
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
