@@ -58,7 +58,7 @@ class BookingController extends Controller
         $booking->booking_status = $request->booking_status;
         $booking->save();
 
-        return redirect()->route('admin.bookings.index')->with('success', 'Booking created successfully.');
+        return redirect()->route('admin.bookings.index')->with('create_success', 'Pemesanan berhasil dibuat.');
     }
 
     /**
@@ -105,7 +105,7 @@ class BookingController extends Controller
         $booking->booking_status = $request->booking_status;
         $booking->save();
 
-        return redirect()->route('admin.bookings.index')->with('success', 'Booking updated successfully.');
+        return redirect()->route('admin.bookings.index')->with('update_success', 'Pemesanan berhasil diperbarui.');
     }
 
     /**
@@ -116,6 +116,6 @@ class BookingController extends Controller
         $booking = Booking::findOrFail($id);
         $booking->delete();
 
-        return redirect()->route('admin.bookings.index')->with('success', 'Booking deleted successfully.');
+        return redirect()->route('admin.bookings.index')->with('delete_success', 'Pemesanan berhasil dihapus.');
     }
 }

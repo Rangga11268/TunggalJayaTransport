@@ -41,7 +41,7 @@ class BusController extends Controller
 
         Bus::create($request->all());
 
-        return redirect()->route('admin.buses.index')->with('success', 'Bus created successfully.');
+        return redirect()->route('admin.buses.index')->with('create_success', 'Bus berhasil dibuat.');
     }
 
     /**
@@ -80,7 +80,7 @@ class BusController extends Controller
 
         $bus->update($request->all());
 
-        return redirect()->route('admin.buses.index')->with('success', 'Bus updated successfully.');
+        return redirect()->route('admin.buses.index')->with('update_success', 'Bus berhasil diperbarui.');
     }
 
     /**
@@ -91,6 +91,6 @@ class BusController extends Controller
         $bus = Bus::findOrFail($id);
         $bus->delete();
 
-        return redirect()->route('admin.buses.index')->with('success', 'Bus deleted successfully.');
+        return redirect()->route('admin.buses.index')->with('delete_success', 'Bus berhasil dihapus.');
     }
 }

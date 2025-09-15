@@ -38,7 +38,7 @@ class FacilityController extends Controller
 
         Facility::create($request->all());
 
-        return redirect()->route('admin.facilities.index')->with('success', 'Facility created successfully.');
+        return redirect()->route('admin.facilities.index')->with('create_success', 'Fasilitas berhasil dibuat.');
     }
 
     /**
@@ -74,7 +74,7 @@ class FacilityController extends Controller
 
         $facility->update($request->all());
 
-        return redirect()->route('admin.facilities.index')->with('success', 'Facility updated successfully.');
+        return redirect()->route('admin.facilities.index')->with('update_success', 'Fasilitas berhasil diperbarui.');
     }
 
     /**
@@ -85,6 +85,6 @@ class FacilityController extends Controller
         $facility = Facility::findOrFail($id);
         $facility->delete();
 
-        return redirect()->route('admin.facilities.index')->with('success', 'Facility deleted successfully.');
+        return redirect()->route('admin.facilities.index')->with('delete_success', 'Fasilitas berhasil dihapus.');
     }
 }

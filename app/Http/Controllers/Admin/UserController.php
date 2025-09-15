@@ -52,7 +52,7 @@ class UserController extends Controller
             $user->syncRoles($roleIds);
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        return redirect()->route('admin.users.index')->with('create_success', 'Pengguna berhasil dibuat.');
     }
 
     /**
@@ -106,7 +106,7 @@ class UserController extends Controller
             $user->syncRoles([]);
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.users.index')->with('update_success', 'Pengguna berhasil diperbarui.');
     }
 
     /**
@@ -118,11 +118,11 @@ class UserController extends Controller
         
         // Prevent deleting the current user
         if ($user->id == auth()->id()) {
-            return redirect()->route('admin.users.index')->with('error', 'You cannot delete yourself.');
+            return redirect()->route('admin.users.index')->with('error', 'Anda tidak dapat menghapus diri sendiri.');
         }
         
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.users.index')->with('delete_success', 'Pengguna berhasil dihapus.');
     }
 }

@@ -41,7 +41,7 @@ class RouteController extends Controller
 
         BusRoute::create($request->all());
 
-        return redirect()->route('admin.routes.index')->with('success', 'Route created successfully.');
+        return redirect()->route('admin.routes.index')->with('create_success', 'Rute berhasil dibuat.');
     }
 
     /**
@@ -80,7 +80,7 @@ class RouteController extends Controller
 
         $route->update($request->all());
 
-        return redirect()->route('admin.routes.index')->with('success', 'Route updated successfully.');
+        return redirect()->route('admin.routes.index')->with('update_success', 'Rute berhasil diperbarui.');
     }
 
     /**
@@ -91,6 +91,6 @@ class RouteController extends Controller
         $route = BusRoute::findOrFail($id);
         $route->delete();
 
-        return redirect()->route('admin.routes.index')->with('success', 'Route deleted successfully.');
+        return redirect()->route('admin.routes.index')->with('delete_success', 'Rute berhasil dihapus.');
     }
 }

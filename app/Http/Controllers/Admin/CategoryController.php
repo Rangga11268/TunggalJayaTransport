@@ -35,7 +35,7 @@ class CategoryController extends Controller
         $category->parent_id = $request->parent_id;
         $category->save();
 
-        return response()->json(['success' => 'Category created successfully.']);
+        return response()->json(['success' => true, 'message' => 'Kategori berhasil dibuat.']);
     }
 
     /**
@@ -57,7 +57,7 @@ class CategoryController extends Controller
         $category->parent_id = $request->parent_id;
         $category->save();
 
-        return response()->json(['success' => 'Category updated successfully.']);
+        return response()->json(['success' => true, 'message' => 'Kategori berhasil diperbarui.']);
     }
 
     /**
@@ -69,16 +69,16 @@ class CategoryController extends Controller
         
         // Check if category has articles
         if ($category->articles()->count() > 0) {
-            return response()->json(['error' => 'Cannot delete category because it has articles.'], 400);
+            return response()->json(['error' => 'Tidak dapat menghapus kategori karena masih memiliki artikel.'], 400);
         }
         
         // Check if category has children
         if ($category->children()->count() > 0) {
-            return response()->json(['error' => 'Cannot delete category because it has subcategories.'], 400);
+            return response()->json(['error' => 'Tidak dapat menghapus kategori karena masih memiliki subkategori.'], 400);
         }
         
         $category->delete();
 
-        return response()->json(['success' => 'Category deleted successfully.']);
+        return response()->json(['success' => true, 'message' => 'Kategori berhasil dihapus.']);
     }
 }

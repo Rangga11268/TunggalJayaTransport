@@ -16,19 +16,6 @@
                         </button>
                     </div>
 
-                    <!-- Success Message -->
-                    @if(session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                            <span class="block sm:inline">{{ session('success') }}</span>
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                            <span class="block sm:inline">{{ session('error') }}</span>
-                        </div>
-                    @endif
-
                     <!-- Categories Table -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
@@ -207,7 +194,16 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonColor: '#3085d6',
+                        timer: 3000,
+                        timerProgressBar: true
+                    }).then(() => {
+                        location.reload();
+                    });
                 } else if (data.errors) {
                     if (data.errors.name) {
                         nameError.textContent = data.errors.name[0];
@@ -217,6 +213,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
+                Swal.fire('Error!', 'Terjadi kesalahan saat membuat kategori.', 'error');
             });
         });
 
@@ -240,7 +237,16 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    Swal.fire({
+                        title: 'Berhasil Diperbarui!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonColor: '#3085d6',
+                        timer: 3000,
+                        timerProgressBar: true
+                    }).then(() => {
+                        location.reload();
+                    });
                 } else if (data.errors) {
                     if (data.errors.name) {
                         nameError.textContent = data.errors.name[0];
@@ -250,30 +256,52 @@
             })
             .catch(error => {
                 console.error('Error:', error);
+                Swal.fire('Error!', 'Terjadi kesalahan saat memperbarui kategori.', 'error');
             });
         });
 
         // Delete Category
         function deleteCategory(id) {
-            if (confirm('Are you sure you want to delete this category?')) {
-                fetch("{{ url('admin/categories') }}/" + id, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else if (data.error) {
-                        alert(data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            }
+            Swal.fire({
+                title: 'Hapus Kategori?',
+                text: 'Apakah Anda yakin ingin menghapus kategori ini? Tindakan ini tidak dapat dibatalkan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch("{{ url('admin/categories') }}/" + id, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Berhasil Dihapus!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonColor: '#3085d6',
+                                timer: 3000,
+                                timerProgressBar: true
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else if (data.error) {
+                            Swal.fire('Error!', data.error, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error!', 'Terjadi kesalahan saat menghapus kategori.', 'error');
+                    });
+                }
+            });
         }
     </script>
 </x-app-layout>

@@ -41,7 +41,7 @@ class DriverController extends Controller
 
         Driver::create($request->all());
 
-        return redirect()->route('admin.drivers.index')->with('success', 'Driver created successfully.');
+        return redirect()->route('admin.drivers.index')->with('create_success', 'Driver berhasil dibuat.');
     }
 
     /**
@@ -80,7 +80,7 @@ class DriverController extends Controller
 
         $driver->update($request->all());
 
-        return redirect()->route('admin.drivers.index')->with('success', 'Driver updated successfully.');
+        return redirect()->route('admin.drivers.index')->with('update_success', 'Driver berhasil diperbarui.');
     }
 
     /**
@@ -91,6 +91,6 @@ class DriverController extends Controller
         $driver = Driver::findOrFail($id);
         $driver->delete();
 
-        return redirect()->route('admin.drivers.index')->with('success', 'Driver deleted successfully.');
+        return redirect()->route('admin.drivers.index')->with('delete_success', 'Driver berhasil dihapus.');
     }
 }

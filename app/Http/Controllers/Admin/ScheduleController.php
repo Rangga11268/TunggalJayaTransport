@@ -45,7 +45,7 @@ class ScheduleController extends Controller
 
         Schedule::create($request->all());
 
-        return redirect()->route('admin.schedules.index')->with('success', 'Schedule created successfully.');
+        return redirect()->route('admin.schedules.index')->with('create_success', 'Jadwal berhasil dibuat.');
     }
 
     /**
@@ -86,7 +86,7 @@ class ScheduleController extends Controller
 
         $schedule->update($request->all());
 
-        return redirect()->route('admin.schedules.index')->with('success', 'Schedule updated successfully.');
+        return redirect()->route('admin.schedules.index')->with('update_success', 'Jadwal berhasil diperbarui.');
     }
 
     /**
@@ -97,6 +97,6 @@ class ScheduleController extends Controller
         $schedule = Schedule::findOrFail($id);
         $schedule->delete();
 
-        return redirect()->route('admin.schedules.index')->with('success', 'Schedule deleted successfully.');
+        return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal berhasil dihapus.');
     }
 }

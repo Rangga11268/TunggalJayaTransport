@@ -54,7 +54,7 @@ class NewsController extends Controller
             $article->addMediaFromRequest('featured_image')->toMediaCollection('featured_images');
         }
 
-        return redirect()->route('admin.news.index')->with('success', 'News article created successfully.');
+        return redirect()->route('admin.news.index')->with('create_success', 'Artikel berita berhasil dibuat.');
     }
 
     /**
@@ -106,7 +106,7 @@ class NewsController extends Controller
             $article->addMediaFromRequest('featured_image')->toMediaCollection('featured_images');
         }
 
-        return redirect()->route('admin.news.index')->with('success', 'News article updated successfully.');
+        return redirect()->route('admin.news.index')->with('update_success', 'Artikel berita berhasil diperbarui.');
     }
 
     /**
@@ -117,7 +117,7 @@ class NewsController extends Controller
         $article = NewsArticle::findOrFail($id);
         $article->delete();
 
-        return redirect()->route('admin.news.index')->with('success', 'News article deleted successfully.');
+        return redirect()->route('admin.news.index')->with('delete_success', 'Artikel berita berhasil dihapus.');
     }
 
     /**
