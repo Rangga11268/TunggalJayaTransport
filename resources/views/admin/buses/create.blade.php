@@ -64,6 +64,42 @@
                             @enderror
                         </div>
                         
+                        <!-- Drivers Selection -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Drivers</label>
+                            <div class="mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                @foreach($drivers as $driver)
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="drivers[]" value="{{ $driver->id }}" id="driver_{{ $driver->id }}" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                        <label for="driver_{{ $driver->id }}" class="ml-2 text-sm text-gray-700">
+                                            {{ $driver->name }} ({{ $driver->license_number }})
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @error('drivers')
+                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
+                        <!-- Conductors Selection -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Conductors</label>
+                            <div class="mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                @foreach($conductors as $conductor)
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="conductors[]" value="{{ $conductor->id }}" id="conductor_{{ $conductor->id }}" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                        <label for="conductor_{{ $conductor->id }}" class="ml-2 text-sm text-gray-700">
+                                            {{ $conductor->name }} ({{ $conductor->employee_id }})
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @error('conductors')
+                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
                         <div class="mb-4">
                             <label for="image" class="block text-sm font-medium text-gray-700">Bus Image</label>
                             <input type="file" name="image" id="image" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">

@@ -28,4 +28,14 @@ class Bus extends Model implements HasMedia
     {
         return $this->belongsToMany(Facility::class);
     }
+
+    public function drivers()
+    {
+        return $this->belongsToMany(Driver::class);
+    }
+
+    public function conductors()
+    {
+        return $this->belongsToMany(Conductor::class);
+    }
 }

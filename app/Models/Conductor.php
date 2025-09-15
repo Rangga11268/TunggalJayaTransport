@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Driver extends Model
+class Conductor extends Model
 {
     protected $fillable = [
         'name',
         'employee_id',
-        'license_number',
         'phone',
         'email',
         'address',

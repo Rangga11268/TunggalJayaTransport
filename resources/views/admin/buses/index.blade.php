@@ -26,6 +26,8 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plate Number</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacity</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Drivers</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conductors</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
@@ -54,6 +56,28 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ $bus->capacity }}
                                         </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            @if($bus->drivers->count() > 0)
+                                                <ul class="list-disc list-inside">
+                                                    @foreach($bus->drivers as $driver)
+                                                        <li>{{ $driver->name }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            @else
+                                                <span class="text-gray-400">No drivers assigned</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            @if($bus->conductors->count() > 0)
+                                                <ul class="list-disc list-inside">
+                                                    @foreach($bus->conductors as $conductor)
+                                                        <li>{{ $conductor->name }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            @else
+                                                <span class="text-gray-400">No conductors assigned</span>
+                                            @endif
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($bus->status === 'active')
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
@@ -70,6 +94,7 @@
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="{{ route('admin.buses.show', $bus) }}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
                                             <a href="{{ route('admin.buses.edit', $bus) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
                                             <form id="delete-form-{{ $bus->id }}" action="{{ route('admin.buses.destroy', $bus) }}" method="POST" class="inline">
                                                 @csrf
@@ -80,7 +105,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                                        <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">
                                             No buses found.
                                         </td>
                                     </tr>

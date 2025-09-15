@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bus;
+use App\Models\Driver;
+use App\Models\Conductor;
 use Illuminate\Http\Request;
 
 class BusController extends Controller
@@ -13,7 +15,7 @@ class BusController extends Controller
      */
     public function index()
     {
-        $buses = Bus::latest()->paginate(10);
+        $buses = Bus::with(['drivers', 'conductors'])->latest()->paginate(10);
         return view('admin.buses.index', compact('buses'));
     }
 
@@ -22,7 +24,9 @@ class BusController extends Controller
      */
     public function create()
     {
-        return view('admin.buses.create');
+        $drivers = Driver::where('status', 'active')->get();
+        $conductors = Conductor::where('status', 'active')->get();
+        return view('admin.buses.create', compact('drivers', 'conductors'));
     }
 
     /**
@@ -37,10 +41,24 @@ class BusController extends Controller
             'capacity' => 'required|integer|min:1',
             'description' => 'nullable|string',
             'status' => 'required|in:active,maintenance,inactive',
+            'drivers' => 'nullable|array',
+            'drivers.*' => 'exists:drivers,id',
+            'conductors' => 'nullable|array',
+            'conductors.*' => 'exists:conductors,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $bus = Bus::create($request->except('image'));
+        $bus = Bus::create($request->except('image', 'drivers', 'conductors'));
+
+        // Sync drivers
+        if ($request->has('drivers')) {
+            $bus->drivers()->sync($request->input('drivers'));
+        }
+
+        // Sync conductors
+        if ($request->has('conductors')) {
+            $bus->conductors()->sync($request->input('conductors'));
+        }
 
         if ($request->hasFile('image')) {
             $bus->addMediaFromRequest('image')->toMediaCollection('buses');
@@ -54,7 +72,7 @@ class BusController extends Controller
      */
     public function show(string $id)
     {
-        $bus = Bus::findOrFail($id);
+        $bus = Bus::with(['drivers', 'conductors'])->findOrFail($id);
         return view('admin.buses.show', compact('bus'));
     }
 
@@ -63,8 +81,10 @@ class BusController extends Controller
      */
     public function edit(string $id)
     {
-        $bus = Bus::findOrFail($id);
-        return view('admin.buses.edit', compact('bus'));
+        $bus = Bus::with(['drivers', 'conductors'])->findOrFail($id);
+        $drivers = Driver::where('status', 'active')->get();
+        $conductors = Conductor::where('status', 'active')->get();
+        return view('admin.buses.edit', compact('bus', 'drivers', 'conductors'));
     }
 
     /**
@@ -81,10 +101,28 @@ class BusController extends Controller
             'capacity' => 'required|integer|min:1',
             'description' => 'nullable|string',
             'status' => 'required|in:active,maintenance,inactive',
+            'drivers' => 'nullable|array',
+            'drivers.*' => 'exists:drivers,id',
+            'conductors' => 'nullable|array',
+            'conductors.*' => 'exists:conductors,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $bus->update($request->except('image'));
+        $bus->update($request->except('image', 'drivers', 'conductors'));
+
+        // Sync drivers
+        if ($request->has('drivers')) {
+            $bus->drivers()->sync($request->input('drivers'));
+        } else {
+            $bus->drivers()->detach();
+        }
+
+        // Sync conductors
+        if ($request->has('conductors')) {
+            $bus->conductors()->sync($request->input('conductors'));
+        } else {
+            $bus->conductors()->detach();
+        }
 
         if ($request->hasFile('image')) {
             // Remove old image if exists
