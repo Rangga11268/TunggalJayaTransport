@@ -9,8 +9,14 @@
         <h2 class="text-xl font-bold mb-4">Bus Gallery</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($buses as $bus)
-            <div class="border rounded-lg overflow-hidden">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
+            <div class="border rounded-lg overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1">
+                @if($bus->getFirstMediaUrl('buses'))
+                    <img src="{{ $bus->getFirstMediaUrl('buses') }}" alt="{{ $bus->name }}" class="w-full h-48 object-cover">
+                @else
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48 flex items-center justify-center">
+                        <span class="text-gray-500">No Image Available</span>
+                    </div>
+                @endif
                 <div class="p-4">
                     <h3 class="text-lg font-bold">{{ $bus->name ?? $bus->bus_type }}</h3>
                     <p class="text-gray-600">Capacity: {{ $bus->capacity }} seats</p>

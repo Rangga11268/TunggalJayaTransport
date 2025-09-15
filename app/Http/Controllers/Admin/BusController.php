@@ -37,9 +37,14 @@ class BusController extends Controller
             'capacity' => 'required|integer|min:1',
             'description' => 'nullable|string',
             'status' => 'required|in:active,maintenance,inactive',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Bus::create($request->all());
+        $bus = Bus::create($request->except('image'));
+
+        if ($request->hasFile('image')) {
+            $bus->addMediaFromRequest('image')->toMediaCollection('buses');
+        }
 
         return redirect()->route('admin.buses.index')->with('create_success', 'Bus berhasil dibuat.');
     }
@@ -76,9 +81,17 @@ class BusController extends Controller
             'capacity' => 'required|integer|min:1',
             'description' => 'nullable|string',
             'status' => 'required|in:active,maintenance,inactive',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $bus->update($request->all());
+        $bus->update($request->except('image'));
+
+        if ($request->hasFile('image')) {
+            // Remove old image if exists
+            $bus->clearMediaCollection('buses');
+            // Add new image
+            $bus->addMediaFromRequest('image')->toMediaCollection('buses');
+        }
 
         return redirect()->route('admin.buses.index')->with('update_success', 'Bus berhasil diperbarui.');
     }

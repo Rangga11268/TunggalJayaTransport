@@ -11,28 +11,38 @@ class BookingController extends Controller
 {
     public function index(Request $request)
     {
+        // Get all unique origins and destinations for the dropdowns
+        $origins = BusRoute::pluck('origin')->unique()->values();
+        $destinations = BusRoute::pluck('destination')->unique()->values();
+        
         $origin = $request->get('origin');
         $destination = $request->get('destination');
         $date = $request->get('date');
         
         $schedules = collect();
+        $validPair = false;
         
         if ($origin && $destination) {
-            // Find routes that match the origin and destination
-            $routes = BusRoute::where('origin', $origin)
-                ->where('destination', $destination)
-                ->get();
-                
-            if ($routes->count() > 0) {
+            // Check if this is a valid route pair (in either direction)
+            $validRoutes = BusRoute::where(function($query) use ($origin, $destination) {
+                $query->where('origin', $origin)
+                      ->where('destination', $destination);
+            })->orWhere(function($query) use ($origin, $destination) {
+                $query->where('origin', $destination)
+                      ->where('destination', $origin);
+            })->get();
+            
+            if ($validRoutes->count() > 0) {
+                $validPair = true;
                 // Get schedules for these routes
-                $routeIds = $routes->pluck('id');
+                $routeIds = $validRoutes->pluck('id');
                 $schedules = Schedule::whereIn('route_id', $routeIds)
                     ->with('route', 'bus')
                     ->get();
             }
         }
         
-        return view('frontend.booking.index', compact('schedules'));
+        return view('frontend.booking.index', compact('schedules', 'origins', 'destinations', 'validPair', 'origin', 'destination'));
     }
     
     public function show($id)

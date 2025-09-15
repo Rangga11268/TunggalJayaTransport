@@ -12,18 +12,18 @@
                 <label for="origin" class="block text-sm font-medium text-gray-700">Origin</label>
                 <select id="origin" name="origin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                     <option value="">Select Origin</option>
-                    <option value="Jakarta" {{ request()->get('origin') == 'Jakarta' ? 'selected' : '' }}>Jakarta</option>
-                    <option value="Bandung" {{ request()->get('origin') == 'Bandung' ? 'selected' : '' }}>Bandung</option>
-                    <option value="Surabaya" {{ request()->get('origin') == 'Surabaya' ? 'selected' : '' }}>Surabaya</option>
+                    @foreach($origins as $originOption)
+                        <option value="{{ $originOption }}" {{ request()->get('origin') == $originOption ? 'selected' : '' }}>{{ $originOption }}</option>
+                    @endforeach
                 </select>
             </div>
             <div>
                 <label for="destination" class="block text-sm font-medium text-gray-700">Destination</label>
                 <select id="destination" name="destination" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                     <option value="">Select Destination</option>
-                    <option value="Jakarta" {{ request()->get('destination') == 'Jakarta' ? 'selected' : '' }}>Jakarta</option>
-                    <option value="Bandung" {{ request()->get('destination') == 'Bandung' ? 'selected' : '' }}>Bandung</option>
-                    <option value="Surabaya" {{ request()->get('destination') == 'Surabaya' ? 'selected' : '' }}>Surabaya</option>
+                    @foreach($destinations as $destinationOption)
+                        <option value="{{ $destinationOption }}" {{ request()->get('destination') == $destinationOption ? 'selected' : '' }}>{{ $destinationOption }}</option>
+                    @endforeach
                 </select>
             </div>
             <div>
@@ -42,7 +42,12 @@
     @if(request()->has('origin') && request()->has('destination'))
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 class="text-xl font-bold mb-4">Available Schedules</h2>
-        @if(isset($schedules) && $schedules->count() > 0)
+        @if(isset($validPair) && !$validPair)
+        <div class="text-center py-4">
+            <p class="text-red-600 font-bold">No routes available between {{ request()->get('origin') }} and {{ request()->get('destination') }}.</p>
+            <p class="text-gray-600 mt-2">Please select a different origin/destination combination.</p>
+        </div>
+        @elseif(isset($schedules) && $schedules->count() > 0)
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">

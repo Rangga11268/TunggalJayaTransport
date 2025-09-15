@@ -72,6 +72,13 @@
                             @else
                                 <p class="text-gray-500 italic">No description provided.</p>
                             @endif
+                            
+                            @if($bus->getFirstMediaUrl('buses'))
+                                <div class="mt-4">
+                                    <h3 class="text-lg font-medium mb-2">Bus Image</h3>
+                                    <img src="{{ $bus->getFirstMediaUrl('buses') }}" alt="Bus Image" class="w-full max-w-md h-auto rounded-lg shadow">
+                                </div>
+                            @endif
                         </div>
                     </div>
                     
