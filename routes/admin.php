@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\DriverController;
+use App\Http\Controllers\Admin\ConductorController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SettingController;
@@ -40,6 +41,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     
     // Driver Management
     Route::resource('drivers', DriverController::class);
+    
+    // Conductor Management
+    Route::resource('conductors', ConductorController::class);
     
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

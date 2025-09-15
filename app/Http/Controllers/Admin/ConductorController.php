@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Driver;
+use App\Models\Conductor;
 use Illuminate\Http\Request;
 
-class DriverController extends Controller
+class ConductorController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $drivers = Driver::latest()->paginate(10);
-        return view('admin.drivers.index', compact('drivers'));
+        $conductors = Conductor::latest()->paginate(10);
+        return view('admin.conductors.index', compact('conductors'));
     }
 
     /**
@@ -22,7 +22,7 @@ class DriverController extends Controller
      */
     public function create()
     {
-        return view('admin.drivers.create');
+        return view('admin.conductors.create');
     }
 
     /**
@@ -32,8 +32,7 @@ class DriverController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'employee_id' => 'required|string|unique:drivers',
-            'license_number' => 'required|string|unique:drivers',
+            'employee_id' => 'required|string|unique:conductors',
             'phone' => 'required|string|max:20',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
@@ -41,13 +40,13 @@ class DriverController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $driver = Driver::create($request->except('image'));
+        $conductor = Conductor::create($request->except('image'));
 
         if ($request->hasFile('image')) {
-            $driver->addMediaFromRequest('image')->toMediaCollection('drivers');
+            $conductor->addMediaFromRequest('image')->toMediaCollection('conductors');
         }
 
-        return redirect()->route('admin.drivers.index')->with('create_success', 'Driver berhasil dibuat.');
+        return redirect()->route('admin.conductors.index')->with('create_success', 'Conductor berhasil dibuat.');
     }
 
     /**
@@ -55,8 +54,8 @@ class DriverController extends Controller
      */
     public function show(string $id)
     {
-        $driver = Driver::findOrFail($id);
-        return view('admin.drivers.show', compact('driver'));
+        $conductor = Conductor::findOrFail($id);
+        return view('admin.conductors.show', compact('conductor'));
     }
 
     /**
@@ -64,8 +63,8 @@ class DriverController extends Controller
      */
     public function edit(string $id)
     {
-        $driver = Driver::findOrFail($id);
-        return view('admin.drivers.edit', compact('driver'));
+        $conductor = Conductor::findOrFail($id);
+        return view('admin.conductors.edit', compact('conductor'));
     }
 
     /**
@@ -73,12 +72,11 @@ class DriverController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $driver = Driver::findOrFail($id);
+        $conductor = Conductor::findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'employee_id' => 'required|string|unique:drivers,employee_id,' . $driver->id,
-            'license_number' => 'required|string|unique:drivers,license_number,' . $driver->id,
+            'employee_id' => 'required|string|unique:conductors,employee_id,' . $conductor->id,
             'phone' => 'required|string|max:20',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
@@ -86,16 +84,16 @@ class DriverController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $driver->update($request->except('image'));
+        $conductor->update($request->except('image'));
 
         if ($request->hasFile('image')) {
             // Remove old image if exists
-            $driver->clearMediaCollection('drivers');
+            $conductor->clearMediaCollection('conductors');
             // Add new image
-            $driver->addMediaFromRequest('image')->toMediaCollection('drivers');
+            $conductor->addMediaFromRequest('image')->toMediaCollection('conductors');
         }
 
-        return redirect()->route('admin.drivers.index')->with('update_success', 'Driver berhasil diperbarui.');
+        return redirect()->route('admin.conductors.index')->with('update_success', 'Conductor berhasil diperbarui.');
     }
 
     /**
@@ -103,9 +101,9 @@ class DriverController extends Controller
      */
     public function destroy(string $id)
     {
-        $driver = Driver::findOrFail($id);
-        $driver->delete();
+        $conductor = Conductor::findOrFail($id);
+        $conductor->delete();
 
-        return redirect()->route('admin.drivers.index')->with('delete_success', 'Driver berhasil dihapus.');
+        return redirect()->route('admin.conductors.index')->with('delete_success', 'Conductor berhasil dihapus.');
     }
 }

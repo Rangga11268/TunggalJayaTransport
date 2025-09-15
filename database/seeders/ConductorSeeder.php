@@ -46,6 +46,22 @@ class ConductorSeeder extends Seeder
                 'address' => 'Jalan Gatot Subroto No. 321, Medan',
                 'status' => 'inactive',
             ],
+            [
+                'name' => 'Siti Nurhaliza',
+                'employee_id' => 'CNT005',
+                'phone' => '081234567895',
+                'email' => 'siti.nurhaliza@example.com',
+                'address' => 'Jalan Diponegoro No. 159, Yogyakarta',
+                'status' => 'active',
+            ],
+            [
+                'name' => 'Rudi Hartono',
+                'employee_id' => 'CNT006',
+                'phone' => '081234567896',
+                'email' => 'rudi.hartono@example.com',
+                'address' => 'Jalan Asia Afrika No. 258, Bandung',
+                'status' => 'active',
+            ],
         ];
 
         foreach ($conductors as $conductor) {

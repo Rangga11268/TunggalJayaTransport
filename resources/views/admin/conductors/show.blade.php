@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Driver Details') }}
+            {{ __('Conductor Details') }}
         </h2>
     </x-slot>
 
@@ -10,12 +10,12 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold">Driver Information</h3>
+                        <h3 class="text-lg font-bold">Conductor Information</h3>
                         <div>
-                            <a href="{{ route('admin.drivers.edit', $driver) }}" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2">
+                            <a href="{{ route('admin.conductors.edit', $conductor) }}" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2">
                                 Edit
                             </a>
-                            <a href="{{ route('admin.drivers.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            <a href="{{ route('admin.conductors.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                                 Back
                             </a>
                         </div>
@@ -26,8 +26,8 @@
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Photo</label>
                                 <div class="mt-1">
-                                    @if($driver->getFirstMediaUrl('drivers'))
-                                        <img src="{{ $driver->getFirstMediaUrl('drivers') }}" alt="Driver Photo" class="w-48 h-48 object-cover rounded">
+                                    @if($conductor->getFirstMediaUrl('conductors'))
+                                        <img src="{{ $conductor->getFirstMediaUrl('conductors') }}" alt="Conductor Photo" class="w-48 h-48 object-cover rounded">
                                     @else
                                         <div class="w-48 h-48 bg-gray-200 rounded flex items-center justify-center">
                                             <span class="text-gray-500">No Image</span>
@@ -40,38 +40,38 @@
                         <div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Full Name</label>
-                                <div class="mt-1 text-lg">{{ $driver->name }}</div>
+                                <div class="mt-1 text-lg">{{ $conductor->name }}</div>
                             </div>
 
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Employee ID</label>
-                                <div class="mt-1 text-lg">{{ $driver->employee_id }}</div>
+                                <div class="mt-1 text-lg">{{ $conductor->employee_id }}</div>
                             </div>
 
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">License Number</label>
-                                <div class="mt-1 text-lg">{{ $driver->license_number }}</div>
+                                <div class="mt-1 text-lg">{{ $conductor->license_number ?? '-' }}</div>
                             </div>
 
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Phone Number</label>
-                                <div class="mt-1 text-lg">{{ $driver->phone }}</div>
+                                <div class="mt-1 text-lg">{{ $conductor->phone }}</div>
                             </div>
 
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Email Address</label>
-                                <div class="mt-1 text-lg">{{ $driver->email ?? '-' }}</div>
+                                <div class="mt-1 text-lg">{{ $conductor->email ?? '-' }}</div>
                             </div>
 
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Address</label>
-                                <div class="mt-1 text-lg">{{ $driver->address ?? '-' }}</div>
+                                <div class="mt-1 text-lg">{{ $conductor->address ?? '-' }}</div>
                             </div>
 
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Status</label>
                                 <div class="mt-1">
-                                    @if($driver->status === 'active')
+                                    @if($conductor->status === 'active')
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                             Active
                                         </span>
@@ -85,18 +85,18 @@
 
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Created At</label>
-                                <div class="mt-1 text-lg">{{ $driver->created_at->format('d M Y H:i') }}</div>
+                                <div class="mt-1 text-lg">{{ $conductor->created_at->format('d M Y H:i') }}</div>
                             </div>
 
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Last Updated</label>
-                                <div class="mt-1 text-lg">{{ $driver->updated_at->format('d M Y H:i') }}</div>
+                                <div class="mt-1 text-lg">{{ $conductor->updated_at->format('d M Y H:i') }}</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Assigned Buses -->
-                    @if($driver->buses->count() > 0)
+                    @if($conductor->buses->count() > 0)
                     <div class="mt-8">
                         <h4 class="text-md font-bold mb-4">Assigned Buses</h4>
                         <div class="overflow-x-auto">
@@ -110,7 +110,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($driver->buses as $bus)
+                                    @foreach($conductor->buses as $bus)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                             {{ $bus->name }}

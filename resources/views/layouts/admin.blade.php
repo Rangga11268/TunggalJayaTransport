@@ -14,15 +14,15 @@
      }">
     <!-- Sidebar - Hidden on mobile by default -->
     <div :class="{
-            'w-64': sidebarOpen && window.innerWidth >= 1024,
-            'w-0': !sidebarOpen && window.innerWidth >= 1024,
+            'w-64': sidebarOpen && window.innerWidth >= 1024, 
+            'w-20': !sidebarOpen && window.innerWidth >= 1024,
             'w-64 absolute inset-y-0 left-0 transform transition duration-300 ease-in-out z-30': sidebarOpen && window.innerWidth < 1024,
             'w-0 absolute inset-y-0 left-0 transform -translate-x-full transition duration-300 ease-in-out z-30': !sidebarOpen && window.innerWidth < 1024
          }" 
          class="bg-gradient-to-b from-gray-800 to-gray-900 text-white min-h-screen shadow-xl">
         <div class="p-4 flex items-center justify-between border-b border-gray-700">
             <h1 :class="{
-                    'block': sidebarOpen,
+                    'block': sidebarOpen, 
                     'hidden': !sidebarOpen
                 }" 
                 class="text-xl font-bold whitespace-nowrap transition-opacity duration-300">Panel Admin</h1>
@@ -38,7 +38,7 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-tachometer-alt text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Dashboard</span>
@@ -47,7 +47,7 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.news.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-newspaper text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Manajemen Berita</span>
@@ -56,7 +56,7 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.categories.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-tags text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Manajemen Kategori</span>
@@ -65,7 +65,7 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.buses.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-bus text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Manajemen Bus</span>
@@ -74,7 +74,7 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.routes.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-route text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Manajemen Rute</span>
@@ -83,7 +83,7 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedules.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-calendar-alt text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Manajemen Jadwal</span>
@@ -92,7 +92,7 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.bookings.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-ticket-alt text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Manajemen Pemesanan</span>
@@ -101,7 +101,7 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.users.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-users text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Manajemen Pengguna</span>
@@ -110,7 +110,7 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.facilities.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-concierge-bell text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Manajemen Fasilitas</span>
@@ -119,16 +119,25 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.drivers.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-id-card text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Manajemen Driver</span>
+                </a>
+                <a href="{{ route('admin.conductors.index') }}"
+                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.conductors.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                    <i class="fas fa-user-tie text-lg w-6"></i> 
+                    <span :class="{
+                            'ml-3 inline': sidebarOpen, 
+                            'hidden': !sidebarOpen
+                        }" 
+                        class="transition-opacity duration-300">Manajemen Conductor</span>
                 </a>
                 <a href="{{ route('admin.reports.index') }}"
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.reports.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-chart-bar text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Laporan</span>
@@ -137,7 +146,7 @@
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.settings.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-cog text-lg w-6"></i> 
                     <span :class="{
-                            'ml-3 inline': sidebarOpen,
+                            'ml-3 inline': sidebarOpen, 
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Pengaturan</span>
