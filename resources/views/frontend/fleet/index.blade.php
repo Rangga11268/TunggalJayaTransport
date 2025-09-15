@@ -29,22 +29,23 @@
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 class="text-xl font-bold mb-4">Facilities</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            @forelse($facilities as $facility)
             <div class="text-center">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-2"></div>
-                <h3 class="text-lg font-bold">Air Conditioning</h3>
+                @if($facility->icon)
+                    <i class="{{ $facility->icon }} text-4xl text-blue-500 mx-auto mb-2"></i>
+                @else
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-2"></div>
+                @endif
+                <h3 class="text-lg font-bold">{{ $facility->name }}</h3>
+                @if($facility->description)
+                    <p class="text-gray-600 text-sm">{{ $facility->description }}</p>
+                @endif
             </div>
-            <div class="text-center">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-2"></div>
-                <h3 class="text-lg font-bold">Wi-Fi</h3>
+            @empty
+            <div class="col-span-4">
+                <p class="text-gray-600 text-center">No facilities available at the moment.</p>
             </div>
-            <div class="text-center">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-2"></div>
-                <h3 class="text-lg font-bold">Entertainment</h3>
-            </div>
-            <div class="text-center">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-2"></div>
-                <h3 class="text-lg font-bold">Restroom</h3>
-            </div>
+            @endforelse
         </div>
     </div>
 </div>

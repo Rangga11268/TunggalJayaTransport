@@ -12,7 +12,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="text-3xl font-bold text-blue-500">128</div>
+                            <div class="text-3xl font-bold text-blue-500">{{ $totalBookings }}</div>
                             <div class="ml-4 text-gray-500">Total Bookings</div>
                         </div>
                     </div>
@@ -20,7 +20,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="text-3xl font-bold text-green-500">Rp. 245M</div>
+                            <div class="text-3xl font-bold text-green-500">{{ $formattedRevenue }}</div>
                             <div class="ml-4 text-gray-500">Revenue</div>
                         </div>
                     </div>
@@ -28,7 +28,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="text-3xl font-bold text-yellow-500">42</div>
+                            <div class="text-3xl font-bold text-yellow-500">{{ $activeRoutes }}</div>
                             <div class="ml-4 text-gray-500">Active Routes</div>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="text-3xl font-bold text-purple-500">1,248</div>
+                            <div class="text-3xl font-bold text-purple-500">{{ $registeredUsers }}</div>
                             <div class="ml-4 text-gray-500">Registered Users</div>
                         </div>
                     </div>
@@ -57,39 +57,25 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
+                                @forelse($recentActivities as $activity)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">New booking created</div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $activity['description'] }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">John Doe</div>
+                                        <div class="text-sm text-gray-900">{{ $activity['user'] }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        2 minutes ago
+                                        {{ $activity['time'] }}
                                     </td>
                                 </tr>
+                                @empty
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">News article published</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">Admin User</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        1 hour ago
+                                    <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                                        No recent activities found.
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">Bus schedule updated</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">Manager User</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        3 hours ago
-                                    </td>
-                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
