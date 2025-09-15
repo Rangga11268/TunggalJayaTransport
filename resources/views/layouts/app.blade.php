@@ -28,8 +28,6 @@
                 </div>
             </header>
         @endisset
-
-
     </div>
 
     <!-- Alpine.js for interactivity -->

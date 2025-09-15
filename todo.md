@@ -1,6 +1,5 @@
 ## TODO LIST
 
--- Tambah sweetalert2 pada admin panel saat crud
--- Optimize website agar tidak lambat hindari masalah n+1
--- Buat UI Frontend jadi lebih baik bisa gunakan library yang tersedia
--- Dan buat semua crud di dalam modal box saja
+-- footer nya juga di perbaiki dan lebih baik dan responsive
+-- di bagian fleet tambahkan our drivers berisi data supir 
+-- dan tambahkan pada crud yaitu sopir dan bus berelasi jadi kalau add data bus bisa pilih supir dan kernet serta kondektur nya siapa aja 
