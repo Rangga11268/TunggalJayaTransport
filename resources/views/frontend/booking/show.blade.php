@@ -26,39 +26,37 @@
     
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 class="text-xl font-bold mb-4">Passenger Information</h2>
-        <form class="space-y-4">
+        <form method="POST" action="{{ route('frontend.booking.store') }}" class="space-y-4">
+            @csrf
+            <input type="hidden" name="schedule_id" value="{{ $schedule->id }}">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                    <input type="text" id="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <label for="passenger_name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" id="passenger_name" name="passenger_name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                 </div>
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                    <input type="email" id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <label for="passenger_email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                    <input type="email" id="passenger_email" name="passenger_email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                    <input type="tel" id="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <label for="passenger_phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <input type="tel" id="passenger_phone" name="passenger_phone" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                 </div>
                 <div>
-                    <label for="id_number" class="block text-sm font-medium text-gray-700">ID Number</label>
-                    <input type="text" id="id_number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <label for="number_of_seats" class="block text-sm font-medium text-gray-700">Number of Seats</label>
+                    <select id="number_of_seats" name="number_of_seats" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
                 </div>
-            </div>
-            <div>
-                <label for="seats" class="block text-sm font-medium text-gray-700">Number of Seats</label>
-                <select id="seats" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                </select>
             </div>
             <div class="flex items-center">
-                <input type="checkbox" id="terms" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                <input type="checkbox" id="terms" name="terms" required class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                 <label for="terms" class="ml-2 block text-sm text-gray-900">
                     I agree to the <a href="#" class="text-blue-500 hover:underline">Terms and Conditions</a>
                 </label>

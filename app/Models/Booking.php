@@ -17,7 +17,7 @@ class Booking extends Model implements HasMedia
         'passenger_name',
         'passenger_phone',
         'passenger_email',
-        'seat_number',
+        'seat_numbers',
         'total_price',
         'payment_status',
         'booking_status',

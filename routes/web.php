@@ -14,10 +14,12 @@ Route::prefix('')->name('frontend.')->group(function () {
     Route::prefix('booking')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\BookingController::class, 'index'])->name('booking.index');
         Route::get('/{id}', [App\Http\Controllers\Frontend\BookingController::class, 'show'])->name('booking.show');
+        Route::post('/', [App\Http\Controllers\Frontend\BookingController::class, 'store'])->name('booking.store');
+        Route::post('/select-seats', [App\Http\Controllers\Frontend\BookingController::class, 'selectSeats'])->name('booking.select-seats');
+        Route::post('/process-payment', [App\Http\Controllers\Frontend\BookingController::class, 'processPayment'])->name('booking.process-payment');
         
-        Route::get('/confirmation', function () {
-            return view('frontend.booking.confirmation');
-        })->name('booking.confirmation');
+        Route::get('/confirmation/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'confirmation'])->name('booking.confirmation');
+        Route::get('/success/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'success'])->name('booking.success');
     });
 
     Route::get('/routes', [App\Http\Controllers\Frontend\RouteController::class, 'index'])->name('routes.index');
