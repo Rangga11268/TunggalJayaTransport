@@ -30,7 +30,7 @@
     <div :class="{
             'w-64 lg:block lg:relative': sidebarOpen && window.innerWidth >= 1024, 
             'w-20 lg:block lg:relative': !sidebarOpen && window.innerWidth >= 1024,
-            'w-64 relative z-30 block': sidebarOpen && window.innerWidth < 1024,
+            'w-64 fixed z-30 block': sidebarOpen && window.innerWidth < 1024,
             'w-0 hidden': !sidebarOpen && window.innerWidth < 1024
          }" 
          class="bg-gradient-to-b from-gray-800 to-gray-900 text-white min-h-screen shadow-xl flex-shrink-0 flex flex-col">
