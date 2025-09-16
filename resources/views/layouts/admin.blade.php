@@ -1,4 +1,8 @@
 <div class="flex min-h-screen"
+     :class="{
+        'flex-col': window.innerWidth < 1024 && sidebarOpen,
+        'flex-row': window.innerWidth >= 1024 || !sidebarOpen
+     }"
      x-data="{
         sidebarOpen: window.innerWidth >= 1024,
         init() {
@@ -26,11 +30,11 @@
     <div :class="{
             'w-64 lg:block lg:relative': sidebarOpen && window.innerWidth >= 1024, 
             'w-20 lg:block lg:relative': !sidebarOpen && window.innerWidth >= 1024,
-            'w-64 absolute inset-y-0 left-0 transform transition duration-300 ease-in-out z-30': sidebarOpen && window.innerWidth < 1024,
-            'w-0 absolute inset-y-0 left-0 transform -translate-x-full transition duration-300 ease-in-out z-30': !sidebarOpen && window.innerWidth < 1024
+            'w-64 relative z-30 block': sidebarOpen && window.innerWidth < 1024,
+            'w-0 hidden': !sidebarOpen && window.innerWidth < 1024
          }" 
-         class="bg-gradient-to-b from-gray-800 to-gray-900 text-white min-h-screen shadow-xl flex-shrink-0">
-        <div class="p-4 flex items-center justify-between border-b border-gray-700">
+         class="bg-gradient-to-b from-gray-800 to-gray-900 text-white min-h-screen shadow-xl flex-shrink-0 flex flex-col">
+        <div class="p-4 flex items-center justify-between border-b border-gray-700 flex-shrink-0">
             <h1 :class="{
                     'block': sidebarOpen, 
                     'hidden': !sidebarOpen
@@ -42,7 +46,7 @@
             </button>
         </div>
         <!-- Scrollable sidebar content -->
-        <div class="overflow-y-auto" style="max-height: calc(100vh - 64px);">
+        <div class="overflow-y-auto flex-1">
             <nav class="mt-5 px-2 pb-4">
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
@@ -177,18 +181,22 @@
     <!-- Overlay for mobile sidebar -->
     <div x-show="sidebarOpen && window.innerWidth < 1024" 
          @click="sidebarOpen = false" 
-         class="fixed inset-0 z-20 bg-black bg-opacity-50"></div>
+         class="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden"></div>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col min-h-0 w-full">
+    <div class="flex-1 flex flex-col min-h-0 w-full"
+         :class="{
+            'lg:ml-0': window.innerWidth >= 1024,
+            'ml-0': window.innerWidth < 1024
+         }">
         <!-- Top Navigation -->
-        <nav class="bg-white shadow-sm z-10 sticky top-0">
+        <nav class="bg-white shadow-sm z-10 sticky top-0 flex-shrink-0">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex items-center">
                         <!-- Single hamburger menu button for both sidebar and mobile menu -->
                         <button @click="sidebarOpen = !sidebarOpen" 
-                                class="text-gray-500 hover:text-gray-700 focus:outline-none mr-2">
+                                class="text-gray-500 hover:text-gray-700 focus:outline-none mr-2 lg:hidden">
                             <i class="fas fa-bars text-xl"></i>
                         </button>
                         
