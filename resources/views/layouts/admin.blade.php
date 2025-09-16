@@ -3,37 +3,32 @@
         'flex-col': window.innerWidth < 1024 && sidebarOpen,
         'flex-row': window.innerWidth >= 1024 || !sidebarOpen
      }"
-     x-data="{
-        sidebarOpen: window.innerWidth >= 1024,
-        init() {
-            // Listen for window resize events
-            const handleResize = () => {
-                if (window.innerWidth >= 1024) {
-                    this.sidebarOpen = true;
-                } else {
-                    this.sidebarOpen = false;
-                }
-            };
-            
-            // Initial check
-            handleResize();
-            
-            // Listen for window resize events with debounce
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(handleResize, 250);
-            });
-        }
+     x-data="{ sidebarOpen: window.innerWidth >= 1024 }"
+     x-init="() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1024) {
+                sidebarOpen = true;
+            } else {
+                sidebarOpen = false;
+            }
+        };
+        
+        handleResize();
+        
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(handleResize, 250);
+        });
      }">
     <!-- Sidebar - Hidden on mobile by default -->
     <div :class="{
             'w-64 lg:block lg:relative': sidebarOpen && window.innerWidth >= 1024, 
             'w-20 lg:block lg:relative': !sidebarOpen && window.innerWidth >= 1024,
-            'w-64 fixed z-30 block': sidebarOpen && window.innerWidth < 1024,
+            'w-64 fixed z-30 block mobile-sidebar-fixed': sidebarOpen && window.innerWidth < 1024,
             'w-0 hidden': !sidebarOpen && window.innerWidth < 1024
          }" 
-         class="bg-gradient-to-b from-gray-800 to-gray-900 text-white min-h-screen shadow-xl flex-shrink-0 flex flex-col">
+         class="bg-gradient-to-b from-gray-800 to-gray-900 text-white min-h-screen shadow-xl flex-shrink-0 flex flex-col sidebar mobile-sidebar-container">
         <div class="p-4 flex items-center justify-between border-b border-gray-700 flex-shrink-0">
             <h1 :class="{
                     'block': sidebarOpen, 
@@ -46,7 +41,7 @@
             </button>
         </div>
         <!-- Scrollable sidebar content -->
-        <div class="overflow-y-auto flex-1">
+        <div class="overflow-y-auto flex-1 mobile-sidebar-scrollable">
             <nav class="mt-5 px-2 pb-4">
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
@@ -181,7 +176,8 @@
     <!-- Overlay for mobile sidebar -->
     <div x-show="sidebarOpen && window.innerWidth < 1024" 
          @click="sidebarOpen = false" 
-         class="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden"></div>
+         class="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden"
+         x-cloak></div>
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col min-h-0 w-full"
@@ -255,9 +251,7 @@
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6">
             {{ $slot }}
         </main>
-        
-        </div>
-</div>
+    </div>
 
 <!-- Pass success messages to JavaScript -->
 @if(session('create_success'))
@@ -275,5 +269,3 @@
 @if(session('update_success'))
     <div data-update-success-message="{{ session('update_success') }}" style="display: none;"></div>
 @endif
-    </div>
-</div>

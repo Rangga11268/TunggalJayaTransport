@@ -16,6 +16,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
+    <!-- Alpine.js for interactivity -->
+    <script src="//unpkg.com/alpinejs" defer></script>
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/admin.js'])
 </head>
@@ -24,9 +27,6 @@
     <div class="min-h-screen bg-gray-100">
         @include('layouts.admin')
     </div>
-
-    <!-- Alpine.js for interactivity -->
-    <script src="//unpkg.com/alpinejs" defer></script>
 </body>
 
 </html>

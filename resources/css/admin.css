@@ -749,6 +749,60 @@
     min-width: 600px;
 }
 
+/* Mobile sidebar improvements */
+@media (max-width: 1023px) {
+    /* Fix mobile sidebar scrolling */
+    .mobile-sidebar-container {
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden;
+    }
+    
+    .mobile-sidebar-scrollable {
+        height: 100%;
+        max-height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Ensure sidebar content is scrollable on mobile */
+    .sidebar .overflow-y-auto {
+        max-height: calc(100vh - 64px); /* Subtract header height */
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Fix for sidebar overlay */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 20;
+        display: none;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    /* Ensure sidebar has proper z-index */
+    .mobile-sidebar {
+        z-index: 30;
+    }
+    
+    /* Fix for sidebar positioning on mobile */
+    .mobile-sidebar-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        overflow: hidden;
+    }
+}
+
 @media (max-width: 767px) {
     .responsive-table table {
         font-size: 0.875rem;
