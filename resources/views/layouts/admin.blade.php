@@ -1,25 +1,35 @@
-<div class="flex min-h-screen" 
+<div class="flex min-h-screen"
      x-data="{
         sidebarOpen: window.innerWidth >= 1024,
         init() {
             // Listen for window resize events
-            window.addEventListener('resize', () => {
+            const handleResize = () => {
                 if (window.innerWidth >= 1024) {
                     this.sidebarOpen = true;
                 } else {
                     this.sidebarOpen = false;
                 }
+            };
+            
+            // Initial check
+            handleResize();
+            
+            // Listen for window resize events with debounce
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(handleResize, 250);
             });
         }
      }">
     <!-- Sidebar - Hidden on mobile by default -->
     <div :class="{
-            'w-64': sidebarOpen && window.innerWidth >= 1024, 
-            'w-20': !sidebarOpen && window.innerWidth >= 1024,
+            'w-64 lg:block lg:relative': sidebarOpen && window.innerWidth >= 1024, 
+            'w-20 lg:block lg:relative': !sidebarOpen && window.innerWidth >= 1024,
             'w-64 absolute inset-y-0 left-0 transform transition duration-300 ease-in-out z-30': sidebarOpen && window.innerWidth < 1024,
             'w-0 absolute inset-y-0 left-0 transform -translate-x-full transition duration-300 ease-in-out z-30': !sidebarOpen && window.innerWidth < 1024
          }" 
-         class="bg-gradient-to-b from-gray-800 to-gray-900 text-white min-h-screen shadow-xl">
+         class="bg-gradient-to-b from-gray-800 to-gray-900 text-white min-h-screen shadow-xl flex-shrink-0">
         <div class="p-4 flex items-center justify-between border-b border-gray-700">
             <h1 :class="{
                     'block': sidebarOpen, 
@@ -151,6 +161,15 @@
                         }" 
                         class="transition-opacity duration-300">Pengaturan</span>
                 </a>
+                <a href="{{ route('admin.test-sidebar') }}"
+                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.test-sidebar') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                    <i class="fas fa-vial text-lg w-6"></i> 
+                    <span :class="{
+                            'ml-3 inline': sidebarOpen, 
+                            'hidden': !sidebarOpen
+                        }" 
+                        class="transition-opacity duration-300">Test Sidebar</span>
+                </a>
             </nav>
         </div>
     </div>
@@ -221,7 +240,7 @@
         </nav>
 
         <!-- Page Content -->
-        <main class="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-6">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6">
             {{ $slot }}
         </main>
     </div>

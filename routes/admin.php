@@ -18,6 +18,11 @@ use App\Http\Controllers\Admin\SettingController;
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
+    // Test route for sidebar fixes
+    Route::get('/test-sidebar', function () {
+        return view('admin.test-sidebar');
+    })->name('test-sidebar');
+    
     // News Management
     Route::resource('news', NewsController::class);
     

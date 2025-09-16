@@ -115,6 +115,101 @@
     }
 }
 
+/* Sidebar improvements for all screen sizes */
+.sidebar-transition {
+    transition: all 0.3s ease-in-out;
+}
+
+.sidebar-shadow {
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Main content improvements */
+.main-content-transition {
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* Flexbox improvements for responsive layouts */
+.flex-responsive {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .flex-responsive {
+        flex-direction: row;
+    }
+}
+
+/* Ensure proper flex behavior */
+.flex-container {
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.flex-sidebar {
+    flex-shrink: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.flex-main {
+    flex: 1;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* Fix for wide content layouts */
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
+/* Ensure tables don't break layout */
+.table-container {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+/* Fix gap issues between sidebar and content */
+.no-gap {
+    gap: 0;
+}
+
+.sidebar-expanded {
+    width: 16rem;
+}
+
+.sidebar-collapsed {
+    width: 5rem;
+}
+
+.content-expanded {
+    margin-left: 16rem;
+}
+
+.content-collapsed {
+    margin-left: 5rem;
+}
+
+/* Ensure proper alignment on large screens */
+@media (min-width: 1024px) {
+    .sidebar-lg {
+        position: relative;
+        display: block !important;
+    }
+    
+    .content-lg {
+        margin-left: 0;
+    }
+    
+    .sidebar-expanded ~ .content-lg {
+        margin-left: 16rem;
+    }
+    
+    .sidebar-collapsed ~ .content-lg {
+        margin-left: 5rem;
+    }
+}
+
 /* Tablet improvements (768px to 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
     /* Sidebar adjustments for tablet */

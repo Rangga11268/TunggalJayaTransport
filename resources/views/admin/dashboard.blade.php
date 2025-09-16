@@ -84,7 +84,7 @@
 
             <!-- Quick Actions -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
+                <div class="p-6 table-container">
                     <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <a href="{{ route('admin.bookings.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-6 rounded text-center">
