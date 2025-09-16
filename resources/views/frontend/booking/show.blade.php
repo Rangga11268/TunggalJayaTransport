@@ -19,6 +19,7 @@
                 <p class="text-gray-600"><strong>Departure:</strong> {{ $schedule->departure_time->format('d M Y H:i') }}</p>
                 <p class="text-gray-600"><strong>Arrival:</strong> {{ $schedule->arrival_time->format('d M Y H:i') }}</p>
                 <p class="text-gray-600"><strong>Bus Type:</strong> {{ $schedule->bus->bus_type ?? 'Standard' }}</p>
+                <p class="text-gray-600"><strong>Available Seats:</strong> {{ $schedule->getAvailableSeatsCount() }} / {{ $schedule->bus->capacity }}</p>
                 <p class="text-gray-600"><strong>Price:</strong> Rp. {{ number_format($schedule->price, 0, ',', '.') }}</p>
             </div>
         </div>

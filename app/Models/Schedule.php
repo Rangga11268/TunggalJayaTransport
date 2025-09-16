@@ -34,4 +34,41 @@ class Schedule extends Model
     {
         return $this->hasMany(Booking::class);
     }
+    
+    public function getBookedSeatsCount()
+    {
+        // Count seats for confirmed bookings that haven't failed payment
+        return $this->bookings()
+            ->where('booking_status', 'confirmed')
+            ->where('payment_status', '!=', 'failed')
+            ->sum('number_of_seats');
+    }
+    
+    public function getAvailableSeatsCount()
+    {
+        $bookedSeats = $this->getBookedSeatsCount();
+        $available = $this->bus->capacity - $bookedSeats;
+        return max(0, $available);
+    }
+    
+    public function getBookedSeatNumbers()
+    {
+        // Get seat numbers for confirmed bookings that haven't failed payment
+        $bookings = $this->bookings()
+            ->where('booking_status', 'confirmed')
+            ->where('payment_status', '!=', 'failed')
+            ->whereNotNull('seat_numbers')
+            ->pluck('seat_numbers')
+            ->toArray();
+            
+        $seatNumbers = [];
+        foreach ($bookings as $seatString) {
+            if ($seatString) {
+                $seats = explode(',', $seatString);
+                $seatNumbers = array_merge($seatNumbers, $seats);
+            }
+        }
+        
+        return array_map('trim', $seatNumbers);
+    }
 }

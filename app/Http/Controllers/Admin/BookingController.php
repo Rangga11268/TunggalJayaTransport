@@ -36,7 +36,7 @@ class BookingController extends Controller
             'passenger_name' => 'required|string|max:255',
             'passenger_phone' => 'required|string|max:20',
             'passenger_email' => 'required|email|max:255',
-            'seat_number' => 'required|string|max:10',
+            'seat_numbers' => 'required|string|max:255',
             'total_price' => 'required|numeric|min:0',
             'payment_status' => 'required|in:pending,paid,failed,refunded',
             'booking_status' => 'required|in:pending,confirmed,cancelled,completed',
@@ -52,7 +52,7 @@ class BookingController extends Controller
         $booking->passenger_name = $request->passenger_name;
         $booking->passenger_phone = $request->passenger_phone;
         $booking->passenger_email = $request->passenger_email;
-        $booking->seat_number = $request->seat_number;
+        $booking->seat_numbers = $request->seat_numbers;
         $booking->total_price = $request->total_price;
         $booking->payment_status = $request->payment_status;
         $booking->booking_status = $request->booking_status;
@@ -90,7 +90,7 @@ class BookingController extends Controller
             'passenger_name' => 'required|string|max:255',
             'passenger_phone' => 'required|string|max:20',
             'passenger_email' => 'required|email|max:255',
-            'seat_number' => 'required|string|max:10',
+            'seat_numbers' => 'required|string|max:255',
             'total_price' => 'required|numeric|min:0',
             'payment_status' => 'required|in:pending,paid,failed,refunded',
             'booking_status' => 'required|in:pending,confirmed,cancelled,completed',
@@ -99,7 +99,7 @@ class BookingController extends Controller
         $booking->passenger_name = $request->passenger_name;
         $booking->passenger_phone = $request->passenger_phone;
         $booking->passenger_email = $request->passenger_email;
-        $booking->seat_number = $request->seat_number;
+        $booking->seat_numbers = $request->seat_numbers;
         $booking->total_price = $request->total_price;
         $booking->payment_status = $request->payment_status;
         $booking->booking_status = $request->booking_status;

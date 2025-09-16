@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('passenger_name');
             $table->string('passenger_phone');
             $table->string('passenger_email');
-            $table->string('seat_number');
+            $table->string('seat_numbers');
             $table->decimal('total_price', 10, 2);
             $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
             $table->enum('booking_status', ['pending', 'confirmed', 'cancelled', 'completed'])->default('pending');

@@ -70,9 +70,9 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
-                                <label for="seat_number" class="block text-sm font-medium text-gray-700">Seat Number</label>
-                                <input type="text" name="seat_number" id="seat_number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('seat_number') }}" required>
-                                @error('seat_number')
+                                <label for="seat_numbers" class="block text-sm font-medium text-gray-700">Seat Numbers</label>
+                                <input type="text" name="seat_numbers" id="seat_numbers" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('seat_numbers') }}" required>
+                                @error('seat_numbers')
                                     <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                                 @enderror
                             </div>

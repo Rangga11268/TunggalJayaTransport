@@ -22,6 +22,7 @@
                 <p><strong>Email:</strong> {{ $booking->passenger_email }}</p>
                 <p><strong>Phone:</strong> {{ $booking->passenger_phone }}</p>
                 <p><strong>Booking Code:</strong> {{ $booking->booking_code }}</p>
+                <p><strong>Number of Seats:</strong> {{ $booking->number_of_seats }}</p>
                 @if($booking->seat_numbers)
                 <p><strong>Selected Seats:</strong> {{ $booking->seat_numbers }}</p>
                 @endif
@@ -69,6 +70,12 @@
     <!-- Seat Selection -->
     <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-xl font-bold mb-4">Select Your Seat</h2>
+        <div class="mb-4">
+            <p class="text-gray-600">
+                <strong>Available Seats:</strong> 
+                {{ $booking->schedule->getAvailableSeatsCount() }} / {{ $booking->schedule->bus->capacity }}
+            </p>
+        </div>
         <div class="flex flex-col items-center">
             <div class="mb-4">
                 <div class="bg-gray-800 text-white px-4 py-2 rounded-t-lg inline-block">Driver</div>
@@ -111,40 +118,60 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // If seats are already selected, mark them
     @if($booking->seat_numbers)
-        const selectedSeatNumbers = "{{ $booking->seat_numbers }}".split(',');
+        const selectedSeatNumbers = "{{ $booking->seat_numbers }}".split(',').map(Number);
         selectedSeatNumbers.forEach(seatNumber => {
             const seatElement = document.querySelector(`.seat[data-seat="${seatNumber}"]`);
             if (seatElement) {
                 seatElement.classList.remove('bg-green-500');
                 seatElement.classList.add('bg-blue-500');
-                selectedSeats.push(seatNumber);
+                selectedSeats.push(String(seatNumber));
+            }
+        });
+    @endif
+    
+    // Mark occupied seats
+    @if(isset($occupiedSeats))
+        const occupiedSeatNumbers = @json($occupiedSeats);
+        occupiedSeatNumbers.forEach(seatNumber => {
+            const seatElement = document.querySelector(`.seat[data-seat="${seatNumber}"]`);
+            if (seatElement && !seatElement.classList.contains('bg-blue-500')) {
+                seatElement.classList.remove('bg-green-500');
+                seatElement.classList.add('bg-red-500');
+                seatElement.classList.remove('cursor-pointer');
+                seatElement.title = 'This seat is already booked';
             }
         });
     @endif
     
     seats.forEach(seat => {
-        seat.addEventListener('click', function() {
-            const seatNumber = this.getAttribute('data-seat');
-            
-            // Toggle seat selection
-            if (this.classList.contains('bg-blue-500')) {
-                // Deselect seat
-                this.classList.remove('bg-blue-500');
-                this.classList.add('bg-green-500');
-                selectedSeats = selectedSeats.filter(seat => seat !== seatNumber);
-            } else {
-                // Select seat (limit to 5 seats)
-                if (selectedSeats.length < 5) {
-                    this.classList.remove('bg-green-500');
-                    this.classList.add('bg-blue-500');
-                    selectedSeats.push(seatNumber);
+        // Only add click event to available seats (not occupied)
+        if (!seat.classList.contains('bg-red-500')) {
+            seat.addEventListener('click', function() {
+                const seatNumber = this.getAttribute('data-seat');
+                
+                // Toggle seat selection
+                if (this.classList.contains('bg-blue-500')) {
+                    // Deselect seat
+                    this.classList.remove('bg-blue-500');
+                    this.classList.add('bg-green-500');
+                    selectedSeats = selectedSeats.filter(seat => seat !== seatNumber);
                 } else {
-                    alert('You can only select up to 5 seats.');
+                    // Select seat (limit to number of seats requested)
+                    if (selectedSeats.length < {{ $booking->number_of_seats }}) {
+                        this.classList.remove('bg-green-500');
+                        this.classList.add('bg-blue-500');
+                        selectedSeats.push(seatNumber);
+                    } else {
+                        alert('You can only select up to {{ $booking->number_of_seats }} seats.');
+                    }
                 }
-            }
-            
-            console.log('Selected seats:', selectedSeats);
-        });
+                
+                console.log('Selected seats:', selectedSeats);
+            });
+        } else {
+            // Add tooltip or visual indicator for occupied seats
+            seat.title = 'This seat is already booked';
+        }
     });
     
     // Save seat selection
@@ -152,6 +179,12 @@ document.addEventListener('DOMContentLoaded', function() {
     saveSeatsButton.addEventListener('click', function() {
         if (selectedSeats.length === 0) {
             alert('Please select at least one seat.');
+            return;
+        }
+        
+        // Validate that the number of selected seats matches the requested number
+        if (selectedSeats.length != {{ $booking->number_of_seats }}) {
+            alert('Please select exactly {{ $booking->number_of_seats }} seats.');
             return;
         }
         
@@ -164,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({
                 booking_id: {{ $booking->id }},
-                seat_numbers: selectedSeats
+                seat_numbers: selectedSeats.map(Number) // Convert to numbers
             })
         })
         .then(response => response.json())
@@ -174,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Reload the page to show updated seat selection
                 location.reload();
             } else {
-                alert('Error saving seat selection. Please try again.');
+                alert('Error: ' + data.message);
             }
         })
         .catch(error => {
@@ -203,35 +236,57 @@ document.addEventListener('DOMContentLoaded', function() {
     // Payment button functionality
     const payButton = document.getElementById('pay-button');
     payButton.addEventListener('click', function() {
-        if (selectedSeats.length === 0 && !'{{ $booking->seat_numbers }}') {
-            alert('Please select at least one seat and save your selection before proceeding to payment.');
+        // Check if seats have been selected and saved
+        if (!'{{ $booking->seat_numbers }}' || '{{ $booking->seat_numbers }}'.length === 0) {
+            alert('Please select and save your seats before proceeding to payment.');
             return;
         }
         
+        // Show processing message
+        const originalText = payButton.textContent;
+        payButton.disabled = true;
+        payButton.textContent = 'Processing...';
+        
         // Process payment
+        const data = {
+            booking_id: {{ $booking->id }},
+            payment_method: selectedPaymentMethod,
+            _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        };
+        
         fetch('{{ route("frontend.booking.process-payment") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                booking_id: {{ $booking->id }},
-                payment_method: selectedPaymentMethod
-            })
+            body: JSON.stringify(data)
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 // Redirect to success page
                 window.location.href = '{{ route("frontend.booking.success", ["booking" => $booking->id]) }}';
             } else {
-                alert('Error processing payment. Please try again.');
+                alert('Error: ' + data.message);
+                // Reset button
+                payButton.disabled = false;
+                payButton.textContent = originalText;
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error processing payment. Please try again.');
+            alert('Error processing payment: ' + error.message + '. Please try again.');
+            // Reset button
+            payButton.disabled = false;
+            payButton.textContent = originalText;
         });
     });
 });

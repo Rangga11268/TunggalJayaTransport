@@ -22,6 +22,7 @@
                     <p><strong>Name:</strong> {{ $booking->passenger_name }}</p>
                     <p><strong>Email:</strong> {{ $booking->passenger_email }}</p>
                     <p><strong>Phone:</strong> {{ $booking->passenger_phone }}</p>
+                    <p><strong>Number of Seats:</strong> {{ $booking->number_of_seats }}</p>
                     <p><strong>Selected Seats:</strong> {{ $booking->seat_numbers }}</p>
                 </div>
             </div>
@@ -29,6 +30,10 @@
                 <div class="flex justify-between">
                     <span class="text-lg font-bold">Total Paid:</span>
                     <span class="text-lg font-bold">Rp. {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                </div>
+                <div class="mt-2">
+                    <span class="text-sm text-gray-600">Payment Status: </span>
+                    <span class="text-sm font-bold text-green-600">Completed</span>
                 </div>
             </div>
         </div>

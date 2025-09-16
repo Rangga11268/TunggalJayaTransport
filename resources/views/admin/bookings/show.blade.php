@@ -33,8 +33,8 @@
                                     <dd class="text-gray-900">{{ $booking->passenger_email }}</dd>
                                 </div>
                                 <div class="flex">
-                                    <dt class="font-medium text-gray-500 w-32">Seat Number:</dt>
-                                    <dd class="text-gray-900">{{ $booking->seat_number }}</dd>
+                                    <dt class="font-medium text-gray-500 w-32">Seat Numbers:</dt>
+                                    <dd class="text-gray-900">{{ $booking->seat_numbers }}</dd>
                                 </div>
                             </dl>
                         </div>

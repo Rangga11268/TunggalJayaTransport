@@ -64,7 +64,23 @@ class BookingController extends Controller
             'terms' => 'required|accepted',
         ]);
         
-        $schedule = Schedule::findOrFail($request->schedule_id);
+        $schedule = Schedule::with('bus')->findOrFail($request->schedule_id);
+        
+        // Check if there are enough seats available
+        $availableSeats = $schedule->getAvailableSeatsCount();
+        
+        if ($request->number_of_seats > $availableSeats) {
+            return redirect()->back()->withErrors([
+                'number_of_seats' => "Only {$availableSeats} seats are available for this schedule. Please select fewer seats."
+            ])->withInput();
+        }
+        
+        // Double check that number of seats doesn't exceed bus capacity
+        if ($request->number_of_seats > $schedule->bus->capacity) {
+            return redirect()->back()->withErrors([
+                'number_of_seats' => "Maximum capacity for this bus is {$schedule->bus->capacity} seats."
+            ])->withInput();
+        }
         
         // Create booking
         $booking = new Booking();
@@ -74,6 +90,7 @@ class BookingController extends Controller
         $booking->passenger_email = $request->passenger_email;
         $booking->passenger_phone = $request->passenger_phone;
         $booking->seat_numbers = null; // Will be set later during seat selection
+        $booking->number_of_seats = $request->number_of_seats;
         $booking->total_price = $schedule->price * $request->number_of_seats;
         $booking->booking_code = 'BK' . strtoupper(uniqid());
         $booking->payment_status = 'pending';
@@ -88,7 +105,10 @@ class BookingController extends Controller
     {
         $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
         
-        return view('frontend.booking.confirmation', compact('booking'));
+        // Get occupied seats for this schedule
+        $occupiedSeats = $booking->schedule->getBookedSeatNumbers();
+        
+        return view('frontend.booking.confirmation', compact('booking', 'occupiedSeats'));
     }
     
     public function selectSeats(Request $request)
@@ -99,7 +119,37 @@ class BookingController extends Controller
             'seat_numbers.*' => 'integer|min:1|max:40'
         ]);
         
-        $booking = Booking::findOrFail($request->booking_id);
+        $booking = Booking::with('schedule.bus')->findOrFail($request->booking_id);
+        
+        // Validate that the number of selected seats matches the requested number
+        if (count($request->seat_numbers) != $booking->number_of_seats) {
+            return response()->json(['success' => false, 'message' => 'Please select exactly ' . $booking->number_of_seats . ' seats.']);
+        }
+        
+        // Check if there are enough seats available
+        $availableSeats = $booking->schedule->getAvailableSeatsCount();
+        // Add back the current booking's seats as they are being reselected
+        $availableSeats += $booking->number_of_seats;
+        
+        if (count($request->seat_numbers) > $availableSeats) {
+            return response()->json(['success' => false, 'message' => "Only {$availableSeats} seats are available for this schedule. Please select fewer seats."]);
+        }
+        
+        // Check if any of the selected seats are already booked
+        $occupiedSeats = $booking->schedule->getBookedSeatNumbers();
+        $selectedSeats = array_map('strval', $request->seat_numbers);
+        
+        // Check for conflicts
+        $conflictingSeats = array_intersect($selectedSeats, $occupiedSeats);
+        if (!empty($conflictingSeats)) {
+            return response()->json(['success' => false, 'message' => 'Some seats are already booked: ' . implode(', ', $conflictingSeats)]);
+        }
+        
+        // Validate that all seat numbers are unique
+        if (count($selectedSeats) != count(array_unique($selectedSeats))) {
+            return response()->json(['success' => false, 'message' => 'Please select unique seats.']);
+        }
+        
         $seatNumbers = implode(',', $request->seat_numbers);
         
         $booking->seat_numbers = $seatNumbers;
@@ -110,24 +160,74 @@ class BookingController extends Controller
     
     public function processPayment(Request $request)
     {
-        $request->validate([
-            'booking_id' => 'required|exists:bookings,id',
-            'payment_method' => 'required|string|in:credit_card,bank_transfer,e_wallet'
-        ]);
-        
-        $booking = Booking::findOrFail($request->booking_id);
-        
-        // In a real application, you would integrate with a payment gateway here
-        // For now, we'll just mark the payment as completed
-        $booking->payment_status = 'completed';
-        $booking->save();
-        
-        return response()->json(['success' => true, 'message' => 'Payment processed successfully']);
+        try {
+            // Log request details for debugging
+            \Log::info('Payment processing request', [
+                'all_request_data' => $request->all(),
+                'headers' => $request->headers->all(),
+                'content_type' => $request->header('Content-Type'),
+                'user_id' => auth()->id()
+            ]);
+            
+            // Validate the request
+            $validatedData = $request->validate([
+                'booking_id' => 'required|exists:bookings,id',
+                'payment_method' => 'required|string|in:credit_card,bank_transfer,e_wallet'
+            ]);
+            
+            \Log::info('Validation passed', ['validated_data' => $validatedData]);
+            
+            $booking = Booking::findOrFail($validatedData['booking_id']);
+            
+            // Check if seat selection has been completed
+            if (empty($booking->seat_numbers)) {
+                return response()->json(['success' => false, 'message' => 'Please select and save your seats before proceeding to payment.']);
+            }
+            
+            // For demo purposes, we'll just mark the payment as paid
+            $booking->payment_status = 'paid';
+            
+            if ($booking->save()) {
+                return response()->json(['success' => true, 'message' => 'Payment processed successfully']);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Failed to process payment. Please try again.']);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Payment validation error', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            
+            return response()->json(['success' => false, 'message' => 'Validation failed: ' . json_encode($e->errors())]);
+        } catch (\Exception $e) {
+            \Log::error('Payment processing error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+            
+            return response()->json(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
+        }
     }
     
     public function success($id)
     {
         $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
+        
+        // Ensure the booking is valid for success page
+        if ($booking->booking_status !== 'confirmed') {
+            abort(404, 'Invalid booking');
+        }
+        
+        // For demo purposes, we ensure the booking is marked as completed
+        if ($booking->payment_status !== 'paid') {
+            // In a real scenario, you might want to verify with payment gateway
+            // For demo, we'll just mark it as completed if it's confirmed and has seat numbers
+            if ($booking->booking_status === 'confirmed' && !empty($booking->seat_numbers)) {
+                $booking->payment_status = 'paid';
+                $booking->save();
+            }
+        }
         
         return view('frontend.booking.success', compact('booking'));
     }
