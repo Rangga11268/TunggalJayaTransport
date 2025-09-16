@@ -13,16 +13,16 @@
                         @csrf
                         @method('PUT')
                         
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Booking Code</label>
-                            <div class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-100 p-2">
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Booking Code</label>
+                            <div class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 p-2">
                                 {{ $booking->booking_code }}
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label for="user_id" class="block text-sm font-medium text-gray-700">User</label>
+                                <label for="user_id" class="block text-sm font-medium text-gray-700 mb-1">User</label>
                                 <select name="user_id" id="user_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Select User</option>
                                     @foreach(App\Models\User::all() as $user)
@@ -35,7 +35,7 @@
                             </div>
                             
                             <div>
-                                <label for="schedule_id" class="block text-sm font-medium text-gray-700">Schedule</label>
+                                <label for="schedule_id" class="block text-sm font-medium text-gray-700 mb-1">Schedule</label>
                                 <select name="schedule_id" id="schedule_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Select Schedule</option>
                                     @foreach(App\Models\Schedule::with('route', 'bus')->get() as $schedule)
@@ -50,9 +50,9 @@
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label for="passenger_name" class="block text-sm font-medium text-gray-700">Passenger Name</label>
+                                <label for="passenger_name" class="block text-sm font-medium text-gray-700 mb-1">Passenger Name</label>
                                 <input type="text" name="passenger_name" id="passenger_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('passenger_name', $booking->passenger_name) }}" required>
                                 @error('passenger_name')
                                     <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -60,7 +60,7 @@
                             </div>
                             
                             <div>
-                                <label for="passenger_phone" class="block text-sm font-medium text-gray-700">Passenger Phone</label>
+                                <label for="passenger_phone" class="block text-sm font-medium text-gray-700 mb-1">Passenger Phone</label>
                                 <input type="text" name="passenger_phone" id="passenger_phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('passenger_phone', $booking->passenger_phone) }}" required>
                                 @error('passenger_phone')
                                     <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -68,17 +68,17 @@
                             </div>
                         </div>
                         
-                        <div class="mb-4">
-                            <label for="passenger_email" class="block text-sm font-medium text-gray-700">Passenger Email</label>
+                        <div class="mb-6">
+                            <label for="passenger_email" class="block text-sm font-medium text-gray-700 mb-1">Passenger Email</label>
                             <input type="email" name="passenger_email" id="passenger_email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('passenger_email', $booking->passenger_email) }}" required>
                             @error('passenger_email')
                                 <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label for="seat_number" class="block text-sm font-medium text-gray-700">Seat Number</label>
+                                <label for="seat_number" class="block text-sm font-medium text-gray-700 mb-1">Seat Number</label>
                                 <input type="text" name="seat_number" id="seat_number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('seat_number', $booking->seat_number) }}" required>
                                 @error('seat_number')
                                     <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -86,7 +86,7 @@
                             </div>
                             
                             <div>
-                                <label for="total_price" class="block text-sm font-medium text-gray-700">Total Price (Rp)</label>
+                                <label for="total_price" class="block text-sm font-medium text-gray-700 mb-1">Total Price (Rp)</label>
                                 <input type="number" name="total_price" id="total_price" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('total_price', $booking->total_price) }}" required>
                                 @error('total_price')
                                     <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -94,9 +94,9 @@
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label for="payment_status" class="block text-sm font-medium text-gray-700">Payment Status</label>
+                                <label for="payment_status" class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
                                 <select name="payment_status" id="payment_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="pending" {{ old('payment_status', $booking->payment_status) == 'pending' ? 'selected' : '' }}>Pending</option>
                                     <option value="paid" {{ old('payment_status', $booking->payment_status) == 'paid' ? 'selected' : '' }}>Paid</option>
@@ -109,7 +109,7 @@
                             </div>
                             
                             <div>
-                                <label for="booking_status" class="block text-sm font-medium text-gray-700">Booking Status</label>
+                                <label for="booking_status" class="block text-sm font-medium text-gray-700 mb-1">Booking Status</label>
                                 <select name="booking_status" id="booking_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="pending" {{ old('booking_status', $booking->booking_status) == 'pending' ? 'selected' : '' }}>Pending</option>
                                     <option value="confirmed" {{ old('booking_status', $booking->booking_status) == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
@@ -122,7 +122,7 @@
                             </div>
                         </div>
                         
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between pt-6">
                             <a href="{{ route('admin.bookings.index') }}" class="text-gray-600 hover:text-gray-800">
                                 ← Back to Bookings
                             </a>

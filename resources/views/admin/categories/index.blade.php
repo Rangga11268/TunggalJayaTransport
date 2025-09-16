@@ -9,9 +9,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h3 class="text-lg font-bold">Categories</h3>
-                        <button onclick="openCreateModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <button onclick="openCreateModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full md:w-auto touch-friendly">
                             Add New Category
                         </button>
                     </div>
@@ -21,32 +21,34 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parent Category</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parent Category</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($categories as $category)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <td class="px-4 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">{{ $category->name }}</div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ $category->description ?? 'No description' }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ $category->parent ? $category->parent->name : '-' }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button onclick="openEditModal({{ $category->id }}, '{{ $category->name }}', '{{ $category->description ?? '' }}', {{ $category->parent_id ?? 'null' }})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-                                            <button onclick="deleteCategory({{ $category->id }})" class="text-red-600 hover:text-red-900">Delete</button>
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex flex-col sm:flex-row gap-2">
+                                                <button onclick="openEditModal({{ $category->id }}, '{{ $category->name }}', '{{ $category->description ?? '' }}', {{ $category->parent_id ?? 'null' }})" class="text-indigo-600 hover:text-indigo-900 text-center touch-friendly">Edit</button>
+                                                <button onclick="deleteCategory({{ $category->id }})" class="text-red-600 hover:text-red-900 text-center touch-friendly">Delete</button>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                        <td colspan="4" class="px-4 py-4 text-center text-sm text-gray-500">
                                             No categories found.
                                         </td>
                                     </tr>
@@ -73,18 +75,18 @@
                     @csrf
                     <div class="mb-4">
                         <label for="create_name" class="block text-sm font-medium text-gray-700">Name</label>
-                        <input type="text" name="name" id="create_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                        <input type="text" name="name" id="create_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" required>
                         <p id="create_name_error" class="text-red-500 text-xs italic mt-1 hidden"></p>
                     </div>
                     
                     <div class="mb-4">
                         <label for="create_description" class="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea name="description" id="create_description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></textarea>
+                        <textarea name="description" id="create_description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly"></textarea>
                     </div>
                     
                     <div class="mb-4">
                         <label for="create_parent_id" class="block text-sm font-medium text-gray-700">Parent Category</label>
-                        <select name="parent_id" id="create_parent_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <select name="parent_id" id="create_parent_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly">
                             <option value="">None</option>
                             @foreach(App\Models\Category::whereNull('parent_id')->get() as $parent)
                                 <option value="{{ $parent->id }}">{{ $parent->name }}</option>
@@ -92,11 +94,11 @@
                         </select>
                     </div>
                     
-                    <div class="flex items-center justify-between">
-                        <button type="button" onclick="closeCreateModal()" class="text-gray-600 hover:text-gray-800">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+                        <button type="button" onclick="closeCreateModal()" class="text-gray-600 hover:text-gray-800 w-full sm:w-auto touch-friendly">
                             Cancel
                         </button>
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto touch-friendly">
                             Create Category
                         </button>
                     </div>
@@ -116,18 +118,18 @@
                     <input type="hidden" id="edit_id" name="id">
                     <div class="mb-4">
                         <label for="edit_name" class="block text-sm font-medium text-gray-700">Name</label>
-                        <input type="text" name="name" id="edit_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                        <input type="text" name="name" id="edit_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" required>
                         <p id="edit_name_error" class="text-red-500 text-xs italic mt-1 hidden"></p>
                     </div>
                     
                     <div class="mb-4">
                         <label for="edit_description" class="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea name="description" id="edit_description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></textarea>
+                        <textarea name="description" id="edit_description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly"></textarea>
                     </div>
                     
                     <div class="mb-4">
                         <label for="edit_parent_id" class="block text-sm font-medium text-gray-700">Parent Category</label>
-                        <select name="parent_id" id="edit_parent_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <select name="parent_id" id="edit_parent_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly">
                             <option value="">None</option>
                             @foreach(App\Models\Category::whereNull('parent_id')->get() as $parent)
                                 <option value="{{ $parent->id }}">{{ $parent->name }}</option>
@@ -135,11 +137,11 @@
                         </select>
                     </div>
                     
-                    <div class="flex items-center justify-between">
-                        <button type="button" onclick="closeEditModal()" class="text-gray-600 hover:text-gray-800">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+                        <button type="button" onclick="closeEditModal()" class="text-gray-600 hover:text-gray-800 w-full sm:w-auto touch-friendly">
                             Cancel
                         </button>
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto touch-friendly">
                             Update Category
                         </button>
                     </div>

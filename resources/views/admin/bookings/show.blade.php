@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <div class="mb-4">
+                    <div class="mb-6">
                         <h1 class="text-2xl font-bold">Booking Details</h1>
                         <div class="mt-2 text-sm text-gray-500">
                             Booking Code: {{ $booking->booking_code }}
@@ -18,8 +18,8 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <h3 class="text-lg font-medium mb-2">Passenger Information</h3>
-                            <dl class="grid grid-cols-1 gap-2">
+                            <h3 class="text-lg font-medium mb-4">Passenger Information</h3>
+                            <dl class="grid grid-cols-1 gap-3">
                                 <div class="flex">
                                     <dt class="font-medium text-gray-500 w-32">Name:</dt>
                                     <dd class="text-gray-900">{{ $booking->passenger_name }}</dd>
@@ -40,8 +40,8 @@
                         </div>
                         
                         <div>
-                            <h3 class="text-lg font-medium mb-2">Booking Information</h3>
-                            <dl class="grid grid-cols-1 gap-2">
+                            <h3 class="text-lg font-medium mb-4">Booking Information</h3>
+                            <dl class="grid grid-cols-1 gap-3">
                                 <div class="flex">
                                     <dt class="font-medium text-gray-500 w-32">Total Price:</dt>
                                     <dd class="text-gray-900">Rp. {{ number_format($booking->total_price, 0, ',', '.') }}</dd>
@@ -94,9 +94,9 @@
                         </div>
                     </div>
                     
-                    <div class="mt-6">
-                        <h3 class="text-lg font-medium mb-2">Schedule Information</h3>
-                        <dl class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div class="mt-8">
+                        <h3 class="text-lg font-medium mb-4">Schedule Information</h3>
+                        <dl class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Route:</dt>
                                 <dd class="text-gray-900">{{ $booking->schedule->route->name }}</dd>
@@ -124,7 +124,7 @@
                         </dl>
                     </div>
                     
-                    <div class="mt-8 flex items-center justify-between">
+                    <div class="mt-8 flex items-center justify-between pt-6 border-t border-gray-200">
                         <a href="{{ route('admin.bookings.index') }}" class="text-gray-600 hover:text-gray-800">
                             ← Back to Bookings
                         </a>

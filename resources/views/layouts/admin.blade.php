@@ -194,7 +194,11 @@
                         
                         <!-- Breadcrumb or page title -->
                         <div class="text-lg font-semibold text-gray-800 truncate">
-                            Admin Panel
+                            @isset($header)
+                                {{ $header }}
+                            @else
+                                Admin Panel
+                            @endisset
                         </div>
                     </div>
 
@@ -243,12 +247,9 @@
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6">
             {{ $slot }}
         </main>
-    </div>
+        
+        </div>
 </div>
-
-<!-- Font Awesome for icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <!-- Pass success messages to JavaScript -->
 @if(session('create_success'))
@@ -266,3 +267,5 @@
 @if(session('update_success'))
     <div data-update-success-message="{{ session('update_success') }}" style="display: none;"></div>
 @endif
+    </div>
+</div>
