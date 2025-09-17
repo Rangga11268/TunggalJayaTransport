@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <form action="{{ route('admin.buses.update', $bus) }}" method="POST" enctype="multipart/form-data">
+                    <form id="busForm" action="{{ route('admin.buses.update', $bus) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         
@@ -165,4 +165,29 @@
             </div>
         </div>
     </div>
+    
+    @section('scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const busForm = document.getElementById('busForm');
+        const plateNumberInput = document.getElementById('plate_number');
+        
+        // Add form submission validation
+        busForm.addEventListener('submit', function(e) {
+            const plateNumber = plateNumberInput.value.trim();
+            
+            if (!plateNumber) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Plate Number Required',
+                    text: 'Please enter a plate number.',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+        });
+    });
+    </script>
+    @endsection
 </x-app-layout>

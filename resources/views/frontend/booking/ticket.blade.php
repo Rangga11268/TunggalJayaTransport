@@ -556,7 +556,11 @@
             <div class="barcode-section">
                 <div class="barcode-label">Ticket Barcode - Scan at Boarding Point</div>
                 <div class="barcode-container">
-                    {!! DNS1D()->getBarcodeHTML($booking->booking_code, 'C128', 2.5, 50) !!}
+                    @php
+                        use Milon\Barcode\DNS1D;
+                        $dns1d = new DNS1D();
+                        echo $dns1d->getBarcodeHTML($booking->booking_code, 'C128', 2.5, 50);
+                    @endphp
                 </div>
                 <div class="booking-code-large">{{ $booking->booking_code }}</div>
             </div>

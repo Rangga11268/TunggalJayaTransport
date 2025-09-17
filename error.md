@@ -1,4 +1,4 @@
 -- todos
 -- bug saat tiket download hasi nya aneh dan belum ada barcode
 -- update semua nya menggunakan sweetalert di frontend
--- update di complate schedule ada jadwal yang gak ada yaitu Jakarta - Kuningan via sindang laut
+-- fix pemiliah seat kembali user bisa pilih semua seat yang tersedia namun tampilan nya di buat lebih baik saja buat atau gunakan icon yang mirip bangku agar lebih baik

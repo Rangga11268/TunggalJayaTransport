@@ -252,6 +252,7 @@
             {{ $slot }}
         </main>
     </div>
+</div>
 
 <!-- Pass success messages to JavaScript -->
 @if(session('create_success'))
@@ -269,3 +270,6 @@
 @if(session('update_success'))
     <div data-update-success-message="{{ session('update_success') }}" style="display: none;"></div>
 @endif
+
+<!-- Yield scripts section -->
+@yield('scripts')
