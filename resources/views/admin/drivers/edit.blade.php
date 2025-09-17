@@ -29,6 +29,9 @@
                                     @error('employee_id')
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                                     @enderror
+                                    @if(session('error'))
+                                        <p class="text-red-500 text-xs italic mt-1">{{ session('error') }}</p>
+                                    @endif
                                 </div>
                                 
                                 <div class="mb-4">
@@ -37,6 +40,9 @@
                                     @error('license_number')
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                                     @enderror
+                                    @if(session('error'))
+                                        <p class="text-red-500 text-xs italic mt-1">{{ session('error') }}</p>
+                                    @endif
                                 </div>
                                 
                                 <div class="mb-4">

@@ -22,6 +22,6 @@ class Driver extends Model implements HasMedia
 
     public function buses()
     {
-        return $this->belongsToMany(Bus::class);
+        return $this->belongsToMany(Bus::class)->withTimestamps();
     }
 }

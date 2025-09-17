@@ -7,6 +7,7 @@ use App\Models\Route as BusRoute;
 use App\Models\Schedule;
 use App\Models\Booking;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BookingController extends Controller
 {
@@ -44,6 +45,49 @@ class BookingController extends Controller
         }
         
         return view('frontend.booking.index', compact('schedules', 'origins', 'destinations', 'validPair', 'origin', 'destination'));
+    }
+    
+    public function schedules(Request $request)
+    {
+        // Get all unique origins and destinations for the dropdowns
+        $origins = BusRoute::pluck('origin')->unique()->values();
+        $destinations = BusRoute::pluck('destination')->unique()->values();
+        
+        $origin = $request->get('origin');
+        $destination = $request->get('destination');
+        $date = $request->get('date');
+        
+        // Validate request parameters
+        $request->validate([
+            'origin' => 'nullable|string|max:255',
+            'destination' => 'nullable|string|max:255',
+            'date' => 'nullable|date',
+        ]);
+        
+        // Get all schedules with their relations
+        $query = Schedule::with('route', 'bus');
+        
+        // Apply filters if provided
+        if ($origin) {
+            $query->whereHas('route', function ($q) use ($origin) {
+                $q->where('origin', $origin);
+            });
+        }
+        
+        if ($destination) {
+            $query->whereHas('route', function ($q) use ($destination) {
+                $q->where('destination', $destination);
+            });
+        }
+        
+        if ($date) {
+            $query->whereDate('departure_time', $date);
+        }
+        
+        // Order by departure time
+        $schedules = $query->orderBy('departure_time')->paginate(10);
+        
+        return view('frontend.booking.schedules', compact('schedules', 'origins', 'destinations', 'origin', 'destination', 'date'));
     }
     
     public function show($id)
@@ -230,5 +274,22 @@ class BookingController extends Controller
         }
         
         return view('frontend.booking.success', compact('booking'));
+    }
+    
+    public function downloadTicket($id)
+    {
+        $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
+        
+        // Ensure the booking has seat numbers
+        if (empty($booking->seat_numbers)) {
+            abort(404, 'Ticket not available. Please select seats first.');
+        }
+        
+        // Load the ticket view and return it as PDF
+        $pdf = Pdf::loadView('frontend.booking.ticket-pdf', [
+            'booking' => $booking
+        ]);
+        
+        return $pdf->download('ticket-' . $booking->booking_code . '.pdf');
     }
 }

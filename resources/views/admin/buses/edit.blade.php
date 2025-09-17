@@ -87,12 +87,28 @@
                         <!-- Drivers Selection -->
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700">Drivers</label>
+                            <p class="text-sm text-gray-500 mb-2">Note: Each driver can only be assigned to one bus at a time.</p>
                             <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                 @foreach($drivers as $driver)
-                                    <div class="flex items-center p-2 border border-gray-200 rounded hover:bg-gray-50">
-                                        <input type="checkbox" name="drivers[]" value="{{ $driver->id }}" id="driver_{{ $driver->id }}" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" {{ in_array($driver->id, old('drivers', $bus->drivers->pluck('id')->toArray())) ? 'checked' : '' }}>
+                                    @php
+                                        $isAssignedToOtherBus = in_array($driver->id, $assignedDrivers) && !in_array($driver->id, $bus->drivers->pluck('id')->toArray());
+                                        $isChecked = in_array($driver->id, old('drivers', $bus->drivers->pluck('id')->toArray()));
+                                    @endphp
+                                    <div class="flex items-center p-2 border border-gray-200 rounded hover:bg-gray-50 {{ $isAssignedToOtherBus ? 'bg-red-50 opacity-75' : '' }}">
+                                        <input 
+                                            type="checkbox" 
+                                            name="drivers[]" 
+                                            value="{{ $driver->id }}" 
+                                            id="driver_{{ $driver->id }}" 
+                                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" 
+                                            {{ $isAssignedToOtherBus ? 'disabled' : '' }}
+                                            {{ $isChecked ? 'checked' : '' }}
+                                        >
                                         <label for="driver_{{ $driver->id }}" class="ml-2 text-sm text-gray-700">
                                             {{ $driver->name }} ({{ $driver->license_number }})
+                                            @if($isAssignedToOtherBus)
+                                                <span class="text-red-500 text-xs">(Already assigned)</span>
+                                            @endif
                                         </label>
                                     </div>
                                 @endforeach
@@ -105,12 +121,28 @@
                         <!-- Conductors Selection -->
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700">Conductors</label>
+                            <p class="text-sm text-gray-500 mb-2">Note: Each conductor can only be assigned to one bus at a time.</p>
                             <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                 @foreach($conductors as $conductor)
-                                    <div class="flex items-center p-2 border border-gray-200 rounded hover:bg-gray-50">
-                                        <input type="checkbox" name="conductors[]" value="{{ $conductor->id }}" id="conductor_{{ $conductor->id }}" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" {{ in_array($conductor->id, old('conductors', $bus->conductors->pluck('id')->toArray())) ? 'checked' : '' }}>
+                                    @php
+                                        $isAssignedToOtherBus = in_array($conductor->id, $assignedConductors) && !in_array($conductor->id, $bus->conductors->pluck('id')->toArray());
+                                        $isChecked = in_array($conductor->id, old('conductors', $bus->conductors->pluck('id')->toArray()));
+                                    @endphp
+                                    <div class="flex items-center p-2 border border-gray-200 rounded hover:bg-gray-50 {{ $isAssignedToOtherBus ? 'bg-red-50 opacity-75' : '' }}">
+                                        <input 
+                                            type="checkbox" 
+                                            name="conductors[]" 
+                                            value="{{ $conductor->id }}" 
+                                            id="conductor_{{ $conductor->id }}" 
+                                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" 
+                                            {{ $isAssignedToOtherBus ? 'disabled' : '' }}
+                                            {{ $isChecked ? 'checked' : '' }}
+                                        >
                                         <label for="conductor_{{ $conductor->id }}" class="ml-2 text-sm text-gray-700">
                                             {{ $conductor->name }} ({{ $conductor->employee_id }})
+                                            @if($isAssignedToOtherBus)
+                                                <span class="text-red-500 text-xs">(Already assigned)</span>
+                                            @endif
                                         </label>
                                     </div>
                                 @endforeach

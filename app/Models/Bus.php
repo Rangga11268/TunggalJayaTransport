@@ -31,11 +31,11 @@ class Bus extends Model implements HasMedia
 
     public function drivers()
     {
-        return $this->belongsToMany(Driver::class);
+        return $this->belongsToMany(Driver::class)->withTimestamps();
     }
 
     public function conductors()
     {
-        return $this->belongsToMany(Conductor::class);
+        return $this->belongsToMany(Conductor::class)->withTimestamps();
     }
 }

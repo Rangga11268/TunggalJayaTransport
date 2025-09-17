@@ -26,7 +26,9 @@ class BusController extends Controller
     {
         $drivers = Driver::where('status', 'active')->get();
         $conductors = Conductor::where('status', 'active')->get();
-        return view('admin.buses.create', compact('drivers', 'conductors'));
+        $assignedDrivers = $this->getAssignedDrivers();
+        $assignedConductors = $this->getAssignedConductors();
+        return view('admin.buses.create', compact('drivers', 'conductors', 'assignedDrivers', 'assignedConductors'));
     }
 
     /**
@@ -48,23 +50,67 @@ class BusController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $bus = Bus::create($request->except('image', 'drivers', 'conductors'));
-
-        // Sync drivers
+        // Check if any selected drivers or conductors are already assigned
+        $assignedDrivers = $this->getAssignedDrivers();
+        $assignedConductors = $this->getAssignedConductors();
+        
         if ($request->has('drivers')) {
-            $bus->drivers()->sync($request->input('drivers'));
+            $selectedDrivers = $request->input('drivers');
+            $conflictingDrivers = array_intersect($selectedDrivers, $assignedDrivers);
+            if (!empty($conflictingDrivers)) {
+                $driverNames = Driver::whereIn('id', $conflictingDrivers)->pluck('name')->toArray();
+                return redirect()->back()->withErrors([
+                    'drivers' => 'The following drivers are already assigned to another bus: ' . implode(', ', $driverNames)
+                ])->withInput();
+            }
         }
-
-        // Sync conductors
+        
         if ($request->has('conductors')) {
-            $bus->conductors()->sync($request->input('conductors'));
+            $selectedConductors = $request->input('conductors');
+            $conflictingConductors = array_intersect($selectedConductors, $assignedConductors);
+            if (!empty($conflictingConductors)) {
+                $conductorNames = Conductor::whereIn('id', $conflictingConductors)->pluck('name')->toArray();
+                return redirect()->back()->withErrors([
+                    'conductors' => 'The following conductors are already assigned to another bus: ' . implode(', ', $conductorNames)
+                ])->withInput();
+            }
         }
 
-        if ($request->hasFile('image')) {
-            $bus->addMediaFromRequest('image')->toMediaCollection('buses');
-        }
+        try {
+            $bus = Bus::create($request->except('image', 'drivers', 'conductors'));
 
-        return redirect()->route('admin.buses.index')->with('create_success', 'Bus berhasil dibuat.');
+            // Sync drivers
+            if ($request->has('drivers')) {
+                $bus->drivers()->sync($request->input('drivers'));
+            }
+
+            // Sync conductors
+            if ($request->has('conductors')) {
+                $bus->conductors()->sync($request->input('conductors'));
+            }
+
+            if ($request->hasFile('image')) {
+                $bus->addMediaFromRequest('image')->toMediaCollection('buses');
+            }
+
+            return redirect()->route('admin.buses.index')->with('create_success', 'Bus berhasil dibuat.');
+        } catch (\Exception $e) {
+            // Handle duplicate entry error
+            if (strpos($e->getMessage(), 'unique_driver_per_bus') !== false) {
+                return redirect()->back()->withErrors([
+                    'drivers' => 'One or more drivers are already assigned to another bus.'
+                ])->withInput();
+            }
+            
+            if (strpos($e->getMessage(), 'unique_conductor_per_bus') !== false) {
+                return redirect()->back()->withErrors([
+                    'conductors' => 'One or more conductors are already assigned to another bus.'
+                ])->withInput();
+            }
+            
+            // Re-throw the exception if it's not related to our constraints
+            throw $e;
+        }
     }
 
     /**
@@ -84,7 +130,9 @@ class BusController extends Controller
         $bus = Bus::with(['drivers', 'conductors'])->findOrFail($id);
         $drivers = Driver::where('status', 'active')->get();
         $conductors = Conductor::where('status', 'active')->get();
-        return view('admin.buses.edit', compact('bus', 'drivers', 'conductors'));
+        $assignedDrivers = $this->getAssignedDrivers($bus->id);
+        $assignedConductors = $this->getAssignedConductors($bus->id);
+        return view('admin.buses.edit', compact('bus', 'drivers', 'conductors', 'assignedDrivers', 'assignedConductors'));
     }
 
     /**
@@ -108,30 +156,74 @@ class BusController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $bus->update($request->except('image', 'drivers', 'conductors'));
-
-        // Sync drivers
+        // Check if any selected drivers or conductors are already assigned
+        $assignedDrivers = $this->getAssignedDrivers($bus->id);
+        $assignedConductors = $this->getAssignedConductors($bus->id);
+        
         if ($request->has('drivers')) {
-            $bus->drivers()->sync($request->input('drivers'));
-        } else {
-            $bus->drivers()->detach();
+            $selectedDrivers = $request->input('drivers');
+            $conflictingDrivers = array_intersect($selectedDrivers, $assignedDrivers);
+            if (!empty($conflictingDrivers)) {
+                $driverNames = Driver::whereIn('id', $conflictingDrivers)->pluck('name')->toArray();
+                return redirect()->back()->withErrors([
+                    'drivers' => 'The following drivers are already assigned to another bus: ' . implode(', ', $driverNames)
+                ])->withInput();
+            }
         }
-
-        // Sync conductors
+        
         if ($request->has('conductors')) {
-            $bus->conductors()->sync($request->input('conductors'));
-        } else {
-            $bus->conductors()->detach();
+            $selectedConductors = $request->input('conductors');
+            $conflictingConductors = array_intersect($selectedConductors, $assignedConductors);
+            if (!empty($conflictingConductors)) {
+                $conductorNames = Conductor::whereIn('id', $conflictingConductors)->pluck('name')->toArray();
+                return redirect()->back()->withErrors([
+                    'conductors' => 'The following conductors are already assigned to another bus: ' . implode(', ', $conductorNames)
+                ])->withInput();
+            }
         }
 
-        if ($request->hasFile('image')) {
-            // Remove old image if exists
-            $bus->clearMediaCollection('buses');
-            // Add new image
-            $bus->addMediaFromRequest('image')->toMediaCollection('buses');
-        }
+        try {
+            $bus->update($request->except('image', 'drivers', 'conductors'));
 
-        return redirect()->route('admin.buses.index')->with('update_success', 'Bus berhasil diperbarui.');
+            // Sync drivers
+            if ($request->has('drivers')) {
+                $bus->drivers()->sync($request->input('drivers'));
+            } else {
+                $bus->drivers()->detach();
+            }
+
+            // Sync conductors
+            if ($request->has('conductors')) {
+                $bus->conductors()->sync($request->input('conductors'));
+            } else {
+                $bus->conductors()->detach();
+            }
+
+            if ($request->hasFile('image')) {
+                // Remove old image if exists
+                $bus->clearMediaCollection('buses');
+                // Add new image
+                $bus->addMediaFromRequest('image')->toMediaCollection('buses');
+            }
+
+            return redirect()->route('admin.buses.index')->with('update_success', 'Bus berhasil diperbarui.');
+        } catch (\Exception $e) {
+            // Handle duplicate entry error
+            if (strpos($e->getMessage(), 'unique_driver_per_bus') !== false) {
+                return redirect()->back()->withErrors([
+                    'drivers' => 'One or more drivers are already assigned to another bus.'
+                ])->withInput();
+            }
+            
+            if (strpos($e->getMessage(), 'unique_conductor_per_bus') !== false) {
+                return redirect()->back()->withErrors([
+                    'conductors' => 'One or more conductors are already assigned to another bus.'
+                ])->withInput();
+            }
+            
+            // Re-throw the exception if it's not related to our constraints
+            throw $e;
+        }
     }
 
     /**
@@ -143,5 +235,51 @@ class BusController extends Controller
         $bus->delete();
 
         return redirect()->route('admin.buses.index')->with('delete_success', 'Bus berhasil dihapus.');
+    }
+
+    /**
+     * Get list of driver IDs that are already assigned to buses
+     */
+    private function getAssignedDrivers($excludeBusId = null)
+    {
+        $query = Bus::with('drivers');
+        
+        if ($excludeBusId) {
+            $query->where('id', '!=', $excludeBusId);
+        }
+        
+        $buses = $query->get();
+        $assignedDriverIds = [];
+        
+        foreach ($buses as $bus) {
+            foreach ($bus->drivers as $driver) {
+                $assignedDriverIds[] = $driver->id;
+            }
+        }
+        
+        return array_unique($assignedDriverIds);
+    }
+
+    /**
+     * Get list of conductor IDs that are already assigned to buses
+     */
+    private function getAssignedConductors($excludeBusId = null)
+    {
+        $query = Bus::with('conductors');
+        
+        if ($excludeBusId) {
+            $query->where('id', '!=', $excludeBusId);
+        }
+        
+        $buses = $query->get();
+        $assignedConductorIds = [];
+        
+        foreach ($buses as $bus) {
+            foreach ($bus->conductors as $conductor) {
+                $assignedConductorIds[] = $conductor->id;
+            }
+        }
+        
+        return array_unique($assignedConductorIds);
     }
 }

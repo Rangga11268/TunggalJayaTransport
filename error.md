@@ -1,3 +1,4 @@
-Warning: require(D:\laragon\www\TunggalJayaTransport\vendor\composer/../../app/helpers.php): Failed to open stream: No such file or directory in D:\laragon\www\TunggalJayaTransport\vendor\composer\autoload_real.php on line 41
-
-Fatal error: Uncaught Error: Failed opening required 'D:\laragon\www\TunggalJayaTransport\vendor\composer/../../app/helpers.php' (include_path='.;D:/laragon/etc/php/pear') in D:\laragon\www\TunggalJayaTransport\vendor\composer\autoload_real.php:41 Stack trace: #0 D:\laragon\www\TunggalJayaTransport\vendor\composer\autoload_real.php(45): {closure}('b4e3f29b106af37...', 'D:\\laragon\\www\\...') #1 D:\laragon\www\TunggalJayaTransport\vendor\autoload.php(25): ComposerAutoloaderInit70aeb27416def355eea2e8f29fe738e5::getLoader() #2 D:\laragon\www\TunggalJayaTransport\public\index.php(14): require('D:\\laragon\\www\\...') #3 {main} thrown in D:\laragon\www\TunggalJayaTransport\vendor\composer\autoload_real.php on line 41
+-- todos
+-- bug saat tiket download hasi nya aneh dan belum ada barcode
+-- update semua nya menggunakan sweetalert di frontend
+-- update di complate schedule ada jadwal yang gak ada yaitu Jakarta - Kuningan via sindang laut
