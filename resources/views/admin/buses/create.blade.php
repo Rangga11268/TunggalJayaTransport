@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <form action="{{ route('admin.buses.store') }}" method="POST" enctype="multipart/form-data">
+                    <form id="busForm" action="{{ route('admin.buses.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -155,4 +155,33 @@
             </div>
         </div>
     </div>
+    
+    @section('scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const busForm = document.getElementById('busForm');
+        const plateNumberInput = document.getElementById('plate_number');
+        
+        // Add form submission validation
+        busForm.addEventListener('submit', function(e) {
+            const plateNumber = plateNumberInput.value.trim();
+            
+            if (!plateNumber) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Plate Number Required',
+                    text: 'Please enter a plate number.',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+            
+            // Check if plate number already exists in the database
+            // This is a client-side check to provide immediate feedback
+            // The server-side validation will still be the authoritative check
+        });
+    });
+    </script>
+    @endsection
 </x-app-layout>

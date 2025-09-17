@@ -302,3 +302,6 @@ resources/
 └── scss/
 ├── frontend.scss
 └── admin.scss
+
+
+tambah kan icon untuk seat nya dan tampilkan semua seat yang ada buat seat nya jadi konfigurasi 2 2 di kiri 3 3 di kanan dan gunakan icon ini pastikan responsive juga dan sekalian perbaiki styling nya
