@@ -15,36 +15,38 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Bus Management
-Route::resource('buses', BusController::class);
+    // Bus Management
+    Route::resource('buses', BusController::class);
 
-// AJAX route to check if plate number exists
-Route::get('/buses/check-plate/{plateNumber}', [BusController::class, 'checkPlateNumber'])->name('buses.check-plate');
+    // AJAX route to check if plate number exists
+    Route::get('/buses/check-plate/{plateNumber}', [BusController::class, 'checkPlateNumber'])->name('buses.check-plate');
 
-// Other routes...
-Route::resource('routes', RouteController::class);
-Route::resource('schedules', ScheduleController::class);
-Route::resource('bookings', BookingController::class);
-Route::resource('news', NewsController::class);
-Route::resource('categories', CategoryController::class);
-Route::resource('facilities', FacilityController::class);
-Route::resource('users', UserController::class);
-Route::resource('drivers', DriverController::class);
-Route::resource('conductors', ConductorController::class);
+    // Other routes...
+    Route::resource('routes', RouteController::class);
+    Route::resource('schedules', ScheduleController::class);
+    Route::resource('bookings', BookingController::class);
+    Route::resource('news', NewsController::class);
+    Route::resource('categories', CategoryController::class);
+    Route::resource('facilities', FacilityController::class);
+    Route::resource('users', UserController::class);
+    Route::resource('drivers', DriverController::class);
+    Route::resource('conductors', ConductorController::class);
 
-// Reports
-Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-Route::get('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
-Route::get('/reports/custom', [ReportController::class, 'custom'])->name('reports.custom');
-Route::post('/reports/custom', [ReportController::class, 'generateCustom'])->name('reports.custom.generate');
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
+    Route::get('/reports/custom', [ReportController::class, 'custom'])->name('reports.custom');
+    Route::post('/reports/custom', [ReportController::class, 'generateCustom'])->name('reports.custom.generate');
 
-// Settings
-Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+    // Settings
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 
-// Test route for sidebar issues
-Route::get('/test-sidebar', function () {
-    return view('admin.test-sidebar');
-})->name('test-sidebar');
+    // Test route for sidebar issues
+    Route::get('/test-sidebar', function () {
+        return view('admin.test-sidebar');
+    })->name('test-sidebar');
+});
