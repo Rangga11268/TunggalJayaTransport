@@ -1096,6 +1096,62 @@
     border-bottom: none;
 }
 
+/* Icon button improvements */
+.action-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.action-buttons a,
+.action-buttons button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+    font-size: 1rem;
+}
+
+.action-buttons a:hover,
+.action-buttons button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.view-icon {
+    background-color: #dbeafe;
+    color: #3b82f6;
+}
+
+.view-icon:hover {
+    background-color: #bfdbfe;
+    color: #2563eb;
+}
+
+.edit-icon {
+    background-color: #ede9fe;
+    color: #8b5cf6;
+}
+
+.edit-icon:hover {
+    background-color: #ddd6fe;
+    color: #7c3aed;
+}
+
+.delete-icon {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+.delete-icon:hover {
+    background-color: #fecaca;
+    color: #dc2626;
+}
+
 /* Booking table specific enhancements */
 .booking-table {
     width: 100%;

@@ -50,14 +50,20 @@
                                             @endif
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div class="flex flex-col sm:flex-row gap-2">
-                                                <a href="{{ route('admin.users.show', $user) }}" class="text-indigo-600 hover:text-indigo-900 text-center touch-friendly">View</a>
-                                                <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900 text-center touch-friendly">Edit</a>
+                                            <div class="flex flex-row gap-2 action-buttons">
+                                                <a href="{{ route('admin.users.show', $user) }}" class="view-icon" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ route('admin.users.edit', $user) }}" class="edit-icon" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
                                                 @if($user->id != auth()->id())
                                                     <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="button" class="text-red-600 hover:text-red-900 w-full text-center touch-friendly" onclick="handleDelete('delete-form-{{ $user->id }}', 'Hapus Pengguna?', 'Apakah Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.')">Hapus</button>
+                                                        <button type="button" class="delete-icon" onclick="handleDelete('delete-form-{{ $user->id }}', 'Hapus Pengguna?', 'Apakah Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.')" title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
                                                     </form>
                                                 @endif
                                             </div>

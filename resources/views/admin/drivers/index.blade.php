@@ -66,13 +66,19 @@
                                             @endif
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div class="flex flex-col sm:flex-row gap-2">
-                                                <a href="{{ route('admin.drivers.show', $driver) }}" class="text-blue-600 hover:text-blue-900 text-center">View</a>
-                                                <a href="{{ route('admin.drivers.edit', $driver) }}" class="text-indigo-600 hover:text-indigo-900 text-center">Edit</a>
+                                            <div class="flex flex-row gap-2 action-buttons">
+                                                <a href="{{ route('admin.drivers.show', $driver) }}" class="view-icon" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ route('admin.drivers.edit', $driver) }}" class="edit-icon" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
                                                 <form id="delete-form-{{ $driver->id }}" action="{{ route('admin.drivers.destroy', $driver) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="button" class="text-red-600 hover:text-red-900 w-full text-center" onclick="handleDelete('delete-form-{{ $driver->id }}', 'Hapus Driver?', 'Apakah Anda yakin ingin menghapus driver ini? Tindakan ini tidak dapat dibatalkan.')">Hapus</button>
+                                                    <button type="button" class="delete-icon" onclick="handleDelete('delete-form-{{ $driver->id }}', 'Hapus Driver?', 'Apakah Anda yakin ingin menghapus driver ini? Tindakan ini tidak dapat dibatalkan.')" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
                                                 </form>
                                             </div>
                                         </td>

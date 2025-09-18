@@ -90,13 +90,19 @@
                                             @endif
                                         </td>
                                         <td class="px-4 py-3 sm:py-4 whitespace-nowrap text-sm font-medium">
-                                            <div class="flex flex-col sm:flex-row gap-1 sm:gap-2 action-buttons">
-                                                <a href="{{ route('admin.bookings.show', $booking) }}" class="text-blue-600 hover:text-blue-900 text-center touch-friendly text-sm">View</a>
-                                                <a href="{{ route('admin.bookings.edit', $booking) }}" class="text-indigo-600 hover:text-indigo-900 text-center touch-friendly text-sm">Edit</a>
+                                            <div class="flex flex-row gap-2 action-buttons">
+                                                <a href="{{ route('admin.bookings.show', $booking) }}" class="view-icon" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ route('admin.bookings.edit', $booking) }}" class="edit-icon" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
                                                 <form id="delete-form-{{ $booking->id }}" action="{{ route('admin.bookings.destroy', $booking) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="button" class="text-red-600 hover:text-red-900 w-full text-center touch-friendly text-sm" onclick="handleDelete('delete-form-{{ $booking->id }}', 'Hapus Pemesanan?', 'Apakah Anda yakin ingin menghapus pemesanan ini? Tindakan ini tidak dapat dibatalkan.')">Hapus</button>
+                                                    <button type="button" class="delete-icon" onclick="handleDelete('delete-form-{{ $booking->id }}', 'Hapus Pemesanan?', 'Apakah Anda yakin ingin menghapus pemesanan ini? Tindakan ini tidak dapat dibatalkan.')" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
                                                 </form>
                                             </div>
                                         </td>

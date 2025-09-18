@@ -40,9 +40,13 @@
                                             {{ $category->parent ? $category->parent->name : '-' }}
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div class="flex flex-col sm:flex-row gap-2">
-                                                <button onclick="openEditModal({{ $category->id }}, '{{ $category->name }}', '{{ $category->description ?? '' }}', {{ $category->parent_id ?? 'null' }})" class="text-indigo-600 hover:text-indigo-900 text-center touch-friendly">Edit</button>
-                                                <button onclick="deleteCategory({{ $category->id }})" class="text-red-600 hover:text-red-900 text-center touch-friendly">Delete</button>
+                                            <div class="flex flex-row gap-2 action-buttons">
+                                                <button onclick="openEditModal({{ $category->id }}, '{{ $category->name }}', '{{ $category->description ?? '' }}', {{ $category->parent_id ?? 'null' }})" class="edit-icon" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button onclick="deleteCategory({{ $category->id }})" class="delete-icon" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
