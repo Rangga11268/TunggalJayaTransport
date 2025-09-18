@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
     <h1 class="text-3xl font-bold mb-6">Search Results</h1>
     
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">

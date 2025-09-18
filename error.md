@@ -1,1 +1,3 @@
 logic baru  untuk jadwal yaitu ketika bus sudah berangkat atau waktunya berangkat tiket sudah tidak bisa di pesan dan akan ke reset ke awal lagi atau besok nya sudah ke reset lagi atau bisa kasih opsi jadwal perminggu nya bagaimana
+
+fix margin top dan bottom di setiap pag khusus nya page setelah home page yang terlihat belum ada jarak nya

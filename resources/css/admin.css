@@ -1,5 +1,18 @@
 /* Additional Admin Panel Responsive Styles */
 
+/* Page spacing for frontend pages */
+.page-spacing {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+    .page-spacing {
+        padding-top: 3rem;
+        padding-bottom: 4rem;
+    }
+}
+
 /* Mobile improvements (up to 1023px) */
 @media (max-width: 1023px) {
     .mobile-sidebar {

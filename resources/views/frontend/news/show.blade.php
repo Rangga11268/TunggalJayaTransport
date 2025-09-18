@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
     <article class="bg-white rounded-xl shadow-lg overflow-hidden mb-10">
         @if($article->getFirstMediaUrl('featured_images'))
             <div class="relative">
