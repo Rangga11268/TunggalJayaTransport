@@ -1,4 +1,12 @@
-<header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-lg" x-data="{ open: false }" @click.outside="open = false">
+<header 
+    id="navbar"
+    class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-lg transition-all duration-300 ease-in-out fixed w-full z-50"
+    style="background-color: rgba(29, 78, 216, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);"
+    x-data="{ 
+        open: false
+    }" 
+    @click.outside="open = false"
+>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
