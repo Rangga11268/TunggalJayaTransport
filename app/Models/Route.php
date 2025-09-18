@@ -10,9 +10,18 @@ class Route extends Model
         'name',
         'origin',
         'destination',
+        'origin_lat',
+        'origin_lng',
+        'destination_lat',
+        'destination_lng',
+        'waypoints',
         'distance',
         'duration',
         'description',
+    ];
+
+    protected $casts = [
+        'waypoints' => 'array',
     ];
 
     public function schedules()
@@ -41,5 +50,44 @@ class Route extends Model
         } else {
             return "{$minutes}m";
         }
+    }
+
+    /**
+     * Get all coordinates for the route including origin, waypoints, and destination
+     * @return array
+     */
+    public function getAllCoordinatesAttribute()
+    {
+        $coordinates = [];
+        
+        // Add origin
+        if ($this->origin_lat && $this->origin_lng) {
+            $coordinates[] = [
+                'lat' => (float) $this->origin_lat,
+                'lng' => (float) $this->origin_lng
+            ];
+        }
+        
+        // Add waypoints
+        if ($this->waypoints && is_array($this->waypoints)) {
+            foreach ($this->waypoints as $waypoint) {
+                if (isset($waypoint['lat']) && isset($waypoint['lng'])) {
+                    $coordinates[] = [
+                        'lat' => (float) $waypoint['lat'],
+                        'lng' => (float) $waypoint['lng']
+                    ];
+                }
+            }
+        }
+        
+        // Add destination
+        if ($this->destination_lat && $this->destination_lng) {
+            $coordinates[] = [
+                'lat' => (float) $this->destination_lat,
+                'lng' => (float) $this->destination_lng
+            ];
+        }
+        
+        return $coordinates;
     }
 }

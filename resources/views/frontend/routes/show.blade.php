@@ -77,6 +77,31 @@
         </div>
     </div>
     
+    <!-- Route Map -->
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 mb-10">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Route Map</h2>
+            <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                <i class="fas fa-map-marked-alt mr-1"></i>Visualize Route
+            </div>
+        </div>
+        
+        @if($route->origin_lat && $route->origin_lng && $route->destination_lat && $route->destination_lng)
+        <div id="route-map" style="height: 400px; width: 100%; border-radius: 0.5rem; z-index: 10;"></div>
+        <div class="mt-4 text-sm text-gray-600">
+            <p><i class="fas fa-mouse-pointer mr-2"></i>Click and drag to pan the map</p>
+        </div>
+        @else
+        <div class="bg-white rounded-xl shadow-sm p-8 text-center">
+            <div class="text-gray-400 text-5xl mb-4">
+                <i class="fas fa-map"></i>
+            </div>
+            <p class="text-gray-600 text-lg">Map information is not available for this route.</p>
+            <p class="text-gray-500 mt-2">Please check back later for updates.</p>
+        </div>
+        @endif
+    </div>
+    
     <!-- Schedule Legend -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md p-4 mb-6">
         <div class="flex flex-wrap items-center justify-between">
@@ -239,4 +264,195 @@
         </a>
     </div>
 </div>
+
+@endsection
+
+@section('scripts')
+@if($route->origin_lat && $route->origin_lng && $route->destination_lat && $route->destination_lng)
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the map with zoom disabled
+        var map = L.map('route-map', {
+            center: [{{ $route->origin_lat }}, {{ $route->origin_lng }}],
+            zoom: 6,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            dragging: true,
+            touchZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            keyboard: false
+        });
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 6,
+            minZoom: 6
+        }).addTo(map);
+
+        // Parse waypoints if they exist
+        var waypoints = [];
+        if ({{ $route->waypoints ? 'true' : 'false' }}) {
+            try {
+                waypoints = @json($route->waypoints);
+            } catch (e) {
+                console.error('Error parsing waypoints:', e);
+            }
+        }
+
+        // Add marker for origin
+        var originLatLng = L.latLng({{ $route->origin_lat }}, {{ $route->origin_lng }});
+        var originMarker = L.marker(originLatLng, {
+            title: "{{ $route->origin }} (Origin)"
+        }).addTo(map);
+        originMarker.bindPopup("<b>{{ $route->origin }}</b><br>Origin").openPopup();
+
+        // Add marker for destination
+        var destinationLatLng = L.latLng({{ $route->destination_lat }}, {{ $route->destination_lng }});
+        var destinationMarker = L.marker(destinationLatLng, {
+            title: "{{ $route->destination }} (Destination)"
+        }).addTo(map);
+        destinationMarker.bindPopup("<b>{{ $route->destination }}</b><br>Destination");
+
+        // Create polyline from waypoints
+        var routeCoordinates = [];
+        
+        // Add origin
+        routeCoordinates.push(originLatLng);
+        
+        // Add waypoints if available
+        if (waypoints && Array.isArray(waypoints)) {
+            waypoints.forEach(function(waypoint) {
+                if (waypoint.lat && waypoint.lng) {
+                    routeCoordinates.push(L.latLng(waypoint.lat, waypoint.lng));
+                }
+            });
+        }
+        
+        // Add destination
+        routeCoordinates.push(destinationLatLng);
+
+        var routeLine = L.polyline(routeCoordinates, {
+            color: 'blue',
+            weight: 4,
+            opacity: 0.7,
+            smoothFactor: 1
+        }).addTo(map);
+
+        // Fit the map to the route bounds with padding
+        var bounds = L.latLngBounds(routeCoordinates);
+        map.fitBounds(bounds, {padding: [50, 50]});
+
+        // Add a legend
+        var legend = L.control({position: 'bottomright'});
+
+        legend.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'info legend');
+            div.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+            div.style.padding = '6px';
+            div.style.borderRadius = '3px';
+            div.style.boxShadow = '0 0 8px rgba(0,0,0,0.2)';
+            div.style.marginBottom = '10px';
+            div.style.fontSize = '9px';
+            div.style.lineHeight = '1.2';
+            div.innerHTML = `
+                <h4 style="margin: 0 0 4px 0; font-weight: bold; font-size: 11px;">Route</h4>
+                <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                    <div style="width: 12px; height: 2px; background: blue; margin-right: 4px;"></div>
+                    <span>Path</span>
+                </div>
+                <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                    <div style="width: 8px; height: 8px; background: red; border-radius: 50%; margin-right: 4px;"></div>
+                    <span>Start</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 8px; height: 8px; background: green; border-radius: 50%; margin-right: 4px;"></div>
+                    <span>End</span>
+                </div>
+            `;
+            return div;
+        };
+
+        legend.addTo(map);
+    });
+</script>
+
+<style>
+    #route-map {
+        cursor: grab;
+    }
+    
+    #route-map:active {
+        cursor: grabbing;
+    }
+    
+    .info.legend {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 6px;
+        border-radius: 3px;
+        box-shadow: 0 0 8px rgba(0,0,0,0.2);
+        line-height: 1.2;
+        font-size: 9px;
+        margin-bottom: 10px;
+    }
+    
+    .info.legend h4 {
+        margin: 0 0 4px 0;
+        font-weight: bold;
+        font-size: 11px;
+    }
+    
+    /* Ensure map is properly sized */
+    .leaflet-container {
+        height: 100%;
+        width: 100%;
+    }
+    
+    /* Mobile responsive fixes */
+    @media (max-width: 768px) {
+        #route-map {
+            height: 300px !important;
+        }
+        
+        .info.legend {
+            font-size: 8px;
+            padding: 5px;
+            border-radius: 2px;
+            box-shadow: 0 0 6px rgba(0,0,0,0.2);
+            margin-bottom: 8px;
+        }
+        
+        .info.legend h4 {
+            font-size: 10px;
+            margin-bottom: 3px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        #route-map {
+            height: 250px !important;
+        }
+        
+        .info.legend {
+            font-size: 8px;
+            padding: 5px;
+            border-radius: 3px;
+            boxShadow: 0 0 6px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+        
+        .info.legend h4 {
+            font-size: 10px;
+            margin-bottom: 3px;
+        }
+    }
+</style>
+@endif
 @endsection
