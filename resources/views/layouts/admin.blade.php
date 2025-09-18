@@ -30,11 +30,14 @@
          }" 
          class="bg-gradient-to-b from-gray-800 to-gray-900 text-white min-h-screen shadow-xl flex-shrink-0 flex flex-col sidebar mobile-sidebar-container">
         <div class="p-4 flex items-center justify-between border-b border-gray-700 flex-shrink-0">
-            <h1 :class="{
+            <div :class="{
                     'block': sidebarOpen, 
                     'hidden': !sidebarOpen
                 }" 
-                class="text-xl font-bold whitespace-nowrap transition-opacity duration-300">Panel Admin</h1>
+                class="transition-opacity duration-300 flex items-center">
+                <img src="{{ asset('img/logoNoBg.png') }}" alt="Tunggal Jaya Transport Logo" class="h-10 w-auto mr-2">
+                <h1 class="text-xl font-bold whitespace-nowrap">Panel Admin</h1>
+            </div>
             <button @click="sidebarOpen = !sidebarOpen" 
                     class="text-white focus:outline-none hover:bg-gray-700 rounded-full p-2 transition-colors duration-200">
                 <i :class="sidebarOpen ? 'fas fa-times' : 'fas fa-bars'" class="text-xl"></i>
