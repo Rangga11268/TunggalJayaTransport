@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
     <!-- Header -->
     <div class="text-center mb-8">
         <h1 class="text-4xl font-bold text-gray-800 mb-3">{{ $route->name ?? $route->origin . ' - ' . $route->destination }}</h1>
@@ -54,7 +54,7 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Duration</p>
-                                <p class="font-medium">{{ $route->duration }} hours</p>
+                                <p class="font-medium">{{ $route->formatted_duration }}</p>
                             </div>
                         </div>
                     </div>
@@ -77,6 +77,24 @@
         </div>
     </div>
     
+    <!-- Schedule Legend -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md p-4 mb-6">
+        <div class="flex flex-wrap items-center justify-between">
+            <div class="flex items-center mb-2 md:mb-0">
+                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                <span class="text-sm">Daily Schedule</span>
+            </div>
+            <div class="flex items-center mb-2 md:mb-0">
+                <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                <span class="text-sm">Weekly Schedule</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                <span class="text-sm">Departed</span>
+            </div>
+        </div>
+    </div>
+    
     <!-- Schedules -->
     <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 mb-10">
         <div class="flex justify-between items-center mb-6">
@@ -91,9 +109,11 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
                     <tr>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Schedule Type</th>
                         <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Departure</th>
                         <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Arrival</th>
                         <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Bus Type</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Availability</th>
                         <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Price</th>
                         <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Action</th>
                     </tr>
@@ -103,12 +123,22 @@
                     <tr class="hover:bg-green-50 transition duration-150">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center {{ $schedule->is_weekly ? 'bg-green-100' : 'bg-blue-100' }}">
+                                    <i class="fas fa-{{ $schedule->is_weekly ? 'calendar-week' : 'clock' }} text-{{ $schedule->is_weekly ? 'green' : 'blue' }}-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ $schedule->is_weekly ? 'Weekly' : 'Daily' }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
                                 <div class="bg-green-100 p-2 rounded-full mr-3">
                                     <i class="fas fa-sign-out-alt text-green-600"></i>
                                 </div>
                                 <div>
                                     <div class="text-sm font-medium text-gray-900">{{ $schedule->departure_time->format('H:i') }}</div>
-                                    <div class="text-sm text-gray-500">Terminal {{ $schedule->departure_terminal ?? '1' }}</div>
+                                    <div class="text-sm text-gray-500">{{ $schedule->departure_time->format('l, F j') }}</div>
                                 </div>
                             </div>
                         </td>
@@ -119,7 +149,7 @@
                                 </div>
                                 <div>
                                     <div class="text-sm font-medium text-gray-900">{{ $schedule->arrival_time->format('H:i') }}</div>
-                                    <div class="text-sm text-gray-500">Terminal {{ $schedule->arrival_terminal ?? '1' }}</div>
+                                    <div class="text-sm text-gray-500">{{ $schedule->arrival_time->format('l, F j') }}</div>
                                 </div>
                             </div>
                         </td>
@@ -129,18 +159,44 @@
                                     <i class="fas fa-bus text-green-600"></i>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-900">{{ $schedule->bus->bus_type ?? 'Standard' }}</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ $schedule->bus->name ?? $schedule->bus->bus_type ?? 'Standard' }}</div>
                                     <div class="text-sm text-gray-500">{{ $schedule->bus->plate_number }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
+                            @if($schedule->hasDeparted())
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    <i class="fas fa-times-circle mr-1"></i>Departed
+                                </span>
+                            @else
+                                <div class="text-sm text-gray-900">{{ $schedule->getAvailableSeatsCount() }} / {{ $schedule->bus->capacity }} seats</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%"></div>
+                                </div>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-lg font-bold text-gray-900">Rp. {{ number_format($schedule->price, 0, ',', '.') }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="{{ route('frontend.booking.show', $schedule->id) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-700 border border-transparent rounded-md font-semibold text-white hover:from-green-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition duration-300 transform hover:scale-105">
-                                <i class="fas fa-ticket-alt mr-1"></i>Book Now
-                            </a>
+                            @if($schedule->hasDeparted())
+                                <span class="inline-flex items-center px-3 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
+                                    Departed
+                                </span>
+                            @elseif($schedule->getAvailableSeatsCount() > 0 && $schedule->isAvailableForBooking())
+                                <a href="{{ route('frontend.booking.show', $schedule->id) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-700 border border-transparent rounded-md font-semibold text-white hover:from-green-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition duration-300 transform hover:scale-105">
+                                    <i class="fas fa-ticket-alt mr-1"></i>Book Now
+                                </a>
+                            @elseif($schedule->getAvailableSeatsCount() == 0)
+                                <span class="inline-flex items-center px-3 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
+                                    Full
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-3 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
+                                    Not Available
+                                </span>
+                            @endif
                         </td>
                     </tr>
                     @endforeach
@@ -156,6 +212,21 @@
             <p class="text-gray-500 mt-2">Please check back later for updates or contact our customer service.</p>
         </div>
         @endif
+    </div>
+    
+    <!-- Info about schedule reset -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-md p-4 mb-8">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-blue-700">
+                    <strong>Schedule Information:</strong> Daily schedules reset automatically each day. Weekly schedules repeat on their designated days. 
+                    Once a bus has departed, tickets can no longer be purchased for that schedule.
+                </p>
+            </div>
+        </div>
     </div>
     
     <!-- Back to Routes -->

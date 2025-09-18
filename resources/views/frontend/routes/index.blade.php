@@ -8,6 +8,21 @@
         <p class="text-lg text-gray-600 max-w-2xl mx-auto">Explore our extensive network of routes connecting cities and towns across the region</p>
     </div>
     
+    <!-- Info about schedule reset -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-md p-4 mb-6">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-blue-700">
+                    <strong>Route Information:</strong> Our routes operate with daily and weekly schedules. 
+                    Daily schedules reset automatically each day, while weekly schedules repeat on their designated days.
+                </p>
+            </div>
+        </div>
+    </div>
+    
     <!-- Interactive Map -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-10">
         <div class="flex justify-between items-center mb-6">
@@ -60,7 +75,7 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Duration</p>
-                                <p class="font-medium">{{ $route->duration }} hours</p>
+                                <p class="font-medium">{{ $route->formatted_duration }}</p>
                             </div>
                         </div>
                     </div>

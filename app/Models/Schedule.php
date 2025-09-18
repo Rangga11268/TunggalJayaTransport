@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Schedule extends Model
 {
@@ -13,6 +14,8 @@ class Schedule extends Model
         'arrival_time',
         'price',
         'status',
+        'is_weekly',
+        'day_of_week',
     ];
 
     protected $casts = [
@@ -70,5 +73,61 @@ class Schedule extends Model
         }
         
         return array_map('trim', $seatNumbers);
+    }
+
+    /**
+     * Check if the schedule departure time has passed
+     */
+    public function hasDeparted()
+    {
+        return $this->departure_time->isPast();
+    }
+
+    /**
+     * Check if the schedule is available for booking
+     */
+    public function isAvailableForBooking()
+    {
+        // If schedule has already departed, it's not available
+        if ($this->hasDeparted()) {
+            return false;
+        }
+
+        // If it's a weekly schedule, check if it's the correct day
+        if ($this->is_weekly && $this->day_of_week !== null) {
+            $today = Carbon::now()->dayOfWeek;
+            if ($today != $this->day_of_week) {
+                return false;
+            }
+        }
+
+        // Check if there are available seats
+        return $this->getAvailableSeatsCount() > 0;
+    }
+
+    /**
+     * Scope for available schedules only
+     */
+    public function scopeAvailable($query)
+    {
+        return $query->where('departure_time', '>', Carbon::now())
+            ->whereHas('bus')
+            ->whereHas('route');
+    }
+
+    /**
+     * Scope for weekly schedules
+     */
+    public function scopeWeekly($query)
+    {
+        return $query->where('is_weekly', true);
+    }
+
+    /**
+     * Scope for daily schedules
+     */
+    public function scopeDaily($query)
+    {
+        return $query->where('is_weekly', false);
     }
 }

@@ -36,11 +36,15 @@ class BookingController extends Controller
             
             if ($validRoutes->count() > 0) {
                 $validPair = true;
-                // Get schedules for these routes
+                // Get schedules for these routes that are available for booking
                 $routeIds = $validRoutes->pluck('id');
                 $schedules = Schedule::whereIn('route_id', $routeIds)
                     ->with('route', 'bus')
-                    ->get();
+                    ->available()
+                    ->get()
+                    ->filter(function ($schedule) {
+                        return $schedule->isAvailableForBooking();
+                    });
             }
         }
         
@@ -64,8 +68,8 @@ class BookingController extends Controller
             'date' => 'nullable|date',
         ]);
         
-        // Get all schedules with their relations
-        $query = Schedule::with('route', 'bus');
+        // Get all schedules with their relations that are available for booking
+        $query = Schedule::with('route', 'bus')->available();
         
         // Apply filters if provided
         if ($origin) {
@@ -87,12 +91,26 @@ class BookingController extends Controller
         // Order by departure time
         $schedules = $query->orderBy('departure_time')->paginate(10);
         
+        // Filter out schedules that are not available for booking
+        $schedules->setCollection(
+            $schedules->getCollection()->filter(function ($schedule) {
+                return $schedule->isAvailableForBooking();
+            })
+        );
+        
         return view('frontend.booking.schedules', compact('schedules', 'origins', 'destinations', 'origin', 'destination', 'date'));
     }
     
     public function show($id)
     {
         $schedule = Schedule::with('route', 'bus')->findOrFail($id);
+        
+        // Check if schedule is available for booking
+        if (!$schedule->isAvailableForBooking()) {
+            return redirect()->route('frontend.booking.index')
+                ->withErrors(['schedule' => 'This schedule is no longer available for booking.'])
+                ->withInput();
+        }
         
         return view('frontend.booking.show', compact('schedule'));
     }
@@ -109,6 +127,13 @@ class BookingController extends Controller
         ]);
         
         $schedule = Schedule::with('bus')->findOrFail($request->schedule_id);
+        
+        // Check if schedule is available for booking
+        if (!$schedule->isAvailableForBooking()) {
+            return redirect()->route('frontend.booking.index')
+                ->withErrors(['schedule' => 'This schedule is no longer available for booking.'])
+                ->withInput();
+        }
         
         // Check if there are enough seats available
         $availableSeats = $schedule->getAvailableSeatsCount();

@@ -2,7 +2,17 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
-    <h1 class="text-3xl font-bold mb-6">Complete Schedule</h1>
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Complete Schedule</h1>
+        <div class="flex items-center space-x-2">
+            <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+                <i class="fas fa-sync-alt mr-1"></i>Daily Reset
+            </span>
+            <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
+                <i class="fas fa-calendar-week mr-1"></i>Weekly Schedules
+            </span>
+        </div>
+    </div>
     
     <!-- Search Form -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -31,70 +41,99 @@
                 <input type="date" id="date" name="date" value="{{ request()->get('date') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
             </div>
             <div class="flex items-end">
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Search
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <i class="fas fa-search mr-2"></i>Search
                 </button>
             </div>
         </form>
-        
-        <!-- Info -->
-        <div class="mt-4 text-sm text-gray-600">
-            <p>Showing all available schedules. Use the filters above to narrow down your search.</p>
+    </div>
+    
+    <!-- Schedule Legend -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md p-4 mb-6">
+        <div class="flex flex-wrap items-center justify-between">
+            <div class="flex items-center mb-2 md:mb-0">
+                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                <span class="text-sm">Daily Schedule</span>
+            </div>
+            <div class="flex items-center mb-2 md:mb-0">
+                <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                <span class="text-sm">Weekly Schedule</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                <span class="text-sm">Departed</span>
+            </div>
         </div>
     </div>
-
-    <!-- All Schedules -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold">All Available Schedules</h2>
-            <span class="text-sm text-gray-500">{{ $schedules->total() }} schedules found</span>
-        </div>
-        
-        @if(isset($schedules) && $schedules->count() > 0)
+    
+    <!-- Schedule Results -->
+    @if($schedules->count() > 0)
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bus Type</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Available Seats</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Schedule</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Route</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Bus</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Availability</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Price</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($schedules as $schedule)
-                    <tr>
+                    <tr class="hover:bg-gray-50 transition duration-150">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">{{ $schedule->route->origin }} - {{ $schedule->route->destination }}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $schedule->departure_time->format('d M Y H:i') }}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $schedule->arrival_time->format('d M Y H:i') }}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $schedule->bus->bus_type ?? 'Standard' }}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            @php
-                                $availableSeats = $schedule->getAvailableSeatsCount();
-                                $capacity = $schedule->bus->capacity;
-                                $percentage = $capacity > 0 ? ($availableSeats / $capacity) * 100 : 0;
-                            @endphp
-                            <div class="text-sm text-gray-900">{{ $availableSeats }} / {{ $capacity }}</div>
-                            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                <div class="bg-green-600 h-2 rounded-full" style="width: {{ $percentage }}%"></div>
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center {{ $schedule->is_weekly ? 'bg-green-100' : 'bg-blue-100' }}">
+                                    <i class="fas fa-{{ $schedule->is_weekly ? 'calendar-week' : 'clock' }} text-{{ $schedule->is_weekly ? 'green' : 'blue' }}-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ $schedule->departure_time->format('H:i') }}
+                                        <span class="text-gray-500 mx-1">→</span>
+                                        {{ $schedule->arrival_time->format('H:i') }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ $schedule->departure_time->format('l, F j') }}
+                                    </div>
+                                </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Rp. {{ number_format($schedule->price, 0, ',', '.') }}</div>
+                            <div class="text-sm font-medium text-gray-900">{{ $schedule->route->origin }}</div>
+                            <div class="text-sm text-gray-500">{{ $schedule->route->destination }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ $schedule->bus->name ?? 'N/A' }}</div>
+                            <div class="text-sm text-gray-500">{{ $schedule->bus->plate_number }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($schedule->hasDeparted())
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    <i class="fas fa-times-circle mr-1"></i>Departed
+                                </span>
+                            @else
+                                <div class="text-sm text-gray-900">{{ $schedule->getAvailableSeatsCount() }} / {{ $schedule->bus->capacity }} seats</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%"></div>
+                                </div>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            Rp. {{ number_format($schedule->price, 0, ',', '.') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="{{ route('frontend.booking.show', $schedule->id) }}" class="text-indigo-600 hover:text-indigo-900">Select</a>
+                            @if($schedule->hasDeparted())
+                                <span class="text-gray-400">Unavailable</span>
+                            @elseif($schedule->getAvailableSeatsCount() > 0)
+                                <a href="{{ route('frontend.booking.show', $schedule->id) }}" class="text-blue-600 hover:text-blue-900">
+                                    Book Now
+                                </a>
+                            @else
+                                <span class="text-gray-400">Full</span>
+                            @endif
                         </td>
                     </tr>
                     @endforeach
@@ -102,34 +141,16 @@
             </table>
         </div>
         
-        <!-- Pagination -->
-        <div class="mt-6">
-            {{ $schedules->appends(request()->query())->links() }}
+        <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
+            {{ $schedules->links() }}
         </div>
-        @else
-        <div class="text-center py-4">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-            <h3 class="mt-2 text-lg font-medium text-gray-900">No schedules found</h3>
-            <p class="mt-1 text-gray-500">No schedules match your search criteria. Please try different search parameters.</p>
-            <div class="mt-6">
-                <a href="{{ route('frontend.booking.schedules') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    View All Schedules
-                </a>
-            </div>
-        </div>
-        @endif
     </div>
-    
-    <!-- Back to Booking -->
-    <div class="mb-8">
-        <a href="{{ route('frontend.booking.index') }}" class="inline-flex items-center text-blue-500 hover:underline">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Back to Booking
-        </a>
+    @else
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <i class="fas fa-calendar-times text-gray-300 text-5xl mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-1">No schedules found</h3>
+        <p class="text-gray-500">There are no available schedules matching your search criteria.</p>
     </div>
+    @endif
 </div>
 @endsection

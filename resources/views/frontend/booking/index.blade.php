@@ -18,6 +18,21 @@
         </a>
     </div>
     
+    <!-- Info about schedule reset -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-md p-4 mb-8">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-blue-700">
+                    <strong>Schedule Information:</strong> Daily schedules reset automatically each day. Weekly schedules repeat on their designated days. 
+                    Once a bus has departed, tickets can no longer be purchased for that schedule.
+                </p>
+            </div>
+        </div>
+    </div>
+    
     <!-- Search Form -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-10">
         <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Search for Schedules</h2>
@@ -125,7 +140,11 @@
                             <div class="text-lg font-bold text-gray-900">Rp. {{ number_format($schedule->price, 0, ',', '.') }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            @if($schedule->getAvailableSeatsCount() > 0)
+                            @if($schedule->hasDeparted())
+                                <span class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
+                                    Departed
+                                </span>
+                            @elseif($schedule->getAvailableSeatsCount() > 0)
                             <a href="{{ route('frontend.booking.show', $schedule->id) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 border border-transparent rounded-md font-semibold text-white hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm">
                                 Select
                             </a>

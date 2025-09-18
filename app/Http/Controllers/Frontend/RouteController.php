@@ -17,7 +17,17 @@ class RouteController extends Controller
     
     public function show($id)
     {
-        $route = BusRoute::with('schedules.bus')->findOrFail($id);
+        $route = BusRoute::with(['schedules.bus' => function($query) {
+            $query->orderBy('plate_number');
+        }])->findOrFail($id);
+        
+        // Filter schedules to only show available ones
+        $availableSchedules = $route->schedules->filter(function ($schedule) {
+            return $schedule->isAvailableForBooking();
+        });
+        
+        // Add the filtered schedules to the route object
+        $route->availableSchedules = $availableSchedules;
         
         return view('frontend.routes.show', compact('route'));
     }
