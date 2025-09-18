@@ -2,77 +2,196 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8 text-center">
-        <div class="text-green-500 text-6xl mb-4">
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-8 mb-10 text-center">
+        <div class="text-green-500 text-7xl mb-6 animate-bounce">
             <i class="fas fa-check-circle"></i>
         </div>
-        <h1 class="text-3xl font-bold mb-4">Booking Successful!</h1>
-        <p class="text-gray-600 mb-6">Thank you for your booking. Your payment has been processed successfully.</p>
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Booking Successful!</h1>
+        <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Thank you for your booking. Your payment has been processed successfully. Your ticket is ready to use!</p>
         
-        <div class="bg-gray-50 rounded-lg p-6 mb-6 text-left">
-            <h2 class="text-xl font-bold mb-4">Booking Details</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <p><strong>Booking Code:</strong> {{ $booking->booking_code }}</p>
-                    <p><strong>Route:</strong> {{ $booking->schedule->route->origin }} - {{ $booking->schedule->route->destination }}</p>
-                    <p><strong>Date:</strong> {{ $booking->schedule->departure_time->format('F j, Y') }}</p>
-                    <p><strong>Departure:</strong> {{ $booking->schedule->departure_time->format('H:i') }}</p>
-                </div>
-                <div>
-                    <p><strong>Name:</strong> {{ $booking->passenger_name }}</p>
-                    <p><strong>Email:</strong> {{ $booking->passenger_email }}</p>
-                    <p><strong>Phone:</strong> {{ $booking->passenger_phone }}</p>
-                    <p><strong>Number of Seats:</strong> {{ $booking->number_of_seats }}</p>
-                    <p><strong>Selected Seats:</strong> {{ $booking->seat_numbers }}</p>
+        <div class="bg-white rounded-xl shadow-md p-8 mb-8 text-left">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Booking Details</h2>
+                <div class="bg-green-100 text-green-800 px-4 py-2 rounded-full font-bold">
+                    <i class="fas fa-check mr-2"></i>Confirmed
                 </div>
             </div>
-            <div class="mt-4 pt-4 border-t border-gray-200">
-                <div class="flex justify-between">
-                    <span class="text-lg font-bold">Total Paid:</span>
-                    <span class="text-lg font-bold">Rp. {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-gray-50 p-5 rounded-lg">
+                    <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2">Trip Information</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-hashtag text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Booking Code</p>
+                                <p class="font-medium">{{ $booking->booking_code }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-route text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Route</p>
+                                <p class="font-medium">{{ $booking->schedule->route->origin }} <i class="fas fa-arrow-right mx-2 text-green-500"></i> {{ $booking->schedule->route->destination }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-calendar-alt text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Date</p>
+                                <p class="font-medium">{{ $booking->schedule->departure_time->format('l, F j, Y') }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-sign-out-alt text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Departure</p>
+                                <p class="font-medium">{{ $booking->schedule->departure_time->format('H:i') }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mt-2">
-                    <span class="text-sm text-gray-600">Payment Status: </span>
-                    <span class="text-sm font-bold text-green-600">Completed</span>
+                
+                <div class="bg-gray-50 p-5 rounded-lg">
+                    <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2">Passenger Information</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-user text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Name</p>
+                                <p class="font-medium">{{ $booking->passenger_name }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-envelope text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Email</p>
+                                <p class="font-medium">{{ $booking->passenger_email }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-phone text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Phone</p>
+                                <p class="font-medium">{{ $booking->passenger_phone }}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-center">
+                                <div class="bg-green-100 p-2 rounded-full mr-3">
+                                    <i class="fas fa-chair text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Seats</p>
+                                    <p class="font-medium">{{ $booking->number_of_seats }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="bg-green-100 p-2 rounded-full mr-3">
+                                    <i class="fas fa-hashtag text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Seat Numbers</p>
+                                    <p class="font-medium">{{ $booking->seat_numbers }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <p class="text-gray-600">Payment Status: <span class="font-bold text-green-600">Completed</span></p>
+                    <p class="text-sm text-gray-500">+ Service Fee: Rp. 5,000</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-600">Total Paid:</p>
+                    <p class="text-3xl font-bold text-green-600">Rp. {{ number_format($booking->total_price + 5000, 0, ',', '.') }}</p>
                 </div>
             </div>
         </div>
         
         <!-- Ticket Preview -->
-        @include('frontend.booking.partials.ticket-preview', [
-            'origin' => $booking->schedule->route->origin,
-            'destination' => $booking->schedule->route->destination,
-            'departureDate' => $booking->schedule->departure_time->format('d M Y'),
-            'departureTime' => $booking->schedule->departure_time->format('H:i'),
-            'arrivalTime' => $booking->schedule->arrival_time->format('H:i'),
-            'passengerName' => $booking->passenger_name,
-            'passengerEmail' => $booking->passenger_email,
-            'passengerPhone' => $booking->passenger_phone,
-            'bookingCode' => $booking->booking_code,
-            'bookingId' => $booking->id,
-            'busType' => $booking->schedule->bus->bus_type ?? 'Standard',
-            'seatNumber' => $booking->seat_numbers,
-            'price' => 'Rp. ' . number_format($booking->total_price, 0, ',', '.'),
-        ])
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Your Ticket</h2>
+            @include('frontend.booking.partials.ticket-preview', [
+                'origin' => $booking->schedule->route->origin,
+                'destination' => $booking->schedule->route->destination,
+                'departureDate' => $booking->schedule->departure_time->format('d M Y'),
+                'departureTime' => $booking->schedule->departure_time->format('H:i'),
+                'arrivalTime' => $booking->schedule->arrival_time->format('H:i'),
+                'passengerName' => $booking->passenger_name,
+                'passengerEmail' => $booking->passenger_email,
+                'passengerPhone' => $booking->passenger_phone,
+                'bookingCode' => $booking->booking_code,
+                'bookingId' => $booking->id,
+                'busType' => $booking->schedule->bus->bus_type ?? 'Standard',
+                'seatNumber' => $booking->seat_numbers,
+                'price' => 'Rp. ' . number_format($booking->total_price, 0, ',', '.'),
+            ])
+        </div>
         
-        <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+        <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
             <a href="{{ route('frontend.booking.view-ticket', $booking->id) }}" 
-               class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+               class="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center"
                target="_blank">
-                👀 View Ticket
+                <i class="fas fa-eye mr-2"></i> View Ticket
             </a>
             <a href="{{ route('frontend.booking.download-ticket', $booking->id) }}" 
-               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                📥 Download Ticket (PDF)
+               class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center">
+                <i class="fas fa-download mr-2"></i> Download Ticket (PDF)
             </a>
             <a href="{{ route('frontend.booking.index') }}" 
-               class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                🚌 Book Another Ticket
+               class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center">
+                <i class="fas fa-bus mr-2"></i> Book Another Ticket
             </a>
             <a href="{{ route('frontend.home') }}" 
-               class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
-                🏠 Back to Home
+               class="bg-gradient-to-r from-purple-600 to-violet-700 hover:from-purple-700 hover:to-violet-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center">
+                <i class="fas fa-home mr-2"></i> Back to Home
             </a>
+        </div>
+    </div>
+    
+    <!-- Additional Information -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-8 mb-10">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Next Steps</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                <div class="text-blue-500 text-4xl mb-4">
+                    <i class="fas fa-print"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Print Your Ticket</h3>
+                <p class="text-gray-600 text-sm">Download and print your ticket or save it on your mobile device for easy access.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                <div class="text-blue-500 text-4xl mb-4">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Arrive Early</h3>
+                <p class="text-gray-600 text-sm">Please arrive at the departure point at least 30 minutes before departure time.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                <div class="text-blue-500 text-4xl mb-4">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Contact Us</h3>
+                <p class="text-gray-600 text-sm">If you have any questions, contact our customer service at +1 (555) 123-4567.</p>
+            </div>
         </div>
     </div>
 </div>
