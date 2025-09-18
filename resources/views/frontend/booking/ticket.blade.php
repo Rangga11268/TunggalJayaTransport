@@ -559,7 +559,7 @@
                     @php
                         use Milon\Barcode\DNS1D;
                         $dns1d = new DNS1D();
-                        echo $dns1d->getBarcodeHTML($booking->booking_code, 'C128', 2.5, 50);
+                        echo $dns1d->getBarcodeSVG($booking->booking_code, 'C128', 2.5, 50);
                     @endphp
                 </div>
                 <div class="booking-code-large">{{ $booking->booking_code }}</div>
@@ -597,6 +597,17 @@
         </div>
         
         <button onclick="window.print()" class="print-button">🖨️ Print Bus Ticket</button>
+        
+        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+            <a href="{{ route('frontend.booking.download-ticket', $booking->id) }}" 
+               style="display: inline-block; padding: 12px 20px; background: #10b981; color: white; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); transition: all 0.3s ease;">
+                📥 Download PDF
+            </a>
+            <a href="{{ route('frontend.booking.index') }}" 
+               style="display: inline-block; padding: 12px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); transition: all 0.3s ease;">
+                🚌 Book Another Ticket
+            </a>
+        </div>
     </div>
     
     <script>

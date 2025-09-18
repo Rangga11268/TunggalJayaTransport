@@ -302,9 +302,11 @@
                     <div class="barcode-placeholder">
                         <!-- Barcode will be generated here -->
                         <div class="barcode-lines">
-                            @for ($i = 0; $i < 30; $i++)
-                                <div class="barcode-line" style="height: {{ rand(15, 45) }}px;"></div>
-                            @endfor
+                            @php
+                                use Milon\Barcode\DNS1D;
+                                $dns1d = new DNS1D();
+                                echo $dns1d->getBarcodeSVG($booking->booking_code, 'C128', 1.5, 30);
+                            @endphp
                         </div>
                         <div class="barcode-number">{{ $booking->booking_code }}</div>
                     </div>

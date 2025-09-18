@@ -253,17 +253,20 @@
         </div>
         
         @if($booking->seat_numbers)
-            @include('frontend.booking.partials.ticket', [
+            @include('frontend.booking.partials.ticket-preview', [
                 'passengerName' => $booking->passenger_name,
+                'passengerEmail' => $booking->passenger_email,
+                'passengerPhone' => $booking->passenger_phone,
                 'bookingCode' => $booking->booking_code,
+                'bookingId' => $booking->id,
                 'origin' => $booking->schedule->route->origin,
                 'destination' => $booking->schedule->route->destination,
-                'departureDate' => $booking->schedule->departure_time->format('M j, Y'),
+                'departureDate' => $booking->schedule->departure_time->format('d M Y'),
                 'departureTime' => $booking->schedule->departure_time->format('H:i'),
+                'arrivalTime' => $booking->schedule->arrival_time->format('H:i'),
                 'seatNumber' => $booking->seat_numbers,
                 'busType' => $booking->schedule->bus->bus_type ?? 'Standard',
                 'price' => 'Rp. ' . number_format($booking->total_price, 0, ',', '.'),
-                'boardingPoint' => 'Main Terminal'
             ])
         @else
             <div class="text-center py-8 text-gray-500">

@@ -292,4 +292,17 @@ class BookingController extends Controller
         
         return $pdf->download('ticket-' . $booking->booking_code . '.pdf');
     }
+    
+    public function viewTicket($id)
+    {
+        $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
+        
+        // Ensure the booking has seat numbers
+        if (empty($booking->seat_numbers)) {
+            abort(404, 'Ticket not available. Please select seats first.');
+        }
+        
+        // Return the ticket view for online viewing
+        return view('frontend.booking.ticket-preview', compact('booking'));
+    }
 }

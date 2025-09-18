@@ -38,12 +38,40 @@
             </div>
         </div>
         
-        <div class="flex flex-col sm:flex-row justify-center gap-4">
-            <a href="{{ route('frontend.booking.index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Book Another Ticket
+        <!-- Ticket Preview -->
+        @include('frontend.booking.partials.ticket-preview', [
+            'origin' => $booking->schedule->route->origin,
+            'destination' => $booking->schedule->route->destination,
+            'departureDate' => $booking->schedule->departure_time->format('d M Y'),
+            'departureTime' => $booking->schedule->departure_time->format('H:i'),
+            'arrivalTime' => $booking->schedule->arrival_time->format('H:i'),
+            'passengerName' => $booking->passenger_name,
+            'passengerEmail' => $booking->passenger_email,
+            'passengerPhone' => $booking->passenger_phone,
+            'bookingCode' => $booking->booking_code,
+            'bookingId' => $booking->id,
+            'busType' => $booking->schedule->bus->bus_type ?? 'Standard',
+            'seatNumber' => $booking->seat_numbers,
+            'price' => 'Rp. ' . number_format($booking->total_price, 0, ',', '.'),
+        ])
+        
+        <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+            <a href="{{ route('frontend.booking.view-ticket', $booking->id) }}" 
+               class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+               target="_blank">
+                👀 View Ticket
             </a>
-            <a href="{{ route('frontend.home') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                Back to Home
+            <a href="{{ route('frontend.booking.download-ticket', $booking->id) }}" 
+               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                📥 Download Ticket (PDF)
+            </a>
+            <a href="{{ route('frontend.booking.index') }}" 
+               class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                🚌 Book Another Ticket
+            </a>
+            <a href="{{ route('frontend.home') }}" 
+               class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                🏠 Back to Home
             </a>
         </div>
     </div>

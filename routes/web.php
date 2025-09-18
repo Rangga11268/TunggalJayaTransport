@@ -22,6 +22,7 @@ Route::prefix('')->name('frontend.')->group(function () {
         Route::get('/confirmation/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'confirmation'])->name('booking.confirmation');
         Route::get('/success/{id}', [App\Http\Controllers\Frontend\BookingController::class, 'success'])->name('booking.success');
         Route::get('/ticket/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'downloadTicket'])->name('booking.download-ticket');
+        Route::get('/ticket/view/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'viewTicket'])->name('booking.view-ticket');
     });
 
     Route::get('/routes', [App\Http\Controllers\Frontend\RouteController::class, 'index'])->name('routes.index');
