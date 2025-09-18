@@ -5,10 +5,10 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
+                <div class="p-4 sm:p-6">
                     <form action="{{ route('admin.bookings.update', $booking) }}" method="POST">
                         @csrf
                         @method('PUT')
@@ -123,10 +123,10 @@
                         </div>
                         
                         <div class="flex items-center justify-between pt-6">
-                            <a href="{{ route('admin.bookings.index') }}" class="text-gray-600 hover:text-gray-800">
+                            <a href="{{ route('admin.bookings.index') }}" class="text-gray-600 hover:text-gray-800 touch-friendly">
                                 ← Back to Bookings
                             </a>
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded touch-friendly">
                                 Update Booking
                             </button>
                         </div>

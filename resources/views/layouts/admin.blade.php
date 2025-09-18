@@ -1,4 +1,4 @@
-<div class="flex min-h-screen"
+<div class="flex min-h-screen w-full max-w-full"
      :class="{
         'flex-col': window.innerWidth < 1024 && sidebarOpen,
         'flex-row': window.innerWidth >= 1024 || !sidebarOpen
@@ -180,7 +180,7 @@
          x-cloak></div>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col min-h-0 w-full"
+    <div class="flex-1 flex flex-col min-h-0 w-full max-w-full overflow-x-hidden"
          :class="{
             'lg:ml-0': window.innerWidth >= 1024,
             'ml-0': window.innerWidth < 1024
@@ -248,7 +248,7 @@
         </nav>
 
         <!-- Page Content -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6 w-full max-w-full">
             {{ $slot }}
         </main>
     </div>

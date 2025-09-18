@@ -5,10 +5,10 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
+                <div class="p-4 sm:p-6">
                     <div class="mb-6">
                         <h1 class="text-2xl font-bold">Booking Details</h1>
                         <div class="mt-2 text-sm text-gray-500">
@@ -125,17 +125,17 @@
                     </div>
                     
                     <div class="mt-8 flex items-center justify-between pt-6 border-t border-gray-200">
-                        <a href="{{ route('admin.bookings.index') }}" class="text-gray-600 hover:text-gray-800">
+                        <a href="{{ route('admin.bookings.index') }}" class="text-gray-600 hover:text-gray-800 touch-friendly">
                             ← Back to Bookings
                         </a>
                         <div>
-                            <a href="{{ route('admin.bookings.edit', $booking) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                            <a href="{{ route('admin.bookings.edit', $booking) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 touch-friendly">
                                 Edit
                             </a>
                             <form action="{{ route('admin.bookings.destroy', $booking) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="return confirm('Are you sure you want to delete this booking?')">
+                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded touch-friendly" onclick="return confirm('Are you sure you want to delete this booking?')">
                                     Delete
                                 </button>
                             </form>
