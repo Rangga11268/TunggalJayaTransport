@@ -37,7 +37,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
+    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('reports.occupancy');
     Route::get('/reports/custom', [ReportController::class, 'custom'])->name('reports.custom');
     Route::post('/reports/custom', [ReportController::class, 'generateCustom'])->name('reports.custom.generate');
 

@@ -20,29 +20,40 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <div class="text-sm font-medium text-blue-800">Average Occupancy</div>
-                            <div class="mt-2 text-2xl font-bold text-blue-900">85%</div>
+                            <div class="mt-2 text-2xl font-bold text-blue-900">
+                                @php
+                                    $averageOccupancy = count($occupancyData) > 0 ? array_sum(array_column($occupancyData, 'occupancy_rate')) / count($occupancyData) : 0;
+                                @endphp
+                                {{ number_format($averageOccupancy, 2) }}%
+                            </div>
                         </div>
                         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
                             <div class="text-sm font-medium text-green-800">Highest Route</div>
-                            <div class="mt-2 text-2xl font-bold text-green-900">Jakarta - Bandung</div>
+                            <div class="mt-2 text-2xl font-bold text-green-900">
+                                @if(count($occupancyData) > 0)
+                                    {{ $occupancyData[0]['route'] }}
+                                @else
+                                    N/A
+                                @endif
+                            </div>
                         </div>
                         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                             <div class="text-sm font-medium text-yellow-800">Lowest Route</div>
-                            <div class="mt-2 text-2xl font-bold text-yellow-900">Yogyakarta - Solo</div>
+                            <div class="mt-2 text-2xl font-bold text-yellow-900">
+                                @if(count($occupancyData) > 0)
+                                    {{ end($occupancyData)['route'] }}
+                                @else
+                                    N/A
+                                @endif
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Chart Container -->
                     <div class="mb-8">
-                        <h4 class="text-md font-medium mb-4">Occupancy by Route</h4>
-                        <div class="bg-gray-100 border border-gray-300 rounded-lg p-8 h-64 flex items-center justify-center">
-                            <div class="text-center">
-                                <svg class="h-12 w-12 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <p class="mt-2 text-gray-500">Occupancy chart visualization would appear here</p>
-                                <p class="text-sm text-gray-400">Using Chart.js library</p>
-                            </div>
+                        <h4 class="text-md font-medium mb-4">Top 10 Occupancy Rates by Bus</h4>
+                        <div class="bg-white border border-gray-300 rounded-lg p-4 h-80">
+                            <canvas id="occupancyChart" data-occupancy="{{ json_encode($occupancyData) }}"></canvas>
                         </div>
                     </div>
                     
@@ -62,51 +73,33 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
+                                    @forelse($occupancyData as $data)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Executive Bus 1</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">B 1234 XYZ</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Jakarta - Bandung</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">40</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">34</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $data['bus_name'] }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data['plate_number'] }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data['route'] }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data['capacity'] }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data['booked_seats'] }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div class="w-24 bg-gray-200 rounded-full h-2.5">
-                                                    <div class="bg-green-600 h-2.5 rounded-full" style="width: 85%"></div>
+                                                    @php
+                                                        $rate = $data['occupancy_rate'];
+                                                        $color = $rate >= 80 ? 'bg-green-600' : ($rate >= 60 ? 'bg-yellow-600' : 'bg-red-600');
+                                                    @endphp
+                                                    <div class="{{ $color }} h-2.5 rounded-full" style="width: {{ min($rate, 100) }}%"></div>
                                                 </div>
-                                                <span class="ml-2 text-sm text-gray-500">85%</span>
+                                                <span class="ml-2 text-sm text-gray-500">{{ number_format($rate, 2) }}%</span>
                                             </div>
                                         </td>
                                     </tr>
+                                    @empty
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Business Bus 1</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">B 5678 ABC</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Surabaya - Malang</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">35</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">28</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="w-24 bg-gray-200 rounded-full h-2.5">
-                                                    <div class="bg-yellow-600 h-2.5 rounded-full" style="width: 80%"></div>
-                                                </div>
-                                                <span class="ml-2 text-sm text-gray-500">80%</span>
-                                            </div>
+                                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                                            No occupancy data available
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Economy Bus 1</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">B 9012 DEF</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yogyakarta - Solo</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">30</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">18</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="w-24 bg-gray-200 rounded-full h-2.5">
-                                                    <div class="bg-red-600 h-2.5 rounded-full" style="width: 60%"></div>
-                                                </div>
-                                                <span class="ml-2 text-sm text-gray-500">60%</span>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>

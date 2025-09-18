@@ -160,7 +160,7 @@
                         }" 
                         class="transition-opacity duration-300">Pengaturan</span>
                 </a>
-                <a href="{{ route('admin.test-sidebar') }}"
+                {{-- <a href="{{ route('admin.test-sidebar') }}"
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.test-sidebar') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-vial text-lg w-6"></i> 
                     <span :class="{
@@ -168,7 +168,7 @@
                             'hidden': !sidebarOpen
                         }" 
                         class="transition-opacity duration-300">Test Sidebar</span>
-                </a>
+                </a> --}}
             </nav>
         </div>
     </div>

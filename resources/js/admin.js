@@ -1,6 +1,8 @@
 import Swal from 'sweetalert2';
+import Chart from 'chart.js/auto';
 
 window.Swal = Swal;
+window.Chart = Chart;
 
 // Global configuration for SweetAlert2
 const swalConfig = {
@@ -83,4 +85,116 @@ document.addEventListener('DOMContentLoaded', function() {
             timerProgressBar: true
         });
     }
+    
+    // Initialize charts if they exist on the page
+    initializeCharts();
 });
+
+// Function to initialize charts
+function initializeCharts() {
+    // Sales chart
+    const salesChartElement = document.getElementById('salesChart');
+    if (salesChartElement) {
+        const salesData = JSON.parse(salesChartElement.getAttribute('data-sales'));
+        
+        // Prepare data for Chart.js
+        const dates = salesData.map(item => item.date);
+        const totals = salesData.map(item => item.total);
+        
+        new Chart(salesChartElement, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Revenue',
+                    data: totals,
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp. ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Rp. ' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Occupancy chart
+    const occupancyChartElement = document.getElementById('occupancyChart');
+    if (occupancyChartElement) {
+        const occupancyData = JSON.parse(occupancyChartElement.getAttribute('data-occupancy'));
+        
+        // Take top 10 for better visualization
+        const topOccupancy = occupancyData.slice(0, 10);
+        const labels = topOccupancy.map(item => item.bus_name + ' (' + item.route + ')');
+        const occupancyRates = topOccupancy.map(item => item.occupancy_rate);
+        
+        new Chart(occupancyChartElement, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Occupancy Rate (%)',
+                    data: occupancyRates,
+                    backgroundColor: occupancyRates.map(rate => 
+                        rate >= 80 ? 'rgba(34, 197, 94, 0.7)' : 
+                        rate >= 60 ? 'rgba(251, 191, 36, 0.7)' : 
+                        'rgba(239, 68, 68, 0.7)'
+                    ),
+                    borderColor: occupancyRates.map(rate => 
+                        rate >= 80 ? 'rgb(34, 197, 94)' : 
+                        rate >= 60 ? 'rgb(251, 191, 36)' : 
+                        'rgb(239, 68, 68)'
+                    ),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y.toFixed(2) + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}

@@ -44,7 +44,7 @@
                             </div>
                         </a>
                         
-                        <a href="#" class="block">
+                        <a href="{{ route('admin.reports.custom') }}" class="block">
                             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 hover:bg-yellow-100 transition-colors">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 bg-yellow-100 p-3 rounded-full">

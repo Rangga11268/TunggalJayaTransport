@@ -276,7 +276,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Seat selection functionality
-    const seats = document.querySelectorAll('.seat-item:not(.bg-red-500)');
+    const seats = document.querySelectorAll('.seat-item:not(.bg-red-100)');
     const selectedSeatsDisplay = document.getElementById('selected-seats-display');
     const selectedCount = document.getElementById('selected-count');
     const saveSeatsButton = document.getElementById('save-seats');
@@ -286,9 +286,8 @@ document.addEventListener('DOMContentLoaded', function() {
     @if($booking->seat_numbers)
         selectedSeats = "{{ $booking->seat_numbers }}".split(',').map(Number);
         selectedCount.textContent = selectedSeats.length;
-        if (selectedSeats.length === {{ $booking->number_of_seats }}) {
-            saveSeatsButton.disabled = false;
-        }
+        // Enable save button if correct number of seats are selected
+        saveSeatsButton.disabled = selectedSeats.length !== {{ $booking->number_of_seats }};
         
         // Update the styling of already selected seats
         selectedSeats.forEach(seatNumber => {
@@ -309,31 +308,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+    @else
+        saveSeatsButton.disabled = true;
     @endif
     
     seats.forEach(seat => {
         seat.addEventListener('click', function() {
             const seatNumber = parseInt(this.getAttribute('data-seat'));
             
+            // Check if seat is already occupied
+            if (this.classList.contains('bg-red-100')) {
+                return; // Do nothing for occupied seats
+            }
+            
             // Toggle seat selection
             if (this.classList.contains('bg-blue-100')) {
                 // Deselect seat
-                this.classList.remove('bg-blue-100', 'ring-4', 'ring-blue-500');
+                this.classList.remove('bg-blue-100', 'ring-2', 'ring-blue-500');
                 this.classList.add('bg-green-100');
-                this.querySelector('.seat-icon').classList.remove('text-blue-500');
-                this.querySelector('.seat-icon').classList.add('text-green-600');
-                this.querySelector('.seat-number').classList.remove('text-blue-700');
-                this.querySelector('.seat-number').classList.add('text-green-700');
+                // Remove filter from seat image
+                const seatImage = this.querySelector('.seat-image');
+                if (seatImage) {
+                    seatImage.classList.remove('filter', 'brightness-75');
+                }
+                // Update seat number color
+                const seatNumberEl = this.querySelector('.seat-number');
+                if (seatNumberEl) {
+                    seatNumberEl.classList.remove('text-blue-700');
+                    seatNumberEl.classList.add('text-green-700');
+                }
                 selectedSeats = selectedSeats.filter(num => num !== seatNumber);
             } else {
                 // Select seat (limit to number of seats requested)
                 if (selectedSeats.length < {{ $booking->number_of_seats }}) {
                     this.classList.remove('bg-green-100');
-                    this.classList.add('bg-blue-100', 'ring-4', 'ring-blue-500');
-                    this.querySelector('.seat-icon').classList.remove('text-green-600');
-                    this.querySelector('.seat-icon').classList.add('text-blue-500');
-                    this.querySelector('.seat-number').classList.remove('text-green-700');
-                    this.querySelector('.seat-number').classList.add('text-blue-700');
+                    this.classList.add('bg-blue-100', 'ring-2', 'ring-blue-500');
+                    // Add filter to seat image
+                    const seatImage = this.querySelector('.seat-image');
+                    if (seatImage) {
+                        seatImage.classList.add('filter', 'brightness-75');
+                    }
+                    // Update seat number color
+                    const seatNumberEl = this.querySelector('.seat-number');
+                    if (seatNumberEl) {
+                        seatNumberEl.classList.remove('text-green-700');
+                        seatNumberEl.classList.add('text-blue-700');
+                    }
                     selectedSeats.push(seatNumber);
                 } else {
                     Swal.fire({
@@ -342,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         text: 'You can only select up to {{ $booking->number_of_seats }} seats.',
                         confirmButtonColor: '#3b82f6'
                     });
+                    return;
                 }
             }
             
@@ -462,11 +483,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const payButton = document.getElementById('pay-button');
     payButton.addEventListener('click', function() {
         // Check if seats have been selected and saved
-        if (!'{{ $booking->seat_numbers }}' || '{{ $booking->seat_numbers }}'.length === 0) {
+        if (selectedSeats.length !== {{ $booking->number_of_seats }}) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Seat Selection Required',
-                text: 'Please select and save your seats before proceeding to payment.',
+                text: 'Please select and save exactly {{ $booking->number_of_seats }} seats before proceeding to payment.',
                 confirmButtonColor: '#3b82f6'
             });
             return;
