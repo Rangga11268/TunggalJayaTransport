@@ -36,31 +36,31 @@
     <!-- Search Form -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-10">
         <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Search for Schedules</h2>
-        <form method="GET" action="{{ route('frontend.booking.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div>
-                <label for="origin" class="block text-sm font-medium text-gray-700 mb-2">Origin</label>
-                <select id="origin" name="origin" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4">
+        <form method="GET" action="{{ route('frontend.booking.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-6 mobile-search-form">
+            <div class="mobile-form-group">
+                <label for="origin" class="block text-sm font-medium text-gray-700 mb-2 mobile-form-label">Origin</label>
+                <select id="origin" name="origin" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4 mobile-select">
                     <option value="">Select Origin</option>
                     @foreach($origins as $originOption)
                         <option value="{{ $originOption }}" {{ request()->get('origin') == $originOption ? 'selected' : '' }}>{{ $originOption }}</option>
                     @endforeach
                 </select>
             </div>
-            <div>
-                <label for="destination" class="block text-sm font-medium text-gray-700 mb-2">Destination</label>
-                <select id="destination" name="destination" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4">
+            <div class="mobile-form-group">
+                <label for="destination" class="block text-sm font-medium text-gray-700 mb-2 mobile-form-label">Destination</label>
+                <select id="destination" name="destination" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4 mobile-select">
                     <option value="">Select Destination</option>
                     @foreach($destinations as $destinationOption)
                         <option value="{{ $destinationOption }}" {{ request()->get('destination') == $destinationOption ? 'selected' : '' }}>{{ $destinationOption }}</option>
                     @endforeach
                 </select>
             </div>
-            <div>
-                <label for="date" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
-                <input type="date" id="date" name="date" value="{{ request()->get('date') }}" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4">
+            <div class="mobile-form-group">
+                <label for="date" class="block text-sm font-medium text-gray-700 mb-2 mobile-form-label">Date</label>
+                <input type="date" id="date" name="date" value="{{ request()->get('date') }}" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4 mobile-input">
             </div>
             <div class="flex items-end">
-                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg mobile-btn-full">
                     <i class="fas fa-search mr-2"></i>Search
                 </button>
             </div>
@@ -69,7 +69,7 @@
 
     <!-- Search Results -->
     @if(request()->has('origin') && request()->has('destination'))
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-10">
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-10 mobile-booking-summary">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800">Available Schedules</h2>
             <div class="text-sm text-gray-500">
@@ -89,8 +89,9 @@
             <p class="text-gray-600 mt-4">Please select a different origin/destination combination.</p>
         </div>
         @elseif(isset($schedules) && $schedules->count() > 0)
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+        <!-- Mobile responsive table -->
+        <div class="mobile-table-responsive">
+            <table class="min-w-full divide-y divide-gray-200 mobile-table mobile-booking-table">
                 <thead class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
                     <tr>
                         <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Route</th>
@@ -105,7 +106,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($schedules as $schedule)
                     <tr class="hover:bg-blue-50 transition duration-150">
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Route">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
                                     <i class="fas fa-route text-blue-600"></i>
@@ -118,28 +119,28 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Departure">
                             <div class="text-sm font-medium text-gray-900">{{ $schedule->departure_time->format('H:i') }}</div>
                             <div class="text-sm text-gray-500">Terminal {{ $schedule->departure_terminal ?? '1' }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Arrival">
                             <div class="text-sm font-medium text-gray-900">{{ $schedule->arrival_time->format('H:i') }}</div>
                             <div class="text-sm text-gray-500">Terminal {{ $schedule->arrival_terminal ?? '1' }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Bus Type">
                             <div class="text-sm font-medium text-gray-900">{{ $schedule->bus->bus_type ?? 'Standard' }}</div>
                             <div class="text-sm text-gray-500">{{ $schedule->bus->plate_number }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Available Seats">
                             <div class="text-sm font-medium text-gray-900">{{ $schedule->getAvailableSeatsCount() }} / {{ $schedule->bus->capacity }}</div>
                             <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
                                 <div class="bg-blue-600 h-2 rounded-full" style="width: {{ ($schedule->getAvailableSeatsCount() / $schedule->bus->capacity) * 100 }}%"></div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Price">
                             <div class="text-lg font-bold text-gray-900">Rp. {{ number_format($schedule->price, 0, ',', '.') }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" data-label="Action">
                             @if($schedule->hasDeparted())
                                 <span class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
                                     Departed

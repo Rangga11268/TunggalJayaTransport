@@ -9,16 +9,16 @@
     </div>
     
     <!-- Route Information -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-10">
-        <div class="flex justify-between items-center mb-6">
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-10 mobile-info-card">
+        <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
             <h2 class="text-2xl font-bold text-gray-800">Route Details</h2>
             <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
                 <i class="fas fa-info-circle mr-1"></i>Route Info
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2">Route Overview</h3>
+            <div class="bg-white p-6 rounded-lg shadow-sm mobile-info-card">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Route Overview</h3>
                 <div class="space-y-4">
                     <div class="flex items-center">
                         <div class="bg-blue-100 p-3 rounded-full mr-4">
@@ -61,8 +61,8 @@
                 </div>
             </div>
             
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2">Description</h3>
+            <div class="bg-white p-6 rounded-lg shadow-sm mobile-info-card">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Description</h3>
                 <div class="prose max-w-none">
                     <p class="text-gray-700">{{ $route->description ?? 'No detailed description available for this route. Our buses operate regularly on this route with comfortable seating and professional drivers to ensure a pleasant journey.' }}</p>
                 </div>
@@ -78,8 +78,8 @@
     </div>
     
     <!-- Route Map -->
-    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 mb-10">
-        <div class="flex justify-between items-center mb-6">
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 mb-10 mobile-info-card">
+        <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
             <h2 class="text-2xl font-bold text-gray-800">Route Map</h2>
             <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
                 <i class="fas fa-map-marked-alt mr-1"></i>Visualize Route
@@ -103,7 +103,7 @@
     </div>
     
     <!-- Schedule Legend -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md p-4 mb-6">
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md p-4 mb-6 mobile-legend">
         <div class="flex flex-wrap items-center justify-between">
             <div class="flex items-center mb-2 md:mb-0">
                 <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
@@ -121,8 +121,8 @@
     </div>
     
     <!-- Schedules -->
-    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 mb-10">
-        <div class="flex justify-between items-center mb-6">
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 mb-10 mobile-info-card">
+        <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
             <h2 class="text-2xl font-bold text-gray-800">Available Schedules</h2>
             <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
                 <i class="fas fa-calendar-alt mr-1"></i>{{ $route->schedules->count() }} Schedules
@@ -130,8 +130,9 @@
         </div>
         
         @if($route->schedules->count() > 0)
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+        <!-- Mobile responsive table -->
+        <div class="mobile-table-responsive">
+            <table class="min-w-full divide-y divide-gray-200 mobile-table mobile-booking-table">
                 <thead class="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
                     <tr>
                         <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Schedule Type</th>
@@ -146,7 +147,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($route->schedules as $schedule)
                     <tr class="hover:bg-green-50 transition duration-150">
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Schedule Type">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center {{ $schedule->is_weekly ? 'bg-green-100' : 'bg-blue-100' }}">
                                     <i class="fas fa-{{ $schedule->is_weekly ? 'calendar-week' : 'clock' }} text-{{ $schedule->is_weekly ? 'green' : 'blue' }}-600"></i>
@@ -156,7 +157,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Departure">
                             <div class="flex items-center">
                                 <div class="bg-green-100 p-2 rounded-full mr-3">
                                     <i class="fas fa-sign-out-alt text-green-600"></i>
@@ -167,7 +168,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Arrival">
                             <div class="flex items-center">
                                 <div class="bg-green-100 p-2 rounded-full mr-3">
                                     <i class="fas fa-sign-in-alt text-green-600"></i>
@@ -178,7 +179,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Bus Type">
                             <div class="flex items-center">
                                 <div class="bg-green-100 p-2 rounded-full mr-3">
                                     <i class="fas fa-bus text-green-600"></i>
@@ -189,7 +190,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Availability">
                             @if($schedule->hasDeparted())
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                                     <i class="fas fa-times-circle mr-1"></i>Departed
@@ -201,10 +202,10 @@
                                 </div>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="Price">
                             <div class="text-lg font-bold text-gray-900">Rp. {{ number_format($schedule->price, 0, ',', '.') }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" data-label="Action">
                             @if($schedule->hasDeparted())
                                 <span class="inline-flex items-center px-3 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
                                     Departed
@@ -256,7 +257,7 @@
     
     <!-- Back to Routes -->
     <div class="mb-10">
-        <a href="{{ route('frontend.routes.index') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold rounded-lg transition duration-300 shadow-lg transform hover:scale-105">
+        <a href="{{ route('frontend.routes.index') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold rounded-lg transition duration-300 shadow-lg transform hover:scale-105 mobile-action-button">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>

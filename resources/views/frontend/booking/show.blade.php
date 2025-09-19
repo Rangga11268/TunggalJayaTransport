@@ -11,17 +11,17 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Schedule Information -->
         <div class="lg:col-span-2">
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-8">
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-8 mobile-info-card">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-800">Schedule Information</h2>
                     <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                        <i class="fas fa-clock mr-1"></i>{{ $schedule->route->duration }} hours
+                        <i class="fas fa-clock mr-1"></i>{{ $schedule->route->formatted_duration }}
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-5 rounded-lg shadow-sm">
-                        <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2">Route Details</h3>
+                    <div class="bg-white p-5 rounded-lg shadow-sm mobile-info-card">
+                        <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Route Details</h3>
                         <div class="space-y-3">
                             <div class="flex items-center">
                                 <div class="bg-blue-100 p-2 rounded-full mr-3">
@@ -53,8 +53,8 @@
                         </div>
                     </div>
                     
-                    <div class="bg-white p-5 rounded-lg shadow-sm">
-                        <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2">Schedule Details</h3>
+                    <div class="bg-white p-5 rounded-lg shadow-sm mobile-info-card">
+                        <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Schedule Details</h3>
                         <div class="space-y-3">
                             <div class="flex items-center">
                                 <div class="bg-blue-100 p-2 rounded-full mr-3">
@@ -96,7 +96,7 @@
                     </div>
                 </div>
                 
-                <div class="mt-6 bg-white p-5 rounded-lg shadow-sm">
+                <div class="mt-6 bg-white p-5 rounded-lg shadow-sm mobile-info-card">
                     <div class="flex justify-between items-center">
                         <div>
                             <p class="text-sm text-gray-500">Available Seats</p>
@@ -116,30 +116,30 @@
         
         <!-- Passenger Information -->
         <div>
-            <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800">Passenger Information</h2>
+            <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6 mobile-booking-card">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 mobile-info-card-title">Passenger Information</h2>
                 <form method="POST" action="{{ route('frontend.booking.store') }}" class="space-y-5">
                     @csrf
                     <input type="hidden" name="schedule_id" value="{{ $schedule->id }}">
                     
-                    <div>
-                        <label for="passenger_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                        <input type="text" id="passenger_name" name="passenger_name" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4">
+                    <div class="mobile-form-group">
+                        <label for="passenger_name" class="block text-sm font-medium text-gray-700 mb-1 mobile-form-label">Full Name</label>
+                        <input type="text" id="passenger_name" name="passenger_name" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4 mobile-form-control">
                     </div>
                     
-                    <div>
-                        <label for="passenger_email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                        <input type="email" id="passenger_email" name="passenger_email" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4">
+                    <div class="mobile-form-group">
+                        <label for="passenger_email" class="block text-sm font-medium text-gray-700 mb-1 mobile-form-label">Email Address</label>
+                        <input type="email" id="passenger_email" name="passenger_email" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4 mobile-form-control">
                     </div>
                     
-                    <div>
-                        <label for="passenger_phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                        <input type="tel" id="passenger_phone" name="passenger_phone" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4">
+                    <div class="mobile-form-group">
+                        <label for="passenger_phone" class="block text-sm font-medium text-gray-700 mb-1 mobile-form-label">Phone Number</label>
+                        <input type="tel" id="passenger_phone" name="passenger_phone" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4 mobile-form-control">
                     </div>
                     
-                    <div>
-                        <label for="number_of_seats" class="block text-sm font-medium text-gray-700 mb-1">Number of Seats</label>
-                        <select id="number_of_seats" name="number_of_seats" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4">
+                    <div class="mobile-form-group">
+                        <label for="number_of_seats" class="block text-sm font-medium text-gray-700 mb-1 mobile-form-label">Number of Seats</label>
+                        <select id="number_of_seats" name="number_of_seats" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4 mobile-select">
                             <option value="1">1 Seat (Rp. {{ number_format($schedule->price, 0, ',', '.') }})</option>
                             <option value="2">2 Seats (Rp. {{ number_format($schedule->price * 2, 0, ',', '.') }})</option>
                             <option value="3">3 Seats (Rp. {{ number_format($schedule->price * 3, 0, ',', '.') }})</option>
@@ -156,7 +156,7 @@
                     </div>
                     
                     <div>
-                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg mobile-btn-full">
                             <i class="fas fa-credit-card mr-2"></i>Proceed to Payment
                         </button>
                     </div>

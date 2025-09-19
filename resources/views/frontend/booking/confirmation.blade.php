@@ -9,7 +9,7 @@
     </div>
     
     <!-- Booking Summary -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-8">
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-8 mobile-booking-summary">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800">Booking Details</h2>
             <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
@@ -18,8 +18,8 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2">Route Information</h3>
+            <div class="bg-white p-6 rounded-lg shadow-sm mobile-info-card">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Route Information</h3>
                 <div class="space-y-4">
                     <div class="flex items-center">
                         <div class="bg-blue-100 p-3 rounded-full mr-4">
@@ -71,8 +71,8 @@
                 </div>
             </div>
             
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2">Passenger Information</h3>
+            <div class="bg-white p-6 rounded-lg shadow-sm mobile-info-card">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Passenger Information</h3>
                 <div class="space-y-4">
                     <div class="flex items-center">
                         <div class="bg-blue-100 p-3 rounded-full mr-4">
@@ -127,7 +127,7 @@
             </div>
         </div>
         
-        <div class="mt-8 pt-6 border-t border-gray-200 bg-white p-6 rounded-lg shadow-sm">
+        <div class="mt-8 pt-6 border-t border-gray-200 bg-white p-6 rounded-lg shadow-sm mobile-info-card">
             <div class="flex justify-between items-center">
                 <div>
                     <p class="text-gray-600">Total Price ({{ $booking->number_of_seats }} seats)</p>
@@ -141,9 +141,9 @@
     </div>
 
     <!-- Payment Options -->
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Payment Method</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8 mobile-booking-card">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 mobile-info-card-title">Payment Method</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mobile-payment-options">
             <div class="border-2 border-gray-200 rounded-lg p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="credit_card">
                 <div class="flex items-center">
                     <input type="radio" id="credit-card" name="payment" class="h-5 w-5 text-blue-600" checked>
@@ -180,15 +180,15 @@
         </div>
         
         <div class="mt-8">
-            <button id="pay-button" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg text-lg">
-                <i class="fas fa-lock mr-2"></i>Proceed to Secure Payment
+            <button id="pay-button" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg text-base sm:text-lg mobile-btn-full flex items-center justify-center">
+                <i class="fas fa-lock mr-2"></i> Proceed to Secure Payment
             </button>
         </div>
     </div>
 
     <!-- Seat Selection -->
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8 mobile-booking-card">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center mobile-info-card-title">
             <i class="fas fa-bus mr-3 text-blue-500"></i> Select Your Seat (2-3 Layout)
         </h2>
         
@@ -228,13 +228,13 @@
                                         $isSelected = $booking->seat_numbers && in_array($seatNumber, explode(',', $booking->seat_numbers));
                                     @endphp
                                     <div 
-                                        class="seat-item w-14 h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-lg relative
+                                        class="seat-item w-14 h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-lg relative mobile-seat-item
                                             {{ $isOccupied ? 'bg-red-100 cursor-not-allowed opacity-70' : ($isSelected ? 'bg-blue-100 ring-4 ring-blue-500' : 'bg-green-100 hover:bg-green-200') }}"
                                         data-seat="{{ $seatNumber }}"
                                         {{ $isOccupied ? 'title=This seat is already booked' : 'title=Select seat '.$seatNumber }}
                                     >
                                         <!-- Seat Image -->
-                                        <div class="seat-image w-10 h-10 flex items-center justify-center {{ $isOccupied ? 'opacity-50' : ($isSelected ? 'filter brightness-75' : '') }}">
+                                        <div class="seat-image w-10 h-10 flex items-center justify-center {{ $isOccupied ? 'opacity-50' : ($isSelected ? 'filter brightness-75' : '') }} mobile-seat-image">
                                             <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-full h-full object-contain">
                                         </div>
                                         
@@ -269,13 +269,13 @@
                                         $isSelected = $booking->seat_numbers && in_array($seatNumber, explode(',', $booking->seat_numbers));
                                     @endphp
                                     <div 
-                                        class="seat-item w-14 h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-lg relative
+                                        class="seat-item w-14 h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-lg relative mobile-seat-item
                                             {{ $isOccupied ? 'bg-red-100 cursor-not-allowed opacity-70' : ($isSelected ? 'bg-blue-100 ring-4 ring-blue-500' : 'bg-green-100 hover:bg-green-200') }}"
                                         data-seat="{{ $seatNumber }}"
                                         {{ $isOccupied ? 'title=This seat is already booked' : 'title=Select seat '.$seatNumber }}
                                     >
                                         <!-- Seat Image -->
-                                        <div class="seat-image w-10 h-10 flex items-center justify-center {{ $isOccupied ? 'opacity-50' : ($isSelected ? 'filter brightness-75' : '') }}">
+                                        <div class="seat-image w-10 h-10 flex items-center justify-center {{ $isOccupied ? 'opacity-50' : ($isSelected ? 'filter brightness-75' : '') }} mobile-seat-image">
                                             <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-full h-full object-contain">
                                         </div>
                                         
@@ -305,7 +305,7 @@
         </div>
         
         <!-- Seat Legend -->
-        <div class="seat-legend flex flex-wrap justify-center gap-4 mb-8">
+        <div class="seat-legend flex flex-wrap justify-center gap-4 mb-8 mobile-legend">
             <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
                 <div class="w-5 h-5 bg-green-100 rounded mr-2 flex items-center justify-center">
                     <img src="{{ asset('img/car-seat.png') }}" alt="Available Seat" class="w-4 h-4 object-contain">
@@ -350,22 +350,22 @@
         </div>
         
         <!-- Action Buttons -->
-        <div class="action-buttons flex justify-center">
-            <button id="save-seats" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 rounded-lg flex items-center transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg" title="Save your seat selection">
+        <div class="flex justify-center w-full mt-4">
+            <button id="save-seats" class="save-seats-btn" title="Save your seat selection">
                 <i class="fas fa-save mr-2"></i> Save Seats
             </button>
         </div>
     </div>
     
     <!-- Ticket Preview and Download -->
-    <div class="bg-white rounded-xl shadow-lg p-6">
+    <div class="bg-white rounded-xl shadow-lg p-6 mobile-booking-card">
         <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
             <div>
                 <h2 class="text-2xl font-bold text-gray-800">Ticket Preview</h2>
                 <p class="text-gray-600">Your ticket will be available after payment</p>
             </div>
             @if($booking->seat_numbers)
-            <a href="{{ route('frontend.booking.download-ticket', $booking->id) }}" target="_blank" class="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+            <a href="{{ route('frontend.booking.download-ticket', $booking->id) }}" target="_blank" class="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 mobile-action-button">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                 </svg>

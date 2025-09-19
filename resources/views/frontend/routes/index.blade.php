@@ -25,7 +25,7 @@
     
     <!-- Interactive Map -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-10">
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
             <h2 class="text-2xl font-bold text-gray-800">Route Network Map</h2>
             <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
                 <i class="fas fa-map-marked-alt mr-1"></i>{{ $routes->count() }} Routes
@@ -39,7 +39,7 @@
 
     <!-- Route List -->
     <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-6">
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
             <h2 class="text-2xl font-bold text-gray-800">All Routes</h2>
             <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
                 <i class="fas fa-route mr-1"></i>{{ $routes->count() }} Routes
@@ -47,9 +47,9 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @forelse($routes as $route)
-            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden mobile-info-card">
                 <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-4">
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center flex-col gap-2">
                         <h3 class="text-xl font-bold text-white">{{ $route->origin }}</h3>
                         <i class="fas fa-exchange-alt text-white text-xl"></i>
                         <h3 class="text-xl font-bold text-white">{{ $route->destination }}</h3>
@@ -76,7 +76,7 @@
                             </div>
                         </div>
                     </div>
-                    <a href="{{ route('frontend.routes.show', $route->id) }}" class="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-md flex items-center justify-center">
+                    <a href="{{ route('frontend.routes.show', $route->id) }}" class="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-md flex items-center justify-center mobile-btn-full">
                         <i class="fas fa-calendar-alt mr-2"></i>View Schedule
                     </a>
                 </div>
@@ -324,7 +324,7 @@
             font-size: 7px;
             padding: 4px;
             border-radius: 2px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            boxShadow: 0 0 6px rgba(0,0,0,0.2);
             margin-bottom: 6px;
         }
         

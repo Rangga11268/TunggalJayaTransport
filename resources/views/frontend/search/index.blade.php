@@ -5,9 +5,9 @@
     <h1 class="text-3xl font-bold mb-6">Search Results</h1>
     
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <form method="GET" action="{{ route('frontend.search.index') }}" class="flex">
-            <input type="text" name="q" placeholder="Search..." class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ request()->get('q') }}">
-            <button type="submit" class="px-6 py-2 bg-blue-500 text-white font-medium rounded-r-md hover:bg-blue-600">
+        <form method="GET" action="{{ route('frontend.search.index') }}" class="flex flex-col sm:flex-row">
+            <input type="text" name="q" placeholder="Search..." class="flex-grow px-4 py-2 border border-gray-300 rounded-t-md sm:rounded-l-md sm:rounded-t-none focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ request()->get('q') }}">
+            <button type="submit" class="px-6 py-2 bg-blue-500 text-white font-medium rounded-b-md sm:rounded-r-md sm:rounded-b-none hover:bg-blue-600">
                 Search
             </button>
         </form>
@@ -19,7 +19,7 @@
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         @forelse($results as $result)
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mobile-info-card">
             <div class="p-6">
                 <h3 class="text-xl font-bold mb-2">
                     <a href="{{ $result['url'] }}" class="text-blue-500 hover:underline">{{ $result['title'] }}</a>
