@@ -87,7 +87,19 @@
                                             <div class="text-sm text-gray-500">{{ $schedule->route->origin }} → {{ $schedule->route->destination }}</div>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $schedule->departure_time->format('d M Y H:i') }}
+                                            @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                                @php
+                                                    $nextDate = $schedule->getNextAvailableDate();
+                                                    if ($nextDate) {
+                                                        $displayDateTime = $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                                                        echo $displayDateTime->format('d M Y H:i');
+                                                    } else {
+                                                        echo $schedule->departure_time->format('d M Y H:i');
+                                                    }
+                                                @endphp
+                                            @else
+                                                {{ $schedule->departure_time->format('d M Y H:i') }}
+                                            @endif
                                             @if($schedule->hasDeparted())
                                                 <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded">
                                                     DEPARTED

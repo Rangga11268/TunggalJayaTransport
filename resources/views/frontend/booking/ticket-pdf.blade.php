@@ -271,7 +271,18 @@
                     
                     <div class="info-item">
                         <label>Departure</label>
-                        <div class="info-value">{{ $booking->schedule->departure_time->format('M j, Y') }} | {{ $booking->schedule->departure_time->format('H:i') }}</div>
+                        <div class="info-value">
+                            @if($booking->schedule->is_weekly && $booking->schedule->day_of_week !== null)
+                                @php
+                                    $nextDate = $booking->schedule->getNextAvailableDate();
+                                    $displayDate = $nextDate ? $nextDate : $booking->schedule->departure_time;
+                                    $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($booking->schedule->departure_time->format('H:i:s')) : $booking->schedule->departure_time;
+                                    echo $displayDate->format('M j, Y') . ' | ' . $displayTime->format('H:i');
+                                @endphp
+                            @else
+                                {{ $booking->schedule->departure_time->format('M j, Y') }} | {{ $booking->schedule->departure_time->format('H:i') }}
+                            @endif
+                        </div>
                     </div>
                     
                     <div class="info-item">

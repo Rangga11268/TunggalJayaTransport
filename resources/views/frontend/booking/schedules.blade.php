@@ -94,12 +94,35 @@
                                     </div>
                                     <div class="ml-3">
                                         <div class="text-sm font-medium text-gray-900">
-                                            {{ $schedule->departure_time->format('H:i') }}
+                                            @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                                @php
+                                                    $nextDate = $schedule->getNextAvailableDate();
+                                                    $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s')) : $schedule->departure_time;
+                                                    echo $displayTime->format('H:i');
+                                                @endphp
+                                            @else
+                                                {{ $schedule->departure_time->format('H:i') }}
+                                            @endif
                                             <span class="text-gray-500 mx-1">→</span>
-                                            {{ $schedule->arrival_time->format('H:i') }}
+                                            @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                                @php
+                                                    $nextDate = $schedule->getNextAvailableDate();
+                                                    $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($schedule->arrival_time->format('H:i:s')) : $schedule->arrival_time;
+                                                    echo $displayTime->format('H:i');
+                                                @endphp
+                                            @else
+                                                {{ $schedule->arrival_time->format('H:i') }}
+                                            @endif
                                         </div>
                                         <div class="text-xs text-gray-500">
-                                            {{ $schedule->departure_time->format('M j') }}
+                                            @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                                @php
+                                                    $nextDate = $schedule->getNextAvailableDate();
+                                                    echo $nextDate ? $nextDate->format('M j') : $schedule->departure_time->format('M j');
+                                                @endphp
+                                            @else
+                                                {{ $schedule->departure_time->format('M j') }}
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -158,10 +181,26 @@
                             </div>
                             <div class="ml-3">
                                 <div class="text-sm font-medium text-gray-900">
-                                    {{ $schedule->departure_time->format('H:i') }} → {{ $schedule->arrival_time->format('H:i') }}
+                                    @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                        @php
+                                            $nextDate = $schedule->getNextAvailableDate();
+                                            $displayDeparture = $nextDate ? $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s')) : $schedule->departure_time;
+                                            $displayArrival = $nextDate ? $nextDate->copy()->setTimeFromTimeString($schedule->arrival_time->format('H:i:s')) : $schedule->arrival_time;
+                                            echo $displayDeparture->format('H:i') . ' → ' . $displayArrival->format('H:i');
+                                        @endphp
+                                    @else
+                                        {{ $schedule->departure_time->format('H:i') }} → {{ $schedule->arrival_time->format('H:i') }}
+                                    @endif
                                 </div>
                                 <div class="text-xs text-gray-500">
-                                    {{ $schedule->departure_time->format('M j') }}
+                                    @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                        @php
+                                            $nextDate = $schedule->getNextAvailableDate();
+                                            echo $nextDate ? $nextDate->format('M j') : $schedule->departure_time->format('M j');
+                                        @endphp
+                                    @else
+                                        {{ $schedule->departure_time->format('M j') }}
+                                    @endif
                                 </div>
                             </div>
                         </div>

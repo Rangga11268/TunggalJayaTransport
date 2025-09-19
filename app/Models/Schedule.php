@@ -111,15 +111,19 @@ class Schedule extends Model
      */
     public function isAvailableForBooking()
     {
-        // If schedule has already departed, it's not available
-        if ($this->hasDeparted()) {
-            return false;
-        }
-
-        // If it's a weekly schedule, check if it's the correct day
+        // If it's a weekly schedule, check if it's the correct day (regardless of time)
+        // Weekly schedules are continuously available on their designated day
         if ($this->is_weekly && $this->day_of_week !== null) {
             $today = Carbon::now()->dayOfWeek;
             if ($today != $this->day_of_week) {
+                return false;
+            }
+            
+            // For weekly schedules, we don't check if the time has passed
+            // because they represent a recurring pattern
+        } else {
+            // For daily schedules, check if schedule has already departed
+            if ($this->hasDeparted()) {
                 return false;
             }
         }
@@ -187,9 +191,20 @@ class Schedule extends Model
      */
     public function scopeAvailable($query)
     {
-        return $query->where('departure_time', '>', Carbon::now())
-            ->whereHas('bus')
-            ->whereHas('route');
+        return $query->where(function($q) {
+            // For weekly schedules, check if they have a valid day_of_week
+            $q->where(function($q2) {
+                $q2->where('is_weekly', true)
+                  ->whereNotNull('day_of_week');
+            })
+            // For daily schedules, check if departure_time is in the future
+            ->orWhere(function($q2) {
+                $q2->where('is_weekly', false)
+                  ->where('departure_time', '>', Carbon::now());
+            });
+        })
+        ->whereHas('bus')
+        ->whereHas('route');
     }
 
     /**

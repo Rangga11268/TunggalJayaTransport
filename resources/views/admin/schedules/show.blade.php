@@ -76,11 +76,39 @@
                         <dl class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Departure Time:</dt>
-                                <dd class="text-gray-900">{{ $schedule->departure_time->format('d M Y H:i') }}</dd>
+                                <dd class="text-gray-900">
+                                    @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                        @php
+                                            $nextDate = $schedule->getNextAvailableDate();
+                                            if ($nextDate) {
+                                                $displayDateTime = $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                                                echo $displayDateTime->format('d M Y H:i');
+                                            } else {
+                                                echo $schedule->departure_time->format('d M Y H:i');
+                                            }
+                                        @endphp
+                                    @else
+                                        {{ $schedule->departure_time->format('d M Y H:i') }}
+                                    @endif
+                                </dd>
                             </div>
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Arrival Time:</dt>
-                                <dd class="text-gray-900">{{ $schedule->arrival_time->format('d M Y H:i') }}</dd>
+                                <dd class="text-gray-900">
+                                    @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                        @php
+                                            $nextDate = $schedule->getNextAvailableDate();
+                                            if ($nextDate) {
+                                                $displayDateTime = $nextDate->copy()->setTimeFromTimeString($schedule->arrival_time->format('H:i:s'));
+                                                echo $displayDateTime->format('d M Y H:i');
+                                            } else {
+                                                echo $schedule->arrival_time->format('d M Y H:i');
+                                            }
+                                        @endphp
+                                    @else
+                                        {{ $schedule->arrival_time->format('d M Y H:i') }}
+                                    @endif
+                                </dd>
                             </div>
                             @if($schedule->is_weekly)
                             <div class="flex">

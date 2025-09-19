@@ -43,8 +43,8 @@ class BookingController extends Controller
                     ->available()
                     ->get()
                     ->filter(function ($schedule) {
-                        // Filter out schedules that have already departed
-                        return !$schedule->hasDeparted() && $schedule->isAvailableForBooking();
+                        // All schedules must pass the isAvailableForBooking check
+                        return $schedule->isAvailableForBooking();
                     });
             }
         }
@@ -95,7 +95,8 @@ class BookingController extends Controller
         // Filter out schedules that have already departed or are not available for booking
         $schedules->setCollection(
             $schedules->getCollection()->filter(function ($schedule) {
-                return !$schedule->hasDeparted() && $schedule->isAvailableForBooking();
+                // All schedules must pass the isAvailableForBooking check
+                return $schedule->isAvailableForBooking();
             })
         );
         
@@ -107,7 +108,8 @@ class BookingController extends Controller
         $schedule = Schedule::with('route', 'bus')->findOrFail($id);
         
         // Additional check: if schedule has already departed, redirect with error
-        if ($schedule->hasDeparted()) {
+        // For weekly schedules, we don't check if they've departed because they're recurring
+        if (!$schedule->is_weekly && $schedule->hasDeparted()) {
             return redirect()->route('frontend.booking.index')
                 ->withErrors(['schedule' => 'This schedule has already departed and is no longer available for booking.'])
                 ->withInput();
@@ -137,7 +139,8 @@ class BookingController extends Controller
         $schedule = Schedule::with('bus')->findOrFail($request->schedule_id);
         
         // Additional check: if schedule has already departed, redirect with error
-        if ($schedule->hasDeparted()) {
+        // For weekly schedules, we don't check if they've departed because they're recurring
+        if (!$schedule->is_weekly && $schedule->hasDeparted()) {
             return redirect()->route('frontend.booking.index')
                 ->withErrors(['schedule' => 'This schedule has already departed and is no longer available for booking.'])
                 ->withInput();

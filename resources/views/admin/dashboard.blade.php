@@ -20,7 +20,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="text-3xl font-bold text-green-500">{{ $formattedRevenue }}</div>
+                            <div class="text-3xl font-bold text-green-500">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</div>
                             <div class="ml-4 text-gray-500">Revenue</div>
                         </div>
                     </div>
@@ -28,7 +28,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="text-3xl font-bold text-yellow-500">{{ $activeRoutes }}</div>
+                            <div class="text-3xl font-bold text-yellow-500">{{ $totalSchedules }}</div>
                             <div class="ml-4 text-gray-500">Active Routes</div>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="text-3xl font-bold text-purple-500">{{ $registeredUsers }}</div>
+                            <div class="text-3xl font-bold text-purple-500">{{ $totalUsers }}</div>
                             <div class="ml-4 text-gray-500">Registered Users</div>
                         </div>
                     </div>
@@ -57,16 +57,18 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($recentActivities as $activity)
+                                @forelse($recentBookings as $booking)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $activity['description'] }}</div>
+                                        <div class="text-sm font-medium text-gray-900">
+                                            New booking #{{ $booking->booking_code }} for {{ $booking->schedule->route->origin }} to {{ $booking->schedule->route->destination }}
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $activity['user'] }}</div>
+                                        <div class="text-sm text-gray-900">{{ $booking->passenger_name }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $activity['time'] }}
+                                        {{ $booking->created_at->diffForHumans() }}
                                     </td>
                                 </tr>
                                 @empty

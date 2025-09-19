@@ -74,7 +74,17 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Date</p>
-                            <p class="font-medium">{{ $booking->schedule->departure_time->format('l, F j, Y') }}</p>
+                            <p class="font-medium">
+                                @if($booking->schedule->is_weekly && $booking->schedule->day_of_week !== null)
+                                    @php
+                                        $nextDate = $booking->schedule->getNextAvailableDate();
+                                        $displayDate = $nextDate ? $nextDate : $booking->schedule->departure_time;
+                                        echo $displayDate->format('l, F j, Y');
+                                    @endphp
+                                @else
+                                    {{ $booking->schedule->departure_time->format('l, F j, Y') }}
+                                @endif
+                            </p>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
@@ -84,7 +94,17 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Departure</p>
-                                <p class="font-medium">{{ $booking->schedule->departure_time->format('H:i') }}</p>
+                                <p class="font-medium">
+                                    @if($booking->schedule->is_weekly && $booking->schedule->day_of_week !== null)
+                                        @php
+                                            $nextDate = $booking->schedule->getNextAvailableDate();
+                                            $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($booking->schedule->departure_time->format('H:i:s')) : $booking->schedule->departure_time;
+                                            echo $displayTime->format('H:i');
+                                        @endphp
+                                    @else
+                                        {{ $booking->schedule->departure_time->format('H:i') }}
+                                    @endif
+                                </p>
                             </div>
                         </div>
                         <div class="flex items-center">
@@ -93,7 +113,17 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Arrival</p>
-                                <p class="font-medium">{{ $booking->schedule->arrival_time->format('H:i') }}</p>
+                                <p class="font-medium">
+                                    @if($booking->schedule->is_weekly && $booking->schedule->day_of_week !== null)
+                                        @php
+                                            $nextDate = $booking->schedule->getNextAvailableDate();
+                                            $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($booking->schedule->arrival_time->format('H:i:s')) : $booking->schedule->arrival_time;
+                                            echo $displayTime->format('H:i');
+                                        @endphp
+                                    @else
+                                        {{ $booking->schedule->arrival_time->format('H:i') }}
+                                    @endif
+                                </p>
                             </div>
                         </div>
                     </div>
