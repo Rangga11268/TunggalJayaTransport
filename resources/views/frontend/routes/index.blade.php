@@ -9,31 +9,36 @@
     </div>
     
     <!-- Info about schedule reset -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-md p-4 mb-6">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+    <div class="mobile-info-section">
+        <div class="mobile-info-section-content">
+            <div class="mobile-info-section-icon">
+                <i class="fas fa-info-circle"></i>
             </div>
-            <div class="ml-3">
-                <p class="text-sm text-blue-700">
-                    <strong>Route Information:</strong> Our routes operate with daily and weekly schedules. 
+            <div class="mobile-info-section-text">
+                <div class="mobile-info-section-title">Route Information</div>
+                <div class="mobile-info-section-description">
+                    Our routes operate with daily and weekly schedules. 
                     Daily schedules reset automatically each day, while weekly schedules repeat on their designated days.
-                </p>
+                </div>
             </div>
         </div>
     </div>
     
     <!-- Interactive Map -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-10">
-        <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
-            <h2 class="text-2xl font-bold text-gray-800">Route Network Map</h2>
-            <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                <i class="fas fa-map-marked-alt mr-1"></i>{{ $routes->count() }} Routes
+    <div class="mobile-route-map-container">
+        <div class="mobile-route-map-header">
+            <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
+                <h2 class="text-2xl font-bold text-gray-800">Route Network Map</h2>
+                <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-map-marked-alt mr-1"></i>{{ $routes->count() }} Routes
+                </div>
             </div>
         </div>
-        <div id="routes-map" style="height: 500px; width: 100%; border-radius: 0.5rem; z-index: 10;"></div>
-        <div class="mt-4 text-sm text-gray-600">
-            <p><i class="fas fa-mouse-pointer mr-2"></i>Click and drag to pan the map</p>
+        <div class="mobile-route-map-content">
+            <div id="routes-map" style="height: 500px; width: 100%; border-radius: 0.5rem; z-index: 10;"></div>
+            <div class="mt-4 text-sm text-gray-600">
+                <p><i class="fas fa-mouse-pointer mr-2"></i>Click and drag to pan the map</p>
+            </div>
         </div>
     </div>
 

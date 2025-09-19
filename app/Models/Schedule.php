@@ -111,16 +111,10 @@ class Schedule extends Model
      */
     public function isAvailableForBooking()
     {
-        // If it's a weekly schedule, check if it's the correct day (regardless of time)
-        // Weekly schedules are continuously available on their designated day
+        // For weekly schedules, check if they are active
         if ($this->is_weekly && $this->day_of_week !== null) {
-            $today = Carbon::now()->dayOfWeek;
-            if ($today != $this->day_of_week) {
-                return false;
-            }
-            
-            // For weekly schedules, we don't check if the time has passed
-            // because they represent a recurring pattern
+            // Weekly schedules are available as long as they are active
+            return $this->status === 'active';
         } else {
             // For daily schedules, check if schedule has already departed
             if ($this->hasDeparted()) {
@@ -134,13 +128,14 @@ class Schedule extends Model
 
     /**
      * Check if the schedule is available for weekly booking
+     * For booking purposes, we want to show all active weekly schedules
+     * regardless of the day of the week
      */
     public function isAvailableForWeeklyBooking()
     {
-        // For weekly schedules, check if it's the correct day
+        // For weekly schedules, check if they are active
         if ($this->is_weekly && $this->day_of_week !== null) {
-            $today = Carbon::now()->dayOfWeek;
-            return $today == $this->day_of_week;
+            return $this->status === 'active';
         }
         
         // For non-weekly schedules, always return false for this check
