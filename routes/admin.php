@@ -15,36 +15,55 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule_manager'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Test route for role verification
+    Route::get('/test-roles', [DashboardController::class, 'testRoles'])->name('test-roles');
 
-    // Bus Management
-    Route::resource('buses', BusController::class);
+    // Bus Management (schedule managers can manage buses)
+    Route::resource('buses', BusController::class)->middleware('role:admin,schedule_manager');
 
     // AJAX route to check if plate number exists
     Route::get('/buses/check-plate/{plateNumber}', [BusController::class, 'checkPlateNumber'])->name('buses.check-plate');
 
-    // Other routes...
-    Route::resource('routes', RouteController::class);
-    Route::resource('schedules', ScheduleController::class);
-    Route::resource('bookings', BookingController::class);
-    Route::resource('news', NewsController::class);
-    Route::resource('categories', CategoryController::class);
-    Route::resource('facilities', FacilityController::class);
-    Route::resource('users', UserController::class);
-    Route::resource('drivers', DriverController::class);
-    Route::resource('conductors', ConductorController::class);
+    // Route Management (schedule managers can manage routes)
+    Route::resource('routes', RouteController::class)->middleware('role:admin,schedule_manager');
 
-    // Reports
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
-    Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('reports.occupancy');
-    Route::get('/reports/custom', [ReportController::class, 'custom'])->name('reports.custom');
-    Route::post('/reports/custom', [ReportController::class, 'generateCustom'])->name('reports.custom.generate');
+    // Schedule Management (schedule managers can manage schedules)
+    Route::resource('schedules', ScheduleController::class)->middleware('role:admin,schedule_manager');
 
-    // Settings
-    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+    // Booking Management (only admins can manage bookings)
+    Route::resource('bookings', BookingController::class)->middleware('role:admin');
+
+    // News Management (only admins can manage news)
+    Route::resource('news', NewsController::class)->middleware('role:admin');
+
+    // Category Management (only admins can manage categories)
+    Route::resource('categories', CategoryController::class)->middleware('role:admin');
+
+    // Facility Management (only admins can manage facilities)
+    Route::resource('facilities', FacilityController::class)->middleware('role:admin');
+
+    // User Management (only admins can manage users)
+    Route::resource('users', UserController::class)->middleware('role:admin');
+
+    // Driver Management (only admins can manage drivers)
+    Route::resource('drivers', DriverController::class)->middleware('role:admin');
+
+    // Conductor Management (only admins can manage conductors)
+    Route::resource('conductors', ConductorController::class)->middleware('role:admin');
+
+    // Reports (admins and schedule managers can view reports)
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index')->middleware('role:admin,schedule_manager');
+    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales')->middleware('role:admin');
+    Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('reports.occupancy')->middleware('role:admin,schedule_manager');
+    Route::get('/reports/custom', [ReportController::class, 'custom'])->name('reports.custom')->middleware('role:admin,schedule_manager');
+    Route::post('/reports/custom', [ReportController::class, 'generateCustom'])->name('reports.custom.generate')->middleware('role:admin,schedule_manager');
+
+    // Settings (only admins can manage settings)
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index')->middleware('role:admin');
+    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update')->middleware('role:admin');
 
     // Test route for sidebar issues
     Route::get('/test-sidebar', function () {

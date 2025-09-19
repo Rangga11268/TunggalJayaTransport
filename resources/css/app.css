@@ -4,4 +4,83 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile-specific styles for booking pages */
+@media (max-width: 640px) {
+    .mobile-booking-card {
+        padding: 1rem;
+    }
+    
+    .mobile-info-card {
+        padding: 1rem;
+    }
+    
+    .mobile-info-card-title {
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+    }
+    
+    .mobile-btn-full {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        padding: 0.75rem;
+    }
+    
+    .mobile-seat-item {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    
+    .mobile-seat-image {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .mobile-ticket-container {
+        margin: 1.5rem auto;
+    }
+    
+    .mobile-ticket-content {
+        border-radius: 1rem;
+    }
+    
+    .mobile-ticket-section {
+        padding: 0.75rem;
+    }
+    
+    .mobile-action-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        line-height: 1rem;
+    }
+    
+    .mobile-button-group {
+        gap: 0.5rem;
+    }
+    
+    .mobile-legend {
+        gap: 0.5rem;
+    }
+    
+    .page-spacing {
+        padding: 1rem;
+    }
+}
+
+/* Small mobile devices (iPhone SE, etc.) */
+@media (max-width: 375px) {
+    .mobile-payment-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .mobile-seat-item {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+    
+    .mobile-seat-image {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+
 

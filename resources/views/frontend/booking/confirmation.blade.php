@@ -179,24 +179,24 @@
     </div>
 
     <!-- Payment Options -->
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-8 mobile-booking-card">
+    <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-8 mobile-booking-card">
         <h2 class="text-2xl font-bold text-gray-800 mb-6 mobile-info-card-title">Payment Method</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mobile-payment-options">
-            <div class="border-2 border-gray-200 rounded-lg p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="credit_card">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mobile-payment-options">
+            <div class="border-2 border-gray-200 rounded-lg p-4 sm:p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="credit_card">
                 <div class="flex items-center">
-                    <input type="radio" id="credit-card" name="payment" class="h-5 w-5 text-blue-600" checked>
-                    <label for="credit-card" class="ml-3 block text-lg font-medium text-gray-700">Credit/Debit Card</label>
+                    <input type="radio" id="credit-card" name="payment" class="h-5 w-5 text-blue-600">
+                    <label for="credit-card" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">Credit/Debit Card</label>
                 </div>
                 <div class="mt-4 flex space-x-2">
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
                 </div>
             </div>
-            <div class="border-2 border-gray-200 rounded-lg p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="bank_transfer">
+            <div class="border-2 border-gray-200 rounded-lg p-4 sm:p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="bank_transfer">
                 <div class="flex items-center">
                     <input type="radio" id="bank-transfer" name="payment" class="h-5 w-5 text-blue-600">
-                    <label for="bank-transfer" class="ml-3 block text-lg font-medium text-gray-700">Bank Transfer</label>
+                    <label for="bank-transfer" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">Bank Transfer</label>
                 </div>
                 <div class="mt-4 flex space-x-2">
                     <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
@@ -204,43 +204,43 @@
                     <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
                 </div>
             </div>
-            <div class="border-2 border-gray-200 rounded-lg p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="e_wallet">
+            <div class="border-2 border-gray-200 rounded-lg p-4 sm:p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="e_wallet">
                 <div class="flex items-center">
                     <input type="radio" id="e-wallet" name="payment" class="h-5 w-5 text-blue-600">
-                    <label for="e-wallet" class="ml-3 block text-lg font-medium text-gray-700">E-Wallet</label>
+                    <label for="e-wallet" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">E-Wallet</label>
                 </div>
                 <div class="mt-4 flex space-x-2">
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
                 </div>
             </div>
         </div>
         
-        <div class="mt-8">
-            <button id="pay-button" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg text-base sm:text-lg mobile-btn-full flex items-center justify-center">
+        <div class="mt-6 sm:mt-8">
+            <button id="pay-button" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg text-base mobile-btn-full flex items-center justify-center">
                 <i class="fas fa-lock mr-2"></i> Proceed to Secure Payment
             </button>
         </div>
     </div>
 
     <!-- Seat Selection -->
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-8 mobile-booking-card">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center mobile-info-card-title">
-            <i class="fas fa-bus mr-3 text-blue-500"></i> Select Your Seat (2-3 Layout)
+    <div class=\"bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-8 mobile-booking-card\">
+        <h2 class=\"text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center mobile-info-card-title\">
+            <i class=\"fas fa-bus mr-2 sm:mr-3 text-blue-500\"></i> Select Your Seat (2-3 Layout)
         </h2>
         
         <!-- Bus Visualization -->
-        <div class="bus-layout mb-8">
-            <div class="bus-driver-area text-center mb-6">
-                <div class="driver-seat bg-gradient-to-r from-gray-800 to-gray-900 text-white px-8 py-3 rounded-t-xl inline-block font-bold shadow-lg">
-                    <i class="fas fa-steering-wheel mr-2"></i>Driver
+        <div class=\"bus-layout mb-6 sm:mb-8\">
+            <div class=\"bus-driver-area text-center mb-4 sm:mb-6\">
+                <div class=\"driver-seat bg-gradient-to-r from-gray-800 to-gray-900 text-white px-4 sm:px-8 py-2 sm:py-3 rounded-t-xl inline-block font-bold shadow-lg text-sm sm:text-base\">
+                    <i class=\"fas fa-steering-wheel mr-1 sm:mr-2\"></i>Driver
                 </div>
             </div>
             
             <div class="bus-seats-area">
                 <!-- Aisle Separator (main) -->
-                <div class="aisle-separator my-6 flex justify-center">
+                <div class="aisle-separator my-4 sm:my-6 flex justify-center">
                     <div class="w-4/5 h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>
                 </div>
                 
@@ -253,9 +253,9 @@
                     @endphp
                     
                     @for ($row = 0; $row < $rows; $row++)
-                        <div class="seat-row flex items-center justify-center mb-6 w-full max-w-lg bg-gray-50 p-4 rounded-xl shadow-sm">
+                        <div class="seat-row flex items-center justify-center mb-4 sm:mb-6 w-full max-w-lg bg-gray-50 p-3 sm:p-4 rounded-xl shadow-sm">
                             <!-- Left side (2 seats) -->
-                            <div class="left-seats flex gap-4">
+                            <div class="left-seats flex gap-2 sm:gap-4">
                                 @for ($leftSeat = 0; $leftSeat < 2; $leftSeat++)
                                     @php
                                         $seatNumber = ($row * 5) + $leftSeat + 1;
@@ -266,24 +266,24 @@
                                         $isSelected = $booking->seat_numbers && in_array($seatNumber, explode(',', $booking->seat_numbers));
                                     @endphp
                                     <div 
-                                        class="seat-item w-14 h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-lg relative mobile-seat-item
+                                        class="seat-item w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-lg relative mobile-seat-item
                                             {{ $isOccupied ? 'bg-red-100 cursor-not-allowed opacity-70' : ($isSelected ? 'bg-blue-100 ring-4 ring-blue-500' : 'bg-green-100 hover:bg-green-200') }}"
                                         data-seat="{{ $seatNumber }}"
                                         {{ $isOccupied ? 'title=This seat is already booked' : 'title=Select seat '.$seatNumber }}
                                     >
                                         <!-- Seat Image -->
-                                        <div class="seat-image w-10 h-10 flex items-center justify-center {{ $isOccupied ? 'opacity-50' : ($isSelected ? 'filter brightness-75' : '') }} mobile-seat-image">
+                                        <div class="seat-image w-6 h-6 sm:w-10 sm:h-10 flex items-center justify-center {{ $isOccupied ? 'opacity-50' : ($isSelected ? 'filter brightness-75' : '') }} mobile-seat-image">
                                             <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-full h-full object-contain">
                                         </div>
                                         
                                         <!-- Seat Number -->
-                                        <div class="seat-number absolute -bottom-2 -right-1 text-xs font-bold {{ $isOccupied ? 'text-red-700' : ($isSelected ? 'text-blue-700' : 'text-green-700') }}">
+                                        <div class="seat-number absolute -bottom-1 -right-0 sm:-bottom-2 sm:-right-1 text-xs font-bold {{ $isOccupied ? 'text-red-700' : ($isSelected ? 'text-blue-700' : 'text-green-700') }}">
                                             {{ $seatNumber }}
                                         </div>
                                         
                                         @if($isOccupied)
                                             <div class="occupied-overlay absolute inset-0 bg-red-500 bg-opacity-70 rounded-xl flex items-center justify-center">
-                                                <i class="fas fa-times text-white text-lg"></i>
+                                                <i class="fas fa-times text-white text-sm sm:text-lg"></i>
                                             </div>
                                         @endif
                                     </div>
@@ -291,12 +291,12 @@
                             </div>
                             
                             <!-- Aisle separator -->
-                            <div class="aisle w-10 flex items-center justify-center mx-4">
+                            <div class="aisle w-4 sm:w-10 flex items-center justify-center mx-2 sm:mx-4">
                                 <div class="w-full h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>
                             </div>
                             
                             <!-- Right side (3 seats) -->
-                            <div class="right-seats flex gap-4">
+                            <div class="right-seats flex gap-2 sm:gap-4">
                                 @for ($rightSeat = 0; $rightSeat < 3; $rightSeat++)
                                     @php
                                         $seatNumber = ($row * 5) + $rightSeat + 3;
@@ -307,24 +307,24 @@
                                         $isSelected = $booking->seat_numbers && in_array($seatNumber, explode(',', $booking->seat_numbers));
                                     @endphp
                                     <div 
-                                        class="seat-item w-14 h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-lg relative mobile-seat-item
+                                        class="seat-item w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-lg relative mobile-seat-item
                                             {{ $isOccupied ? 'bg-red-100 cursor-not-allowed opacity-70' : ($isSelected ? 'bg-blue-100 ring-4 ring-blue-500' : 'bg-green-100 hover:bg-green-200') }}"
                                         data-seat="{{ $seatNumber }}"
                                         {{ $isOccupied ? 'title=This seat is already booked' : 'title=Select seat '.$seatNumber }}
                                     >
                                         <!-- Seat Image -->
-                                        <div class="seat-image w-10 h-10 flex items-center justify-center {{ $isOccupied ? 'opacity-50' : ($isSelected ? 'filter brightness-75' : '') }} mobile-seat-image">
+                                        <div class="seat-image w-6 h-6 sm:w-10 sm:h-10 flex items-center justify-center {{ $isOccupied ? 'opacity-50' : ($isSelected ? 'filter brightness-75' : '') }} mobile-seat-image">
                                             <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-full h-full object-contain">
                                         </div>
                                         
                                         <!-- Seat Number -->
-                                        <div class="seat-number absolute -bottom-2 -right-1 text-xs font-bold {{ $isOccupied ? 'text-red-700' : ($isSelected ? 'text-blue-700' : 'text-green-700') }}">
+                                        <div class="seat-number absolute -bottom-1 -right-0 sm:-bottom-2 sm:-right-1 text-xs font-bold {{ $isOccupied ? 'text-red-700' : ($isSelected ? 'text-blue-700' : 'text-green-700') }}">
                                             {{ $seatNumber }}
                                         </div>
                                         
                                         @if($isOccupied)
                                             <div class="occupied-overlay absolute inset-0 bg-red-500 bg-opacity-70 rounded-xl flex items-center justify-center">
-                                                <i class="fas fa-times text-white text-lg"></i>
+                                                <i class="fas fa-times text-white text-sm sm:text-lg"></i>
                                             </div>
                                         @endif
                                     </div>
@@ -343,38 +343,38 @@
         </div>
         
         <!-- Seat Legend -->
-        <div class="seat-legend flex flex-wrap justify-center gap-4 mb-8 mobile-legend">
-            <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
-                <div class="w-5 h-5 bg-green-100 rounded mr-2 flex items-center justify-center">
-                    <img src="{{ asset('img/car-seat.png') }}" alt="Available Seat" class="w-4 h-4 object-contain">
+        <div class="seat-legend flex flex-wrap justify-center gap-2 sm:gap-4 mb-6 sm:mb-8 mobile-legend">
+            <div class="flex items-center bg-gray-50 px-2 py-1 sm:px-3 sm:py-2 rounded-lg shadow-sm">
+                <div class="w-4 h-4 sm:w-5 sm:h-5 bg-green-100 rounded mr-1 sm:mr-2 flex items-center justify-center">
+                    <img src="{{ asset('img/car-seat.png') }}" alt="Available Seat" class="w-3 h-3 sm:w-4 sm:h-4 object-contain">
                 </div>
-                <span class="text-sm font-medium">Available</span>
+                <span class="text-xs sm:text-sm font-medium">Available</span>
             </div>
-            <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
-                <div class="w-5 h-5 bg-red-100 rounded mr-2 flex items-center justify-center">
-                    <i class="fas fa-times text-red-500 text-xs"></i>
+            <div class="flex items-center bg-gray-50 px-2 py-1 sm:px-3 sm:py-2 rounded-lg shadow-sm">
+                <div class="w-4 h-4 sm:w-5 sm:h-5 bg-red-100 rounded mr-1 sm:mr-2 flex items-center justify-center">
+                    <i class="fas fa-times text-red-500 text-xs sm:text-sm"></i>
                 </div>
-                <span class="text-sm font-medium">Occupied</span>
+                <span class="text-xs sm:text-sm font-medium">Occupied</span>
             </div>
-            <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
-                <div class="w-5 h-5 bg-blue-100 rounded mr-2 flex items-center justify-center">
-                    <img src="{{ asset('img/car-seat.png') }}" alt="Selected Seat" class="w-4 h-4 object-contain filter brightness-75">
+            <div class="flex items-center bg-gray-50 px-2 py-1 sm:px-3 sm:py-2 rounded-lg shadow-sm">
+                <div class="w-4 h-4 sm:w-5 sm:h-5 bg-blue-100 rounded mr-1 sm:mr-2 flex items-center justify-center">
+                    <img src="{{ asset('img/car-seat.png') }}" alt="Selected Seat" class="w-3 h-3 sm:w-4 sm:h-4 object-contain filter brightness-75">
                 </div>
-                <span class="text-sm font-medium">Selected</span>
+                <span class="text-xs sm:text-sm font-medium">Selected</span>
             </div>
-            <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
-                <div class="w-8 h-4 flex items-center justify-center">
-                    <div class="w-4 h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>
+            <div class="flex items-center bg-gray-50 px-2 py-1 sm:px-3 sm:py-2 rounded-lg shadow-sm">
+                <div class="w-6 sm:w-8 h-1 flex items-center justify-center">
+                    <div class="w-4 h-0.5 sm:h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>
                 </div>
-                <span class="text-sm font-medium">Aisle</span>
+                <span class="text-xs sm:text-sm font-medium ml-1 sm:ml-2">Aisle</span>
             </div>
         </div>
         
         <!-- Selected Seats Info -->
-        <div class="selected-seats-info text-center mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
-            <p class="text-gray-700">
+        <div class="selected-seats-info text-center mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 sm:p-4">
+            <p class="text-gray-700 text-sm sm:text-base">
                 Selected Seats: 
-                <span id="selected-seats-display" class="font-bold text-blue-600 bg-white px-3 py-1 rounded-lg text-lg shadow-sm">
+                <span id="selected-seats-display" class="font-bold text-blue-600 bg-white px-2 py-1 rounded-lg text-base sm:text-lg shadow-sm">
                     @if($booking->seat_numbers)
                         {{ $booking->seat_numbers }}
                     @else
@@ -382,29 +382,29 @@
                     @endif
                 </span>
             </p>
-            <p class="text-gray-600 mt-2">
+            <p class="text-gray-600 mt-2 text-sm sm:text-base">
                 <span id="selected-count" class="font-bold text-lg">{{ $booking->seat_numbers ? count(explode(',', $booking->seat_numbers)) : 0 }}</span> of {{ $booking->number_of_seats }} seats selected
             </p>
         </div>
         
         <!-- Action Buttons -->
         <div class="flex justify-center w-full mt-4">
-            <button id="save-seats" class="save-seats-btn" title="Save your seat selection">
+            <button id="save-seats" class="save-seats-btn text-sm sm:text-base" title="Save your seat selection">
                 <i class="fas fa-save mr-2"></i> Save Seats
             </button>
         </div>
     </div>
     
     <!-- Ticket Preview and Download -->
-    <div class="bg-white rounded-xl shadow-lg p-6 mobile-booking-card">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+    <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mobile-booking-card">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-4">
             <div>
-                <h2 class="text-2xl font-bold text-gray-800">Ticket Preview</h2>
-                <p class="text-gray-600">Your ticket will be available after payment</p>
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Ticket Preview</h2>
+                <p class="text-gray-600 text-sm sm:text-base">Your ticket will be available after payment</p>
             </div>
             @if($booking->seat_numbers)
-            <a href="{{ route('frontend.booking.download-ticket', $booking->id) }}" target="_blank" class="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 mobile-action-button">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <a href="{{ route('frontend.booking.download-ticket', $booking->id) }}" target="_blank" class="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg inline-flex items-center transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 mobile-action-button text-sm sm:text-base">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                 </svg>
                 Download Ticket

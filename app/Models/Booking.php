@@ -26,8 +26,8 @@ class Booking extends Model implements HasMedia
         'payment_started_at',
     ];
 
-    protected $dates = [
-        'payment_started_at',
+    protected $casts = [
+        'payment_started_at' => 'datetime',
     ];
 
     public function user()

@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             RouteSeeder::class,
             FacilitySeeder::class,
             DriverSeeder::class,
+            RoleSeeder::class,
+            UserRoleSeeder::class,
         ]);
     }
 }
