@@ -77,18 +77,12 @@
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Departure Time:</dt>
                                 <dd class="text-gray-900">
-                                    @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                        @php
-                                            $nextDate = $schedule->getNextAvailableDate();
-                                            if ($nextDate) {
-                                                $displayDateTime = $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
-                                                echo $displayDateTime->format('d M Y H:i');
-                                            } else {
-                                                echo $schedule->departure_time->format('d M Y H:i');
-                                            }
-                                        @endphp
+                                                                        @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                        <div class="text-sm text-gray-500">{{ date('l', strtotime("Sunday + {$schedule->day_of_week} days")) }} at {{ $schedule->departure_time->format('H:i') }}</div>
+                                    @elseif($schedule->is_daily)
+                                        <div class="text-sm text-gray-500">Daily at {{ $schedule->departure_time->format('H:i') }}</div>
                                     @else
-                                        {{ $schedule->departure_time->format('d M Y H:i') }}
+                                        <div class="text-sm text-gray-500">{{ $schedule->departure_time->format('l, F j, Y H:i') }}</div>
                                     @endif
                                 </dd>
                             </div>
@@ -97,7 +91,7 @@
                                 <dd class="text-gray-900">
                                     @if($schedule->is_weekly && $schedule->day_of_week !== null)
                                         @php
-                                            $nextDate = $schedule->getNextAvailableDate();
+                                            $nextDate = $schedule->is_weekly && $schedule->day_of_week !== null ? $schedule->getNextAvailableDate() : null;
                                             if ($nextDate) {
                                                 $displayDateTime = $nextDate->copy()->setTimeFromTimeString($schedule->arrival_time->format('H:i:s'));
                                                 echo $displayDateTime->format('d M Y H:i');

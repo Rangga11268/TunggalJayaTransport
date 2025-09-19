@@ -121,25 +121,10 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap" data-label="Departure">
                             <div class="text-sm font-medium text-gray-900">
-                                @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                    @php
-                                        $nextDate = $schedule->getNextAvailableDate();
-                                        $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s')) : $schedule->departure_time;
-                                        echo $displayTime->format('H:i');
-                                    @endphp
-                                @else
-                                    {{ $schedule->departure_time->format('H:i') }}
-                                @endif
+                                {{ $schedule->getActualDepartureTime()->format('H:i') }}
                             </div>
                             <div class="text-sm text-gray-500">
-                                @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                    @php
-                                        $nextDate = $schedule->getNextAvailableDate();
-                                        echo $nextDate ? $nextDate->format('l, F j') : $schedule->departure_time->format('l, F j');
-                                    @endphp
-                                @else
-                                    {{ $schedule->departure_time->format('l, F j') }}
-                                @endif
+                                {{ $schedule->getActualDepartureTime()->format('l, F j') }}
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap" data-label="Arrival">

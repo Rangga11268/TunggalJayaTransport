@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Add New Schedule') }}
+            {{ __('Create Schedule') }}
         </h2>
     </x-slot>
 
@@ -9,122 +9,149 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <form action="{{ route('admin.schedules.store') }}" method="POST">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold">Create New Schedule</h3>
+                        <a href="{{ route('admin.schedules.index') }}" class="text-blue-500 hover:text-blue-700">
+                            ← Back to Schedules
+                        </a>
+                    </div>
+                    
+                    <form method="POST" action="{{ route('admin.schedules.store') }}">
                         @csrf
                         
-                        <div class="mb-4">
-                            <label for="bus_id" class="block text-sm font-medium text-gray-700">Bus</label>
-                            <select name="bus_id" id="bus_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-                                <option value="">Select a bus</option>
-                                @foreach($buses as $bus)
-                                    <option value="{{ $bus->id }}" {{ old('bus_id') == $bus->id ? 'selected' : '' }}>
-                                        {{ $bus->name }} ({{ $bus->plate_number }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('bus_id')
-                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="route_id" class="block text-sm font-medium text-gray-700">Route</label>
-                            <select name="route_id" id="route_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-                                <option value="">Select a route</option>
-                                @foreach($routes as $route)
-                                    <option value="{{ $route->id }}" {{ old('route_id') == $route->id ? 'selected' : '' }}>
-                                        {{ $route->name }} ({{ $route->origin }} → {{ $route->destination }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('route_id')
-                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Schedule Type</label>
-                            <div class="mt-1 space-y-2">
-                                <div class="flex items-center">
-                                    <input type="radio" name="is_weekly" id="daily" value="0" {{ old('is_weekly', 0) == 0 ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
-                                    <label for="daily" class="ml-3 block text-sm font-medium text-gray-700">Daily Schedule</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="radio" name="is_weekly" id="weekly" value="1" {{ old('is_weekly', 0) == 1 ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
-                                    <label for="weekly" class="ml-3 block text-sm font-medium text-gray-700">Weekly Schedule</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="weekly-options" class="mb-4 hidden">
-                            <label for="day_of_week" class="block text-sm font-medium text-gray-700">Day of Week</label>
-                            <select name="day_of_week" id="day_of_week" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                <option value="">Select a day</option>
-                                <option value="0" {{ old('day_of_week') == 0 ? 'selected' : '' }}>Sunday</option>
-                                <option value="1" {{ old('day_of_week') == 1 ? 'selected' : '' }}>Monday</option>
-                                <option value="2" {{ old('day_of_week') == 2 ? 'selected' : '' }}>Tuesday</option>
-                                <option value="3" {{ old('day_of_week') == 3 ? 'selected' : '' }}>Wednesday</option>
-                                <option value="4" {{ old('day_of_week') == 4 ? 'selected' : '' }}>Thursday</option>
-                                <option value="5" {{ old('day_of_week') == 5 ? 'selected' : '' }}>Friday</option>
-                                <option value="6" {{ old('day_of_week') == 6 ? 'selected' : '' }}>Saturday</option>
-                            </select>
-                            @error('day_of_week')
-                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div id="daily-options" class="mb-4">
-                            <label for="departure_date" class="block text-sm font-medium text-gray-700">Departure Date</label>
-                            <input type="date" name="departure_date" id="departure_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('departure_date') }}">
-                            @error('departure_date')
-                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label for="departure_time" class="block text-sm font-medium text-gray-700">Departure Time</label>
-                                <input type="time" name="departure_time" id="departure_time" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('departure_time') }}" required>
-                                @error('departure_time')
-                                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Bus -->
+                            <div class="mb-4">
+                                <label for="bus_id" class="block text-sm font-medium text-gray-700">Bus</label>
+                                <select name="bus_id" id="bus_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                    <option value="">Select a Bus</option>
+                                    @foreach($buses as $bus)
+                                        <option value="{{ $bus->id }}" {{ old('bus_id') == $bus->id ? 'selected' : '' }}>
+                                            {{ $bus->name }} ({{ $bus->plate_number }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('bus_id')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
                             
-                            <div>
+                            <!-- Route -->
+                            <div class="mb-4">
+                                <label for="route_id" class="block text-sm font-medium text-gray-700">Route</label>
+                                <select name="route_id" id="route_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                    <option value="">Select a Route</option>
+                                    @foreach($routes as $route)
+                                        <option value="{{ $route->id }}" {{ old('route_id') == $route->id ? 'selected' : '' }}>
+                                            {{ $route->name }} ({{ $route->origin }} → {{ $route->destination }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('route_id')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            
+                            <!-- Schedule Type -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Schedule Type</label>
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex items-center">
+                                        <input type="radio" name="is_weekly" id="daily" value="0" {{ old('is_weekly', 0) == 0 && old('is_daily', 0) == 0 ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
+                                        <label for="daily" class="ml-3 block text-sm font-medium text-gray-700">One-time Schedule</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" name="is_weekly" id="weekly" value="1" {{ old('is_weekly', 0) == 1 ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
+                                        <label for="weekly" class="ml-3 block text-sm font-medium text-gray-700">Weekly Schedule</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" name="is_daily" id="daily_recurring" value="1" {{ old('is_daily', 0) == 1 ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
+                                        <label for="daily_recurring" class="ml-3 block text-sm font-medium text-gray-700">Daily Recurring</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Weekly Options -->
+                            <div id="weekly-options" class="mb-4 {{ old('is_weekly', 0) == 1 ? '' : 'hidden' }}">
+                                <label for="day_of_week" class="block text-sm font-medium text-gray-700">Day of Week</label>
+                                <select name="day_of_week" id="day_of_week" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                    <option value="">Select a Day</option>
+                                    <option value="0" {{ old('day_of_week') == 0 ? 'selected' : '' }}>Sunday</option>
+                                    <option value="1" {{ old('day_of_week') == 1 ? 'selected' : '' }}>Monday</option>
+                                    <option value="2" {{ old('day_of_week') == 2 ? 'selected' : '' }}>Tuesday</option>
+                                    <option value="3" {{ old('day_of_week') == 3 ? 'selected' : '' }}>Wednesday</option>
+                                    <option value="4" {{ old('day_of_week') == 4 ? 'selected' : '' }}>Thursday</option>
+                                    <option value="5" {{ old('day_of_week') == 5 ? 'selected' : '' }}>Friday</option>
+                                    <option value="6" {{ old('day_of_week') == 6 ? 'selected' : '' }}>Saturday</option>
+                                </select>
+                                @error('day_of_week')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            
+                            <!-- Daily Options -->
+                            <div id="daily-options" class="mb-4 {{ (old('is_weekly', 0) == 0 && old('is_daily', 0) == 0) ? '' : 'hidden' }}">
+                                <label for="departure_date" class="block text-sm font-medium text-gray-700">Departure Date</label>
+                                <input type="date" name="departure_date" id="departure_date" value="{{ old('departure_date') }}" 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                @error('departure_date')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            
+                            <!-- Departure Time -->
+                            <div class="mb-4">
+                                <label for="departure_time" class="block text-sm font-medium text-gray-700">Departure Time</label>
+                                <input type="time" name="departure_time" id="departure_time" value="{{ old('departure_time') }}" 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
+                                    required>
+                                @error('departure_time')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            
+                            <!-- Arrival Time -->
+                            <div class="mb-4">
                                 <label for="arrival_time" class="block text-sm font-medium text-gray-700">Arrival Time</label>
-                                <input type="time" name="arrival_time" id="arrival_time" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('arrival_time') }}" required>
+                                <input type="time" name="arrival_time" id="arrival_time" value="{{ old('arrival_time') }}" 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
+                                    required>
                                 @error('arrival_time')
-                                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            
+                            <!-- Price -->
+                            <div class="mb-4">
+                                <label for="price" class="block text-sm font-medium text-gray-700">Price (Rp)</label>
+                                <input type="number" name="price" id="price" value="{{ old('price') }}" 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
+                                    min="0" step="0.01" required>
+                                @error('price')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            
+                            <!-- Status -->
+                            <div class="mb-4">
+                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="cancelled" {{ old('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                    <option value="delayed" {{ old('status') == 'delayed' ? 'selected' : '' }}>Delayed</option>
+                                </select>
+                                @error('status')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
                         
-                        <div class="mb-4">
-                            <label for="price" class="block text-sm font-medium text-gray-700">Price (Rp)</label>
-                            <input type="number" name="price" id="price" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('price') }}" required>
-                            @error('price')
-                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                            <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-                                <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                                <option value="cancelled" {{ old('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                <option value="delayed" {{ old('status') == 'delayed' ? 'selected' : '' }}>Delayed</option>
-                            </select>
-                            @error('status')
-                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <a href="{{ route('admin.schedules.index') }}" class="text-gray-600 hover:text-gray-800">
-                                ← Back to Schedules
+                        <div class="flex items-center justify-end mt-6">
+                            <a href="{{ route('admin.schedules.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">
+                                Cancel
                             </a>
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                Add Schedule
+                                Create Schedule
                             </button>
                         </div>
                     </form>
@@ -134,29 +161,41 @@
     </div>
     
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const scheduleType = document.querySelectorAll('input[name="is_weekly"]');
-        const weeklyOptions = document.getElementById('weekly-options');
-        const dailyOptions = document.getElementById('daily-options');
-        
-        scheduleType.forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.value == '1') {
-                    weeklyOptions.classList.remove('hidden');
-                    dailyOptions.classList.add('hidden');
-                } else {
-                    weeklyOptions.classList.add('hidden');
-                    dailyOptions.classList.remove('hidden');
-                }
+        document.addEventListener('DOMContentLoaded', function() {
+            const scheduleType = document.querySelectorAll('input[name="is_weekly"], input[name="is_daily"]');
+            const weeklyOptions = document.getElementById('weekly-options');
+            const dailyOptions = document.getElementById('daily-options');
+            
+            scheduleType.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.name === 'is_weekly' && this.value == '1') {
+                        // Weekly schedule
+                        weeklyOptions.classList.remove('hidden');
+                        dailyOptions.classList.add('hidden');
+                    } else if (this.name === 'is_daily' && this.value == '1') {
+                        // Daily recurring schedule
+                        weeklyOptions.classList.add('hidden');
+                        dailyOptions.classList.add('hidden');
+                    } else if (this.name === 'is_weekly' && this.value == '0') {
+                        // One-time schedule
+                        weeklyOptions.classList.add('hidden');
+                        dailyOptions.classList.remove('hidden');
+                    }
+                });
             });
+            
+            // Initialize based on checked radio
+            const checkedWeekly = document.querySelector('input[name="is_weekly"]:checked');
+            const checkedDaily = document.querySelector('input[name="is_daily"]:checked');
+            
+            if (checkedWeekly && checkedWeekly.value == '1') {
+                weeklyOptions.classList.remove('hidden');
+            } else if (checkedDaily && checkedDaily.value == '1') {
+                weeklyOptions.classList.add('hidden');
+                dailyOptions.classList.add('hidden');
+            } else {
+                dailyOptions.classList.remove('hidden');
+            }
         });
-        
-        // Initialize based on default value
-        const checkedRadio = document.querySelector('input[name="is_weekly"]:checked');
-        if (checkedRadio && checkedRadio.value == '1') {
-            weeklyOptions.classList.remove('hidden');
-            dailyOptions.classList.add('hidden');
-        }
-    });
     </script>
 </x-app-layout>

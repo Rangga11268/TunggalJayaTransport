@@ -100,6 +100,15 @@
                         }" 
                         class="transition-opacity duration-300">Manajemen Jadwal</span>
                 </a>
+                <a href="{{ route('admin.weekly-schedule-templates.index') }}"
+                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.weekly-schedule-templates.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                    <i class="fas fa-calendar-week text-lg w-6"></i> 
+                    <span :class="{
+                            'ml-3 inline': sidebarOpen, 
+                            'hidden': !sidebarOpen
+                        }" 
+                        class="transition-opacity duration-300">Template Jadwal Mingguan</span>
+                </a>
                 <a href="{{ route('admin.bookings.index') }}"
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.bookings.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-ticket-alt text-lg w-6"></i> 

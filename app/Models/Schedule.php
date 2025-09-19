@@ -11,18 +11,20 @@ class Schedule extends Model
     protected $fillable = [
         'bus_id',
         'route_id',
-        'departure_time',
-        'arrival_time',
+        'departure_time', // For weekly: time only, for daily: datetime
+        'arrival_time',   // For weekly: time only, for daily: datetime
         'price',
         'status',
         'is_weekly',
         'day_of_week',
+        'is_daily', // New field for daily recurring schedules
     ];
 
     protected $casts = [
         'departure_time' => 'datetime',
         'arrival_time' => 'datetime',
         'is_weekly' => 'boolean',
+        'is_daily' => 'boolean',
         'day_of_week' => 'integer',
     ];
 
@@ -84,13 +86,108 @@ class Schedule extends Model
     }
 
     /**
+     * Get the actual departure datetime for display/booking purposes
+     * For weekly schedules, calculates the next occurrence
+     * For daily recurring schedules, calculates the next occurrence
+     * For daily schedules, returns the stored datetime
+     */
+    public function getActualDepartureTime()
+    {
+        if ($this->is_weekly && $this->day_of_week !== null) {
+            // For weekly schedules, calculate the next occurrence
+            $nextDate = $this->getNextAvailableDate();
+            if ($nextDate) {
+                // Combine the next date with the stored time
+                return $nextDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+            }
+            // Fallback to today with the time
+            return Carbon::today()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+        }
+        
+        if ($this->is_daily) {
+            // For daily recurring schedules, we need to find the next available date
+            $today = Carbon::today();
+            $now = Carbon::now();
+            
+            // Get today's departure time for comparison
+            $todayDeparture = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+            
+            // If departure time hasn't passed yet today, return today
+            if ($todayDeparture->isFuture()) {
+                return $todayDeparture;
+            }
+            
+            // Otherwise, return tomorrow's departure time
+            return $today->copy()->addDay()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+        }
+        
+        // For daily schedules, return the stored datetime
+        return $this->departure_time;
+    }
+
+    /**
+     * Get the actual arrival datetime for display/booking purposes
+     * For weekly schedules, calculates the next occurrence
+     * For daily recurring schedules, calculates the next occurrence
+     * For daily schedules, returns the stored datetime
+     */
+    public function getActualArrivalTime()
+    {
+        if ($this->is_weekly && $this->day_of_week !== null) {
+            // For weekly schedules, calculate the next occurrence
+            $nextDate = $this->getNextAvailableDate();
+            if ($nextDate) {
+                // Combine the next date with the stored time
+                return $nextDate->copy()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
+            }
+            // Fallback to today with the time
+            return Carbon::today()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
+        }
+        
+        if ($this->is_daily) {
+            // For daily recurring schedules, we need to find the next available date
+            $today = Carbon::today();
+            $now = Carbon::now();
+            
+            // Get today's departure time for comparison
+            $todayDeparture = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+            
+            // If departure time hasn't passed yet today, return today's arrival time
+            if ($todayDeparture->isFuture()) {
+                return $today->copy()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
+            }
+            
+            // Otherwise, return tomorrow's arrival time
+            return $today->copy()->addDay()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
+        }
+        
+        // For daily schedules, return the stored datetime
+        return $this->arrival_time;
+    }
+
+    /**
      * Check if the schedule departure time has passed
+     * For weekly schedules, checks if the next occurrence has passed
+     * For daily recurring schedules, checks if the next occurrence has passed
      */
     public function hasDeparted()
     {
-        // Use system timezone for comparison
         $now = Carbon::now();
-        return $this->departure_time->setTimezone($now->timezone)->isPast();
+        
+        if ($this->is_weekly && $this->day_of_week !== null) {
+            // For weekly schedules, check if the next occurrence has passed
+            $actualDeparture = $this->getActualDepartureTime();
+            return $actualDeparture->isPast();
+        }
+        
+        if ($this->is_daily) {
+            // For daily recurring schedules, check if the next occurrence has passed
+            $actualDeparture = $this->getActualDepartureTime();
+            return $actualDeparture->isPast();
+        }
+        
+        // For daily schedules, check against stored departure time
+        return $this->departure_time->isPast();
     }
 
     /**
@@ -103,7 +200,8 @@ class Schedule extends Model
             $timezone = Carbon::now()->timezone;
         }
         
-        return $this->departure_time->setTimezone($timezone);
+        $departureTime = $this->getActualDepartureTime();
+        return $departureTime->setTimezone($timezone);
     }
 
     /**
@@ -111,35 +209,18 @@ class Schedule extends Model
      */
     public function isAvailableForBooking()
     {
-        // For weekly schedules, check if they are active
-        if ($this->is_weekly && $this->day_of_week !== null) {
-            // Weekly schedules are available as long as they are active
-            return $this->status === 'active';
-        } else {
-            // For daily schedules, check if schedule has already departed
-            if ($this->hasDeparted()) {
-                return false;
-            }
+        // Check if schedule is active
+        if ($this->status !== 'active') {
+            return false;
+        }
+
+        // Check if the schedule has already departed
+        if ($this->hasDeparted()) {
+            return false;
         }
 
         // Check if there are available seats
         return $this->getAvailableSeatsCount() > 0;
-    }
-
-    /**
-     * Check if the schedule is available for weekly booking
-     * For booking purposes, we want to show all active weekly schedules
-     * regardless of the day of the week
-     */
-    public function isAvailableForWeeklyBooking()
-    {
-        // For weekly schedules, check if they are active
-        if ($this->is_weekly && $this->day_of_week !== null) {
-            return $this->status === 'active';
-        }
-        
-        // For non-weekly schedules, always return false for this check
-        return false;
     }
 
     /**
@@ -152,22 +233,72 @@ class Schedule extends Model
             return null;
         }
 
-        $today = Carbon::now();
-        $nextDate = $today->copy()->next($this->day_of_week);
+        $today = Carbon::today();
+        $now = Carbon::now();
         
-        // If today is the scheduled day, check if departure time has passed
+        // Get today's departure time for comparison
+        $todayDeparture = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+        
+        // If today is the scheduled day
         if ($today->dayOfWeek == $this->day_of_week) {
-            $departureToday = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
-            if ($departureToday->isPast()) {
-                // Return next week's date
-                $nextDate = $today->copy()->addWeek()->next($this->day_of_week);
+            // If departure time hasn't passed yet today, return today
+            if ($todayDeparture->isFuture()) {
+                return $today;
+            }
+            // If departure time has passed today, return next week's date
+            return $today->copy()->addWeek();
+        }
+        
+        // If today is not the scheduled day, get the next occurrence
+        // next() returns the next occurrence of the given day of week
+        $nextDate = $today->copy()->next($this->day_of_week);
+        return $nextDate;
+    }
+
+    /**
+     * Get all upcoming dates for a weekly schedule within a date range
+     */
+    public function getUpcomingDates($startDate = null, $endDate = null, $limit = 10)
+    {
+        // Only applicable for weekly schedules
+        if (!$this->is_weekly || $this->day_of_week === null) {
+            return collect();
+        }
+
+        $startDate = $startDate ? Carbon::parse($startDate) : Carbon::today();
+        $endDate = $endDate ? Carbon::parse($endDate) : $startDate->copy()->addMonths(3); // Default 3 months
+        
+        $dates = collect();
+        $currentDate = $startDate->copy();
+        $count = 0;
+        
+        // Find the first occurrence
+        if ($currentDate->dayOfWeek == $this->day_of_week) {
+            // If today is the scheduled day, check if departure time hasn't passed yet
+            $todayDeparture = $currentDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+            if ($todayDeparture->isFuture() || $todayDeparture->isSameAs('H:i:s', Carbon::now()->format('H:i:s'))) {
+                $dates->push($currentDate->copy());
+                $count++;
+            }
+            $currentDate->addDay();
+        }
+        
+        // Continue finding occurrences until we reach the limit or end date
+        while ($currentDate->lte($endDate) && $count < $limit) {
+            // Find the next occurrence of the scheduled day
+            $nextDate = $currentDate->copy()->next($this->day_of_week);
+            
+            // If the next date is within our range, add it
+            if ($nextDate->lte($endDate)) {
+                $dates->push($nextDate);
+                $count++;
+                $currentDate = $nextDate->copy()->addDay();
             } else {
-                // Today is still available
-                $nextDate = $today->copy();
+                break;
             }
         }
         
-        return $nextDate;
+        return $dates;
     }
 
     /**
@@ -186,20 +317,9 @@ class Schedule extends Model
      */
     public function scopeAvailable($query)
     {
-        return $query->where(function($q) {
-            // For weekly schedules, check if they have a valid day_of_week
-            $q->where(function($q2) {
-                $q2->where('is_weekly', true)
-                  ->whereNotNull('day_of_week');
-            })
-            // For daily schedules, check if departure_time is in the future
-            ->orWhere(function($q2) {
-                $q2->where('is_weekly', false)
-                  ->where('departure_time', '>', Carbon::now());
-            });
-        })
-        ->whereHas('bus')
-        ->whereHas('route');
+        return $query->where('status', 'active')
+            ->whereHas('bus')
+            ->whereHas('route');
     }
 
     /**
@@ -216,5 +336,33 @@ class Schedule extends Model
     public function scopeDaily($query)
     {
         return $query->where('is_weekly', false);
+    }
+    
+    /**
+     * Scope for daily recurring schedules
+     */
+    public function scopeDailyRecurring($query)
+    {
+        return $query->where('is_daily', true);
+    }
+    
+    /**
+     * Get formatted schedule information for display
+     */
+    public function getDisplayInfo()
+    {
+        $departure = $this->getActualDepartureTime();
+        $arrival = $this->getActualArrivalTime();
+        
+        return [
+            'departure' => $departure->format('H:i'),
+            'arrival' => $arrival->format('H:i'),
+            'date' => $departure->format('M j'),
+            'full_departure' => $departure->format('Y-m-d H:i:s'),
+            'full_arrival' => $arrival->format('Y-m-d H:i:s'),
+            'is_weekly' => $this->is_weekly,
+            'is_daily' => $this->is_daily,
+            'day_of_week' => $this->is_weekly ? $this->day_of_week : null,
+        ];
     }
 }

@@ -64,26 +64,10 @@
                             <p class="text-xs text-gray-500 uppercase font-semibold">Origin</p>
                             <p class="text-2xl font-bold text-gray-800 mt-2">{{ $booking->schedule->route->origin }}</p>
                             <p class="text-gray-600 mt-1">
-                                @if($booking->schedule->is_weekly && $booking->schedule->day_of_week !== null)
-                                    @php
-                                        $nextDate = $booking->schedule->getNextAvailableDate();
-                                        $displayDate = $nextDate ? $nextDate : $booking->schedule->departure_time;
-                                        echo $displayDate->format('d M Y');
-                                    @endphp
-                                @else
-                                    {{ $booking->schedule->departure_time->format('d M Y') }}
-                                @endif
+                                {{ $booking->schedule->getActualDepartureTime()->format('d M Y') }}
                             </p>
                             <p class="text-lg font-semibold text-blue-600 mt-1">
-                                @if($booking->schedule->is_weekly && $booking->schedule->day_of_week !== null)
-                                    @php
-                                        $nextDate = $booking->schedule->getNextAvailableDate();
-                                        $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($booking->schedule->departure_time->format('H:i:s')) : $booking->schedule->departure_time;
-                                        echo $displayTime->format('H:i');
-                                    @endphp
-                                @else
-                                    {{ $booking->schedule->departure_time->format('H:i') }}
-                                @endif
+                                {{ $booking->schedule->getActualDepartureTime()->format('H:i') }}
                             </p>
                         </div>
                         
@@ -102,26 +86,10 @@
                             <p class="text-xs text-gray-500 uppercase font-semibold">Destination</p>
                             <p class="text-2xl font-bold text-gray-800 mt-2">{{ $booking->schedule->route->destination }}</p>
                             <p class="text-gray-600 mt-1">
-                                @if($booking->schedule->is_weekly && $booking->schedule->day_of_week !== null)
-                                    @php
-                                        $nextDate = $booking->schedule->getNextAvailableDate();
-                                        $displayDate = $nextDate ? $nextDate : $booking->schedule->arrival_time;
-                                        echo $displayDate->format('d M Y');
-                                    @endphp
-                                @else
-                                    {{ $booking->schedule->arrival_time->format('d M Y') }}
-                                @endif
+                                {{ $booking->schedule->getActualArrivalTime()->format('d M Y') }}
                             </p>
                             <p class="text-lg font-semibold text-blue-600 mt-1">
-                                @if($booking->schedule->is_weekly && $booking->schedule->day_of_week !== null)
-                                    @php
-                                        $nextDate = $booking->schedule->getNextAvailableDate();
-                                        $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($booking->schedule->arrival_time->format('H:i:s')) : $booking->schedule->arrival_time;
-                                        echo $displayTime->format('H:i');
-                                    @endphp
-                                @else
-                                    {{ $booking->schedule->arrival_time->format('H:i') }}
-                                @endif
+                                {{ $booking->schedule->getActualArrivalTime()->format('H:i') }}
                             </p>
                         </div>
                     </div>

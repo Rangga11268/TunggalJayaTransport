@@ -46,15 +46,7 @@
                             <div>
                                 <p class="text-xs sm:text-sm text-gray-500">Date</p>
                                 <p class="font-medium text-sm sm:text-base">
-                                    @if($booking->schedule->is_weekly && $booking->schedule->day_of_week !== null)
-                                        @php
-                                            $nextDate = $booking->schedule->getNextAvailableDate();
-                                            $displayDate = $nextDate ? $nextDate : $booking->schedule->departure_time;
-                                            echo $displayDate->format('l, F j, Y');
-                                        @endphp
-                                    @else
-                                        {{ $booking->schedule->departure_time->format('l, F j, Y') }}
-                                    @endif
+                                    {{ $booking->schedule->getActualDepartureTime()->format('l, F j, Y') }}
                                 </p>
                             </div>
                         </div>
@@ -65,15 +57,7 @@
                             <div>
                                 <p class="text-xs sm:text-sm text-gray-500">Departure</p>
                                 <p class="font-medium text-sm sm:text-base">
-                                    @if($booking->schedule->is_weekly && $booking->schedule->day_of_week !== null)
-                                        @php
-                                            $nextDate = $booking->schedule->getNextAvailableDate();
-                                            $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($booking->schedule->departure_time->format('H:i:s')) : $booking->schedule->departure_time;
-                                            echo $displayTime->format('H:i');
-                                        @endphp
-                                    @else
-                                        {{ $booking->schedule->departure_time->format('H:i') }}
-                                    @endif
+                                    {{ $booking->schedule->getActualDepartureTime()->format('H:i') }}
                                 </p>
                             </div>
                         </div>

@@ -174,25 +174,10 @@
                                         </div>
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">
-                                                @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                                    @php
-                                                        $nextDate = $schedule->getNextAvailableDate();
-                                                        $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s')) : $schedule->departure_time;
-                                                        echo $displayTime->format('H:i');
-                                                    @endphp
-                                                @else
-                                                    {{ $schedule->departure_time->format('H:i') }}
-                                                @endif
+                                                {{ $schedule->getActualDepartureTime()->format('H:i') }}
                                             </div>
                                             <div class="text-sm text-gray-500">
-                                                @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                                    @php
-                                                        $nextDate = $schedule->getNextAvailableDate();
-                                                        echo $nextDate ? $nextDate->format('l, F j') : $schedule->departure_time->format('l, F j');
-                                                    @endphp
-                                                @else
-                                                    {{ $schedule->departure_time->format('l, F j') }}
-                                                @endif
+                                                {{ $schedule->getActualDepartureTime()->format('l, F j') }}
                                             </div>
                                         </div>
                                     </div>
@@ -203,8 +188,12 @@
                                             <i class="fas fa-sign-in-alt text-green-600"></i>
                                         </div>
                                         <div>
-                                            <div class="text-sm font-medium text-gray-900">{{ $schedule->arrival_time->format('H:i') }}</div>
-                                            <div class="text-sm text-gray-500">{{ $schedule->arrival_time->format('l, F j') }}</div>
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {{ $schedule->getActualArrivalTime()->format('H:i') }}
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                {{ $schedule->getActualArrivalTime()->format('l, F j') }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -300,7 +289,7 @@
                                         <div class="text-sm font-medium text-gray-900">
                                             @if($schedule->is_weekly && $schedule->day_of_week !== null)
                                                 @php
-                                                    $nextDate = $schedule->getNextAvailableDate();
+                                                    $nextDate = $schedule->is_weekly && $schedule->day_of_week !== null ? $schedule->getNextAvailableDate() : null;
                                                     $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s')) : $schedule->departure_time;
                                                     echo $displayTime->format('H:i');
                                                 @endphp
@@ -308,15 +297,8 @@
                                                 {{ $schedule->departure_time->format('H:i') }}
                                             @endif
                                         </div>
-                                        <div class="text-xs text-gray-500">
-                                            @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                                @php
-                                                    $nextDate = $schedule->getNextAvailableDate();
-                                                    echo $nextDate ? $nextDate->format('M j') : $schedule->departure_time->format('M j');
-                                                @endphp
-                                            @else
-                                                {{ $schedule->departure_time->format('M j') }}
-                                            @endif
+                                        <div>
+                                            {{ $schedule->getActualDepartureTime()->format('M j') }}
                                         </div>
                                     </div>
                                 </div>
@@ -329,8 +311,12 @@
                                         <i class="fas fa-sign-in-alt text-green-600 text-xs"></i>
                                     </div>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900">{{ $schedule->arrival_time->format('H:i') }}</div>
-                                        <div class="text-xs text-gray-500">{{ $schedule->arrival_time->format('M j') }}</div>
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ $schedule->getActualArrivalTime()->format('H:i') }}
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            {{ $schedule->getActualArrivalTime()->format('M j') }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

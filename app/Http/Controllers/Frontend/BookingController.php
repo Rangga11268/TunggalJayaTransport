@@ -8,6 +8,8 @@ use App\Models\Schedule;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class BookingController extends Controller
 {
@@ -38,14 +40,55 @@ class BookingController extends Controller
                 $validPair = true;
                 // Get schedules for these routes that are available for booking
                 $routeIds = $validRoutes->pluck('id');
-                $schedules = Schedule::whereIn('route_id', $routeIds)
-                    ->with('route', 'bus')
-                    ->available()
-                    ->get()
-                    ->filter(function ($schedule) {
-                        // All schedules must pass the isAvailableForBooking check
-                        return $schedule->isAvailableForBooking();
+                
+                // For date-specific searches, we need to handle weekly schedules specially
+                if ($date) {
+                    $searchDate = Carbon::parse($date);
+                    
+                    // Get all active schedules for these routes
+                    $allSchedules = Schedule::whereIn('route_id', $routeIds)
+                        ->with('route', 'bus')
+                        ->available()
+                        ->get();
+                    
+                    // Filter schedules based on the search date
+                    $schedules = $allSchedules->filter(function ($schedule) use ($searchDate) {
+                        if (!$schedule->isAvailableForBooking()) {
+                            return false;
+                        }
+                        
+                        // For daily schedules, check if the date matches
+                        if (!$schedule->is_weekly && !$schedule->is_daily) {
+                            return $schedule->departure_time->toDateString() === $searchDate->toDateString();
+                        }
+                        
+                        // For daily recurring schedules, they are available every day
+                        if ($schedule->is_daily) {
+                            // Check if the time hasn't passed yet today
+                            $departureTime = $searchDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                            return $departureTime->isFuture() || $departureTime->isSameAs('H:i:s', Carbon::now()->format('H:i:s'));
+                        }
+                        
+                        // For weekly schedules, check if the search date is the correct day of week
+                        if ($schedule->day_of_week === $searchDate->dayOfWeek) {
+                            // Also check if the time hasn't passed yet on that day
+                            $departureTime = $searchDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                            return $departureTime->isFuture() || $departureTime->isSameAs('H:i:s', Carbon::now()->format('H:i:s'));
+                        }
+                        
+                        return false;
                     });
+                } else {
+                    // For non-date-specific searches, get all available schedules
+                    $schedules = Schedule::whereIn('route_id', $routeIds)
+                        ->with('route', 'bus')
+                        ->available()
+                        ->get()
+                        ->filter(function ($schedule) {
+                            // All schedules must pass the isAvailableForBooking check
+                            return $schedule->isAvailableForBooking();
+                        });
+                }
             }
         }
         
@@ -69,36 +112,102 @@ class BookingController extends Controller
             'date' => 'nullable|date',
         ]);
         
-        // Get all schedules with their relations that are available for booking
-        $query = Schedule::with('route', 'bus')->available();
-        
-        // Apply filters if provided
-        if ($origin) {
-            $query->whereHas('route', function ($q) use ($origin) {
-                $q->where('origin', $origin);
-            });
-        }
-        
-        if ($destination) {
-            $query->whereHas('route', function ($q) use ($destination) {
-                $q->where('destination', $destination);
-            });
-        }
-        
+        // For date-specific searches, we need to handle weekly schedules specially
         if ($date) {
-            $query->whereDate('departure_time', $date);
-        }
-        
-        // Order by departure time
-        $schedules = $query->orderBy('departure_time')->paginate(10);
-        
-        // Filter out schedules that have already departed or are not available for booking
-        $schedules->setCollection(
-            $schedules->getCollection()->filter(function ($schedule) {
+            $searchDate = Carbon::parse($date);
+            
+            // Get all active schedules
+            $query = Schedule::with('route', 'bus')->available();
+            
+            // Apply filters if provided
+            if ($origin) {
+                $query->whereHas('route', function ($q) use ($origin) {
+                    $q->where('origin', $origin);
+                });
+            }
+            
+            if ($destination) {
+                $query->whereHas('route', function ($q) use ($destination) {
+                    $q->where('destination', $destination);
+                });
+            }
+            
+            // Get all schedules first
+            $allSchedules = $query->get();
+            
+            // Filter schedules based on the search date
+            $filteredSchedules = $allSchedules->filter(function ($schedule) use ($searchDate) {
                 // All schedules must pass the isAvailableForBooking check
-                return $schedule->isAvailableForBooking();
-            })
-        );
+                if (!$schedule->isAvailableForBooking()) {
+                    return false;
+                }
+                
+                // For daily schedules, check if the date matches
+                if (!$schedule->is_weekly && !$schedule->is_daily) {
+                    return $schedule->departure_time->toDateString() === $searchDate->toDateString();
+                }
+                
+                // For daily recurring schedules, they are available every day
+                if ($schedule->is_daily) {
+                    // Check if the time hasn't passed yet today
+                    $departureTime = $searchDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                    return $departureTime->isFuture() || $departureTime->isSameAs('H:i:s', Carbon::now()->format('H:i:s'));
+                }
+                
+                // For weekly schedules, check if the search date is the correct day of week
+                if ($schedule->day_of_week === $searchDate->dayOfWeek) {
+                    // Also check if the time hasn't passed yet on that day
+                    $departureTime = $searchDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                    return $departureTime->isFuture() || $departureTime->isSameAs('H:i:s', Carbon::now()->format('H:i:s'));
+                }
+                
+                return false;
+            });
+            
+            // Create a paginator manually
+            $perPage = 10;
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $currentPageItems = $filteredSchedules->slice(($currentPage - 1) * $perPage, $perPage)->values();
+            
+            $schedules = new LengthAwarePaginator(
+                $currentPageItems,
+                $filteredSchedules->count(),
+                $perPage,
+                $currentPage,
+                [
+                    'path' => $request->url(),
+                    'pageName' => 'page',
+                ]
+            );
+        } else {
+            // Get all schedules with their relations that are available for booking
+            $query = Schedule::with('route', 'bus')->available();
+            
+            // Apply filters if provided
+            if ($origin) {
+                $query->whereHas('route', function ($q) use ($origin) {
+                    $q->where('origin', $origin);
+                });
+            }
+            
+            if ($destination) {
+                $query->whereHas('route', function ($q) use ($destination) {
+                    $q->where('destination', $destination);
+                });
+            }
+            
+            // Order by departure time
+            $schedules = $query->orderBy('departure_time')->paginate(10);
+            
+            // Filter out schedules that have already departed or are not available for booking
+            // For date filtering, we need to check the actual departure time
+            $schedules->setCollection(
+                $schedules->getCollection()->filter(function ($schedule) {
+                    // All schedules must pass the isAvailableForBooking check
+                    return $schedule->isAvailableForBooking();
+                })
+            );
+        }
         
         return view('frontend.booking.schedules', compact('schedules', 'origins', 'destinations', 'origin', 'destination', 'date'));
     }

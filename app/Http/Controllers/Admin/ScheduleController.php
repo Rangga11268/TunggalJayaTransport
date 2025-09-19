@@ -63,6 +63,8 @@ class ScheduleController extends Controller
         // Tambahkan validasi tambahan berdasarkan jenis jadwal
         if ($request->is_weekly == 1) {
             $rules['day_of_week'] = 'required|integer|min:0|max:6';
+        } else if ($request->is_daily == 1) {
+            // Daily recurring schedules don't need additional validation
         } else {
             $rules['departure_date'] = 'required|date';
         }
@@ -76,16 +78,31 @@ class ScheduleController extends Controller
 
         // Handle departure date and time based on schedule type
         if ($request->is_weekly == 1) {
-            // For weekly schedules, we store the day of week and time
-            $data['is_weekly'] = true;
-            $data['day_of_week'] = $request->day_of_week;
-            // For weekly schedules, we only need the time part
+            // For weekly schedules, we store only the time part
             // The date part will be calculated dynamically when needed
-            $data['departure_time'] = now()->format('Y-m-d') . ' ' . $request->departure_time;
-            $data['arrival_time'] = now()->format('Y-m-d') . ' ' . $request->arrival_time;
+            $data['is_weekly'] = true;
+            $data['is_daily'] = false;
+            $data['day_of_week'] = $request->day_of_week;
+            
+            // For weekly schedules, we store just the time without a specific date
+            // Using a base date that won't interfere with calculations
+            $baseDate = '2000-01-01';
+            $data['departure_time'] = $baseDate . ' ' . $request->departure_time;
+            $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time;
+        } else if ($request->is_daily == 1) {
+            // For daily recurring schedules, we store only the time part
+            $data['is_weekly'] = false;
+            $data['is_daily'] = true;
+            $data['day_of_week'] = null;
+            
+            // Using a base date that won't interfere with calculations
+            $baseDate = '2000-01-01';
+            $data['departure_time'] = $baseDate . ' ' . $request->departure_time;
+            $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time;
         } else {
             // For daily schedules, combine date and time
             $data['is_weekly'] = false;
+            $data['is_daily'] = false;
             $data['day_of_week'] = null;
             $data['departure_time'] = $request->departure_date . ' ' . $request->departure_time;
             $data['arrival_time'] = $request->departure_date . ' ' . $request->arrival_time;
@@ -141,6 +158,7 @@ class ScheduleController extends Controller
             'bus_id' => 'required|exists:buses,id',
             'route_id' => 'required|exists:routes,id',
             'is_weekly' => 'required|boolean',
+            'is_daily' => 'required|boolean',
             'departure_time' => 'required|date_format:H:i',
             'arrival_time' => 'required|date_format:H:i',
             'price' => 'required|numeric|min:0',
@@ -150,6 +168,8 @@ class ScheduleController extends Controller
         // Tambahkan validasi tambahan berdasarkan jenis jadwal
         if ($request->is_weekly == 1) {
             $rules['day_of_week'] = 'required|integer|min:0|max:6';
+        } else if ($request->is_daily == 1) {
+            // Daily recurring schedules don't need additional validation
         } else {
             $rules['departure_date'] = 'required|date';
         }
@@ -163,16 +183,31 @@ class ScheduleController extends Controller
 
         // Handle departure date and time based on schedule type
         if ($request->is_weekly == 1) {
-            // For weekly schedules, we store the day of week and time
-            $data['is_weekly'] = true;
-            $data['day_of_week'] = $request->day_of_week;
-            // For weekly schedules, we only need the time part
+            // For weekly schedules, we store only the time part
             // The date part will be calculated dynamically when needed
-            $data['departure_time'] = now()->format('Y-m-d') . ' ' . $request->departure_time;
-            $data['arrival_time'] = now()->format('Y-m-d') . ' ' . $request->arrival_time;
+            $data['is_weekly'] = true;
+            $data['is_daily'] = false;
+            $data['day_of_week'] = $request->day_of_week;
+            
+            // For weekly schedules, we store just the time without a specific date
+            // Using a base date that won't interfere with calculations
+            $baseDate = '2000-01-01';
+            $data['departure_time'] = $baseDate . ' ' . $request->departure_time;
+            $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time;
+        } else if ($request->is_daily == 1) {
+            // For daily recurring schedules, we store only the time part
+            $data['is_weekly'] = false;
+            $data['is_daily'] = true;
+            $data['day_of_week'] = null;
+            
+            // Using a base date that won't interfere with calculations
+            $baseDate = '2000-01-01';
+            $data['departure_time'] = $baseDate . ' ' . $request->departure_time;
+            $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time;
         } else {
             // For daily schedules, combine date and time
             $data['is_weekly'] = false;
+            $data['is_daily'] = false;
             $data['day_of_week'] = null;
             $data['departure_time'] = $request->departure_date . ' ' . $request->departure_time;
             $data['arrival_time'] = $request->departure_date . ' ' . $request->arrival_time;
