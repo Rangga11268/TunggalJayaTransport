@@ -13,9 +13,25 @@ class ScheduleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $schedules = Schedule::with(['bus', 'route'])->latest()->paginate(10);
+        $query = Schedule::with(['bus', 'route']);
+        
+        // Apply filters
+        if ($request->filled('bus_id')) {
+            $query->where('bus_id', $request->bus_id);
+        }
+        
+        if ($request->filled('route_id')) {
+            $query->where('route_id', $request->route_id);
+        }
+        
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        
+        $schedules = $query->latest()->paginate(10);
+        
         return view('admin.schedules.index', compact('schedules'));
     }
 
@@ -34,16 +50,48 @@ class ScheduleController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        // Validasi dasar
+        $rules = [
             'bus_id' => 'required|exists:buses,id',
             'route_id' => 'required|exists:routes,id',
             'departure_time' => 'required|date_format:H:i',
             'arrival_time' => 'required|date_format:H:i',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:active,cancelled,delayed',
+        ];
+
+        // Tambahkan validasi tambahan berdasarkan jenis jadwal
+        if ($request->is_weekly == 1) {
+            $rules['day_of_week'] = 'required|integer|min:0|max:6';
+        } else {
+            $rules['departure_date'] = 'required|date';
+        }
+
+        $request->validate($rules);
+
+        // Prepare data for creation
+        $data = $request->only([
+            'bus_id', 'route_id', 'departure_time', 'arrival_time', 'price', 'status'
         ]);
 
-        Schedule::create($request->all());
+        // Handle departure date and time based on schedule type
+        if ($request->is_weekly == 1) {
+            // For weekly schedules, we store the day of week and time
+            $data['is_weekly'] = true;
+            $data['day_of_week'] = $request->day_of_week;
+            // For weekly schedules, we only need the time part
+            // The date part will be calculated dynamically when needed
+            $data['departure_time'] = now()->format('Y-m-d') . ' ' . $request->departure_time;
+            $data['arrival_time'] = now()->format('Y-m-d') . ' ' . $request->arrival_time;
+        } else {
+            // For daily schedules, combine date and time
+            $data['is_weekly'] = false;
+            $data['day_of_week'] = null;
+            $data['departure_time'] = $request->departure_date . ' ' . $request->departure_time;
+            $data['arrival_time'] = $request->departure_date . ' ' . $request->arrival_time;
+        }
+
+        Schedule::create($data);
 
         return redirect()->route('admin.schedules.index')->with('create_success', 'Jadwal berhasil dibuat.');
     }
@@ -53,7 +101,7 @@ class ScheduleController extends Controller
      */
     public function show(string $id)
     {
-        $schedule = Schedule::with(['bus', 'route'])->findOrFail($id);
+        $schedule = Schedule::with(['bus', 'route', 'bookings'])->findOrFail($id);
         return view('admin.schedules.show', compact('schedule'));
     }
 
@@ -63,6 +111,13 @@ class ScheduleController extends Controller
     public function edit(string $id)
     {
         $schedule = Schedule::findOrFail($id);
+        
+        // Check if schedule has already departed
+        if ($schedule->hasDeparted()) {
+            return redirect()->route('admin.schedules.index')
+                ->with('warning', 'This schedule has already departed. Please be careful when editing as it may affect existing bookings.');
+        }
+        
         $buses = Bus::all();
         $routes = BusRoute::all();
         return view('admin.schedules.edit', compact('schedule', 'buses', 'routes'));
@@ -75,16 +130,55 @@ class ScheduleController extends Controller
     {
         $schedule = Schedule::findOrFail($id);
 
-        $request->validate([
+        // Check if schedule has already departed
+        if ($schedule->hasDeparted()) {
+            return redirect()->route('admin.schedules.index')
+                ->with('warning', 'This schedule has already departed and cannot be updated.');
+        }
+
+        // Validasi dasar
+        $rules = [
             'bus_id' => 'required|exists:buses,id',
             'route_id' => 'required|exists:routes,id',
+            'is_weekly' => 'required|boolean',
             'departure_time' => 'required|date_format:H:i',
             'arrival_time' => 'required|date_format:H:i',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:active,cancelled,delayed',
+        ];
+
+        // Tambahkan validasi tambahan berdasarkan jenis jadwal
+        if ($request->is_weekly == 1) {
+            $rules['day_of_week'] = 'required|integer|min:0|max:6';
+        } else {
+            $rules['departure_date'] = 'required|date';
+        }
+
+        $request->validate($rules);
+
+        // Prepare data for update
+        $data = $request->only([
+            'bus_id', 'route_id', 'departure_time', 'arrival_time', 'price', 'status'
         ]);
 
-        $schedule->update($request->all());
+        // Handle departure date and time based on schedule type
+        if ($request->is_weekly == 1) {
+            // For weekly schedules, we store the day of week and time
+            $data['is_weekly'] = true;
+            $data['day_of_week'] = $request->day_of_week;
+            // For weekly schedules, we only need the time part
+            // The date part will be calculated dynamically when needed
+            $data['departure_time'] = now()->format('Y-m-d') . ' ' . $request->departure_time;
+            $data['arrival_time'] = now()->format('Y-m-d') . ' ' . $request->arrival_time;
+        } else {
+            // For daily schedules, combine date and time
+            $data['is_weekly'] = false;
+            $data['day_of_week'] = null;
+            $data['departure_time'] = $request->departure_date . ' ' . $request->departure_time;
+            $data['arrival_time'] = $request->departure_date . ' ' . $request->arrival_time;
+        }
+
+        $schedule->update($data);
 
         return redirect()->route('admin.schedules.index')->with('update_success', 'Jadwal berhasil diperbarui.');
     }

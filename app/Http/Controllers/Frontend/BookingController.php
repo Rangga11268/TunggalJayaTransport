@@ -43,7 +43,8 @@ class BookingController extends Controller
                     ->available()
                     ->get()
                     ->filter(function ($schedule) {
-                        return $schedule->isAvailableForBooking();
+                        // Filter out schedules that have already departed
+                        return !$schedule->hasDeparted() && $schedule->isAvailableForBooking();
                     });
             }
         }
@@ -91,10 +92,10 @@ class BookingController extends Controller
         // Order by departure time
         $schedules = $query->orderBy('departure_time')->paginate(10);
         
-        // Filter out schedules that are not available for booking
+        // Filter out schedules that have already departed or are not available for booking
         $schedules->setCollection(
             $schedules->getCollection()->filter(function ($schedule) {
-                return $schedule->isAvailableForBooking();
+                return !$schedule->hasDeparted() && $schedule->isAvailableForBooking();
             })
         );
         
@@ -104,6 +105,13 @@ class BookingController extends Controller
     public function show($id)
     {
         $schedule = Schedule::with('route', 'bus')->findOrFail($id);
+        
+        // Additional check: if schedule has already departed, redirect with error
+        if ($schedule->hasDeparted()) {
+            return redirect()->route('frontend.booking.index')
+                ->withErrors(['schedule' => 'This schedule has already departed and is no longer available for booking.'])
+                ->withInput();
+        }
         
         // Check if schedule is available for booking
         if (!$schedule->isAvailableForBooking()) {
@@ -127,6 +135,13 @@ class BookingController extends Controller
         ]);
         
         $schedule = Schedule::with('bus')->findOrFail($request->schedule_id);
+        
+        // Additional check: if schedule has already departed, redirect with error
+        if ($schedule->hasDeparted()) {
+            return redirect()->route('frontend.booking.index')
+                ->withErrors(['schedule' => 'This schedule has already departed and is no longer available for booking.'])
+                ->withInput();
+        }
         
         // Check if schedule is available for booking
         if (!$schedule->isAvailableForBooking()) {
@@ -163,7 +178,8 @@ class BookingController extends Controller
         $booking->total_price = $schedule->price * $request->number_of_seats;
         $booking->booking_code = 'BK' . strtoupper(uniqid());
         $booking->payment_status = 'pending';
-        $booking->booking_status = 'confirmed';
+        $booking->booking_status = 'confirmed'; // For immediate confirmation
+        $booking->startPayment(); // Start payment timer
         $booking->save();
         
         // Redirect to confirmation page with booking details
@@ -173,6 +189,20 @@ class BookingController extends Controller
     public function confirmation($id)
     {
         $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
+        
+        // Check if the schedule has already departed
+        if ($booking->schedule->hasDeparted()) {
+            return redirect()->route('frontend.booking.index')
+                ->withErrors(['schedule' => 'The schedule for this booking has already departed.'])
+                ->withInput();
+        }
+        
+        // Check if the schedule is still available for booking
+        if (!$booking->schedule->isAvailableForBooking()) {
+            return redirect()->route('frontend.booking.index')
+                ->withErrors(['schedule' => 'The schedule for this booking is no longer available.'])
+                ->withInput();
+        }
         
         // Get occupied seats for this schedule
         $occupiedSeats = $booking->schedule->getBookedSeatNumbers();
@@ -189,6 +219,16 @@ class BookingController extends Controller
         ]);
         
         $booking = Booking::with('schedule.bus')->findOrFail($request->booking_id);
+        
+        // Check if the schedule has already departed
+        if ($booking->schedule->hasDeparted()) {
+            return response()->json(['success' => false, 'message' => 'The schedule for this booking has already departed.']);
+        }
+        
+        // Check if the schedule is still available for booking
+        if (!$booking->schedule->isAvailableForBooking()) {
+            return response()->json(['success' => false, 'message' => 'The schedule for this booking is no longer available.']);
+        }
         
         // Validate that the number of selected seats matches the requested number
         if (count($request->seat_numbers) != $booking->number_of_seats) {
@@ -248,6 +288,21 @@ class BookingController extends Controller
             
             $booking = Booking::findOrFail($validatedData['booking_id']);
             
+            // Check if payment has expired
+            if ($booking->isPaymentExpired()) {
+                return response()->json(['success' => false, 'message' => 'Payment time has expired. Please restart the booking process.']);
+            }
+            
+            // Check if the schedule has already departed
+            if ($booking->schedule->hasDeparted()) {
+                return response()->json(['success' => false, 'message' => 'The schedule for this booking has already departed. Payment cannot be processed.']);
+            }
+            
+            // Check if the schedule is still available for booking
+            if (!$booking->schedule->isAvailableForBooking()) {
+                return response()->json(['success' => false, 'message' => 'The schedule for this booking is no longer available. Payment cannot be processed.']);
+            }
+            
             // Check if seat selection has been completed
             if (empty($booking->seat_numbers)) {
                 return response()->json(['success' => false, 'message' => 'Please select and save your seats before proceeding to payment.']);
@@ -255,6 +310,7 @@ class BookingController extends Controller
             
             // For demo purposes, we'll just mark the payment as paid
             $booking->payment_status = 'paid';
+            $booking->payment_started_at = null; // Clear payment timer
             
             if ($booking->save()) {
                 return response()->json(['success' => true, 'message' => 'Payment processed successfully']);
@@ -288,6 +344,13 @@ class BookingController extends Controller
             abort(404, 'Invalid booking');
         }
         
+        // Check if the schedule has already departed
+        if ($booking->schedule->hasDeparted()) {
+            return redirect()->route('frontend.booking.index')
+                ->withErrors(['schedule' => 'The schedule for this booking has already departed.'])
+                ->withInput();
+        }
+        
         // For demo purposes, we ensure the booking is marked as completed
         if ($booking->payment_status !== 'paid') {
             // In a real scenario, you might want to verify with payment gateway
@@ -310,6 +373,16 @@ class BookingController extends Controller
             abort(404, 'Ticket not available. Please select seats first.');
         }
         
+        // Check if the schedule has already departed
+        if ($booking->schedule->hasDeparted()) {
+            abort(404, 'Ticket not available. The schedule has already departed.');
+        }
+        
+        // Check if the booking is valid
+        if ($booking->booking_status !== 'confirmed' || $booking->payment_status !== 'paid') {
+            abort(404, 'Ticket not available. Invalid booking status.');
+        }
+        
         // Load the ticket view and return it as PDF
         $pdf = Pdf::loadView('frontend.booking.ticket-pdf', [
             'booking' => $booking
@@ -325,6 +398,16 @@ class BookingController extends Controller
         // Ensure the booking has seat numbers
         if (empty($booking->seat_numbers)) {
             abort(404, 'Ticket not available. Please select seats first.');
+        }
+        
+        // Check if the schedule has already departed
+        if ($booking->schedule->hasDeparted()) {
+            abort(404, 'Ticket not available. The schedule has already departed.');
+        }
+        
+        // Check if the booking is valid
+        if ($booking->booking_status !== 'confirmed' || $booking->payment_status !== 'paid') {
+            abort(404, 'Ticket not available. Invalid booking status.');
         }
         
         // Return the ticket view for online viewing

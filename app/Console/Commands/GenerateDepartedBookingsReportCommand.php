@@ -1,0 +1,153 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use App\Models\Schedule;
+use App\Models\Booking;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+
+class GenerateDepartedBookingsReportCommand extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'reports:departed-bookings {--days=7 : Number of days to look back} {--format=table : Output format (table, csv, json)}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Generate a report of bookings for departed schedules';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
+    {
+        $days = $this->option('days');
+        $format = $this->option('format');
+        $cutoffDate = Carbon::now()->subDays($days);
+        
+        $this->info("Generating report of bookings for departed schedules from the last {$days} days in {$format} format:");
+        $this->line('');
+        
+        // Get bookings for departed schedules
+        $bookings = Booking::with('schedule.route', 'schedule.bus')
+            ->whereHas('schedule', function ($query) use ($cutoffDate) {
+                $query->where('departure_time', '<=', Carbon::now())
+                      ->where('departure_time', '>=', $cutoffDate);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        if ($bookings->isEmpty()) {
+            $this->info('No bookings found for departed schedules in the specified period.');
+            return 0;
+        }
+        
+        switch ($format) {
+            case 'csv':
+                $this->generateCsvReport($bookings, $days);
+                break;
+                
+            case 'json':
+                $this->generateJsonReport($bookings, $days);
+                break;
+                
+            default:
+                $this->generateTableReport($bookings);
+                break;
+        }
+        
+        return 0;
+    }
+    
+    /**
+     * Generate a table report
+     */
+    private function generateTableReport($bookings)
+    {
+        $this->table(
+            ['Booking Code', 'Passenger', 'Route', 'Bus', 'Departure', 'Payment Status', 'Booking Status'],
+            $bookings->map(function ($booking) {
+                return [
+                    $booking->booking_code,
+                    $booking->passenger_name,
+                    $booking->schedule->route->origin . ' → ' . $booking->schedule->route->destination,
+                    $booking->schedule->bus->name,
+                    $booking->schedule->departure_time->format('d M Y H:i'),
+                    $booking->payment_status,
+                    $booking->booking_status
+                ];
+            })->toArray()
+        );
+    }
+    
+    /**
+     * Generate a CSV report
+     */
+    private function generateCsvReport($bookings, $days)
+    {
+        $filename = 'departed_bookings_report_' . Carbon::now()->format('Y-m-d') . '.csv';
+        $headers = ['Booking Code', 'Passenger Name', 'Passenger Email', 'Passenger Phone', 'Route', 'Bus', 'Departure Time', 'Payment Status', 'Booking Status', 'Total Price'];
+        
+        $csvData = [];
+        $csvData[] = implode(',', $headers);
+        
+        foreach ($bookings as $booking) {
+            $csvData[] = implode(',', [
+                '"' . $booking->booking_code . '"',
+                '"' . $booking->passenger_name . '"',
+                '"' . $booking->passenger_email . '"',
+                '"' . $booking->passenger_phone . '"',
+                '"' . $booking->schedule->route->origin . ' → ' . $booking->schedule->route->destination . '"',
+                '"' . $booking->schedule->bus->name . '"',
+                '"' . $booking->schedule->departure_time->format('d M Y H:i') . '"',
+                '"' . $booking->payment_status . '"',
+                '"' . $booking->booking_status . '"',
+                '"' . $booking->total_price . '"'
+            ]);
+        }
+        
+        Storage::disk('local')->put($filename, implode("\n", $csvData));
+        
+        $this->info("CSV report generated: storage/app/{$filename}");
+    }
+    
+    /**
+     * Generate a JSON report
+     */
+    private function generateJsonReport($bookings, $days)
+    {
+        $filename = 'departed_bookings_report_' . Carbon::now()->format('Y-m-d') . '.json';
+        
+        $reportData = [
+            'generated_at' => Carbon::now()->toISOString(),
+            'period_days' => $days,
+            'total_bookings' => $bookings->count(),
+            'bookings' => $bookings->map(function ($booking) {
+                return [
+                    'booking_code' => $booking->booking_code,
+                    'passenger_name' => $booking->passenger_name,
+                    'passenger_email' => $booking->passenger_email,
+                    'passenger_phone' => $booking->passenger_phone,
+                    'route' => $booking->schedule->route->origin . ' → ' . $booking->schedule->route->destination,
+                    'bus' => $booking->schedule->bus->name,
+                    'departure_time' => $booking->schedule->departure_time->toISOString(),
+                    'payment_status' => $booking->payment_status,
+                    'booking_status' => $booking->booking_status,
+                    'total_price' => $booking->total_price
+                ];
+            })->toArray()
+        ];
+        
+        Storage::disk('local')->put($filename, json_encode($reportData, JSON_PRETTY_PRINT));
+        
+        $this->info("JSON report generated: storage/app/{$filename}");
+    }
+}

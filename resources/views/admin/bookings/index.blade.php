@@ -33,17 +33,31 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($bookings as $booking)
-                                    <tr>
-                                        <td class="px-4 py-3 sm:py-4 whitespace-nowrap">
+                                    <tr class="{{ $booking->schedule->hasDeparted() ? 'bg-red-50' : '' }}">
+                                        <td class="px-4 py-3 sm:py-4">
                                             <div class="text-sm font-medium text-gray-900">{{ $booking->booking_code }}</div>
+                                            @if($booking->schedule->hasDeparted())
+                                                <div class="text-xs text-red-600 font-semibold">DEPARTED</div>
+                                            @endif
+                                            @if($booking->schedule->hasDeparted() && $booking->payment_status == 'pending')
+                                                <div class="text-xs text-orange-600 font-semibold">WILL BE CANCELLED</div>
+                                            @endif
                                         </td>
                                         <td class="px-4 py-3 sm:py-4">
                                             <div class="text-sm font-medium text-gray-900">{{ $booking->passenger_name }}</div>
                                             <div class="text-sm text-gray-500 truncate max-w-[150px] sm:max-w-xs">{{ $booking->passenger_email }}</div>
                                         </td>
                                         <td class="px-4 py-3 sm:py-4">
-                                            <div class="text-sm font-medium text-gray-900">{{ $booking->schedule->route->name }}</div>
-                                            <div class="text-sm text-gray-500 max-w-[120px] sm:max-w-xs truncate">{{ $booking->schedule->route->origin }} → {{ $booking->schedule->route->destination }}</div>
+                                            <div class="text-sm font-medium text-gray-900">{{ $booking->schedule->route->origin }} → {{ $booking->schedule->route->destination }}</div>
+                                            <div class="text-sm text-gray-500">
+                                                {{ $booking->schedule->departure_time->format('d M Y H:i') }}
+                                                @if($booking->schedule->hasDeparted())
+                                                    <span class="text-red-600 font-semibold">(Departed)</span>
+                                                @endif
+                                            </div>
+                                            @if($booking->schedule->hasDeparted() && $booking->payment_status == 'pending')
+                                                <div class="text-xs text-orange-600 font-semibold">Will be cancelled by system</div>
+                                            @endif
                                         </td>
                                         <td class="px-4 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                                             {{ $booking->schedule->bus->name }}

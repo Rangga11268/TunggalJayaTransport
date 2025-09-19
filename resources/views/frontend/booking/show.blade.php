@@ -8,6 +8,51 @@
         <p class="text-lg text-gray-600">Complete your booking information to secure your seat</p>
     </div>
     
+    <!-- Check if schedule has departed -->
+    @if($schedule->hasDeparted())
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded mb-8">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-red-500"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-red-700">
+                    <strong>This schedule has already departed.</strong> 
+                    Bookings cannot be made for schedules that have already departed. 
+                    Please select another schedule.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center">
+        <a href="{{ route('frontend.booking.index') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Schedule Selection
+        </a>
+    </div>
+    
+    @else
+    
+    @if($schedule->is_weekly && $schedule->day_of_week !== null)
+        @php
+            $nextDate = $schedule->getNextAvailableDate();
+        @endphp
+        @if($nextDate)
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-8">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-500"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            <strong>Next Available:</strong> This weekly schedule is next available on {{ $nextDate->format('l, F j, Y') }}.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endif
+    
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Schedule Information -->
         <div class="lg:col-span-2">
@@ -156,28 +201,16 @@
                     </div>
                     
                     <div>
-                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg mobile-btn-full">
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg text-lg mobile-btn-full">
                             <i class="fas fa-credit-card mr-2"></i>Proceed to Payment
                         </button>
                     </div>
                 </form>
-                
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <div class="flex justify-between mb-2">
-                        <span class="text-gray-600">Subtotal:</span>
-                        <span class="font-medium">Rp. {{ number_format($schedule->price, 0, ',', '.') }}</span>
-                    </div>
-                    <div class="flex justify-between mb-2">
-                        <span class="text-gray-600">Service Fee:</span>
-                        <span class="font-medium">Rp. 5,000</span>
-                    </div>
-                    <div class="flex justify-between text-lg font-bold mt-3 pt-3 border-t border-gray-200">
-                        <span>Total:</span>
-                        <span class="text-blue-600">Rp. {{ number_format($schedule->price + 5000, 0, ',', '.') }}</span>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
+    
+    @endif
+    
 </div>
 @endsection

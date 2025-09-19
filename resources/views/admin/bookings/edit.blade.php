@@ -9,6 +9,22 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-4 sm:p-6">
+                    @if($booking->schedule->hasDeparted())
+                        <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-red-700">
+                                        <strong>Warning:</strong> The current schedule for this booking has already departed. 
+                                        Editing this booking is not recommended as it is no longer valid.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    
                     <form action="{{ route('admin.bookings.update', $booking) }}" method="POST">
                         @csrf
                         @method('PUT')
@@ -39,11 +55,19 @@
                                 <select name="schedule_id" id="schedule_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Select Schedule</option>
                                     @foreach(App\Models\Schedule::with('route', 'bus')->get() as $schedule)
-                                        <option value="{{ $schedule->id }}" {{ old('schedule_id', $booking->schedule_id) == $schedule->id ? 'selected' : '' }}>
-                                            {{ $schedule->route->origin }} → {{ $schedule->route->destination }} ({{ $schedule->bus->name ?? 'Bus' }}) - {{ $schedule->departure_time->format('d M Y H:i') }}
-                                        </option>
+                                        @if(!$schedule->hasDeparted() || $schedule->id == $booking->schedule_id)
+                                            <option value="{{ $schedule->id }}" {{ old('schedule_id', $booking->schedule_id) == $schedule->id ? 'selected' : '' }} {{ $schedule->hasDeparted() && $schedule->id != $booking->schedule_id ? 'disabled' : '' }}>
+                                                {{ $schedule->route->origin }} → {{ $schedule->route->destination }} ({{ $schedule->bus->name ?? 'Bus' }}) - {{ $schedule->departure_time->format('d M Y H:i') }}
+                                                @if($schedule->hasDeparted() && $schedule->id != $booking->schedule_id)
+                                                    (DEPARTED - Not Available)
+                                                @endif
+                                            </option>
+                                        @endif
                                     @endforeach
                                 </select>
+                                <div class="text-sm text-gray-500 mt-1">
+                                    Note: You can keep the current schedule even if it has departed, but you cannot change to another schedule that has already departed.
+                                </div>
                                 @error('schedule_id')
                                     <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                                 @enderror

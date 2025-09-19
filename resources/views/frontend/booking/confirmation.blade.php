@@ -5,8 +5,46 @@
     <!-- Header -->
     <div class="text-center mb-8">
         <h1 class="text-4xl font-bold text-gray-800 mb-3">Booking Confirmation</h1>
-        <p class="text-lg text-gray-600">Review your booking details and complete your payment</p>
+        <p class="text-lg text-gray-600">Please select your seats to complete the booking</p>
     </div>
+    
+    <!-- Departure Reminder -->
+    @php
+        $departureTime = $booking->schedule->departure_time;
+        $hoursUntilDeparture = now()->diffInHours($departureTime, false);
+    @endphp
+    
+    @if($hoursUntilDeparture >= 0 && $hoursUntilDeparture <= 24)
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-8">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        <strong>Reminder:</strong> Your bus departs in {{ $hoursUntilDeparture }} hours! 
+                        Please arrive at the terminal at least 30 minutes before departure.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
+    
+    @if($departureTime->isPast())
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded mb-8">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-700">
+                        <strong>Warning:</strong> This schedule has already departed. 
+                        Please contact customer service for assistance.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
     
     <!-- Booking Summary -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-8 mobile-booking-summary">

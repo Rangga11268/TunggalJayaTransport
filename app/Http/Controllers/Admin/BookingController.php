@@ -42,6 +42,21 @@ class BookingController extends Controller
             'booking_status' => 'required|in:pending,confirmed,cancelled,completed',
         ]);
 
+        // Check if the schedule has already departed
+        $schedule = \App\Models\Schedule::findOrFail($request->schedule_id);
+        if ($schedule->hasDeparted()) {
+            return redirect()->back()
+                ->withErrors(['schedule_id' => 'Cannot create booking for a schedule that has already departed. Please select another schedule.'])
+                ->withInput();
+        }
+
+        // Check if schedule is available for booking
+        if (!$schedule->isAvailableForBooking()) {
+            return redirect()->back()
+                ->withErrors(['schedule_id' => 'This schedule is not available for booking. Please select another schedule.'])
+                ->withInput();
+        }
+
         // Generate booking code
         $bookingCode = 'BK' . time() . rand(100, 999);
         
@@ -58,7 +73,7 @@ class BookingController extends Controller
         $booking->booking_status = $request->booking_status;
         $booking->save();
 
-        return redirect()->route('admin.bookings.index')->with('create_success', 'Pemesanan berhasil dibuat.');
+        return redirect()->route('admin.bookings.index')->with('create_success', 'Booking created successfully. Please note that the schedule departs on ' . $schedule->departure_time->format('d M Y H:i'));
     }
 
     /**
@@ -96,6 +111,23 @@ class BookingController extends Controller
             'booking_status' => 'required|in:pending,confirmed,cancelled,completed',
         ]);
 
+        // Check if trying to change to a schedule that has already departed
+        if ($request->has('schedule_id') && $request->schedule_id != $booking->schedule_id) {
+            $newSchedule = \App\Models\Schedule::findOrFail($request->schedule_id);
+            if ($newSchedule->hasDeparted()) {
+                return redirect()->back()
+                    ->withErrors(['schedule_id' => 'Cannot change to a schedule that has already departed. Please select another schedule.'])
+                    ->withInput();
+            }
+            
+            // Check if new schedule is available for booking
+            if (!$newSchedule->isAvailableForBooking()) {
+                return redirect()->back()
+                    ->withErrors(['schedule_id' => 'The new schedule is not available for booking. Please select another schedule.'])
+                    ->withInput();
+            }
+        }
+
         $booking->passenger_name = $request->passenger_name;
         $booking->passenger_phone = $request->passenger_phone;
         $booking->passenger_email = $request->passenger_email;
@@ -103,9 +135,15 @@ class BookingController extends Controller
         $booking->total_price = $request->total_price;
         $booking->payment_status = $request->payment_status;
         $booking->booking_status = $request->booking_status;
+        
+        // Only update schedule_id if provided and valid
+        if ($request->has('schedule_id')) {
+            $booking->schedule_id = $request->schedule_id;
+        }
+        
         $booking->save();
 
-        return redirect()->route('admin.bookings.index')->with('update_success', 'Pemesanan berhasil diperbarui.');
+        return redirect()->route('admin.bookings.index')->with('update_success', 'Booking updated successfully. Please note that the schedule departs on ' . $booking->schedule->departure_time->format('d M Y H:i'));
     }
 
     /**

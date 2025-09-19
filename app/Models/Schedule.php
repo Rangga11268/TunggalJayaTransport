@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Carbon\CarbonTimeZone;
 
 class Schedule extends Model
 {
@@ -21,6 +22,8 @@ class Schedule extends Model
     protected $casts = [
         'departure_time' => 'datetime',
         'arrival_time' => 'datetime',
+        'is_weekly' => 'boolean',
+        'day_of_week' => 'integer',
     ];
 
     public function bus()
@@ -40,26 +43,31 @@ class Schedule extends Model
     
     public function getBookedSeatsCount()
     {
-        // Count seats for confirmed bookings that haven't failed payment
+        // Count seats for confirmed bookings that are paid and not cancelled
         return $this->bookings()
             ->where('booking_status', 'confirmed')
-            ->where('payment_status', '!=', 'failed')
+            ->where('payment_status', 'paid')
             ->sum('number_of_seats');
     }
     
     public function getAvailableSeatsCount()
     {
-        $bookedSeats = $this->getBookedSeatsCount();
+        // Only count confirmed bookings that are paid
+        $bookedSeats = $this->bookings()
+            ->where('booking_status', 'confirmed')
+            ->where('payment_status', 'paid')
+            ->sum('number_of_seats');
+            
         $available = $this->bus->capacity - $bookedSeats;
         return max(0, $available);
     }
     
     public function getBookedSeatNumbers()
     {
-        // Get seat numbers for confirmed bookings that haven't failed payment
+        // Get seat numbers for confirmed bookings that are paid
         $bookings = $this->bookings()
             ->where('booking_status', 'confirmed')
-            ->where('payment_status', '!=', 'failed')
+            ->where('payment_status', 'paid')
             ->whereNotNull('seat_numbers')
             ->pluck('seat_numbers')
             ->toArray();
@@ -80,7 +88,22 @@ class Schedule extends Model
      */
     public function hasDeparted()
     {
-        return $this->departure_time->isPast();
+        // Use system timezone for comparison
+        $now = Carbon::now();
+        return $this->departure_time->setTimezone($now->timezone)->isPast();
+    }
+
+    /**
+     * Get departure time in a specific timezone
+     */
+    public function getDepartureTimeInTimezone($timezone = null)
+    {
+        if ($timezone === null) {
+            // Use system timezone
+            $timezone = Carbon::now()->timezone;
+        }
+        
+        return $this->departure_time->setTimezone($timezone);
     }
 
     /**
@@ -103,6 +126,60 @@ class Schedule extends Model
 
         // Check if there are available seats
         return $this->getAvailableSeatsCount() > 0;
+    }
+
+    /**
+     * Check if the schedule is available for weekly booking
+     */
+    public function isAvailableForWeeklyBooking()
+    {
+        // For weekly schedules, check if it's the correct day
+        if ($this->is_weekly && $this->day_of_week !== null) {
+            $today = Carbon::now()->dayOfWeek;
+            return $today == $this->day_of_week;
+        }
+        
+        // For non-weekly schedules, always return false for this check
+        return false;
+    }
+
+    /**
+     * Get the next available date for a weekly schedule
+     */
+    public function getNextAvailableDate()
+    {
+        // Only applicable for weekly schedules
+        if (!$this->is_weekly || $this->day_of_week === null) {
+            return null;
+        }
+
+        $today = Carbon::now();
+        $nextDate = $today->copy()->next($this->day_of_week);
+        
+        // If today is the scheduled day, check if departure time has passed
+        if ($today->dayOfWeek == $this->day_of_week) {
+            $departureToday = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+            if ($departureToday->isPast()) {
+                // Return next week's date
+                $nextDate = $today->copy()->addWeek()->next($this->day_of_week);
+            } else {
+                // Today is still available
+                $nextDate = $today->copy();
+            }
+        }
+        
+        return $nextDate;
+    }
+
+    /**
+     * Get bookings that should be cancelled when schedule departs
+     */
+    public function getBookingsToCancel()
+    {
+        return $this->bookings()
+            ->where('booking_status', '!=', 'cancelled') // Not already cancelled
+            ->where('payment_status', 'pending') // Only pending payments
+            ->get();
     }
 
     /**

@@ -15,6 +15,50 @@
                             Add New Schedule
                         </a>
                     </div>
+                    
+                    <!-- Filter Form -->
+                    <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+                        <form method="GET" action="{{ route('admin.schedules.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label for="bus_id" class="block text-sm font-medium text-gray-700">Bus</label>
+                                <select name="bus_id" id="bus_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                    <option value="">All Buses</option>
+                                    @foreach(App\Models\Bus::all() as $bus)
+                                        <option value="{{ $bus->id }}" {{ request('bus_id') == $bus->id ? 'selected' : '' }}>{{ $bus->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="route_id" class="block text-sm font-medium text-gray-700">Route</label>
+                                <select name="route_id" id="route_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                    <option value="">All Routes</option>
+                                    @foreach(App\Models\Route::all() as $route)
+                                        <option value="{{ $route->id }}" {{ request('route_id') == $route->id ? 'selected' : '' }}>{{ $route->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                    <option value="">All Statuses</option>
+                                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                    <option value="delayed" {{ request('status') == 'delayed' ? 'selected' : '' }}>Delayed</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex items-end">
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                                    Filter
+                                </button>
+                                <a href="{{ route('admin.schedules.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                                    Reset
+                                </a>
+                            </div>
+                        </form>
+                    </div>
 
                     <!-- Schedules Table -->
                     <div class="overflow-x-auto">
@@ -26,13 +70,14 @@
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bookings</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($schedules as $schedule)
-                                    <tr>
+                                    <tr class="{{ $schedule->hasDeparted() ? 'bg-red-50' : '' }}">
                                         <td class="px-4 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">{{ $schedule->bus->name }}</div>
                                             <div class="text-sm text-gray-500">{{ $schedule->bus->plate_number }}</div>
@@ -42,13 +87,27 @@
                                             <div class="text-sm text-gray-500">{{ $schedule->route->origin }} → {{ $schedule->route->destination }}</div>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $schedule->departure_time }}
+                                            {{ $schedule->departure_time->format('d M Y H:i') }}
+                                            @if($schedule->hasDeparted())
+                                                <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded">
+                                                    DEPARTED
+                                                </span>
+                                            @endif
+                                            @if($schedule->is_weekly)
+                                                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded">
+                                                    WEEKLY
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $schedule->arrival_time }}
+                                            {{ $schedule->arrival_time->format('H:i') }}
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                             Rp. {{ number_format($schedule->price, 0, ',', '.') }}
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <div class="text-sm text-gray-900">{{ $schedule->bookings->count() }} bookings</div>
+                                            <div class="text-xs text-gray-500">{{ $schedule->getAvailableSeatsCount() }} seats available</div>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap">
                                             @if($schedule->status === 'active')
@@ -67,6 +126,9 @@
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex flex-row gap-2 action-buttons">
+                                                <a href="{{ route('admin.schedules.show', $schedule) }}" class="view-icon" title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
                                                 <a href="{{ route('admin.schedules.edit', $schedule) }}" class="edit-icon" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
@@ -82,7 +144,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="px-4 py-4 text-center text-sm text-gray-500">
+                                        <td colspan="8" class="px-4 py-4 text-center text-sm text-gray-500">
                                             No schedules found.
                                         </td>
                                     </tr>

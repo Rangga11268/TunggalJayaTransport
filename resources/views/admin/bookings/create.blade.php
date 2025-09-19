@@ -9,6 +9,19 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-4 sm:p-6">
+                    <div class="mb-4 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    <strong>Note:</strong> Schedules that have already departed are marked as "DEPARTED - Not Available" and cannot be selected.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <form action="{{ route('admin.bookings.store') }}" method="POST">
                         @csrf
                         
@@ -31,11 +44,16 @@
                                 <select name="schedule_id" id="schedule_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Select Schedule</option>
                                     @foreach(App\Models\Schedule::with('route', 'bus')->get() as $schedule)
-                                        <option value="{{ $schedule->id }}" {{ old('schedule_id') == $schedule->id ? 'selected' : '' }}>
-                                            {{ $schedule->route->origin }} → {{ $schedule->route->destination }} ({{ $schedule->bus->name ?? 'Bus' }}) - {{ $schedule->departure_time->format('d M Y H:i') }}
-                                        </option>
+                                        @if(!$schedule->hasDeparted())
+                                            <option value="{{ $schedule->id }}" {{ old('schedule_id') == $schedule->id ? 'selected' : '' }}>
+                                                {{ $schedule->route->origin }} → {{ $schedule->route->destination }} ({{ $schedule->bus->name ?? 'Bus' }}) - {{ $schedule->departure_time->format('d M Y H:i') }}
+                                            </option>
+                                        @endif
                                     @endforeach
                                 </select>
+                                <div class="text-sm text-gray-500 mt-1">
+                                    Note: Schedules that have already departed are not available for selection.
+                                </div>
                                 @error('schedule_id')
                                     <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                                 @enderror

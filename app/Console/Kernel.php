@@ -14,6 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\ResetExpiredSchedules::class,
+        Commands\ResetDepartedTicketsCommand::class,
+        Commands\CleanupInvalidBookingsCommand::class,
     ];
 
     /**
@@ -26,6 +28,12 @@ class Kernel extends ConsoleKernel
     {
         // Reset expired schedules daily at 1:00 AM
         $schedule->command('schedules:reset-expired')->dailyAt('01:00');
+        
+        // Reset departed tickets hourly
+        $schedule->command('tickets:reset-departed')->hourly();
+        
+        // Cleanup invalid bookings daily at 2:00 AM
+        $schedule->command('bookings:cleanup-invalid')->dailyAt('02:00');
     }
 
     /**

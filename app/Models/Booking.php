@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Carbon\Carbon;
 
 class Booking extends Model implements HasMedia
 {
@@ -22,6 +23,11 @@ class Booking extends Model implements HasMedia
         'total_price',
         'payment_status',
         'booking_status',
+        'payment_started_at',
+    ];
+
+    protected $dates = [
+        'payment_started_at',
     ];
 
     public function user()
@@ -63,5 +69,27 @@ class Booking extends Model implements HasMedia
         }
         
         $this->attributes['number_of_seats'] = $value;
+    }
+    
+    /**
+     * Check if payment has expired
+     */
+    public function isPaymentExpired()
+    {
+        // Payment expires after 30 minutes if it's still pending
+        if ($this->payment_status === 'pending' && $this->payment_started_at) {
+            return $this->payment_started_at->addMinutes(30)->isPast();
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Start payment process
+     */
+    public function startPayment()
+    {
+        $this->payment_started_at = Carbon::now();
+        $this->save();
     }
 }

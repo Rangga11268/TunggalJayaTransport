@@ -11,8 +11,13 @@
                 <div class="p-4 sm:p-6">
                     <div class="mb-6">
                         <h1 class="text-2xl font-bold">Booking Details</h1>
-                        <div class="mt-2 text-sm text-gray-500">
-                            Booking Code: {{ $booking->booking_code }}
+                        <div class="mt-2 text-sm text-gray-500 flex items-center">
+                            <span>Booking Code: {{ $booking->booking_code }}</span>
+                            @if($booking->schedule->hasDeparted())
+                                <span class="ml-3 bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                    SCHEDULE DEPARTED
+                                </span>
+                            @endif
                         </div>
                     </div>
                     
@@ -115,12 +120,28 @@
                             </div>
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Departure:</dt>
-                                <dd class="text-gray-900">{{ $booking->schedule->departure_time }}</dd>
+                                <dd class="text-gray-900">
+                                    {{ $booking->schedule->departure_time->format('d M Y H:i') }}
+                                    @if($booking->schedule->hasDeparted())
+                                        <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded">
+                                            DEPARTED
+                                        </span>
+                                    @endif
+                                </dd>
                             </div>
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Arrival:</dt>
-                                <dd class="text-gray-900">{{ $booking->schedule->arrival_time }}</dd>
+                                <dd class="text-gray-900">{{ $booking->schedule->arrival_time->format('d M Y H:i') }}</dd>
                             </div>
+                            @if($booking->schedule->hasDeparted())
+                                <div class="flex md:col-span-2">
+                                    <dt class="font-medium text-gray-500 w-32">Status:</dt>
+                                    <dd class="text-red-600 font-semibold">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        This schedule has already departed. Booking is no longer valid.
+                                    </dd>
+                                </div>
+                            @endif
                         </dl>
                     </div>
                     
