@@ -63,15 +63,15 @@
             <div class="flex flex-wrap items-center justify-between">
                 <div class="flex items-center mb-2 md:mb-0">
                     <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                    <span class="text-sm">Daily Schedule</span>
+                    <span class="text-sm">Daily Schedule (Specific date)</span>
                 </div>
                 <div class="flex items-center mb-2 md:mb-0">
-                    <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                    <span class="text-sm">Weekly Schedule</span>
+                    <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                    <span class="text-sm">Daily Recurring (Available every day)</span>
                 </div>
                 <div class="flex items-center">
-                    <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                    <span class="text-sm">Departed</span>
+                    <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                    <span class="text-sm">Weekly Schedule</span>
                 </div>
             </div>
         </div>
@@ -114,13 +114,23 @@
                                                 </div>
                                                 <div class="ml-3">
                                                     <div class="text-sm font-medium text-gray-900">
-                                                        {{ $schedule->getDepartureTimeWIB()->format('H:i') }}
-                                                        <span class="text-gray-500 mx-1">→</span>
-                                                        {{ $schedule->getArrivalTimeWIB()->format('H:i') }}
+                                                        @if(request()->get('date'))
+                                                            {{ $schedule->getActualDepartureTime(\Carbon\Carbon::parse(request()->get('date')))->format('H:i') }}
+                                                            <span class="text-gray-500 mx-1">→</span>
+                                                            {{ $schedule->getActualArrivalTime(\Carbon\Carbon::parse(request()->get('date')))->format('H:i') }}
+                                                        @else
+                                                            {{ $schedule->getActualDepartureTime()->format('H:i') }}
+                                                            <span class="text-gray-500 mx-1">→</span>
+                                                            {{ $schedule->getActualArrivalTime()->format('H:i') }}
+                                                        @endif
                                                         <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                                     </div>
                                                     <div class="text-xs text-gray-500">
-                                                        {{ $schedule->getDepartureTimeWIB()->format('M j') }}
+                                                        @if(request()->get('date'))
+                                                            {{ \Carbon\Carbon::parse(request()->get('date'))->format('M j') }}
+                                                        @else
+                                                            {{ $schedule->getActualDepartureTime()->format('M j') }}
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
@@ -190,12 +200,21 @@
                                         </div>
                                         <div class="ml-3">
                                             <div class="text-sm font-medium text-gray-900">
-                                                {{ $schedule->getDepartureTimeWIB()->format('H:i') }} →
-                                                {{ $schedule->getArrivalTimeWIB()->format('H:i') }}
+                                                @if(request()->get('date'))
+                                                    {{ $schedule->getActualDepartureTime(\Carbon\Carbon::parse(request()->get('date')))->format('H:i') }} →
+                                                    {{ $schedule->getActualArrivalTime(\Carbon\Carbon::parse(request()->get('date')))->format('H:i') }}
+                                                @else
+                                                    {{ $schedule->getActualDepartureTime()->format('H:i') }} →
+                                                    {{ $schedule->getActualArrivalTime()->format('H:i') }}
+                                                @endif
                                                 <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                             </div>
                                             <div class="text-xs text-gray-500">
-                                                {{ $schedule->getDepartureTimeWIB()->format('M j') }}
+                                                @if(request()->get('date'))
+                                                    {{ \Carbon\Carbon::parse(request()->get('date'))->format('M j') }}
+                                                @else
+                                                    {{ $schedule->getActualDepartureTime()->format('M j') }}
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

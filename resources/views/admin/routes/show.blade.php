@@ -66,15 +66,117 @@
                             <a href="{{ route('admin.routes.edit', $route) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
                                 Edit
                             </a>
-                            <form action="{{ route('admin.routes.destroy', $route) }}" method="POST" class="inline">
+                            <form id="delete-form" action="{{ route('admin.routes.destroy', $route) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="return confirm('Are you sure you want to delete this route?')">
+                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="event.preventDefault(); handleDelete('delete-form', 'Hapus Rute?', 'Apakah Anda yakin ingin menghapus rute ini? Tindakan ini tidak dapat dibatalkan.')">
                                     Delete
                                 </button>
                             </form>
                         </div>
                     </div>
+                    
+                    <!-- Related Schedules -->
+                    @if($route->schedules->count() > 0)
+                    <div class="mt-8">
+                        <h3 class="text-lg font-medium mb-4">Related Schedules</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bus</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($route->schedules as $schedule)
+                                    <tr class="{{ $schedule->hasDeparted() && !$schedule->is_daily ? 'bg-red-50' : '' }}">
+                                        <td class="px-4 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900">{{ $schedule->bus->name }}</div>
+                                            <div class="text-sm text-gray-500">{{ $schedule->bus->plate_number }}</div>
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                                @php
+                                                    $nextDate = $schedule->is_weekly && $schedule->day_of_week !== null ? $schedule->getNextAvailableDate() : null;
+                                                    if ($nextDate) {
+                                                        $displayDateTime = $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                                                        echo $displayDateTime->format('d M Y H:i');
+                                                    } else {
+                                                        echo $schedule->departure_time->format('d M Y H:i');
+                                                    }
+                                                    echo ' <span class="text-xs text-gray-500 ml-1">(WIB)</span>';
+                                                @endphp
+                                            @elseif($schedule->is_daily)
+                                                @php
+                                                    // For daily recurring schedules, show today or tomorrow based on time
+                                                    $today = \Carbon\Carbon::today('Asia/Jakarta');
+                                                    $now = \Carbon\Carbon::now('Asia/Jakarta');
+                                                    $todayDeparture = $today->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                                                    
+                                                    if ($todayDeparture->isFuture()) {
+                                                        echo $todayDeparture->format('d M Y H:i');
+                                                    } else {
+                                                        $tomorrowDeparture = $today->copy()->addDay()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                                                        echo $tomorrowDeparture->format('d M Y H:i');
+                                                    }
+                                                    echo ' <span class="text-xs text-gray-500 ml-1">(WIB)</span>';
+                                                @endphp
+                                            @else
+                                                {{ $schedule->getDepartureTimeWIB()->format('d M Y H:i') }}
+                                                <span class="text-xs text-gray-500 ml-1">(WIB)</span>
+                                            @endif
+                                            @if($schedule->hasDeparted() && !$schedule->is_daily)
+                                                <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded">
+                                                    DEPARTED
+                                                </span>
+                                            @endif
+                                            @if($schedule->is_weekly)
+                                                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded">
+                                                    WEEKLY
+                                                </span>
+                                            @elseif($schedule->is_daily)
+                                                <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">
+                                                    DAILY
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            Rp. {{ number_format($schedule->price, 0, ',', '.') }}
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap">
+                                            @if($schedule->status === 'active')
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    Active
+                                                </span>
+                                            @elseif($schedule->status === 'cancelled')
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                    Cancelled
+                                                </span>
+                                            @else
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    Delayed
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="{{ route('admin.schedules.show', $schedule) }}" class="text-blue-600 hover:text-blue-900 mr-2" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ route('admin.schedules.edit', $schedule) }}" class="text-yellow-600 hover:text-yellow-900 mr-2" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>

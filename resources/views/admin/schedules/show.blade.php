@@ -11,7 +11,7 @@
                 <div class="p-6">
                     <div class="mb-4">
                         <h1 class="text-2xl font-bold">Schedule Details</h1>
-                        @if($schedule->hasDeparted())
+                        @if($schedule->hasDeparted() && !$schedule->is_daily)
                             <div class="mt-2 bg-red-100 text-red-800 text-sm font-semibold px-3 py-2 rounded inline-flex items-center">
                                 <i class="fas fa-exclamation-triangle mr-2"></i>
                                 THIS SCHEDULE HAS ALREADY DEPARTED
@@ -21,6 +21,11 @@
                             <div class="mt-2 bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-2 rounded inline-flex items-center">
                                 <i class="fas fa-calendar-alt mr-2"></i>
                                 WEEKLY SCHEDULE
+                            </div>
+                        @elseif($schedule->is_daily)
+                            <div class="mt-2 bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-2 rounded inline-flex items-center">
+                                <i class="fas fa-sync-alt mr-2"></i>
+                                DAILY RECURRING SCHEDULE
                             </div>
                         @endif
                     </div>
@@ -77,12 +82,12 @@
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Departure Time:</dt>
                                 <dd class="text-gray-900">
-                                                                        @if($schedule->is_weekly && $schedule->day_of_week !== null)
+                                    @if($schedule->is_weekly && $schedule->day_of_week !== null)
                                         <div class="text-sm text-gray-500">{{ date('l', strtotime("Sunday + {$schedule->day_of_week} days")) }} at {{ $schedule->departure_time->format('H:i') }}</div>
                                     @elseif($schedule->is_daily)
-                                        <div class="text-sm text-gray-500">Daily at {{ $schedule->departure_time->format('H:i') }}</div>
+                                        <div class="text-sm text-gray-500">Daily at {{ $schedule->getDepartureTimeWIB()->format('H:i') }} (WIB)</div>
                                     @else
-                                        <div class="text-sm text-gray-500">{{ $schedule->departure_time->format('l, F j, Y H:i') }}</div>
+                                        <div class="text-sm text-gray-500">{{ $schedule->getDepartureTimeWIB()->format('l, F j, Y H:i') }} (WIB)</div>
                                     @endif
                                 </dd>
                             </div>
@@ -206,10 +211,10 @@
                             <a href="{{ route('admin.schedules.edit', $schedule) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
                                 Edit
                             </a>
-                            <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST" class="inline">
+                            <form id="delete-form" action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="return confirm('Are you sure you want to delete this schedule?')">
+                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="event.preventDefault(); handleDelete('delete-form', 'Hapus Jadwal?', 'Apakah Anda yakin ingin menghapus jadwal ini? Tindakan ini tidak dapat dibatalkan.')">
                                     Delete
                                 </button>
                             </form>

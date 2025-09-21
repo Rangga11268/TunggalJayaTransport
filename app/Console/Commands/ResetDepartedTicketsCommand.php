@@ -146,6 +146,23 @@ class ResetDepartedTicketsCommand extends Command
             }
         }
         
+        // For daily recurring schedules, check if it's the correct day
+        if ($schedule->is_daily) {
+            // For daily recurring schedules, we check if the current time has passed the departure time today
+            // Only reset if the schedule has actually departed today
+            $today = Carbon::today('Asia/Jakarta');
+            $todayDeparture = $today->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+            $now = Carbon::now('Asia/Jakarta');
+            
+            // If departure time hasn't passed yet today, don't reset
+            if ($todayDeparture->isFuture() || $todayDeparture->isSameAs('H:i:s', $now->format('H:i:s'))) {
+                $this->info("  Daily recurring schedule but departure time hasn't passed yet today. Skipping...");
+                return;
+            }
+            
+            $this->info("  Processing daily recurring schedule that has departed today.");
+        }
+        
         try {
             // Get all bookings for this schedule that are not yet paid or confirmed
             // We only cancel bookings that are pending payment or not yet confirmed
@@ -232,6 +249,23 @@ class ResetDepartedTicketsCommand extends Command
                 $this->info("  Weekly schedule but not the correct day. Skipping...");
                 return;
             }
+        }
+        
+        // For daily recurring schedules, check if it's the correct day
+        if ($schedule->is_daily) {
+            // For daily recurring schedules, we check if the current time has passed the departure time today
+            // Only reset if the schedule has actually departed today
+            $today = Carbon::today('Asia/Jakarta');
+            $todayDeparture = $today->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+            $now = Carbon::now('Asia/Jakarta');
+            
+            // If departure time hasn't passed yet today, don't reset
+            if ($todayDeparture->isFuture() || $todayDeparture->isSameAs('H:i:s', $now->format('H:i:s'))) {
+                $this->info("  Daily recurring schedule but departure time hasn't passed yet today. Skipping...");
+                return;
+            }
+            
+            $this->info("  Processing daily recurring schedule that has departed today.");
         }
         
         try {

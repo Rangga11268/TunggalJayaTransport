@@ -53,27 +53,23 @@ class BookingController extends Controller
                     
                     // Filter schedules based on the search date
                     $schedules = $allSchedules->filter(function ($schedule) use ($searchDate) {
-                        if (!$schedule->isAvailableForBooking()) {
-                            return false;
-                        }
-                        
                         // For daily schedules, check if the date matches
                         if (!$schedule->is_weekly && !$schedule->is_daily) {
-                            return $schedule->departure_time->toDateString() === $searchDate->toDateString();
+                            return $schedule->departure_time->toDateString() === $searchDate->toDateString() 
+                                && $schedule->isAvailableForBooking($searchDate);
                         }
                         
                         // For daily recurring schedules, they are available every day
                         if ($schedule->is_daily) {
-                            // Check if the time hasn't passed yet today
-                            $departureTime = $searchDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
-                            return $departureTime->isFuture() || $departureTime->isSameAs('H:i:s', Carbon::now()->format('H:i:s'));
+                            // Daily recurring schedules are always available regardless of the search date
+                            // We just need to ensure the time hasn't passed yet on the search date
+                            return $schedule->isAvailableForBooking($searchDate);
                         }
                         
                         // For weekly schedules, check if the search date is the correct day of week
                         if ($schedule->day_of_week === $searchDate->dayOfWeek) {
                             // Also check if the time hasn't passed yet on that day
-                            $departureTime = $searchDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
-                            return $departureTime->isFuture() || $departureTime->isSameAs('H:i:s', Carbon::now()->format('H:i:s'));
+                            return $schedule->isAvailableForBooking($searchDate);
                         }
                         
                         return false;
@@ -137,28 +133,23 @@ class BookingController extends Controller
             
             // Filter schedules based on the search date
             $filteredSchedules = $allSchedules->filter(function ($schedule) use ($searchDate) {
-                // All schedules must pass the isAvailableForBooking check
-                if (!$schedule->isAvailableForBooking()) {
-                    return false;
-                }
-                
                 // For daily schedules, check if the date matches
                 if (!$schedule->is_weekly && !$schedule->is_daily) {
-                    return $schedule->departure_time->toDateString() === $searchDate->toDateString();
+                    return $schedule->departure_time->toDateString() === $searchDate->toDateString() 
+                        && $schedule->isAvailableForBooking($searchDate);
                 }
                 
                 // For daily recurring schedules, they are available every day
                 if ($schedule->is_daily) {
-                    // Check if the time hasn't passed yet today
-                    $departureTime = $searchDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
-                    return $departureTime->isFuture() || $departureTime->isSameAs('H:i:s', Carbon::now()->format('H:i:s'));
+                    // Daily recurring schedules are always available regardless of the search date
+                    // We just need to ensure the time hasn't passed yet on the search date
+                    return $schedule->isAvailableForBooking($searchDate);
                 }
                 
                 // For weekly schedules, check if the search date is the correct day of week
                 if ($schedule->day_of_week === $searchDate->dayOfWeek) {
                     // Also check if the time hasn't passed yet on that day
-                    $departureTime = $searchDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
-                    return $departureTime->isFuture() || $departureTime->isSameAs('H:i:s', Carbon::now()->format('H:i:s'));
+                    return $schedule->isAvailableForBooking($searchDate);
                 }
                 
                 return false;

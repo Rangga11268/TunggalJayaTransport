@@ -234,11 +234,11 @@
                             </form>
                         @endif
                         
-                        <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST">
+                        <form id="delete-form" action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" 
-                                    onclick="return confirm('Are you sure you want to delete this schedule?')">
+                                    onclick="event.preventDefault(); handleDelete('delete-form', 'Hapus Jadwal?', 'Apakah Anda yakin ingin menghapus jadwal ini? Tindakan ini tidak dapat dibatalkan.')">
                                 Delete Schedule
                             </button>
                         </form>

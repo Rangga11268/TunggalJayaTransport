@@ -267,10 +267,9 @@ class ScheduleController extends Controller
             return redirect()->route('admin.schedules.index')->with('error', 'Hanya jadwal harian berulang yang bisa digunakan untuk membuat jadwal hari berikutnya.');
         }
         
-        // Check if schedule has already departed
-        if (!$schedule->hasDeparted()) {
-            return redirect()->route('admin.schedules.index')->with('warning', 'Jadwal ini belum berangkat. Anda hanya bisa membuat jadwal hari berikutnya untuk jadwal yang sudah berangkat.');
-        }
+        // For daily recurring schedules, we don't need to check if they've departed
+        // as they are available every day. Instead, we'll create a specific daily schedule
+        // for tomorrow based on this recurring schedule.
         
         // Create a new daily schedule for tomorrow
         $tomorrow = Carbon::tomorrow();
@@ -283,7 +282,7 @@ class ScheduleController extends Controller
         $newSchedule->price = $schedule->price;
         $newSchedule->status = 'active';
         $newSchedule->is_weekly = false;
-        $newSchedule->is_daily = false;
+        $newSchedule->is_daily = false; // This is a specific daily schedule, not recurring
         $newSchedule->day_of_week = null;
         $newSchedule->save();
         

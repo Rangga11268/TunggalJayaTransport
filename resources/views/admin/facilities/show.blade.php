@@ -52,10 +52,10 @@
                             <a href="{{ route('admin.facilities.edit', $facility) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
                                 Edit
                             </a>
-                            <form action="{{ route('admin.facilities.destroy', $facility) }}" method="POST" class="inline">
+                            <form id="delete-form" action="{{ route('admin.facilities.destroy', $facility) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="return confirm('Are you sure you want to delete this facility?')">
+                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="event.preventDefault(); handleDelete('delete-form', 'Hapus Fasilitas?', 'Apakah Anda yakin ingin menghapus fasilitas ini? Tindakan ini tidak dapat dibatalkan.')">
                                     Delete
                                 </button>
                             </form>

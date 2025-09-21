@@ -55,6 +55,16 @@ class ResetExpiredSchedules extends Command
             }
         }
 
+        // Get all daily recurring schedules
+        $dailyRecurringSchedules = Schedule::dailyRecurring()->get();
+        $this->info("Found {$dailyRecurringSchedules->count()} daily recurring schedules.");
+
+        // For daily recurring schedules, we don't need to reset them as they are available every day
+        // But we can log that we've processed them
+        foreach ($dailyRecurringSchedules as $schedule) {
+            $this->info("Processed daily recurring schedule ID {$schedule->id} - available every day");
+        }
+
         // Get all weekly schedules that have already departed this week
         $expiredWeeklySchedules = Schedule::weekly()
             ->where('departure_time', '<', Carbon::now())
@@ -81,6 +91,6 @@ class ResetExpiredSchedules extends Command
             $weeklyResetCount++;
         }
 
-        $this->info("Schedule reset process completed. Reset {$dailyResetCount} daily schedules and {$weeklyResetCount} weekly schedules.");
+        $this->info("Schedule reset process completed. Reset {$dailyResetCount} daily schedules, processed {$dailyRecurringSchedules->count()} daily recurring schedules, and reset {$weeklyResetCount} weekly schedules.");
     }
 }

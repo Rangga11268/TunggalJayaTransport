@@ -290,11 +290,15 @@
                                             @if($schedule->is_weekly && $schedule->day_of_week !== null)
                                                 @php
                                                     $nextDate = $schedule->is_weekly && $schedule->day_of_week !== null ? $schedule->getNextAvailableDate() : null;
-                                                    $displayTime = $nextDate ? $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s')) : $schedule->departure_time;
-                                                    echo $displayTime->format('H:i');
+                                                    if ($nextDate) {
+                                                        $displayTime = $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                                                        echo $displayTime->setTimezone('Asia/Jakarta')->format('H:i');
+                                                    } else {
+                                                        echo $schedule->getDepartureTimeWIB()->format('H:i');
+                                                    }
                                                 @endphp
                                             @else
-                                                {{ $schedule->departure_time->format('H:i') }}
+                                                {{ $schedule->getDepartureTimeWIB()->format('H:i') }}
                                             @endif
                                         </div>
                                         <div>

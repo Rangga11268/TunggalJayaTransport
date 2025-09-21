@@ -52,10 +52,10 @@
                             <a href="{{ route('admin.news.edit', $article) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
                                 Edit
                             </a>
-                            <form action="{{ route('admin.news.destroy', $article) }}" method="POST" class="inline">
+                            <form id="delete-form" action="{{ route('admin.news.destroy', $article) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="return confirm('Are you sure you want to delete this article?')">
+                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="event.preventDefault(); handleDelete('delete-form', 'Hapus Artikel?', 'Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.')">
                                     Delete
                                 </button>
                             </form>

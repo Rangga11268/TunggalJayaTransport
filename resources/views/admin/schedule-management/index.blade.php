@@ -1,4 +1,7 @@
 <x-app-layout>
+    @php
+        use Carbon\Carbon;
+    @endphp
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Schedule Management Dashboard') }}
@@ -240,6 +243,7 @@
                                                 @endphp
                                             @elseif($schedule->is_daily)
                                                 @php
+                                                    // For daily recurring schedules, show today or tomorrow based on time
                                                     $today = \Carbon\Carbon::today('Asia/Jakarta');
                                                     $now = \Carbon\Carbon::now('Asia/Jakarta');
                                                     $todayDeparture = $today

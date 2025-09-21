@@ -26,7 +26,7 @@
             </div>
             <div class="ml-3">
                 <p class="text-sm text-blue-700">
-                    <strong>Schedule Information:</strong> Daily schedules reset automatically each day. Weekly schedules repeat on their designated days. 
+                    <strong>Schedule Information:</strong> Daily schedules reset automatically each day. Weekly schedules repeat on their designated days. Daily recurring schedules are available every day at the same time.
                     Once a bus has departed, tickets can no longer be purchased for that schedule.
                 </p>
             </div>
@@ -121,10 +121,18 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap" data-label="Departure">
                             <div class="text-sm font-medium text-gray-900">
-                                {{ $schedule->getActualDepartureTime()->format('H:i') }}
+                                @if(request()->get('date'))
+                                    {{ $schedule->getActualDepartureTime(\Carbon\Carbon::parse(request()->get('date')))->format('H:i') }}
+                                @else
+                                    {{ $schedule->getActualDepartureTime()->format('H:i') }}
+                                @endif
                             </div>
                             <div class="text-sm text-gray-500">
-                                {{ $schedule->getActualDepartureTime()->format('l, F j') }}
+                                @if(request()->get('date'))
+                                    {{ \Carbon\Carbon::parse(request()->get('date'))->format('l, F j') }}
+                                @else
+                                    {{ $schedule->getActualDepartureTime()->format('l, F j') }}
+                                @endif
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap" data-label="Arrival">

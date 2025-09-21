@@ -102,7 +102,7 @@
                                         <td class="px-4 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">{{ $schedule->bus->name }}</div>
                                             <div class="text-sm text-gray-500">{{ $schedule->bus->plate_number }}</div>
-                                            @if($schedule->hasDeparted())
+                                            @if($schedule->hasDeparted() && !$schedule->is_daily)
                                                 <div class="text-xs text-red-600 font-semibold">SUDAH BERANGKAT</div>
                                             @endif
                                         </td>
@@ -124,6 +124,7 @@
                                                 @endphp
                                             @elseif($schedule->is_daily)
                                                 @php
+                                                    // For daily recurring schedules, show today or tomorrow based on time
                                                     $today = \Carbon\Carbon::today('Asia/Jakarta');
                                                     $now = \Carbon\Carbon::now('Asia/Jakarta');
                                                     $todayDeparture = $today->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
@@ -140,7 +141,7 @@
                                                 {{ $schedule->getDepartureTimeWIB()->format('d M Y H:i') }}
                                                 <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                             @endif
-                                            @if($schedule->hasDeparted())
+                                            @if($schedule->hasDeparted() && !$schedule->is_daily)
                                                 <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded">
                                                     DEPARTED
                                                 </span>
@@ -148,6 +149,10 @@
                                             @if($schedule->is_weekly)
                                                 <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded">
                                                     WEEKLY
+                                                </span>
+                                            @elseif($schedule->is_daily)
+                                                <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">
+                                                    DAILY
                                                 </span>
                                             @endif
                                         </td>
