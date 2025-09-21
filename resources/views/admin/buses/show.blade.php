@@ -33,10 +33,10 @@
                                 <a href="{{ route('admin.buses.edit', $bus) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center touch-friendly">
                                     Edit
                                 </a>
-                                <form action="{{ route('admin.buses.destroy', $bus) }}" method="POST" class="inline">
+                                <form id="delete-form" action="{{ route('admin.buses.destroy', $bus) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full touch-friendly" onclick="return confirm('Are you sure you want to delete this bus?')">
+                                    <button type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full touch-friendly" onclick="handleDelete('delete-form', 'Hapus Bus?', 'Apakah Anda yakin ingin menghapus bus ini? Tindakan ini tidak dapat dibatalkan.')">
                                         Delete
                                     </button>
                                 </form>

@@ -23,9 +23,7 @@ use Illuminate\Support\Str;
                 </div>
             </div>
             <div class="hidden md:block">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-96 flex items-center justify-center">
-                    <span class="text-2xl text-gray-500">Hero Image</span>
-                </div>
+                <img src="{{ asset('img/heroImg.jpg') }}" alt="Tunggal Jaya Transport" class="w-full h-96 object-cover rounded-xl shadow-lg">
             </div>
         </div>
     </div>

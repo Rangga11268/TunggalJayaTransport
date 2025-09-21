@@ -57,15 +57,15 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Schedule Type</label>
                                 <div class="flex items-center space-x-4">
                                     <div class="flex items-center">
-                                        <input type="radio" name="is_weekly" id="daily" value="0" {{ old('is_weekly', 0) == 0 && old('is_daily', 0) == 0 ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
+                                        <input type="radio" name="schedule_type" id="daily" value="daily" {{ old('schedule_type', 'daily') == 'daily' ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
                                         <label for="daily" class="ml-3 block text-sm font-medium text-gray-700">One-time Schedule</label>
                                     </div>
                                     <div class="flex items-center">
-                                        <input type="radio" name="is_weekly" id="weekly" value="1" {{ old('is_weekly', 0) == 1 ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
+                                        <input type="radio" name="schedule_type" id="weekly" value="weekly" {{ old('schedule_type') == 'weekly' ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
                                         <label for="weekly" class="ml-3 block text-sm font-medium text-gray-700">Weekly Schedule</label>
                                     </div>
                                     <div class="flex items-center">
-                                        <input type="radio" name="is_daily" id="daily_recurring" value="1" {{ old('is_daily', 0) == 1 ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
+                                        <input type="radio" name="schedule_type" id="daily_recurring" value="daily_recurring" {{ old('schedule_type') == 'daily_recurring' ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
                                         <label for="daily_recurring" class="ml-3 block text-sm font-medium text-gray-700">Daily Recurring</label>
                                     </div>
                                 </div>
@@ -162,21 +162,21 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const scheduleType = document.querySelectorAll('input[name="is_weekly"], input[name="is_daily"]');
+            const scheduleType = document.querySelectorAll('input[name="schedule_type"]');
             const weeklyOptions = document.getElementById('weekly-options');
             const dailyOptions = document.getElementById('daily-options');
             
             scheduleType.forEach(radio => {
                 radio.addEventListener('change', function() {
-                    if (this.name === 'is_weekly' && this.value == '1') {
+                    if (this.value === 'weekly') {
                         // Weekly schedule
                         weeklyOptions.classList.remove('hidden');
                         dailyOptions.classList.add('hidden');
-                    } else if (this.name === 'is_daily' && this.value == '1') {
+                    } else if (this.value === 'daily_recurring') {
                         // Daily recurring schedule
                         weeklyOptions.classList.add('hidden');
                         dailyOptions.classList.add('hidden');
-                    } else if (this.name === 'is_weekly' && this.value == '0') {
+                    } else {
                         // One-time schedule
                         weeklyOptions.classList.add('hidden');
                         dailyOptions.classList.remove('hidden');
@@ -185,15 +185,21 @@
             });
             
             // Initialize based on checked radio
-            const checkedWeekly = document.querySelector('input[name="is_weekly"]:checked');
-            const checkedDaily = document.querySelector('input[name="is_daily"]:checked');
+            const checkedRadio = document.querySelector('input[name="schedule_type"]:checked');
             
-            if (checkedWeekly && checkedWeekly.value == '1') {
-                weeklyOptions.classList.remove('hidden');
-            } else if (checkedDaily && checkedDaily.value == '1') {
-                weeklyOptions.classList.add('hidden');
-                dailyOptions.classList.add('hidden');
+            if (checkedRadio) {
+                if (checkedRadio.value === 'weekly') {
+                    weeklyOptions.classList.remove('hidden');
+                    dailyOptions.classList.add('hidden');
+                } else if (checkedRadio.value === 'daily_recurring') {
+                    weeklyOptions.classList.add('hidden');
+                    dailyOptions.classList.add('hidden');
+                } else {
+                    weeklyOptions.classList.add('hidden');
+                    dailyOptions.classList.remove('hidden');
+                }
             } else {
+                // Default to daily schedule
                 dailyOptions.classList.remove('hidden');
             }
         });
