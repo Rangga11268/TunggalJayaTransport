@@ -114,12 +114,13 @@
                                                 </div>
                                                 <div class="ml-3">
                                                     <div class="text-sm font-medium text-gray-900">
-                                                        {{ $schedule->getActualDepartureTime()->format('H:i') }}
+                                                        {{ $schedule->getDepartureTimeWIB()->format('H:i') }}
                                                         <span class="text-gray-500 mx-1">→</span>
-                                                        {{ $schedule->getActualArrivalTime()->format('H:i') }}
+                                                        {{ $schedule->getArrivalTimeWIB()->format('H:i') }}
+                                                        <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                                     </div>
                                                     <div class="text-xs text-gray-500">
-                                                        {{ $schedule->getActualDepartureTime()->format('M j') }}
+                                                        {{ $schedule->getDepartureTimeWIB()->format('M j') }}
                                                     </div>
                                                 </div>
                                             </div>
@@ -189,11 +190,12 @@
                                         </div>
                                         <div class="ml-3">
                                             <div class="text-sm font-medium text-gray-900">
-                                                {{ $schedule->getActualDepartureTime()->format('H:i') }} →
-                                                {{ $schedule->getActualArrivalTime()->format('H:i') }}
+                                                {{ $schedule->getDepartureTimeWIB()->format('H:i') }} →
+                                                {{ $schedule->getArrivalTimeWIB()->format('H:i') }}
+                                                <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                             </div>
                                             <div class="text-xs text-gray-500">
-                                                {{ $schedule->getActualDepartureTime()->format('M j') }}
+                                                {{ $schedule->getDepartureTimeWIB()->format('M j') }}
                                             </div>
                                         </div>
                                     </div>

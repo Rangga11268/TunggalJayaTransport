@@ -62,6 +62,27 @@
 
                     <!-- Schedules Table -->
                     <div class="overflow-x-auto">
+                        @if(session('warning'))
+                            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4" role="alert">
+                                <strong class="font-bold">Peringatan!</strong>
+                                <span class="block sm:inline">{{ session('warning') }}</span>
+                            </div>
+                        @endif
+                        
+                        @if(session('create_success'))
+                            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                                <strong class="font-bold">Sukses!</strong>
+                                <span class="block sm:inline">{{ session('create_success') }}</span>
+                            </div>
+                        @endif
+                        
+                        @if(session('delete_success'))
+                            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                                <strong class="font-bold">Sukses!</strong>
+                                <span class="block sm:inline">{{ session('delete_success') }}</span>
+                            </div>
+                        @endif
+                        
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -81,6 +102,9 @@
                                         <td class="px-4 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">{{ $schedule->bus->name }}</div>
                                             <div class="text-sm text-gray-500">{{ $schedule->bus->plate_number }}</div>
+                                            @if($schedule->hasDeparted())
+                                                <div class="text-xs text-red-600 font-semibold">SUDAH BERANGKAT</div>
+                                            @endif
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">{{ $schedule->route->name }}</div>
@@ -96,11 +120,12 @@
                                                     } else {
                                                         echo $schedule->departure_time->format('d M Y H:i');
                                                     }
+                                                    echo ' <span class="text-xs text-gray-500 ml-1">(WIB)</span>';
                                                 @endphp
                                             @elseif($schedule->is_daily)
                                                 @php
-                                                    $today = \Carbon\Carbon::today();
-                                                    $now = \Carbon\Carbon::now();
+                                                    $today = \Carbon\Carbon::today('Asia/Jakarta');
+                                                    $now = \Carbon\Carbon::now('Asia/Jakarta');
                                                     $todayDeparture = $today->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
                                                     
                                                     if ($todayDeparture->isFuture()) {
@@ -109,9 +134,11 @@
                                                         $tomorrowDeparture = $today->copy()->addDay()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
                                                         echo $tomorrowDeparture->format('d M Y H:i');
                                                     }
+                                                    echo ' <span class="text-xs text-gray-500 ml-1">(WIB)</span>';
                                                 @endphp
                                             @else
-                                                {{ $schedule->departure_time->format('d M Y H:i') }}
+                                                {{ $schedule->getDepartureTimeWIB()->format('d M Y H:i') }}
+                                                <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                             @endif
                                             @if($schedule->hasDeparted())
                                                 <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded">
@@ -125,7 +152,8 @@
                                             @endif
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $schedule->arrival_time->format('H:i') }}
+                                            {{ $schedule->getArrivalTimeWIB()->format('H:i') }}
+                                            <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                             Rp. {{ number_format($schedule->price, 0, ',', '.') }}
@@ -157,6 +185,16 @@
                                                 <a href="{{ route('admin.schedules.edit', $schedule) }}" class="edit-icon" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
+                                                
+                                                @if($schedule->hasDeparted() && $schedule->is_daily && !$schedule->is_weekly)
+                                                    <form id="create-next-day-form-{{ $schedule->id }}" action="{{ route('admin.schedules.create-next-day', $schedule) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        <button type="button" class="text-green-600 hover:text-green-900" onclick="handleDelete('create-next-day-form-{{ $schedule->id }}', 'Buat Jadwal Hari Berikutnya?', 'Apakah Anda yakin ingin membuat jadwal untuk hari berikutnya berdasarkan jadwal ini?')" title="Create Next Day Schedule">
+                                                            <i class="fas fa-calendar-plus"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                                
                                                 <form id="delete-form-{{ $schedule->id }}" action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')

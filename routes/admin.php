@@ -33,6 +33,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule
 
     // Schedule Management (schedule managers can manage schedules)
     Route::resource('schedules', ScheduleController::class)->middleware('role:admin,schedule_manager');
+    Route::post('/schedules/{schedule}/create-next-day', [ScheduleController::class, 'createNextDaySchedule'])->name('schedules.create-next-day')->middleware('role:admin,schedule_manager');
     
     // Weekly Schedule Template Management (schedule managers can manage templates)
     Route::resource('weekly-schedule-templates', WeeklyScheduleTemplateController::class)->middleware('role:admin,schedule_manager');

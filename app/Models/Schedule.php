@@ -168,26 +168,50 @@ class Schedule extends Model
     /**
      * Check if the schedule departure time has passed
      * For weekly schedules, checks if the next occurrence has passed
-     * For daily recurring schedules, checks if the next occurrence has passed
+     * For daily recurring schedules, checks if today's occurrence has passed
+     * For daily schedules, checks if the stored departure time has passed
+     * 
+     * Note: All times are stored in UTC in the database and converted to 
+     * Asia/Jakarta timezone (WIB) for comparison with current time.
      */
     public function hasDeparted()
     {
-        $now = Carbon::now();
+        // Use local timezone (WIB) for checking departure time
+        $now = Carbon::now('Asia/Jakarta');
         
         if ($this->is_weekly && $this->day_of_week !== null) {
             // For weekly schedules, check if the next occurrence has passed
             $actualDeparture = $this->getActualDepartureTime();
-            return $actualDeparture->isPast();
+            // Convert to local timezone for comparison
+            $actualDepartureLocal = $actualDeparture->setTimezone('Asia/Jakarta');
+            return $actualDepartureLocal->isPast();
         }
         
         if ($this->is_daily) {
-            // For daily recurring schedules, check if the next occurrence has passed
-            $actualDeparture = $this->getActualDepartureTime();
-            return $actualDeparture->isPast();
+            // For daily recurring schedules, check if today's occurrence has passed
+            $today = Carbon::today('Asia/Jakarta');
+            $todayDeparture = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+            return $todayDeparture->isPast();
         }
         
         // For daily schedules, check against stored departure time
-        return $this->departure_time->isPast();
+        // Make sure we're comparing with the actual datetime
+        if ($this->departure_time instanceof Carbon) {
+            // Convert to local timezone for comparison
+            $departureTimeLocal = $this->departure_time->setTimezone('Asia/Jakarta');
+            return $departureTimeLocal->isPast();
+        }
+        
+        // If it's not a Carbon instance, try to parse it
+        try {
+            $departureTime = Carbon::parse($this->departure_time);
+            // Convert to local timezone for comparison
+            $departureTimeLocal = $departureTime->setTimezone('Asia/Jakarta');
+            return $departureTimeLocal->isPast();
+        } catch (\Exception $e) {
+            // If parsing fails, fallback to basic comparison
+            return false;
+        }
     }
 
     /**
@@ -202,6 +226,44 @@ class Schedule extends Model
         
         $departureTime = $this->getActualDepartureTime();
         return $departureTime->setTimezone($timezone);
+    }
+    
+    /*-------------------------------------------------------------------------
+     * WIB Time Conversion Methods
+     *-------------------------------------------------------------------------*/
+    
+    /**
+     * Get departure time in WIB timezone for display purposes
+     */
+    public function getDepartureTimeWIB()
+    {
+        if ($this->departure_time instanceof Carbon) {
+            return $this->departure_time->setTimezone('Asia/Jakarta');
+        }
+        
+        try {
+            $departureTime = Carbon::parse($this->departure_time);
+            return $departureTime->setTimezone('Asia/Jakarta');
+        } catch (\Exception $e) {
+            return $this->departure_time;
+        }
+    }
+    
+    /**
+     * Get arrival time in WIB timezone for display purposes
+     */
+    public function getArrivalTimeWIB()
+    {
+        if ($this->arrival_time instanceof Carbon) {
+            return $this->arrival_time->setTimezone('Asia/Jakarta');
+        }
+        
+        try {
+            $arrivalTime = Carbon::parse($this->arrival_time);
+            return $arrivalTime->setTimezone('Asia/Jakarta');
+        } catch (\Exception $e) {
+            return $this->arrival_time;
+        }
     }
 
     /**

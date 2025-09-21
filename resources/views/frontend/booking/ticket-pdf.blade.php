@@ -272,7 +272,7 @@
                     <div class="info-item">
                         <label>Departure</label>
                         <div class="info-value">
-                            {{ $booking->schedule->getActualDepartureTime()->format('M j, Y') }} | {{ $booking->schedule->getActualDepartureTime()->format('H:i') }}
+                            {{ $booking->schedule->getDepartureTimeWIB()->format('M j, Y') }} | {{ $booking->schedule->getDepartureTimeWIB()->format('H:i') }} (WIB)
                         </div>
                     </div>
                     

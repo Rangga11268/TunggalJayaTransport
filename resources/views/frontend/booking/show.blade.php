@@ -108,7 +108,7 @@
                                 <div>
                                     <p class="text-sm text-gray-500">Date</p>
                                     <p class="font-medium">
-                                        {{ $schedule->getActualDepartureTime()->format('d M Y') }}
+                                        {{ $schedule->getDepartureTimeWIB()->format('d M Y') }}
                                     </p>
                                 </div>
                             </div>
@@ -119,7 +119,8 @@
                                 <div>
                                     <p class="text-sm text-gray-500">Departure</p>
                                     <p class="font-medium">
-                                        {{ $schedule->getActualDepartureTime()->format('H:i') }}
+                                        {{ $schedule->getDepartureTimeWIB()->format('H:i') }}
+                                        <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                     </p>
                                 </div>
                             </div>
@@ -130,7 +131,8 @@
                                 <div>
                                     <p class="text-sm text-gray-500">Arrival</p>
                                     <p class="font-medium">
-                                        {{ $schedule->getActualArrivalTime()->format('H:i') }}
+                                        {{ $schedule->getArrivalTimeWIB()->format('H:i') }}
+                                        <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                     </p>
                                 </div>
                             </div>

@@ -217,8 +217,7 @@ class BookingController extends Controller
         $schedule = Schedule::with('route', 'bus')->findOrFail($id);
         
         // Additional check: if schedule has already departed, redirect with error
-        // For weekly schedules, we don't check if they've departed because they're recurring
-        if (!$schedule->is_weekly && $schedule->hasDeparted()) {
+        if ($schedule->hasDeparted()) {
             return redirect()->route('frontend.booking.index')
                 ->withErrors(['schedule' => 'This schedule has already departed and is no longer available for booking.'])
                 ->withInput();
@@ -248,8 +247,7 @@ class BookingController extends Controller
         $schedule = Schedule::with('bus')->findOrFail($request->schedule_id);
         
         // Additional check: if schedule has already departed, redirect with error
-        // For weekly schedules, we don't check if they've departed because they're recurring
-        if (!$schedule->is_weekly && $schedule->hasDeparted()) {
+        if ($schedule->hasDeparted()) {
             return redirect()->route('frontend.booking.index')
                 ->withErrors(['schedule' => 'This schedule has already departed and is no longer available for booking.'])
                 ->withInput();
@@ -471,6 +469,13 @@ class BookingController extends Controller
                 $booking->payment_status = 'paid';
                 $booking->save();
             }
+        }
+        
+        // Check if the schedule has already departed
+        if ($booking->schedule->hasDeparted()) {
+            return redirect()->route('frontend.booking.index')
+                ->withErrors(['schedule' => 'The schedule for this booking has already departed.'])
+                ->withInput();
         }
         
         return view('frontend.booking.success', compact('booking'));

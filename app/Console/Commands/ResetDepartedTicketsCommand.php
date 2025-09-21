@@ -150,12 +150,8 @@ class ResetDepartedTicketsCommand extends Command
             // Get all bookings for this schedule that are not yet paid or confirmed
             // We only cancel bookings that are pending payment or not yet confirmed
             $bookingsToCancel = $schedule->bookings()
-                ->where('booking_status', '!=', 'confirmed') // Not confirmed bookings
-                ->orWhere(function ($query) {
-                    // Or confirmed bookings that haven't been paid yet
-                    $query->where('booking_status', 'confirmed')
-                          ->where('payment_status', 'pending');
-                })
+                ->where('booking_status', '!=', 'cancelled') // Not already cancelled
+                ->where('payment_status', 'pending') // Only pending payments
                 ->get();
                 
             if ($bookingsToCancel->isEmpty()) {

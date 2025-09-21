@@ -64,10 +64,11 @@
                             <p class="text-xs text-gray-500 uppercase font-semibold">Origin</p>
                             <p class="text-2xl font-bold text-gray-800 mt-2">{{ $booking->schedule->route->origin }}</p>
                             <p class="text-gray-600 mt-1">
-                                {{ $booking->schedule->getActualDepartureTime()->format('d M Y') }}
+                                {{ $booking->schedule->getDepartureTimeWIB()->format('d M Y') }}
                             </p>
                             <p class="text-lg font-semibold text-blue-600 mt-1">
-                                {{ $booking->schedule->getActualDepartureTime()->format('H:i') }}
+                                {{ $booking->schedule->getDepartureTimeWIB()->format('H:i') }}
+                                <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                             </p>
                         </div>
                         

@@ -59,3 +59,23 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Cron Jobs Configuration
+
+This application requires cron jobs to be configured for automatic ticket management:
+
+1. **Hourly Ticket Reset** - Automatically cancels unpaid bookings for schedules that have departed
+2. **Daily Expired Schedules Reset** - Resets expired schedules daily
+3. **Daily Invalid Bookings Cleanup** - Cleans up invalid bookings daily
+
+To configure cron jobs, add the following line to your crontab:
+```
+* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Replace `/path-to-your-project` with the actual path to your project directory.
+
+The following commands will be executed automatically:
+- `php artisan tickets:reset-departed` - Hourly
+- `php artisan schedules:reset-expired` - Daily at 1:00 AM
+- `php artisan bookings:cleanup-invalid` - Daily at 2:00 AM

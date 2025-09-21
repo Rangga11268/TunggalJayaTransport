@@ -10,8 +10,8 @@
     
     <!-- Departure Reminder -->
     @php
-        $departureTime = $booking->schedule->departure_time;
-        $hoursUntilDeparture = now()->diffInHours($departureTime, false);
+        $departureTime = $booking->schedule->getDepartureTimeWIB();
+        $hoursUntilDeparture = now('Asia/Jakarta')->diffInHours($departureTime, false);
     @endphp
     
     @if($hoursUntilDeparture >= 0 && $hoursUntilDeparture <= 24)
@@ -75,7 +75,7 @@
                         <div>
                             <p class="text-sm text-gray-500">Date</p>
                             <p class="font-medium">
-                                {{ $booking->schedule->getActualDepartureTime()->format('l, F j, Y') }}
+                                {{ $booking->schedule->getDepartureTimeWIB()->format('l, F j, Y') }}
                             </p>
                         </div>
                     </div>
@@ -87,7 +87,8 @@
                             <div>
                                 <p class="text-sm text-gray-500">Departure</p>
                                 <p class="font-medium">
-                                    {{ $booking->schedule->getActualDepartureTime()->format('H:i') }}
+                                    {{ $booking->schedule->getDepartureTimeWIB()->format('H:i') }}
+                                    <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                 </p>
                             </div>
                         </div>
@@ -98,7 +99,8 @@
                             <div>
                                 <p class="text-sm text-gray-500">Arrival</p>
                                 <p class="font-medium">
-                                    {{ $booking->schedule->getActualArrivalTime()->format('H:i') }}
+                                    {{ $booking->schedule->getArrivalTimeWIB()->format('H:i') }}
+                                    <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                 </p>
                             </div>
                         </div>
@@ -427,9 +429,9 @@
                 'bookingId' => $booking->id,
                 'origin' => $booking->schedule->route->origin,
                 'destination' => $booking->schedule->route->destination,
-                'departureDate' => $booking->schedule->departure_time->format('d M Y'),
-                'departureTime' => $booking->schedule->departure_time->format('H:i'),
-                'arrivalTime' => $booking->schedule->arrival_time->format('H:i'),
+                'departureDate' => $booking->schedule->getDepartureTimeWIB()->format('d M Y'),
+                'departureTime' => $booking->schedule->getDepartureTimeWIB()->format('H:i'),
+                'arrivalTime' => $booking->schedule->getArrivalTimeWIB()->format('H:i'),
                 'seatNumber' => $booking->seat_numbers,
                 'busType' => $booking->schedule->bus->bus_type ?? 'Standard',
                 'price' => 'Rp. ' . number_format($booking->total_price, 0, ',', '.'),

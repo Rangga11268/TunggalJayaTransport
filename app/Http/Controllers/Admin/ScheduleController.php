@@ -7,6 +7,7 @@ use App\Models\Schedule;
 use App\Models\Bus;
 use App\Models\Route as BusRoute;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ScheduleController extends Controller
 {
@@ -130,9 +131,9 @@ class ScheduleController extends Controller
         $schedule = Schedule::findOrFail($id);
         
         // Check if schedule has already departed
-        if ($schedule->hasDeparted()) {
+        if ($schedule->hasDeparted() && !$schedule->is_weekly) {
             return redirect()->route('admin.schedules.index')
-                ->with('warning', 'This schedule has already departed. Please be careful when editing as it may affect existing bookings.');
+                ->with('warning', 'This schedule has already departed and cannot be edited. You can create a new schedule for tomorrow or delete this one.');
         }
         
         $buses = Bus::all();
@@ -148,9 +149,9 @@ class ScheduleController extends Controller
         $schedule = Schedule::findOrFail($id);
 
         // Check if schedule has already departed
-        if ($schedule->hasDeparted()) {
+        if ($schedule->hasDeparted() && !$schedule->is_weekly) {
             return redirect()->route('admin.schedules.index')
-                ->with('warning', 'This schedule has already departed and cannot be updated.');
+                ->with('warning', 'This schedule has already departed and cannot be updated. You can create a new schedule for tomorrow or delete this one.');
         }
 
         // Validasi dasar
@@ -224,8 +225,54 @@ class ScheduleController extends Controller
     public function destroy(string $id)
     {
         $schedule = Schedule::findOrFail($id);
-        $schedule->delete();
-
-        return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal berhasil dihapus.');
+        
+        // Check if schedule has already departed
+        if ($schedule->hasDeparted() && !$schedule->is_weekly) {
+            // For non-weekly schedules that have departed, we can delete them
+            $schedule->delete();
+            return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal berhasil dihapus.');
+        } else if ($schedule->is_weekly) {
+            // For weekly schedules, we don't allow deletion through this method
+            return redirect()->route('admin.schedules.index')->with('warning', 'Jadwal mingguan tidak bisa dihapus. Silakan nonaktifkan jadwal tersebut.');
+        } else {
+            // For daily schedules that haven't departed yet
+            $schedule->delete();
+            return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal berhasil dihapus.');
+        }
+    }
+    
+    /**
+     * Create a new daily schedule for tomorrow based on an existing daily recurring schedule
+     */
+    public function createNextDaySchedule(string $id)
+    {
+        $schedule = Schedule::findOrFail($id);
+        
+        // Only allow this for daily recurring schedules
+        if (!$schedule->is_daily) {
+            return redirect()->route('admin.schedules.index')->with('error', 'Hanya jadwal harian berulang yang bisa digunakan untuk membuat jadwal hari berikutnya.');
+        }
+        
+        // Check if schedule has already departed
+        if (!$schedule->hasDeparted()) {
+            return redirect()->route('admin.schedules.index')->with('warning', 'Jadwal ini belum berangkat. Anda hanya bisa membuat jadwal hari berikutnya untuk jadwal yang sudah berangkat.');
+        }
+        
+        // Create a new daily schedule for tomorrow
+        $tomorrow = Carbon::tomorrow();
+        
+        $newSchedule = new Schedule();
+        $newSchedule->bus_id = $schedule->bus_id;
+        $newSchedule->route_id = $schedule->route_id;
+        $newSchedule->departure_time = $tomorrow->format('Y-m-d') . ' ' . $schedule->departure_time->format('H:i:s');
+        $newSchedule->arrival_time = $tomorrow->format('Y-m-d') . ' ' . $schedule->arrival_time->format('H:i:s');
+        $newSchedule->price = $schedule->price;
+        $newSchedule->status = 'active';
+        $newSchedule->is_weekly = false;
+        $newSchedule->is_daily = false;
+        $newSchedule->day_of_week = null;
+        $newSchedule->save();
+        
+        return redirect()->route('admin.schedules.index')->with('create_success', 'Jadwal untuk hari besok berhasil dibuat.');
     }
 }
