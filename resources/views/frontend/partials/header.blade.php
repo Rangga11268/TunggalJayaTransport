@@ -160,4 +160,72 @@
             </div>
         </div>
     </div>
+    
+    <!-- Tablet-specific navbar fixes -->
+    <style>
+        /* Tablet-specific navbar fixes */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            /* Reduce the space between navigation items on tablet to prevent overflow */
+            #navbar .space-x-8 {
+                gap: 1rem;
+            }
+            
+            /* Reduce left margin of navigation section on tablet */
+            #navbar .sm\:ms-10 {
+                margin-left: 0.75rem;
+            }
+            
+            /* Adjust right margin of dropdown on tablet */
+            #navbar .sm\:ms-6 {
+                margin-left: 0.5rem;
+            }
+            
+            /* Reduce container padding on tablet */
+            #navbar .px-4 {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            
+            /* Adjust max width container on tablet */
+            #navbar .max-w-7xl {
+                max-width: 100%;
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            
+            /* Reduce font size of navigation links on tablet */
+            #navbar .sm\:flex a {
+                font-size: 0.85rem;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            
+            /* Reduce padding on dropdown button for tablet */
+            #navbar button.inline-flex {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.85rem;
+            }
+            
+            /* Adjust logo size on tablet */
+            #navbar .h-12 {
+                height: 2.75rem;
+            }
+        }
+        
+        /* Additional fixes for larger tablets (iPad Pro, etc.) */
+        @media (min-width: 1024px) and (max-width: 1200px) {
+            #navbar .space-x-8 {
+                gap: 1.25rem;
+            }
+            
+            #navbar .sm\:flex a {
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* Ensure proper z-index for dropdown */
+        #navbar .relative {
+            z-index: 60;
+        }
+    </style>
 </header>

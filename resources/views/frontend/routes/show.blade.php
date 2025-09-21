@@ -415,6 +415,96 @@
         </div>
     </div>
     
+    <style>
+        /* Mobile info section improvements - consistent styling for all devices */
+        div.mobile-info-section {
+            background: linear-gradient(to right, #eff6ff, #dbeafe);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        div.mobile-info-section div.mobile-info-section-content {
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-icon {
+            flex-shrink: 0;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 9999px;
+            background-color: #3b82f6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1.25rem;
+        }
+        
+        div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text {
+            flex: 1;
+        }
+        
+        div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+        
+        div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-description {
+            font-size: 0.95rem;
+            color: #374151;
+            line-height: 1.6;
+        }
+        
+        /* Improvements for larger screens */
+        @media (min-width: 768px) {
+            div.mobile-info-section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-icon {
+                width: 2.5rem;
+                height: 2.5rem;
+                margin-right: 1.5rem;
+            }
+            
+            div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-title {
+                font-size: 1.25rem;
+            }
+            
+            div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-description {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Adjustments for smaller screens */
+        @media (max-width: 767px) {
+            div.mobile-info-section {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-icon {
+                width: 2rem;
+                height: 2rem;
+                margin-right: 1rem;
+            }
+            
+            div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-title {
+                font-size: 1.125rem;
+            }
+            
+            div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-description {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    
     <!-- Back to Routes -->
     <div class="mb-10">
         <a href="{{ route('frontend.routes.index') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold rounded-lg transition duration-300 shadow-lg transform hover:scale-105 mobile-action-button">
