@@ -1,20 +1,21 @@
 <?php
 
-use App\Http\Controllers\Admin\BookingController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\BusController;
+use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\RouteController;
+use App\Http\Controllers\Admin\DriverController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\FacilityController;
+use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ConductorController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\DriverController;
-use App\Http\Controllers\Admin\FacilityController;
-use App\Http\Controllers\Admin\NewsController;
-use App\Http\Controllers\Admin\ReportController;
-use App\Http\Controllers\Admin\RouteController;
-use App\Http\Controllers\Admin\ScheduleController;
-use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ScheduleManagementController;
 use App\Http\Controllers\Admin\WeeklyScheduleTemplateController;
-use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule_manager'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -34,6 +35,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule
     // Schedule Management (schedule managers can manage schedules)
     Route::resource('schedules', ScheduleController::class)->middleware('role:admin,schedule_manager');
     Route::post('/schedules/{schedule}/create-next-day', [ScheduleController::class, 'createNextDaySchedule'])->name('schedules.create-next-day')->middleware('role:admin,schedule_manager');
+    
+    // Schedule Management Dashboard
+    Route::get('/schedule-management', [ScheduleManagementController::class, 'index'])->name('schedule-management.index')->middleware('role:admin,schedule_manager');
+    Route::get('/schedule-management/{id}', [ScheduleManagementController::class, 'show'])->name('schedule-management.show')->middleware('role:admin,schedule_manager');
     
     // Weekly Schedule Template Management (schedule managers can manage templates)
     Route::resource('weekly-schedule-templates', WeeklyScheduleTemplateController::class)->middleware('role:admin,schedule_manager');

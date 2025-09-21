@@ -1,8 +1,16 @@
 import Swal from 'sweetalert2';
 import Chart from 'chart.js/auto';
+import Collapse from '@alpinejs/collapse';
 
 window.Swal = Swal;
 window.Chart = Chart;
+
+// Initialize Alpine.js collapse plugin
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.Alpine) {
+        window.Alpine.plugin(Collapse);
+    }
+});
 
 // Global configuration for SweetAlert2
 const swalConfig = {

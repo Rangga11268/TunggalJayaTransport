@@ -55,60 +55,125 @@
                         }" 
                         class="transition-opacity duration-300">Dashboard</span>
                 </a>
-                <a href="{{ route('admin.news.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.news.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-newspaper text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Manajemen Berita</span>
-                </a>
-                <a href="{{ route('admin.categories.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.categories.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-tags text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Manajemen Kategori</span>
-                </a>
-                <a href="{{ route('admin.buses.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.buses.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-bus text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Manajemen Bus</span>
-                </a>
-                <a href="{{ route('admin.routes.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.routes.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-route text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Manajemen Rute</span>
-                </a>
-                <a href="{{ route('admin.schedules.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedules.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-calendar-alt text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Manajemen Jadwal</span>
-                </a>
-                <a href="{{ route('admin.weekly-schedule-templates.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.weekly-schedule-templates.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-calendar-week text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Template Jadwal Mingguan</span>
-                </a>
+
+                <!-- Content Management Dropdown -->
+                <div x-data="{ open: {{ request()->routeIs('admin.news.*') || request()->routeIs('admin.categories.*') ? 'true' : 'false' }} }" class="mb-1">
+                    <button @click="open = !open" 
+                        class="flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.news.*') || request()->routeIs('admin.categories.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-file-alt text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Manajemen Konten</span>
+                        </div>
+                        <i :class="{
+                                'fa-chevron-down': open,
+                                'fa-chevron-right': !open
+                            }" 
+                            :class="{
+                                'inline': sidebarOpen, 
+                                'hidden': !sidebarOpen
+                            }"
+                            class="fas transition-transform duration-200 text-sm"></i>
+                    </button>
+                    
+                    <div x-show="open" x-collapse>
+                        <a href="{{ route('admin.news.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.news.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-newspaper text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Berita</span>
+                        </a>
+                        <a href="{{ route('admin.categories.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.categories.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-tags text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Kategori</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Transport Management Dropdown -->
+                <div x-data="{ open: {{ request()->routeIs('admin.buses.*') || request()->routeIs('admin.routes.*') || request()->routeIs('admin.schedules.*') || request()->routeIs('admin.schedule-management.*') || request()->routeIs('admin.weekly-schedule-templates.*') ? 'true' : 'false' }} }" class="mb-1">
+                    <button @click="open = !open" 
+                        class="flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.buses.*') || request()->routeIs('admin.routes.*') || request()->routeIs('admin.schedules.*') || request()->routeIs('admin.schedule-management.*') || request()->routeIs('admin.weekly-schedule-templates.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-bus text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Manajemen Transport</span>
+                        </div>
+                        <i :class="{
+                                'fa-chevron-down': open,
+                                'fa-chevron-right': !open
+                            }" 
+                            :class="{
+                                'inline': sidebarOpen, 
+                                'hidden': !sidebarOpen
+                            }"
+                            class="fas transition-transform duration-200 text-sm"></i>
+                    </button>
+                    
+                    <div x-show="open" x-collapse>
+                        <a href="{{ route('admin.buses.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.buses.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-bus text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Bus</span>
+                        </a>
+                        <a href="{{ route('admin.routes.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.routes.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-route text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Rute</span>
+                        </a>
+                        <a href="{{ route('admin.schedules.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedules.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-calendar-alt text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Jadwal</span>
+                        </a>
+                        <a href="{{ route('admin.schedule-management.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedule-management.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-table text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Dashboard Jadwal</span>
+                        </a>
+                        <a href="{{ route('admin.weekly-schedule-templates.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.weekly-schedule-templates.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-calendar-week text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Template Mingguan</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Booking Management -->
                 <a href="{{ route('admin.bookings.index') }}"
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.bookings.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-ticket-alt text-lg w-6"></i> 
@@ -118,15 +183,62 @@
                         }" 
                         class="transition-opacity duration-300">Manajemen Pemesanan</span>
                 </a>
-                <a href="{{ route('admin.users.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.users.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-users text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Manajemen Pengguna</span>
-                </a>
+
+                <!-- User Management Dropdown -->
+                <div x-data="{ open: {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.drivers.*') || request()->routeIs('admin.conductors.*') ? 'true' : 'false' }} }" class="mb-1">
+                    <button @click="open = !open" 
+                        class="flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.drivers.*') || request()->routeIs('admin.conductors.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-users text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Manajemen Pengguna</span>
+                        </div>
+                        <i :class="{
+                                'fa-chevron-down': open,
+                                'fa-chevron-right': !open
+                            }" 
+                            :class="{
+                                'inline': sidebarOpen, 
+                                'hidden': !sidebarOpen
+                            }"
+                            class="fas transition-transform duration-200 text-sm"></i>
+                    </button>
+                    
+                    <div x-show="open" x-collapse>
+                        <a href="{{ route('admin.users.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.users.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-user text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Pengguna</span>
+                        </a>
+                        <a href="{{ route('admin.drivers.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.drivers.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-id-card text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Driver</span>
+                        </a>
+                        <a href="{{ route('admin.conductors.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.conductors.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-user-tie text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Conductor</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Facility Management -->
                 <a href="{{ route('admin.facilities.index') }}"
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.facilities.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-concierge-bell text-lg w-6"></i> 
@@ -136,24 +248,8 @@
                         }" 
                         class="transition-opacity duration-300">Manajemen Fasilitas</span>
                 </a>
-                <a href="{{ route('admin.drivers.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.drivers.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-id-card text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Manajemen Driver</span>
-                </a>
-                <a href="{{ route('admin.conductors.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.conductors.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-user-tie text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Manajemen Conductor</span>
-                </a>
+
+                <!-- Reporting -->
                 <a href="{{ route('admin.reports.index') }}"
                     class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.reports.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                     <i class="fas fa-chart-bar text-lg w-6"></i> 
@@ -163,24 +259,42 @@
                         }" 
                         class="transition-opacity duration-300">Laporan</span>
                 </a>
-                <a href="{{ route('admin.settings.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.settings.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-cog text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Pengaturan</span>
-                </a>
-                {{-- <a href="{{ route('admin.test-sidebar') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.test-sidebar') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-vial text-lg w-6"></i> 
-                    <span :class="{
-                            'ml-3 inline': sidebarOpen, 
-                            'hidden': !sidebarOpen
-                        }" 
-                        class="transition-opacity duration-300">Test Sidebar</span>
-                </a> --}}
+
+                <!-- System Dropdown -->
+                <div x-data="{ open: {{ request()->routeIs('admin.settings.*') ? 'true' : 'false' }} }" class="mb-1">
+                    <button @click="open = !open" 
+                        class="flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.settings.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-cog text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Sistem</span>
+                        </div>
+                        <i :class="{
+                                'fa-chevron-down': open,
+                                'fa-chevron-right': !open
+                            }" 
+                            :class="{
+                                'inline': sidebarOpen, 
+                                'hidden': !sidebarOpen
+                            }"
+                            class="fas transition-transform duration-200 text-sm"></i>
+                    </button>
+                    
+                    <div x-show="open" x-collapse>
+                        <a href="{{ route('admin.settings.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.settings.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-cog text-lg w-6"></i> 
+                            <span :class="{
+                                    'ml-3 inline': sidebarOpen, 
+                                    'hidden': !sidebarOpen
+                                }" 
+                                class="transition-opacity duration-300">Pengaturan</span>
+                        </a>
+                    </div>
+                </div>
             </nav>
         </div>
     </div>
