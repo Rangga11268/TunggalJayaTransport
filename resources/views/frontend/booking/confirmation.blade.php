@@ -10,20 +10,57 @@
     
     <!-- Departure Reminder -->
     @php
-        $departureTime = $booking->schedule->getDepartureTimeWIB();
-        $hoursUntilDeparture = now('Asia/Jakarta')->diffInHours($departureTime, false);
+        $departureTime = $booking->schedule->getActualDepartureTime();
+        $now = now('Asia/Jakarta');
+        $hoursUntilDeparture = $now->diffInHours($departureTime, false);
+        $daysUntilDeparture = floor($hoursUntilDeparture / 24);
+        
+        // Create a clean time display
+        if ($daysUntilDeparture > 0) {
+            $timeDisplay = $daysUntilDeparture . ' hari';
+        } else {
+            $timeDisplay = round($hoursUntilDeparture) . ' jam';
+        }
     @endphp
     
-    @if($hoursUntilDeparture >= 0 && $hoursUntilDeparture <= 24)
-        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-8">
+    @if($hoursUntilDeparture >= 0 && $hoursUntilDeparture <= 2)
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded mb-8">
             <div class="flex">
                 <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                    <i class="fas fa-exclamation-triangle text-red-500"></i>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-yellow-700">
-                        <strong>Reminder:</strong> Your bus departs in {{ $hoursUntilDeparture }} hours! 
-                        Please arrive at the terminal at least 30 minutes before departure.
+                    <p class="text-sm text-red-700">
+                        <strong>Penting:</strong> Bus anda akan berangkat dalam {{ $timeDisplay }}! 
+                        Silakan segera ke terminal.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @elseif($hoursUntilDeparture >= 0 && $hoursUntilDeparture <= 6)
+        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded mb-8">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-orange-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-orange-700">
+                        <strong>Peringatan:</strong> Bus anda akan berangkat dalam {{ $timeDisplay }}. 
+                        Silakan segera ke terminal.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @elseif($hoursUntilDeparture >= 0 && $hoursUntilDeparture <= 24)
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-8">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-blue-700">
+                        <strong>Informasi:</strong> Bus anda akan berangkat dalam {{ $timeDisplay }}. 
+                        Silakan datang ke terminal minimal 30 menit sebelum keberangkatan.
                     </p>
                 </div>
             </div>
@@ -75,7 +112,7 @@
                         <div>
                             <p class="text-sm text-gray-500">Date</p>
                             <p class="font-medium">
-                                {{ $booking->schedule->getDepartureTimeWIB()->format('l, F j, Y') }}
+                                {{ $booking->schedule->getActualDepartureTime()->format('l, F j, Y') }}
                             </p>
                         </div>
                     </div>
@@ -87,7 +124,7 @@
                             <div>
                                 <p class="text-sm text-gray-500">Departure</p>
                                 <p class="font-medium">
-                                    {{ $booking->schedule->getDepartureTimeWIB()->format('H:i') }}
+                                    {{ $booking->schedule->getActualDepartureTime()->format('H:i') }}
                                     <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                 </p>
                             </div>
@@ -99,7 +136,7 @@
                             <div>
                                 <p class="text-sm text-gray-500">Arrival</p>
                                 <p class="font-medium">
-                                    {{ $booking->schedule->getArrivalTimeWIB()->format('H:i') }}
+                                    {{ $booking->schedule->getActualArrivalTime()->format('H:i') }}
                                     <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                 </p>
                             </div>
@@ -429,9 +466,9 @@
                 'bookingId' => $booking->id,
                 'origin' => $booking->schedule->route->origin,
                 'destination' => $booking->schedule->route->destination,
-                'departureDate' => $booking->schedule->getDepartureTimeWIB()->format('d M Y'),
-                'departureTime' => $booking->schedule->getDepartureTimeWIB()->format('H:i'),
-                'arrivalTime' => $booking->schedule->getArrivalTimeWIB()->format('H:i'),
+                'departureDate' => $booking->schedule->getActualDepartureTime()->format('d M Y'),
+                'departureTime' => $booking->schedule->getActualDepartureTime()->format('H:i'),
+                'arrivalTime' => $booking->schedule->getActualArrivalTime()->format('H:i'),
                 'seatNumber' => $booking->seat_numbers,
                 'busType' => $booking->schedule->bus->bus_type ?? 'Standard',
                 'price' => 'Rp. ' . number_format($booking->total_price, 0, ',', '.'),

@@ -204,8 +204,7 @@ class Schedule extends Model
      * For daily recurring schedules, checks if today's occurrence has passed (but they're always available for future dates)
      * For daily schedules, checks if the stored departure time has passed
      * 
-     * Note: All times are stored in UTC in the database and converted to 
-     * Asia/Jakarta timezone (WIB) for comparison with current time.
+     * Note: All times are now stored and retrieved in Asia/Jakarta timezone (WIB)
      */
     public function hasDeparted($forDate = null)
     {
@@ -215,9 +214,8 @@ class Schedule extends Model
         if ($this->is_weekly && $this->day_of_week !== null) {
             // For weekly schedules, check if the next occurrence has passed
             $actualDeparture = $this->getActualDepartureTime();
-            // Convert to local timezone for comparison
-            $actualDepartureLocal = $actualDeparture->setTimezone('Asia/Jakarta');
-            return $actualDepartureLocal->isPast();
+            // Already in local timezone, no need to convert
+            return $actualDeparture->isPast();
         }
         
         if ($this->is_daily) {
@@ -239,17 +237,15 @@ class Schedule extends Model
         // For daily schedules, check against stored departure time
         // Make sure we're comparing with the actual datetime
         if ($this->departure_time instanceof \Carbon\Carbon) {
-            // Convert to local timezone for comparison
-            $departureTimeLocal = $this->departure_time->setTimezone('Asia/Jakarta');
-            return $departureTimeLocal->isPast();
+            // Already in local timezone, no need to convert
+            return $this->departure_time->isPast();
         }
         
         // If it's not a Carbon instance, try to parse it
         try {
             $departureTime = \Carbon\Carbon::parse($this->departure_time);
-            // Convert to local timezone for comparison
-            $departureTimeLocal = $departureTime->setTimezone('Asia/Jakarta');
-            return $departureTimeLocal->isPast();
+            // Already in local timezone, no need to convert
+            return $departureTime->isPast();
         } catch (\Exception $e) {
             // If parsing fails, fallback to basic comparison
             return false;
