@@ -87,11 +87,9 @@ class ScheduleController extends Controller
             // For weekly schedules, we store just the time without a specific date
             // Using a base date that won't interfere with calculations
             $baseDate = '2000-01-01';
-            // Convert WIB time to UTC for storage
-            $wibDepartureTime = Carbon::createFromFormat('H:i', $request->departure_time, 'Asia/Jakarta');
-            $wibArrivalTime = Carbon::createFromFormat('H:i', $request->arrival_time, 'Asia/Jakarta');
-            $data['departure_time'] = $baseDate . ' ' . $wibDepartureTime->setTimezone('UTC')->format('H:i:s');
-            $data['arrival_time'] = $baseDate . ' ' . $wibArrivalTime->setTimezone('UTC')->format('H:i:s');
+            // Store times in WIB directly without converting to UTC
+            $data['departure_time'] = $baseDate . ' ' . $request->departure_time . ':00';
+            $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';
         } else if ($request->schedule_type == 'daily_recurring') {
             // For daily recurring schedules, we store only the time part
             $data['is_weekly'] = false;
@@ -100,21 +98,17 @@ class ScheduleController extends Controller
             
             // Using a base date that won't interfere with calculations
             $baseDate = '2000-01-01';
-            // Convert WIB time to UTC for storage
-            $wibDepartureTime = Carbon::createFromFormat('H:i', $request->departure_time, 'Asia/Jakarta');
-            $wibArrivalTime = Carbon::createFromFormat('H:i', $request->arrival_time, 'Asia/Jakarta');
-            $data['departure_time'] = $baseDate . ' ' . $wibDepartureTime->setTimezone('UTC')->format('H:i:s');
-            $data['arrival_time'] = $baseDate . ' ' . $wibArrivalTime->setTimezone('UTC')->format('H:i:s');
+            // Store times in WIB directly without converting to UTC
+            $data['departure_time'] = $baseDate . ' ' . $request->departure_time . ':00';
+            $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';
         } else {
             // For daily schedules, combine date and time
             $data['is_weekly'] = false;
             $data['is_daily'] = false;
             $data['day_of_week'] = null;
-            // Convert WIB time to UTC for storage
-            $wibDepartureDateTime = Carbon::createFromFormat('Y-m-d H:i', $request->departure_date . ' ' . $request->departure_time, 'Asia/Jakarta');
-            $wibArrivalDateTime = Carbon::createFromFormat('Y-m-d H:i', $request->departure_date . ' ' . $request->arrival_time, 'Asia/Jakarta');
-            $data['departure_time'] = $wibDepartureDateTime->setTimezone('UTC')->format('Y-m-d H:i:s');
-            $data['arrival_time'] = $wibArrivalDateTime->setTimezone('UTC')->format('Y-m-d H:i:s');
+            // Store datetime in WIB directly without converting to UTC
+            $data['departure_time'] = $request->departure_date . ' ' . $request->departure_time . ':00';
+            $data['arrival_time'] = $request->departure_date . ' ' . $request->arrival_time . ':00';
         }
 
         Schedule::create($data);
@@ -198,11 +192,9 @@ class ScheduleController extends Controller
             // For weekly schedules, we store just the time without a specific date
             // Using a base date that won't interfere with calculations
             $baseDate = '2000-01-01';
-            // Convert WIB time to UTC for storage
-            $wibDepartureTime = Carbon::createFromFormat('H:i', $request->departure_time, 'Asia/Jakarta');
-            $wibArrivalTime = Carbon::createFromFormat('H:i', $request->arrival_time, 'Asia/Jakarta');
-            $data['departure_time'] = $baseDate . ' ' . $wibDepartureTime->setTimezone('UTC')->format('H:i:s');
-            $data['arrival_time'] = $baseDate . ' ' . $wibArrivalTime->setTimezone('UTC')->format('H:i:s');
+            // Store times in WIB directly without converting to UTC
+            $data['departure_time'] = $baseDate . ' ' . $request->departure_time . ':00';
+            $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';
         } else if ($request->schedule_type == 'daily_recurring') {
             // For daily recurring schedules, we store only the time part
             $data['is_weekly'] = false;
@@ -211,21 +203,17 @@ class ScheduleController extends Controller
             
             // Using a base date that won't interfere with calculations
             $baseDate = '2000-01-01';
-            // Convert WIB time to UTC for storage
-            $wibDepartureTime = Carbon::createFromFormat('H:i', $request->departure_time, 'Asia/Jakarta');
-            $wibArrivalTime = Carbon::createFromFormat('H:i', $request->arrival_time, 'Asia/Jakarta');
-            $data['departure_time'] = $baseDate . ' ' . $wibDepartureTime->setTimezone('UTC')->format('H:i:s');
-            $data['arrival_time'] = $baseDate . ' ' . $wibArrivalTime->setTimezone('UTC')->format('H:i:s');
+            // Store times in WIB directly without converting to UTC
+            $data['departure_time'] = $baseDate . ' ' . $request->departure_time . ':00';
+            $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';
         } else {
             // For daily schedules, combine date and time
             $data['is_weekly'] = false;
             $data['is_daily'] = false;
             $data['day_of_week'] = null;
-            // Convert WIB time to UTC for storage
-            $wibDepartureDateTime = Carbon::createFromFormat('Y-m-d H:i', $request->departure_date . ' ' . $request->departure_time, 'Asia/Jakarta');
-            $wibArrivalDateTime = Carbon::createFromFormat('Y-m-d H:i', $request->departure_date . ' ' . $request->arrival_time, 'Asia/Jakarta');
-            $data['departure_time'] = $wibDepartureDateTime->setTimezone('UTC')->format('Y-m-d H:i:s');
-            $data['arrival_time'] = $wibArrivalDateTime->setTimezone('UTC')->format('Y-m-d H:i:s');
+            // Store datetime in WIB directly without converting to UTC
+            $data['departure_time'] = $request->departure_date . ' ' . $request->departure_time . ':00';
+            $data['arrival_time'] = $request->departure_date . ' ' . $request->arrival_time . ':00';
         }
 
         $schedule->update($data);
@@ -272,7 +260,7 @@ class ScheduleController extends Controller
         // for tomorrow based on this recurring schedule.
         
         // Create a new daily schedule for tomorrow
-        $tomorrow = Carbon::tomorrow();
+        $tomorrow = Carbon::tomorrow('Asia/Jakarta');
         
         $newSchedule = new Schedule();
         $newSchedule->bus_id = $schedule->bus_id;

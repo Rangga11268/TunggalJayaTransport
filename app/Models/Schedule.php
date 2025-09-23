@@ -28,6 +28,24 @@ class Schedule extends Model
         'day_of_week' => 'integer',
     ];
 
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // When retrieving the model, convert times to WIB
+        static::retrieved(function ($schedule) {
+            if ($schedule->departure_time) {
+                $schedule->departure_time = $schedule->departure_time->setTimezone('Asia/Jakarta');
+            }
+            if ($schedule->arrival_time) {
+                $schedule->arrival_time = $schedule->arrival_time->setTimezone('Asia/Jakarta');
+            }
+        });
+    }
+
     public function bus()
     {
         return $this->belongsTo(Bus::class);
