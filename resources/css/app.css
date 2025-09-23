@@ -4,6 +4,64 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-down {
+    animation: fadeInDown 1s ease-out;
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 1s ease-out;
+}
+
+/* Parallax effect */
+[data-rellax-speed] {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Favorite routes animation */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 4px 6px rgba(50, 150, 255, 0.2);
+    }
+    50% {
+        box-shadow: 0 8px 15px rgba(50, 150, 255, 0.4);
+    }
+    100% {
+        box-shadow: 0 4px 6px rgba(50, 150, 255, 0.2);
+    }
+}
+
+.favorite-route-card {
+    transition: all 0.3s ease;
+}
+
+.favorite-route-card:hover {
+    animation: pulse 2s infinite;
+}
+
 /* Mobile-specific styles for booking pages */
 @media (max-width: 640px) {
     .mobile-booking-card {

@@ -31,12 +31,45 @@ class HomeController extends Controller
         // In a real application, you might count bookings or users
         $customerCount = 10000;
         
+        // Get unique origins and destinations for auto-complete
+        $origins = BusRoute::pluck('origin')->unique()->values()->all();
+        $destinations = BusRoute::pluck('destination')->unique()->values()->all();
+        
+        // Get user's favorite routes if logged in
+        $favoriteRoutes = collect();
+        if (auth()->check()) {
+            $userId = auth()->id();
+            $favoriteRoutes = BusRoute::join('schedules', 'routes.id', '=', 'schedules.route_id')
+                ->join('bookings', 'schedules.id', '=', 'bookings.schedule_id')
+                ->where('bookings.user_id', $userId)
+                ->select('routes.*')
+                ->groupBy('routes.id')
+                ->orderByRaw('COUNT(bookings.id) DESC')
+                ->limit(3)
+                ->get();
+        }
+        
         return view('frontend.home', compact(
             'featuredRoutes',
             'latestNews',
             'fleetCount',
             'routeCount',
-            'customerCount'
+            'customerCount',
+            'origins',
+            'destinations',
+            'favoriteRoutes'
         ));
+    }
+    
+    // Method to get origins and destinations for autocomplete (can be used via AJAX)
+    public function getOriginsAndDestinations()
+    {
+        $origins = BusRoute::pluck('origin')->unique()->values()->all();
+        $destinations = BusRoute::pluck('destination')->unique()->values()->all();
+        
+        return response()->json([
+            'origins' => $origins,
+            'destinations' => $destinations
+        ]);
     }
 }

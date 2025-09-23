@@ -6,28 +6,75 @@ use Illuminate\Support\Str;
 
 @section('content')
 <!-- Hero Section -->
-<div class="relative bg-gradient-to-r from-blue-800 to-indigo-900 text-white overflow-hidden">
-    <div class="absolute inset-0 bg-black opacity-50"></div>
-    <!-- Hero image as background for small screens -->
-    <div class="absolute inset-0 bg-cover bg-center md:hidden" style="background-image: url('{{ asset('img/heroImg.jpg') }}'); background-position: center center;"></div>
+<div class="relative bg-gradient-to-r from-blue-900 to-indigo-900 text-white overflow-hidden" x-data="{ showVideo: false }">
+    <div class="absolute inset-0 bg-black opacity-60"></div>
+    
+    <!-- Parallax background image for small screens -->
+    <div class="absolute inset-0 bg-cover bg-center md:hidden" 
+         style="background-image: url('{{ asset('img/heroImg.jpg') }}'); background-position: center center;"
+         data-rellax-speed="-2" 
+         data-rellax-percentage="0.5">
+         <div class="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-indigo-900/70"></div>
+    </div>
+    
+    <!-- Video background for medium and larger screens -->
+    <div class="absolute inset-0 hidden md:block overflow-hidden">
+        <div class="absolute inset-0 z-0" 
+             x-show="!showVideo"
+             x-transition:enter="transition ease-out duration-500"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-indigo-900/70"></div>
+            <img src="{{ asset('img/heroImg.jpg') }}" alt="Tunggal Jaya Transport" class="w-full h-full object-cover">
+        </div>
+        
+        <!-- Video background with actual video file -->
+        <div class="absolute inset-0 z-0" 
+             x-show="showVideo"
+             x-transition:enter="transition ease-out duration-500"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-indigo-900/70"></div>
+            <video autoplay muted loop playsinline preload="metadata" class="w-full h-full object-cover">
+                <source src="{{ asset('video/cinematic 1.mp4') }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        
+        <!-- Video toggle button -->
+        <button @click="showVideo = !showVideo" 
+                class="absolute top-4 right-4 z-10 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg transition duration-300 transform hover:scale-110"
+                title="Toggle video background">
+            <i class="fas" :class="showVideo ? 'fa-image' : 'fa-film'"></i>
+        </button>
+    </div>
     
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24 lg:py-32">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div class="text-center md:text-left bg-black bg-opacity-40 md:bg-transparent p-4 sm:p-6 rounded-xl sm:rounded-none">
-                <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">Comfortable & Reliable Transportation</h1>
-                <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-blue-100">Experience safe and comfortable journeys with our modern fleet and professional drivers.</p>
-                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start">
-                    <a href="{{ route('frontend.booking.index') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition duration-300 text-center text-sm sm:text-base">
-                        Book Now
+            <div class="text-center md:text-left bg-black bg-opacity-50 backdrop-blur-sm p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 animate-fade-in-down">Comfortable & Reliable Transportation</h1>
+                <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-blue-100 animate-fade-in-up">Experience safe and comfortable journeys with our modern fleet and professional drivers.</p>
+                
+                
+                
+                <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center md:justify-start">
+                    <a href="{{ route('frontend.booking.index') }}" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-full transition duration-300 text-center text-base sm:text-lg transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-ticket-alt mr-2"></i>Book Now
                     </a>
-                    <a href="{{ route('frontend.fleet.index') }}" class="bg-transparent border-2 border-white hover:bg-white hover:text-blue-900 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition duration-300 text-center text-sm sm:text-base">
-                        View Fleet
+                    <a href="{{ route('frontend.fleet.index') }}" class="bg-transparent border-2 border-white hover:bg-white hover:text-blue-900 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-full transition duration-300 text-center text-base sm:text-lg transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-bus mr-2"></i>View Fleet
                     </a>
                 </div>
             </div>
             <!-- Show image separately on medium and larger screens -->
             <div class="hidden md:block">
-                <img src="{{ asset('img/heroImg.jpg') }}" alt="Tunggal Jaya Transport" class="w-full h-64 md:h-80 lg:h-96 object-cover rounded-xl shadow-lg">
+                <img src="{{ asset('img/heroImg.jpg') }}" alt="Tunggal Jaya Transport" class="w-full h-64 md:h-80 lg:h-96 object-cover rounded-xl shadow-lg transform hover:scale-105 transition duration-500">
             </div>
         </div>
     </div>
@@ -36,27 +83,119 @@ use Illuminate\Support\Str;
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
     <!-- Quick Booking Form -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md p-4 sm:p-6 mb-8 sm:mb-12 -mt-8 sm:-mt-12 relative z-10 mx-4 sm:mx-6 md:mx-0" x-data="{ origin: '', destination: '', date: '' }">
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md p-4 sm:p-6 mb-8 sm:mb-12 -mt-8 sm:-mt-12 relative z-10 mx-4 sm:mx-6 md:mx-0" 
+         x-data="quickBookingForm()"
+         x-init="init()">
         <h2 class="text-xl sm:text-2xl font-bold mb-4 text-center text-gray-800">Quick Booking</h2>
-        <form method="GET" action="{{ route('frontend.booking.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            <div>
+        <form method="GET" action="{{ route('frontend.booking.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+            <div class="relative">
                 <label for="origin" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Origin</label>
-                <input type="text" id="origin" name="origin" x-model="origin" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm">
+                <input type="text" 
+                       id="origin" 
+                       name="origin" 
+                       x-model="origin" 
+                       @input.debounce.300ms="filterOrigins()"
+                       @focus="filterOrigins()"
+                       class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm"
+                       placeholder="Enter origin">
+                
+                <!-- Auto-complete dropdown for origins -->
+                <div x-show="filteredOrigins.length > 0 && origin !== ''" 
+                     class="absolute z-20 mt-1 w-full bg-white shadow-lg rounded-md py-1 text-sm overflow-auto max-h-60 border border-gray-200">
+                    <template x-for="originOption in filteredOrigins" :key="originOption">
+                        <div @click="selectOrigin(originOption)" 
+                             class="cursor-pointer px-4 py-2 hover:bg-blue-50 hover:text-blue-700">
+                            <span x-text="originOption"></span>
+                        </div>
+                    </template>
+                </div>
             </div>
-            <div>
+            
+            <div class="relative">
                 <label for="destination" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Destination</label>
-                <input type="text" id="destination" name="destination" x-model="destination" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm">
+                <input type="text" 
+                       id="destination" 
+                       name="destination" 
+                       x-model="destination" 
+                       @input.debounce.300ms="filterDestinations()"
+                       @focus="filterDestinations()"
+                       class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm"
+                       placeholder="Enter destination">
+                
+                <!-- Auto-complete dropdown for destinations -->
+                <div x-show="filteredDestinations.length > 0 && destination !== ''" 
+                     class="absolute z-20 mt-1 w-full bg-white shadow-lg rounded-md py-1 text-sm overflow-auto max-h-60 border border-gray-200">
+                    <template x-for="destinationOption in filteredDestinations" :key="destinationOption">
+                        <div @click="selectDestination(destinationOption)" 
+                             class="cursor-pointer px-4 py-2 hover:bg-blue-50 hover:text-blue-700">
+                            <span x-text="destinationOption"></span>
+                        </div>
+                    </template>
+                </div>
             </div>
+            
             <div>
                 <label for="date" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Date</label>
-                <input type="date" id="date" name="date" x-model="date" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm">
+                <input type="date" 
+                       id="date" 
+                       name="date" 
+                       x-model="date" 
+                       @change="checkAvailability()"
+                       class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm">
             </div>
+            
+            <div>
+                <label for="bus_type" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Bus Type</label>
+                <select id="bus_type" 
+                        name="bus_type" 
+                        x-model="selectedBusType"
+                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm">
+                    <template x-for="type in busTypes" :key="type.id">
+                        <option :value="type.id" x-text="type.name"></option>
+                    </template>
+                </select>
+            </div>
+            
             <div class="flex items-end">
-                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-2 px-3 sm:py-3 sm:px-4 rounded-lg transition duration-300 transform hover:scale-105 text-sm sm:text-base">
+                <button type="submit" 
+                        class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-2 px-3 sm:py-3 sm:px-4 rounded-lg transition duration-300 transform hover:scale-105 text-sm sm:text-base flex items-center justify-center">
                     <i class="fas fa-search mr-1 sm:mr-2"></i>Search
                 </button>
             </div>
         </form>
+        
+        <!-- Real-time availability indicator -->
+        <div x-show="availableSeats !== null" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform scale-95"
+             x-transition:enter-end="opacity-100 transform scale-100"
+             class="mt-4 p-3 rounded-lg bg-white shadow-sm border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-chair text-blue-500 mr-2"></i>
+                    <span class="text-sm font-medium text-gray-700">Available Seats:</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-lg font-bold text-blue-600" x-text="availableSeats"></span>
+                    <span class="text-sm text-gray-500 ml-1">seats</span>
+                    <div class="ml-3" x-show="availableSeats > 10">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle mr-1"></i> Available
+                        </span>
+                    </div>
+                    <div class="ml-3" x-show="availableSeats <= 10 && availableSeats > 0">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-exclamation-circle mr-1"></i> Limited
+                        </span>
+                    </div>
+                    <div class="ml-3" x-show="availableSeats === 0">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            <i class="fas fa-times-circle mr-1"></i> Full
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Featured Routes -->
@@ -257,9 +396,47 @@ use Illuminate\Support\Str;
     </div>
 </div>
 
+<!-- Favorite Routes Section (for logged in users) -->
+@if(auth()->check() && isset($favoriteRoutes) && $favoriteRoutes->count() > 0)
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12">
+    <div class="flex justify-between items-center mb-4 sm:mb-6">
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Your Favorite Routes</h2>
+        <div class="text-sm text-blue-600">
+            <i class="fas fa-heart mr-1"></i>Based on your booking history
+        </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+        @foreach($favoriteRoutes as $route)
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 transform hover:-translate-y-1 border-l-4 border-blue-500 favorite-route-card">
+            <div class="p-4 sm:p-6">
+                <div class="flex justify-between items-center mb-3 sm:mb-4">
+                    <h3 class="text-base sm:text-xl font-bold text-gray-800">{{ $route->origin }}</h3>
+                    <i class="fas fa-arrow-right text-blue-500 text-sm sm:text-base"></i>
+                    <h3 class="text-base sm:text-xl font-bold text-gray-800">{{ $route->destination }}</h3>
+                </div>
+                @if($route->distance)
+                    <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4"><i class="fas fa-road mr-1 sm:mr-2"></i>{{ $route->distance }} km</p>
+                @endif
+                <a href="{{ route('frontend.routes.show', $route) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm sm:text-base">
+                    Book Again <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                </a>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
 @endsection
 
 @section('scripts')
+<script>
+    // Pass data to global scope for quick booking form
+    window.homepageData = {
+        origins: @json($origins ?? []),
+        destinations: @json($destinations ?? [])
+    };
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var testimonialsSwiper = new Swiper(".myTestimonialsSwiper", {

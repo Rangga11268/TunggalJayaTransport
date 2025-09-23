@@ -111,6 +111,9 @@
         <!-- Alpine.js for interactivity -->
         <script src="//unpkg.com/alpinejs" defer></script>
 
+        <!-- Rellax.js for parallax effect -->
+        <script src="https://cdn.jsdelivr.net/npm/rellax@1.12.1/rellax.min.js"></script>
+
         <!-- SweetAlert2 -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         
@@ -124,7 +127,100 @@
                 setTimeout(function() {
                     loadingScreen.style.display = 'none';
                 }, 500);
+                
+                // Initialize Rellax for parallax effect
+                if (typeof Rellax !== 'undefined') {
+                    new Rellax('[data-rellax-speed]', {
+                        speed: -2,
+                        center: false,
+                        wrapper: null,
+                        round: true,
+                        vertical: true,
+                        horizontal: false
+                    });
+                }
             });
+            
+            // Quick Booking Form Alpine.js component
+            function quickBookingForm() {
+                return {
+                    origin: '',
+                    destination: '',
+                    date: '',
+                    busType: '',
+                    origins: [],
+                    destinations: [],
+                    filteredOrigins: [],
+                    filteredDestinations: [],
+                    busTypes: [
+                        { id: 'all', name: 'All Bus Types' },
+                        { id: 'economy', name: 'Economy' },
+                        { id: 'business', name: 'Business' },
+                        { id: 'executive', name: 'Executive' }
+                    ],
+                    selectedBusType: 'all',
+                    availableSeats: null,
+                    init() {
+                        // Check if we're on the home page and have inline data
+                        if (typeof window.homepageData !== 'undefined') {
+                            this.origins = window.homepageData.origins || [];
+                            this.destinations = window.homepageData.destinations || [];
+                            this.filteredOrigins = this.origins;
+                            this.filteredDestinations = this.destinations;
+                        } else {
+                            // Fetch origins and destinations from server
+                            fetch('{{ route("frontend.autocomplete.data") }}')
+                                .then(response => response.json())
+                                .then(data => {
+                                    this.origins = data.origins;
+                                    this.destinations = data.destinations;
+                                    this.filteredOrigins = data.origins;
+                                    this.filteredDestinations = data.destinations;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching autocomplete data:', error);
+                                });
+                        }
+                    },
+                    checkAvailability() {
+                        // In a real implementation, this would make an AJAX call to check availability
+                        // For now, we'll simulate with random numbers
+                        if (this.origin && this.destination && this.date) {
+                            this.availableSeats = Math.floor(Math.random() * 40) + 1;
+                        } else {
+                            this.availableSeats = null;
+                        }
+                    },
+                    filterOrigins() {
+                        if (this.origin === '') {
+                            this.filteredOrigins = this.origins;
+                        } else {
+                            this.filteredOrigins = this.origins.filter(o => 
+                                o.toLowerCase().includes(this.origin.toLowerCase())
+                            );
+                        }
+                    },
+                    filterDestinations() {
+                        if (this.destination === '') {
+                            this.filteredDestinations = this.destinations;
+                        } else {
+                            this.filteredDestinations = this.destinations.filter(d => 
+                                d.toLowerCase().includes(this.destination.toLowerCase())
+                            );
+                        }
+                    },
+                    selectOrigin(value) {
+                        this.origin = value;
+                        this.filteredOrigins = this.origins;
+                        this.checkAvailability();
+                    },
+                    selectDestination(value) {
+                        this.destination = value;
+                        this.filteredDestinations = this.destinations;
+                        this.checkAvailability();
+                    }
+                }
+            }
         </script>
         
         @yield('scripts')

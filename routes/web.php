@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 // Frontend Routes
 Route::prefix('')->name('frontend.')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/autocomplete-data', [HomeController::class, 'getOriginsAndDestinations'])->name('autocomplete.data');
 
     Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
