@@ -1,110 +1,219 @@
 ## TODO LIST
 
--- fix bagian routes yang jadwal nya masih belum sesuai
+Peningkatan UI/UX untuk Meningkatkan User Engagement
 
+A. Homepage & Navigasi
 
-## SUMMARRY
-Ringkasan Perbaikan dan Peningkatan Sistem Jadwal
+1. Visual Hero Section yang Lebih Menarik
 
-  Permasalahan yang Ditemukan
-   1. Method `getNextAvailableDate()` tidak ditemukan di model Schedule, menyebabkan error sistem
-   2. Logika penjadwalan mingguan tidak konsisten - jadwal tidak muncul dengan benar di minggu berikutnya
-   3. Kurangnya fitur jadwal harian yang berulang - tidak ada opsi untuk jadwal yang tersedia setiap hari
-   4. Filter pencarian jadwal tidak akurat - tidak menangani semua jenis jadwal dengan benar
-   5. Tiket masih bisa dipesan setelah bus berangkat
-   6. Admin tidak bisa menghapus jadwal harian yang sudah berangkat atau membuat jadwal untuk hari berikutnya
-   7. Ketidakjelasan tentang zona waktu dalam pengecekan jadwal keberangkatan
-   8. Waktu ditampilkan dalam format UTC di frontend yang membingungkan pengguna
+    - Tambahkan animasi parallax pada gambar hero
+    - Implementasi video background loop pendek yang menunjukkan armada dan pelayanan
+    - Penambahan countdown timer untuk promo spesial jika ada
 
-  Perbaikan dan Peningkatan yang Dilakukan
+2. Quick Booking Form yang Lebih Interaktif
 
-  1. Perbaikan Model Schedule
-   - Menambahkan method `getNextAvailableDate()` yang hilang untuk menghitung tanggal keberangkatan mingguan berikutnya
-   - Memperbaiki method `getActualDepartureTime()` dan `getActualArrivalTime()` untuk menangani semua jenis jadwal (mingguan, harian
-     berulang, dan harian)
-   - Menambahkan field `is_daily` untuk mendukung jadwal harian yang berulang
-   - Memperbaiki method `hasDeparted()` untuk mengecek ketersediaan semua jenis jadwal
-   - Menambahkan scope `dailyRecurring()` untuk memfilter jadwal harian yang berulang
-   - Menambahkan method `getDepartureTimeWIB()` dan `getArrivalTimeWIB()` untuk konversi waktu ke zona waktu lokal
+    - Auto-complete untuk origin/destination berdasarkan rute tersedia
+    - Penambahan filter berdasarkan tipe bus (ekonomi, bisnis, eksekutif)
+    - Real-time availability indicator saat memilih tanggal
 
-  2. Penambahan Fitur Jadwal Harian yang Berulang
-   - Jadwal yang tersedia setiap hari dengan waktu keberangkatan yang sama
-   - Logika penanganan waktu yang cerdas:
-     - Jika waktu keberangkatan hari ini belum lewat → tampilkan hari ini
-     - Jika waktu keberangkatan hari ini sudah lewat → tampilkan besok
-   - Integrasi penuh dengan sistem - bekerja dengan pencarian, booking, dan tampilan
+3. Personalisasi Berdasarkan Riwayat Pengguna
+    - Menampilkan rute favorit pengguna berdasarkan riwayat booking
+    - Rekomendasi rute berdasarkan lokasi pengguna (dengan permission)
 
-  3. Perbaikan Logika Penjadwalan Mingguan
-   - Perhitungan tanggal yang akurat:
-     - Jika hari ini adalah hari jadwal dan waktu keberangkatan belum lewat → hari ini
-     - Jika hari ini adalah hari jadwal dan waktu keberangkatan sudah lewat → minggu depan
-     - Jika hari ini bukan hari jadwal → kemunculan berikutnya
-   - Jadwal mingguan sekarang muncul dengan benar di minggu berikutnya
+B. Booking Flow Improvements
 
-  4. Perbaikan Pencarian Jadwal
-   - Filter tanggal yang bekerja untuk semua jenis jadwal
-   - Penggunaan method `getActualDepartureTime()` yang konsisten di seluruh aplikasi
-   - Akurasi tinggi dalam menampilkan jadwal yang tersedia
+1. Seat Selection yang Lebih Visual
 
-  5. Perbaikan Tampilan dan Antarmuka
-   - Pembedaan visual antara jenis jadwal:
-     - Ikon hijau untuk jadwal mingguan
-     - Ikon kuning untuk jadwal harian berulang
-     - Ikon biru untuk jadwal harian
-   - Informasi tanggal dan waktu yang akurat untuk semua jenis jadwal
-   - Pembaruan semua view untuk menggunakan method yang benar
-   - Menambahkan indikasi visual yang jelas untuk jadwal yang sudah berangkat
-   - Menampilkan waktu dalam format WIB (Asia/Jakarta) di semua tampilan frontend untuk menghindari kebingungan
+    - Implementasi seat map interaktif 3D dengan drag-and-drop
+    - Penambahan fitur seat preference (jendela, lorong)
+    - Visualisasi fasilitas bus (AC, toilet, snack) saat memilih seat
 
-  6. Perbaikan Controller dan Sistem
-   - Memperbarui ScheduleController untuk menangani pembuatan dan edit semua jenis jadwal
-   - Memperbarui BookingController untuk pencarian jadwal yang akurat
-   - Menambahkan validasi dan penanganan yang tepat untuk semua jenis jadwal
+2. Progress Indicator yang Jelas
 
-  7. Perbaikan Sistem Booking untuk Mencegah Pemesanan Setelah Keberangkatan
-   - Memperbarui metode `isAvailableForBooking()` untuk mengecek apakah jadwal sudah berangkat
-   - Memperbarui controller Booking untuk memastikan pengecekan yang konsisten di semua metode
-   - Memperbarui command `ResetDepartedTicketsCommand` untuk membatalkan booking yang belum dibayar ketika jadwal sudah berangkat
-   - Menjadwalkan command tersebut untuk dijalankan secara otomatis setiap jam
+    - Stepper component yang menunjukkan tahapan booking
+    - Penambahan estimasi waktu untuk setiap tahap
 
-  8. Peningkatan Fitur Admin untuk Manajemen Jadwal Harian
-   - Menambahkan kemampuan untuk menghapus jadwal harian yang sudah berangkat
-   - Menambahkan fitur untuk membuat jadwal harian untuk hari berikutnya berdasarkan jadwal harian berulang yang sudah berangkat
-   - Menambahkan pengecekan yang ketat untuk mencegah pengeditan jadwal harian yang sudah berangkat
+3. Penyederhanaan Formulir
+    - Auto-fill informasi penumpang untuk user yang sudah login
+    - Penambahan guest checkout untuk pengguna baru
+    - Validasi real-time dan pesan error yang lebih deskriptif
 
-  9. Penjelasan Zona Waktu untuk Pengecekan Jadwal
-   - Semua waktu disimpan dalam format UTC di database
-   - Waktu dibandingkan dalam zona waktu Asia/Jakarta (WIB) untuk pengecekan keberangkatan
-   - Waktu keberangkatan jadwal harian harus disimpan dalam format UTC yang sesuai dengan waktu WIB yang diinginkan
-     Contoh: Jika ingin jadwal berangkat pukul 09:00 WIB, waktu harus disimpan sebagai 02:00:00 UTC
-   - Waktu ditampilkan dalam format WIB di semua tampilan frontend untuk menghindari kebingungan pengguna
+C. Mobile Experience
 
-  Hasil Akhir
+1. Mobile-First Design Enhancements
 
-  Fungsionalitas yang Lebih Baik
-   1. Jadwal mingguan sekarang muncul dengan benar di minggu berikutnya
-   2. Jadwal harian yang berulang tersedia setiap hari tanpa batas tanggal
-   3. Pencarian jadwal bekerja akurat untuk semua jenis jadwal
-   4. Tampilan informasi menunjukkan tanggal dan waktu yang benar sesuai konteks
-   5. Tiket tidak bisa dipesan lagi setelah bus berangkat
-   6. Booking yang belum dibayar akan dibatalkan secara otomatis ketika jadwal sudah berangkat
-   7. Admin bisa dengan mudah mengelola jadwal harian yang sudah berangkat
-   8. Pengguna tidak bingung dengan format waktu karena semua waktu ditampilkan dalam WIB
+    - Bottom navigation bar untuk akses cepat ke fitur utama
+    - Voice search untuk rute dan lokasi
+    - One-tap booking untuk rute favorit
 
-  Keuntungan Bisnis
-   1. Fleksibilitas tinggi - mendukung berbagai model bisnis transportasi
-   2. Pengalaman pengguna yang lebih baik - informasi jadwal yang akurat dan konsisten
-   3. Pemeliharaan yang lebih mudah - logika yang terpusat dan konsisten
-   4. Skalabilitas - sistem siap dikembangkan lebih lanjut
-   5. Pencegahan kesalahan - sistem mencegah pemesanan tiket untuk jadwal yang sudah berangkat
-   6. Kemudahan manajemen - admin bisa dengan mudah mengelola jadwal harian yang sudah berangkat
-   7. Klarifikasi zona waktu - sistem bekerja dengan konsisten menggunakan zona waktu WIB
-   8. Pengalaman pengguna yang lebih baik - waktu ditampilkan dalam format yang mudah dipahami
+2. Offline Functionality
 
-  Kompatibilitas Penuh
-   - Semua fitur lama tetap berfungsi dengan baik
-   - Tidak ada perubahan yang merusak (backward compatible)
-   - Performa sistem tetap optimal
+    - Caching informasi rute dan jadwal untuk akses offline
+    - Save booking draft untuk diselesaikan nanti
 
-  Sistem sekarang dapat menangani berbagai skenario dunia nyata dengan akurat, memberikan pengalaman yang jauh lebih baik bagi pengguna
-  dan administrator.
+3. Fitur Baru untuk Meningkatkan Konversi
+
+A. Fitur Customer Engagement
+
+1. Sistem Loyalty Program
+
+    - Point system berdasarkan booking dan referal
+    - Tier membership dengan benefit berbeda (diskon, prioritas boarding)
+    - Digital membership card
+
+2. Real-time Tracking
+
+    - Live tracking posisi bus dengan estimasi kedatangan
+    - Push notification untuk update penting (delay, gate change)
+    - Driver and conductor information with photo
+
+3. Customer Review & Rating System
+    - Verified review dari penumpang yang sudah melakukan perjalanan
+    - Photo upload dalam review
+    - Response system dari admin untuk feedback
+
+B. Fitur Booking yang Lebih Fleksibel
+
+1. Waiting List untuk Jadwal Penuh
+
+    - Sistem waiting list otomatis jika jadwal penuh
+    - Notifikasi jika seat tersedia
+
+2. Booking Modification
+
+    - Ganti jadwal tanpa biaya tambahan (dengan selisih harga)
+    - Transfer booking ke orang lain
+    - Partial cancellation untuk multi-seat booking
+
+3. Group Booking
+    - Fitur untuk booking untuk rombongan
+    - Diskon khusus untuk group booking
+    - Manajemen peserta rombongan
+
+C. Fitur Komunikasi & Support
+
+1. Live Chat Support
+
+    - Chat 24/7 dengan customer service
+    - Chatbot untuk pertanyaan umum
+    - Integrasi dengan WhatsApp
+
+2. Notifikasi dan Reminder
+
+    - Notifikasi reminder sebelum keberangkatan
+    - Notifikasi perubahan jadwal
+    - Email/SMS konfirmasi otomatis
+
+3. Peningkatan Backend untuk Performance & Scalability
+
+A. Database Optimization
+
+1. Indexing Strategis
+
+    - Index pada kolom yang sering digunakan untuk pencarian (origin, destination, date)
+    - Composite index untuk query kompleks
+
+2. Caching Mechanism
+
+    - Redis caching untuk data yang sering diakses (rute populer, jadwal)
+    - Cache busting mechanism untuk data yang berubah
+
+3. Database Connection Pooling
+    - Optimasi connection pooling untuk menangani traffic tinggi
+
+B. API & Microservices
+
+1. RESTful API Enhancement
+
+    - Rate limiting untuk mencegah abuse
+    - API versioning untuk backward compatibility
+    - Response caching untuk data yang tidak sering berubah
+
+2. Background Job Processing
+    - Queue system untuk email notifications
+    - Scheduled jobs untuk reset jadwal dan cleanup
+    - Real-time processing untuk payment confirmation
+
+C. Monitoring & Logging
+
+1. Application Performance Monitoring
+
+    - Integrasi dengan tools seperti New Relic atau DataDog
+    - Custom metrics untuk business KPIs
+    - Alert system untuk performance degradation
+
+2. Enhanced Logging
+
+    - Structured logging untuk analisis mudah
+    - Log aggregation untuk debugging
+    - Audit trail untuk perubahan penting
+
+3. Peningkatan Frontend untuk User Experience Modern
+
+A. Teknologi & Framework
+
+1. Upgrade ke Vue 3 Composition API
+
+    - Lebih baik reactivity system
+    - Code splitting untuk performance
+    - TypeScript integration untuk type safety
+
+2. State Management
+    - Vuex atau Pinia untuk manajemen state yang kompleks
+    - Persistent state untuk user preferences
+
+B. UI Components
+
+1. Design System Implementation
+
+    - Consistent component library
+    - Dark mode toggle
+    - Accessibility improvements (WCAG compliance)
+
+2. Advanced UI Patterns
+    - Skeleton loading states
+    - Smooth transitions and micro-interactions
+    - Progressive disclosure untuk kompleksitas
+
+C. Performance Optimization
+
+1. Lazy Loading
+
+    - Gambar dan komponen dengan lazy loading
+    - Code splitting berdasarkan route
+    - Preloading critical resources
+
+2. Bundle Optimization
+    - Tree shaking untuk dependencies
+    - Minification dan compression
+    - CDN untuk static assets
+
+D. PWA Implementation
+
+1. Installable Web App
+    - Add to home screen capability
+    - Offline functionality untuk konten penting
+    - Push notifications
+
+Prioritas Implementasi
+
+Phase 1 (High Priority - 2-4 weeks)
+
+1. Booking flow improvements
+2. Real-time tracking
+3. Database indexing
+4. Mobile responsiveness enhancements
+
+Phase 2 (Medium Priority - 4-8 weeks)
+
+1. Loyalty program
+2. Live chat support
+3. Advanced UI components
+4. Performance optimization
+
+Phase 3 (Low Priority - 8+ weeks)
+
+1. PWA implementation
+2. AI-powered recommendations
+3. Advanced analytics dashboard
+4. Microservices architecture
