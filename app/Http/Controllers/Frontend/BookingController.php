@@ -521,4 +521,90 @@ class BookingController extends Controller
         // Return the ticket view for online viewing
         return view('frontend.booking.ticket-preview', compact('booking'));
     }
+    
+    public function checkAvailability(Request $request)
+    {
+        $request->validate([
+            'origin' => 'required|string|max:255',
+            'destination' => 'required|string|max:255',
+            'date' => 'required|date',
+            'bus_type' => 'nullable|string|max:255'
+        ]);
+        
+        $origin = $request->origin;
+        $destination = $request->destination;
+        $date = $request->date;
+        $busType = $request->bus_type;
+        
+        // Find routes matching the origin and destination
+        $route = BusRoute::where(function($query) use ($origin, $destination) {
+            $query->where('origin', $origin)
+                  ->where('destination', $destination);
+        })->orWhere(function($query) use ($origin, $destination) {
+            $query->where('origin', $destination)
+                  ->where('destination', $origin);
+        })->first();
+        
+        if (!$route) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No route found between origin and destination',
+                'available_seats' => 0
+            ]);
+        }
+        
+        // Parse the date for availability check
+        $searchDate = Carbon::parse($date);
+        
+        // Find schedules matching the route and date
+        $query = Schedule::where('route_id', $route->id)->available();
+        
+        // Apply bus type filter if specified
+        if ($busType && $busType !== 'all') {
+            $query->whereHas('bus', function($q) use ($busType) {
+                $q->where('type', $busType);
+            });
+        }
+        
+        // Get all schedules for this route
+        $allSchedules = $query->with('route', 'bus')->get();
+        
+        // Filter schedules based on the search date
+        $schedules = $allSchedules->filter(function ($schedule) use ($searchDate) {
+            // For daily schedules, check if the date matches
+            if (!$schedule->is_weekly && !$schedule->is_daily) {
+                return $schedule->departure_time->toDateString() === $searchDate->toDateString() 
+                    && $schedule->isAvailableForBooking($searchDate);
+            }
+            
+            // For daily recurring schedules, they are available every day
+            if ($schedule->is_daily) {
+                // Daily recurring schedules are always available regardless of the search date
+                // We just need to ensure the time hasn't passed yet on the search date
+                return $schedule->isAvailableForBooking($searchDate);
+            }
+            
+            // For weekly schedules, check if the search date is the correct day of week
+            if ($schedule->day_of_week === $searchDate->dayOfWeek) {
+                // Also check if the time hasn't passed yet on that day
+                return $schedule->isAvailableForBooking($searchDate);
+            }
+            
+            return false;
+        });
+        
+        $totalAvailableSeats = 0;
+        
+        // Calculate total available seats from all matching schedules
+        foreach ($schedules as $schedule) {
+            $availableSeats = $schedule->getAvailableSeatsCount();
+            $totalAvailableSeats += $availableSeats;
+        }
+        
+        return response()->json([
+            'success' => true,
+            'available_seats' => $totalAvailableSeats,
+            'message' => $totalAvailableSeats > 0 ? 'Seats available' : 'No seats available'
+        ]);
+    }
 }

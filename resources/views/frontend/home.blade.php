@@ -94,16 +94,20 @@ use Illuminate\Support\Str;
                        id="origin" 
                        name="origin" 
                        x-model="origin" 
+                       x-ref="originInput"
                        @input.debounce.300ms="filterOrigins()"
-                       @focus="filterOrigins()"
+                       @focus="filterOrigins(); originDropdownOpen = true"
+                       @blur="closeOriginDropdown()"
                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm"
                        placeholder="Enter origin">
                 
                 <!-- Auto-complete dropdown for origins -->
-                <div x-show="filteredOrigins.length > 0 && origin !== ''" 
+                <div x-show="originDropdownOpen && filteredOrigins.length > 0 && origin !== ''" 
+                     @click.outside="closeOriginDropdown()"
+                     @focusout="closeOriginDropdown()"
                      class="absolute z-20 mt-1 w-full bg-white shadow-lg rounded-md py-1 text-sm overflow-auto max-h-60 border border-gray-200">
                     <template x-for="originOption in filteredOrigins" :key="originOption">
-                        <div @click="selectOrigin(originOption)" 
+                        <div @click="selectOrigin(originOption); $refs.originInput.blur()" 
                              class="cursor-pointer px-4 py-2 hover:bg-blue-50 hover:text-blue-700">
                             <span x-text="originOption"></span>
                         </div>
@@ -117,16 +121,20 @@ use Illuminate\Support\Str;
                        id="destination" 
                        name="destination" 
                        x-model="destination" 
+                       x-ref="destinationInput"
                        @input.debounce.300ms="filterDestinations()"
-                       @focus="filterDestinations()"
+                       @focus="filterDestinations(); destinationDropdownOpen = true"
+                       @blur="closeDestinationDropdown()"
                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm"
                        placeholder="Enter destination">
                 
                 <!-- Auto-complete dropdown for destinations -->
-                <div x-show="filteredDestinations.length > 0 && destination !== ''" 
+                <div x-show="destinationDropdownOpen && filteredDestinations.length > 0 && destination !== ''" 
+                     @click.outside="closeDestinationDropdown()"
+                     @focusout="closeDestinationDropdown()"
                      class="absolute z-20 mt-1 w-full bg-white shadow-lg rounded-md py-1 text-sm overflow-auto max-h-60 border border-gray-200">
                     <template x-for="destinationOption in filteredDestinations" :key="destinationOption">
-                        <div @click="selectDestination(destinationOption)" 
+                        <div @click="selectDestination(destinationOption); $refs.destinationInput.blur()" 
                              class="cursor-pointer px-4 py-2 hover:bg-blue-50 hover:text-blue-700">
                             <span x-text="destinationOption"></span>
                         </div>
@@ -149,6 +157,7 @@ use Illuminate\Support\Str;
                 <select id="bus_type" 
                         name="bus_type" 
                         x-model="selectedBusType"
+                        @change="checkAvailability()"
                         class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm">
                     <template x-for="type in busTypes" :key="type.id">
                         <option :value="type.id" x-text="type.name"></option>
@@ -172,7 +181,7 @@ use Illuminate\Support\Str;
              class="mt-4 p-3 rounded-lg bg-white shadow-sm border border-gray-200">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
-                    <i class="fas fa-chair text-blue-500 mr-2"></i>
+                    <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-5 h-5 mr-2">
                     <span class="text-sm font-medium text-gray-700">Available Seats:</span>
                 </div>
                 <div class="flex items-center">
@@ -419,6 +428,37 @@ use Illuminate\Support\Str;
                 @endif
                 <a href="{{ route('frontend.routes.show', $route) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm sm:text-base">
                     Book Again <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                </a>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif>
+
+<!-- Recommended Routes Section -->
+@if(isset($recommendedRoutes) && $recommendedRoutes->count() > 0)
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12">
+    <div class="flex justify-between items-center mb-4 sm:mb-6">
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Recommended For You</h2>
+        <div class="text-sm text-blue-600">
+            <i class="fas fa-location-dot mr-1"></i>Based on popular routes
+        </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+        @foreach($recommendedRoutes as $route)
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 transform hover:-translate-y-1 border-l-4 border-green-500">
+            <div class="p-4 sm:p-6">
+                <div class="flex justify-between items-center mb-3 sm:mb-4">
+                    <h3 class="text-base sm:text-xl font-bold text-gray-800">{{ $route->origin }}</h3>
+                    <i class="fas fa-arrow-right text-green-500 text-sm sm:text-base"></i>
+                    <h3 class="text-base sm:text-xl font-bold text-gray-800">{{ $route->destination }}</h3>
+                </div>
+                @if($route->distance)
+                    <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4"><i class="fas fa-road mr-1 sm:mr-2"></i>{{ $route->distance }} km</p>
+                @endif
+                <a href="{{ route('frontend.routes.show', $route) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm sm:text-base">
+                    View Details <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
                 </a>
             </div>
         </div>

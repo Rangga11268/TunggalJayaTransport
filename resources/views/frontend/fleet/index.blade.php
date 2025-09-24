@@ -41,7 +41,7 @@
                     <div class="flex justify-between items-start mb-3">
                         <h3 class="text-xl font-bold text-gray-800">{{ $bus->name ?? $bus->bus_type }}</h3>
                         <div class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-bold">
-                            <i class="fas fa-chair mr-1"></i>{{ $bus->capacity }} seats
+                            <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-4 h-4 mr-1 inline-block">{{ $bus->capacity }} seats
                         </div>
                     </div>
                     <p class="text-gray-600 mb-4">{{ $bus->description ?? 'No description available for this bus.' }}</p>

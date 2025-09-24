@@ -187,7 +187,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div class="flex items-center">
                             <div class="bg-blue-100 p-2 rounded-full mr-3">
-                                <i class="fas fa-chair text-blue-600"></i>
+                                <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-5 h-5 text-blue-600">
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Seats</p>

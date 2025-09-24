@@ -1,14 +1,7 @@
 ## TODO LIST
-
 Peningkatan UI/UX untuk Meningkatkan User Engagement
 
 A. Homepage & Navigasi
-
-1. Visual Hero Section yang Lebih Menarik
-
-    - Tambahkan animasi parallax pada gambar hero
-    - Implementasi video background loop pendek yang menunjukkan armada dan pelayanan
-    - Penambahan countdown timer untuk promo spesial jika ada
 
 2. Quick Booking Form yang Lebih Interaktif
 

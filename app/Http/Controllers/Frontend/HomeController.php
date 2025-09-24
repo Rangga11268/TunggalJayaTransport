@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bus;
 use App\Models\Route as BusRoute;
 use App\Models\NewsArticle;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -49,6 +50,9 @@ class HomeController extends Controller
                 ->get();
         }
         
+        // Get recommended routes based on user's location or popular routes
+        $recommendedRoutes = $this->getRecommendedRoutes();
+        
         return view('frontend.home', compact(
             'featuredRoutes',
             'latestNews',
@@ -57,8 +61,22 @@ class HomeController extends Controller
             'customerCount',
             'origins',
             'destinations',
-            'favoriteRoutes'
+            'favoriteRoutes',
+            'recommendedRoutes'
         ));
+    }
+    
+    private function getRecommendedRoutes()
+    {
+        // For now, return popular routes based on booking count
+        // In the future, this could be enhanced with location-based recommendations
+        return BusRoute::join('schedules', 'routes.id', '=', 'schedules.route_id')
+            ->join('bookings', 'schedules.id', '=', 'bookings.schedule_id')
+            ->select('routes.*')
+            ->groupBy('routes.id')
+            ->orderByRaw('COUNT(bookings.id) DESC')
+            ->limit(3)
+            ->get();
     }
     
     // Method to get origins and destinations for autocomplete (can be used via AJAX)

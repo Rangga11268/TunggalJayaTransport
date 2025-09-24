@@ -160,6 +160,8 @@
                     ],
                     selectedBusType: 'all',
                     availableSeats: null,
+                    originDropdownOpen: false,
+                    destinationDropdownOpen: false,
                     init() {
                         // Check if we're on the home page and have inline data
                         if (typeof window.homepageData !== 'undefined') {
@@ -183,10 +185,34 @@
                         }
                     },
                     checkAvailability() {
-                        // In a real implementation, this would make an AJAX call to check availability
-                        // For now, we'll simulate with random numbers
+                        // Check if all required fields are filled
                         if (this.origin && this.destination && this.date) {
-                            this.availableSeats = Math.floor(Math.random() * 40) + 1;
+                            // Make an actual AJAX request to check availability
+                            fetch('{{ route("frontend.check-availability") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                },
+                                body: JSON.stringify({
+                                    origin: this.origin,
+                                    destination: this.destination,
+                                    date: this.date,
+                                    bus_type: this.selectedBusType
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if(data.success) {
+                                    this.availableSeats = data.available_seats || 0;
+                                } else {
+                                    this.availableSeats = 0;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error checking availability:', error);
+                                this.availableSeats = 0;
+                            });
                         } else {
                             this.availableSeats = null;
                         }
@@ -194,32 +220,81 @@
                     filterOrigins() {
                         if (this.origin === '') {
                             this.filteredOrigins = this.origins;
+                            this.originDropdownOpen = false;
                         } else {
                             this.filteredOrigins = this.origins.filter(o => 
                                 o.toLowerCase().includes(this.origin.toLowerCase())
                             );
+                            this.originDropdownOpen = true;
                         }
                     },
                     filterDestinations() {
                         if (this.destination === '') {
                             this.filteredDestinations = this.destinations;
+                            this.destinationDropdownOpen = false;
                         } else {
                             this.filteredDestinations = this.destinations.filter(d => 
                                 d.toLowerCase().includes(this.destination.toLowerCase())
                             );
+                            this.destinationDropdownOpen = true;
                         }
                     },
                     selectOrigin(value) {
                         this.origin = value;
                         this.filteredOrigins = this.origins;
+                        this.originDropdownOpen = false;
                         this.checkAvailability();
                     },
                     selectDestination(value) {
                         this.destination = value;
                         this.filteredDestinations = this.destinations;
+                        this.destinationDropdownOpen = false;
                         this.checkAvailability();
+                    },
+                    closeOriginDropdown() {
+                        setTimeout(() => {
+                            this.originDropdownOpen = false;
+                        }, 150); // Small delay to allow click to register before hiding
+                    },
+                    closeDestinationDropdown() {
+                        setTimeout(() => {
+                            this.destinationDropdownOpen = false;
+                        }, 150); // Small delay to allow click to register before hiding
                     }
                 }
+            }
+            
+            // Function to get user's location for route recommendations
+            function getUserLocation() {
+                return {
+                    userLocation: null,
+                    init() {
+                        // Try to get the user's location
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => {
+                                    this.userLocation = {
+                                        latitude: position.coords.latitude,
+                                        longitude: position.coords.longitude
+                                    };
+                                    // You can use this location data to get route recommendations
+                                    console.log('User location:', this.userLocation);
+                                },
+                                (error) => {
+                                    console.log('Error getting location:', error.message);
+                                    // Use fallback location or popular routes if location permission is denied
+                                },
+                                {
+                                    enableHighAccuracy: true,
+                                    timeout: 10000,
+                                    maximumAge: 300000 // 5 minutes
+                                }
+                            );
+                        } else {
+                            console.log('Geolocation is not supported by this browser.');
+                        }
+                    }
+                };
             }
         </script>
         
