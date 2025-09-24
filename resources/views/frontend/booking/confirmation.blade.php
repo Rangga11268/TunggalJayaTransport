@@ -2,6 +2,68 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
+    <!-- Stepper Progress with Time Estimates -->
+    <div class="mb-8 overflow-x-auto">
+        <div class="flex items-center justify-center min-w-max">
+            <div class="flex flex-col items-center">
+                <div class="flex items-center text-blue-600 relative">
+                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                        <span class="text-xs md:text-sm font-bold">1</span>
+                    </div>
+                    <div class="text-center ml-1 md:ml-2">
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Schedule</div>
+                        <div class="text-xs text-gray-500">&lt; 1 min</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
+            <div class="md:hidden flex flex-col items-center mx-1">
+                <div class="text-gray-300 text-lg">↓</div>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="flex items-center text-gray-500 relative">
+                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                        <span class="text-xs md:text-sm font-bold">2</span>
+                    </div>
+                    <div class="text-center ml-1 md:ml-2">
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Passenger</div>
+                        <div class="text-xs text-gray-500">&lt; 1 min</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
+            <div class="md:hidden flex flex-col items-center mx-1">
+                <div class="text-gray-300 text-lg">↓</div>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="flex items-center text-blue-500 relative">
+                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                        <span class="text-xs md:text-sm font-bold">3</span>
+                    </div>
+                    <div class="text-center ml-1 md:ml-2">
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Seat</div>
+                        <div class="text-xs text-gray-500">1-2 min</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden md:flex flex-auto border-t-2 border-gray-300 mx-1 md:mx-4"></div>
+            <div class="md:hidden flex flex-col items-center mx-1">
+                <div class="text-gray-300 text-lg">↓</div>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="flex items-center text-gray-500 relative">
+                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-gray-300 flex items-center justify-center">
+                        <span class="text-xs md:text-sm font-bold">4</span>
+                    </div>
+                    <div class="text-center ml-1 md:ml-2">
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Payment</div>
+                        <div class="text-xs text-gray-500">&lt; 1 min</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <div class="text-center mb-8">
         <h1 class="text-4xl font-bold text-gray-800 mb-3">Booking Confirmation</h1>
@@ -275,11 +337,39 @@
             <i class=\"fas fa-bus mr-2 sm:mr-3 text-blue-500\"></i> Select Your Seat (2-3 Layout)
         </h2>
         
+        <!-- Bus Amenities Indicators -->
+        <div class="bus-amenities mb-4 sm:mb-6 grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
+            <div class="flex items-center bg-blue-50 p-2 sm:p-3 rounded-lg shadow-sm">
+                <div class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded mr-2 flex items-center justify-center">
+                    <i class="fas fa-snowflake text-blue-500"></i>
+                </div>
+                <span class="text-xs sm:text-sm font-medium">AC</span>
+            </div>
+            <div class="flex items-center bg-blue-50 p-2 sm:p-3 rounded-lg shadow-sm">
+                <div class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded mr-2 flex items-center justify-center">
+                    <i class="fas fa-toilet text-blue-500"></i>
+                </div>
+                <span class="text-xs sm:text-sm font-medium">Toilet</span>
+            </div>
+            <div class="flex items-center bg-blue-50 p-2 sm:p-3 rounded-lg shadow-sm">
+                <div class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded mr-2 flex items-center justify-center">
+                    <i class="fas fa-cookie-bite text-blue-500"></i>
+                </div>
+                <span class="text-xs sm:text-sm font-medium">Snacks</span>
+            </div>
+            <div class="flex items-center bg-blue-50 p-2 sm:p-3 rounded-lg shadow-sm">
+                <div class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded mr-2 flex items-center justify-center">
+                    <i class="fas fa-plug text-blue-500"></i>
+                </div>
+                <span class="text-xs sm:text-sm font-medium">Power</span>
+            </div>
+        </div>
+        
         <!-- Bus Visualization -->
-        <div class=\"bus-layout mb-6 sm:mb-8\">
-            <div class=\"bus-driver-area text-center mb-4 sm:mb-6\">
-                <div class=\"driver-seat bg-gradient-to-r from-gray-800 to-gray-900 text-white px-4 sm:px-8 py-2 sm:py-3 rounded-t-xl inline-block font-bold shadow-lg text-sm sm:text-base\">
-                    <i class=\"fas fa-steering-wheel mr-1 sm:mr-2\"></i>Driver
+        <div class="bus-layout mb-6 sm:mb-8">
+            <div class="bus-driver-area text-center mb-4 sm:mb-6">
+                <div class="driver-seat bg-gradient-to-r from-gray-800 to-gray-900 text-white px-4 sm:px-8 py-2 sm:py-3 rounded-t-xl inline-block font-bold shadow-lg text-sm sm:text-base">
+                    <i class="fas fa-steering-wheel mr-1 sm:mr-2"></i>Driver
                 </div>
             </div>
             
@@ -290,7 +380,17 @@
                 </div>
                 
                 <!-- Seat Rows (based on bus capacity) -->
-                <div class="seat-layout flex flex-col items-center">
+                <div class="seat-layout flex flex-col items-center relative">
+                    <!-- Add entrance and toilet indicators -->
+                    <div class="bus-features mb-4 flex justify-between w-full max-w-lg">
+                        <div class="text-sm font-medium text-gray-600">
+                            <i class="fas fa-door-open mr-1 text-blue-500"></i> Entrance
+                        </div>
+                        <div class="text-sm font-medium text-gray-600">
+                            <i class="fas fa-toilet mr-1 text-blue-500"></i> Toilet
+                        </div>
+                    </div>
+                    
                     @php
                         $totalSeats = $booking->schedule->bus->capacity;
                         // Calculate rows needed (2+3 seats per row = 5 seats per row)
@@ -298,9 +398,9 @@
                     @endphp
                     
                     @for ($row = 0; $row < $rows; $row++)
-                        <div class="seat-row flex items-center justify-center mb-4 sm:mb-6 w-full max-w-lg bg-gray-50 p-3 sm:p-4 rounded-xl shadow-sm">
+                        <div class="seat-row flex items-center justify-center mb-4 sm:mb-6 w-full max-w-lg bg-gray-50 p-4 sm:p-5 rounded-xl shadow-sm relative">
                             <!-- Left side (2 seats) -->
-                            <div class="left-seats flex gap-2 sm:gap-4">
+                            <div class="left-seats flex gap-3 sm:gap-4 mr-3">
                                 @for ($leftSeat = 0; $leftSeat < 2; $leftSeat++)
                                     @php
                                         $seatNumber = ($row * 5) + $leftSeat + 1;
@@ -311,37 +411,39 @@
                                         $isSelected = $booking->seat_numbers && in_array($seatNumber, explode(',', $booking->seat_numbers));
                                     @endphp
                                     <div 
-                                        class="seat-item w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-lg relative mobile-seat-item
-                                            {{ $isOccupied ? 'bg-red-100 cursor-not-allowed opacity-70' : ($isSelected ? 'bg-blue-100 ring-4 ring-blue-500' : 'bg-green-100 hover:bg-green-200') }}"
+                                        class="seat-item w-11 h-11 sm:w-16 sm:h-16 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg relative mobile-seat-item
+                                            {{ $isOccupied ? 'bg-red-100 cursor-not-allowed opacity-80' : ($isSelected ? 'bg-gradient-to-br from-blue-400 to-blue-600 ring-4 ring-blue-300' : 'bg-gradient-to-br from-green-400 to-green-600 hover:from-green-500 hover:to-green-700') }}"
                                         data-seat="{{ $seatNumber }}"
                                         {{ $isOccupied ? 'title=This seat is already booked' : 'title=Select seat '.$seatNumber }}
                                     >
-                                        <!-- Seat Image -->
-                                        <div class="seat-image w-6 h-6 sm:w-10 sm:h-10 flex items-center justify-center {{ $isOccupied ? 'opacity-50' : ($isSelected ? 'filter brightness-75' : '') }} mobile-seat-image">
+                                        <!-- Seat Image with enhanced effect -->
+                                        <div class="seat-image w-7 h-7 sm:w-11 sm:h-11 flex items-center justify-center {{ $isOccupied ? 'opacity-70' : ($isSelected ? 'filter brightness-125' : 'filter brightness-90') }} mobile-seat-image">
                                             <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-full h-full object-contain">
                                         </div>
                                         
                                         <!-- Seat Number -->
-                                        <div class="seat-number absolute -bottom-1 -right-0 sm:-bottom-2 sm:-right-1 text-xs font-bold {{ $isOccupied ? 'text-red-700' : ($isSelected ? 'text-blue-700' : 'text-green-700') }}">
+                                        <div class="seat-number absolute -bottom-2 -right-1 sm:-bottom-2 sm:-right-1 text-xs sm:text-sm font-bold {{ $isOccupied ? 'text-red-700' : ($isSelected ? 'text-white' : 'text-green-700') }}">
                                             {{ $seatNumber }}
                                         </div>
                                         
                                         @if($isOccupied)
-                                            <div class="occupied-overlay absolute inset-0 bg-red-500 bg-opacity-70 rounded-xl flex items-center justify-center">
-                                                <i class="fas fa-times text-white text-sm sm:text-lg"></i>
+                                            <div class="occupied-overlay absolute inset-0 bg-red-500 bg-opacity-60 rounded-xl flex items-center justify-center">
+                                                <i class="fas fa-times text-white sm:text-lg"></i>
                                             </div>
                                         @endif
                                     </div>
                                 @endfor
                             </div>
                             
-                            <!-- Aisle separator -->
-                            <div class="aisle w-4 sm:w-10 flex items-center justify-center mx-2 sm:mx-4">
-                                <div class="w-full h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>
+                            <!-- Aisle separator with better styling -->
+                            <div class="aisle w-6 sm:w-12 flex flex-col items-center justify-center mx-3">
+                                <div class="w-1 h-full bg-gradient-to-b from-transparent via-gray-400 to-transparent rounded-full"></div>
+                                <div class="text-xs font-medium mt-1 text-gray-500">AISLE</div>
+                                <div class="w-1 h-full bg-gradient-to-b from-transparent via-gray-400 to-transparent rounded-full"></div>
                             </div>
                             
                             <!-- Right side (3 seats) -->
-                            <div class="right-seats flex gap-2 sm:gap-4">
+                            <div class="right-seats flex gap-3 sm:gap-4 ml-3">
                                 @for ($rightSeat = 0; $rightSeat < 3; $rightSeat++)
                                     @php
                                         $seatNumber = ($row * 5) + $rightSeat + 3;
@@ -352,24 +454,24 @@
                                         $isSelected = $booking->seat_numbers && in_array($seatNumber, explode(',', $booking->seat_numbers));
                                     @endphp
                                     <div 
-                                        class="seat-item w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-lg relative mobile-seat-item
-                                            {{ $isOccupied ? 'bg-red-100 cursor-not-allowed opacity-70' : ($isSelected ? 'bg-blue-100 ring-4 ring-blue-500' : 'bg-green-100 hover:bg-green-200') }}"
+                                        class="seat-item w-11 h-11 sm:w-16 sm:h-16 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg relative mobile-seat-item
+                                            {{ $isOccupied ? 'bg-red-100 cursor-not-allowed opacity-80' : ($isSelected ? 'bg-gradient-to-br from-blue-400 to-blue-600 ring-4 ring-blue-300' : 'bg-gradient-to-br from-green-400 to-green-600 hover:from-green-500 hover:to-green-700') }}"
                                         data-seat="{{ $seatNumber }}"
                                         {{ $isOccupied ? 'title=This seat is already booked' : 'title=Select seat '.$seatNumber }}
                                     >
-                                        <!-- Seat Image -->
-                                        <div class="seat-image w-6 h-6 sm:w-10 sm:h-10 flex items-center justify-center {{ $isOccupied ? 'opacity-50' : ($isSelected ? 'filter brightness-75' : '') }} mobile-seat-image">
+                                        <!-- Seat Image with enhanced effect -->
+                                        <div class="seat-image w-7 h-7 sm:w-11 sm:h-11 flex items-center justify-center {{ $isOccupied ? 'opacity-70' : ($isSelected ? 'filter brightness-125' : 'filter brightness-90') }} mobile-seat-image">
                                             <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-full h-full object-contain">
                                         </div>
                                         
                                         <!-- Seat Number -->
-                                        <div class="seat-number absolute -bottom-1 -right-0 sm:-bottom-2 sm:-right-1 text-xs font-bold {{ $isOccupied ? 'text-red-700' : ($isSelected ? 'text-blue-700' : 'text-green-700') }}">
+                                        <div class="seat-number absolute -bottom-2 -right-1 sm:-bottom-2 sm:-right-1 text-xs sm:text-sm font-bold {{ $isOccupied ? 'text-red-700' : ($isSelected ? 'text-white' : 'text-green-700') }}">
                                             {{ $seatNumber }}
                                         </div>
                                         
                                         @if($isOccupied)
-                                            <div class="occupied-overlay absolute inset-0 bg-red-500 bg-opacity-70 rounded-xl flex items-center justify-center">
-                                                <i class="fas fa-times text-white text-sm sm:text-lg"></i>
+                                            <div class="occupied-overlay absolute inset-0 bg-red-500 bg-opacity-60 rounded-xl flex items-center justify-center">
+                                                <i class="fas fa-times text-white sm:text-lg"></i>
                                             </div>
                                         @endif
                                     </div>
@@ -383,6 +485,34 @@
                             @endphp
                         @endif
                     @endfor
+                </div>
+                
+                <!-- Enhanced seat legend -->
+                <div class="seat-legend grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 sm:mb-8 mobile-legend">
+                    <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
+                        <div class="w-5 h-5 bg-gradient-to-br from-green-400 to-green-600 rounded mr-2 flex items-center justify-center">
+                            <img src="{{ asset('img/car-seat.png') }}" alt="Available Seat" class="w-3 h-3 sm:w-4 sm:h-4 object-contain filter brightness-90">
+                        </div>
+                        <span class="text-xs sm:text-sm font-medium">Available</span>
+                    </div>
+                    <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
+                        <div class="w-5 h-5 bg-red-100 rounded mr-2 flex items-center justify-center">
+                            <i class="fas fa-times text-red-500 text-xs sm:text-sm"></i>
+                        </div>
+                        <span class="text-xs sm:text-sm font-medium">Occupied</span>
+                    </div>
+                    <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
+                        <div class="w-5 h-5 bg-gradient-to-br from-blue-400 to-blue-600 rounded mr-2 flex items-center justify-center">
+                            <img src="{{ asset('img/car-seat.png') }}" alt="Selected Seat" class="w-3 h-3 sm:w-4 sm:h-4 object-contain filter brightness-125">
+                        </div>
+                        <span class="text-xs sm:text-sm font-medium">Selected</span>
+                    </div>
+                    <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
+                        <div class="w-6 sm:w-8 h-1 flex items-center justify-center">
+                            <div class="w-4 h-0.5 sm:h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>
+                        </div>
+                        <span class="text-xs sm:text-sm font-medium ml-1 sm:ml-2">Aisle</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -415,6 +545,21 @@
             </div>
         </div>
         
+        <!-- Seat Preferences -->
+        <div class="seat-preferences mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-5">
+            <h3 class="text-lg font-medium mb-3 text-gray-800 border-b border-gray-200 pb-2">Seat Preferences</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="flex items-center">
+                    <input type="checkbox" id="window-seat" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500">
+                    <label for="window-seat" class="ml-2 text-sm text-gray-700">Window Seat</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="aisle-seat" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500">
+                    <label for="aisle-seat" class="ml-2 text-sm text-gray-700">Aisle Seat</label>
+                </div>
+            </div>
+        </div>
+        
         <!-- Selected Seats Info -->
         <div class="selected-seats-info text-center mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 sm:p-4">
             <p class="text-gray-700 text-sm sm:text-base">
@@ -433,7 +578,10 @@
         </div>
         
         <!-- Action Buttons -->
-        <div class="flex justify-center w-full mt-4">
+        <div class="flex flex-col sm:flex-row sm:justify-center sm:space-x-4 gap-3">
+            <button id="recommend-seats" class="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 shadow-lg text-sm sm:text-base">
+                <i class="fas fa-lightbulb mr-2"></i> Recommend Seats
+            </button>
             <button id="save-seats" class="save-seats-btn text-sm sm:text-base" title="Save your seat selection">
                 <i class="fas fa-save mr-2"></i> Save Seats
             </button>
@@ -492,6 +640,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedSeatsDisplay = document.getElementById('selected-seats-display');
     const selectedCount = document.getElementById('selected-count');
     const saveSeatsButton = document.getElementById('save-seats');
+    const recommendSeatsButton = document.getElementById('recommend-seats');
+    const windowSeatCheckbox = document.getElementById('window-seat');
+    const aisleSeatCheckbox = document.getElementById('aisle-seat');
     let selectedSeats = [];
     
     // Initialize with already selected seats
@@ -523,6 +674,209 @@ document.addEventListener('DOMContentLoaded', function() {
     @else
         saveSeatsButton.disabled = true;
     @endif
+    
+    // Seat preference functionality
+    function recommendSeats() {
+        // Clear current selections
+        selectedSeats = [];
+        seats.forEach(seat => {
+            if (seat.classList.contains('bg-blue-100')) {
+                seat.classList.remove('bg-blue-100', 'ring-4', 'ring-blue-500');
+                seat.classList.add('bg-green-100');
+                // Remove filter from seat image
+                const seatImage = seat.querySelector('.seat-image');
+                if (seatImage) {
+                    seatImage.classList.remove('filter', 'brightness-75');
+                }
+                // Update seat number color
+                const seatNumberEl = seat.querySelector('.seat-number');
+                if (seatNumberEl) {
+                    seatNumberEl.classList.remove('text-blue-700');
+                    seatNumberEl.classList.add('text-green-700');
+                }
+            }
+        });
+        
+        // Get available seats with preferences
+        const availableSeats = Array.from(seats).map(seat => parseInt(seat.getAttribute('data-seat'))).filter(seat => !selectedSeats.includes(seat));
+        
+        // Filter by preferences
+        let preferredSeats = availableSeats;
+        if (windowSeatCheckbox.checked) {
+            preferredSeats = preferredSeats.filter(seat => {
+                // Window seats are typically 1st and 3rd in each row (2-3 layout)
+                const seatPositionInRow = ((seat - 1) % 5) + 1;
+                return seatPositionInRow === 1 || seatPositionInRow === 3;
+            });
+        }
+        
+        if (aisleSeatCheckbox.checked) {
+            preferredSeats = preferredSeats.filter(seat => {
+                // Aisle seats are typically 2nd and 5th in each row (2-3 layout)
+                const seatPositionInRow = ((seat - 1) % 5) + 1;
+                return seatPositionInRow === 2 || seatPositionInRow === 5;
+            });
+        }
+        
+        // If no seats match preferences, fall back to all available seats
+        if (preferredSeats.length === 0) {
+            preferredSeats = availableSeats;
+        }
+        
+        // Select recommended seats
+        for (let i = 0; i < Math.min({{ $booking->number_of_seats }}, preferredSeats.length); i++) {
+            const seatNumber = preferredSeats[i];
+            const seatElement = document.querySelector(`.seat-item[data-seat="${seatNumber}"]`);
+            
+            if (seatElement && !seatElement.classList.contains('bg-red-100')) {
+                seatElement.classList.remove('bg-green-100');
+                seatElement.classList.add('bg-blue-100', 'ring-4', 'ring-blue-500');
+                // Add filter to seat image
+                const seatImage = seatElement.querySelector('.seat-image');
+                if (seatImage) {
+                    seatImage.classList.add('filter', 'brightness-75');
+                }
+                // Update seat number color
+                const seatNumberEl = seatElement.querySelector('.seat-number');
+                if (seatNumberEl) {
+                    seatNumberEl.classList.remove('text-green-700');
+                    seatNumberEl.classList.add('text-blue-700');
+                }
+                
+                selectedSeats.push(seatNumber);
+            }
+        }
+        
+        // Update display
+        selectedSeatsDisplay.textContent = selectedSeats.length > 0 ? selectedSeats.join(', ') : 'None';
+        selectedCount.textContent = selectedSeats.length;
+        
+        // Enable/disable save button
+        saveSeatsButton.disabled = selectedSeats.length !== {{ $booking->number_of_seats }};
+        
+        // Add visual feedback for seat selection
+        if (selectedSeats.length > 0) {
+            selectedSeatsDisplay.classList.add('bg-blue-100', 'text-blue-800');
+            selectedSeatsDisplay.classList.remove('text-gray-500');
+        } else {
+            selectedSeatsDisplay.classList.remove('bg-blue-100', 'text-blue-800');
+            selectedSeatsDisplay.classList.add('text-gray-500');
+        }
+    }
+    
+    // Add event listener for recommend button
+    recommendSeatsButton.addEventListener('click', recommendSeats);
+    
+    // Show estimated time for each step
+    function showStepTimeEstimates() {
+        // This is a simplified version - in a real app, you might want to load actual data
+        const stepTimes = {
+            schedule: { time: '< 1 min', desc: 'Select your preferred schedule' },
+            passenger: { time: '< 1 min', desc: 'Enter your personal information' },
+            seat: { time: '1-2 min', desc: 'Choose your preferred seat' },
+            payment: { time: '< 1 min', desc: 'Complete your payment' }
+        };
+        
+        // In a real implementation, you might want to show these times near the stepper
+        console.log('Step time estimates:', stepTimes);
+    }
+    
+    showStepTimeEstimates();
+    
+    // Enhanced drag and drop functionality for seat selection
+    let isDragging = false;
+    let dragStartSeat = null;
+    
+    seats.forEach(seat => {
+        // Add drag events for drag selection
+        seat.addEventListener('mousedown', function(e) {
+            if (!this.classList.contains('bg-red-100')) { // Only for available seats
+                isDragging = true;
+                dragStartSeat = this;
+                
+                // Toggle the starting seat
+                if (this.classList.contains('bg-blue-100')) {
+                    // Deselect
+                    this.classList.remove('bg-blue-100', 'ring-4', 'ring-blue-500');
+                    this.classList.add('bg-green-500');
+                    const seatImage = this.querySelector('.seat-image');
+                    if (seatImage) seatImage.classList.remove('filter', 'brightness-125');
+                    const seatNumberEl = this.querySelector('.seat-number');
+                    if (seatNumberEl) seatNumberEl.classList.remove('text-white');
+                    
+                    const seatNumber = parseInt(this.getAttribute('data-seat'));
+                    selectedSeats = selectedSeats.filter(num => num !== seatNumber);
+                } else {
+                    // Select if we haven't reached the max
+                    if (selectedSeats.length < {{ $booking->number_of_seats }}) {
+                        this.classList.remove('bg-green-500');
+                        this.classList.add('bg-blue-500', 'ring-4', 'ring-blue-300');
+                        const seatImage = this.querySelector('.seat-image');
+                        if (seatImage) seatImage.classList.add('filter', 'brightness-125');
+                        const seatNumberEl = this.querySelector('.seat-number');
+                        if (seatNumberEl) seatNumberEl.classList.add('text-white');
+                        
+                        const seatNumber = parseInt(this.getAttribute('data-seat'));
+                        selectedSeats.push(seatNumber);
+                    }
+                }
+                
+                // Update display
+                selectedSeatsDisplay.textContent = selectedSeats.length > 0 ? selectedSeats.join(', ') : 'None';
+                selectedCount.textContent = selectedSeats.length;
+                saveSeatsButton.disabled = selectedSeats.length !== {{ $booking->number_of_seats }};
+                
+                if (selectedSeats.length > 0) {
+                    selectedSeatsDisplay.classList.add('bg-blue-100', 'text-blue-800');
+                    selectedSeatsDisplay.classList.remove('text-gray-500');
+                } else {
+                    selectedSeatsDisplay.classList.remove('bg-blue-100', 'text-blue-800');
+                    selectedSeatsDisplay.classList.add('text-gray-500');
+                }
+            }
+        });
+        
+        seat.addEventListener('mouseenter', function(e) {
+            if (isDragging && !this.classList.contains('bg-red-100')) {
+                // For drag selection
+                if (dragStartSeat !== this) {
+                    if (this.classList.contains('bg-blue-500')) {
+                        // Deselect
+                        this.classList.remove('bg-blue-500', 'ring-4', 'ring-blue-300');
+                        this.classList.add('bg-green-500');
+                        const seatImage = this.querySelector('.seat-image');
+                        if (seatImage) seatImage.classList.remove('filter', 'brightness-125');
+                        const seatNumberEl = this.querySelector('.seat-number');
+                        if (seatNumberEl) seatNumberEl.classList.remove('text-white');
+                        
+                        const seatNumber = parseInt(this.getAttribute('data-seat'));
+                        selectedSeats = selectedSeats.filter(num => num !== seatNumber);
+                    } else if (selectedSeats.length < {{ $booking->number_of_seats }}) {
+                        // Select
+                        this.classList.remove('bg-green-500');
+                        this.classList.add('bg-blue-500', 'ring-4', 'ring-blue-300');
+                        const seatImage = this.querySelector('.seat-image');
+                        if (seatImage) seatImage.classList.add('filter', 'brightness-125');
+                        const seatNumberEl = this.querySelector('.seat-number');
+                        if (seatNumberEl) seatNumberEl.classList.add('text-white');
+                        
+                        const seatNumber = parseInt(this.getAttribute('data-seat'));
+                        selectedSeats.push(seatNumber);
+                    }
+                    
+                    // Update display
+                    selectedSeatsDisplay.textContent = selectedSeats.length > 0 ? selectedSeats.join(', ') : 'None';
+                    selectedCount.textContent = selectedSeats.length;
+                    saveSeatsButton.disabled = selectedSeats.length !== {{ $booking->number_of_seats }};
+                }
+            }
+        });
+    });
+    
+    document.addEventListener('mouseup', function() {
+        isDragging = false;
+        dragStartSeat = null;
+    });
     
     seats.forEach(seat => {
         seat.addEventListener('click', function() {

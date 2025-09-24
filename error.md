@@ -7,7 +7,9 @@ yaitu di bookings lebih tepatnya ketika kita user memesan dan masuk payments ada
 -->
 
 NOT SOLVED YET ❌
-logic untuk jadwal daily masih belum baik karena ketika bus sudah berangkat di hari itu namun ketika jadwal untuk besok sudah ada seat nya belum te reset
+-- fix tahun karena tahun tanggal hari bulan yang tidak relevan dan tertulis di database sampai di frontend tidak relevan 
+
+-- logic untuk jadwal daily masih belum baik karena ketika bus sudah berangkat di hari itu namun ketika jadwal untuk besok sudah ada seat nya belum te reset
 
 
 

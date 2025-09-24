@@ -2,12 +2,73 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
-    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-4 sm:p-8 mb-6 sm:mb-10 text-center mobile-booking-card">
-        <div class="text-green-500 text-5xl sm:text-7xl mb-4 sm:mb-6 animate-bounce">
-            <i class="fas fa-check-circle"></i>
+    <!-- Stepper Progress with Time Estimates -->
+    <div class="mb-8 overflow-x-auto">
+        <div class="flex items-center justify-center min-w-max">
+            <div class="flex flex-col items-center">
+                <div class="flex items-center text-blue-600 relative">
+                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                        <span class="text-xs md:text-sm font-bold">1</span>
+                    </div>
+                    <div class="text-center ml-1 md:ml-2">
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Schedule</div>
+                        <div class="text-xs text-gray-500">&lt; 1 min</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
+            <div class="md:hidden flex flex-col items-center mx-1">
+                <div class="text-gray-300 text-lg">↓</div>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="flex items-center text-blue-600 relative">
+                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                        <span class="text-xs md:text-sm font-bold">2</span>
+                    </div>
+                    <div class="text-center ml-1 md:ml-2">
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Passenger</div>
+                        <div class="text-xs text-gray-500">&lt; 1 min</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
+            <div class="md:hidden flex flex-col items-center mx-1">
+                <div class="text-gray-300 text-lg">↓</div>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="flex items-center text-blue-600 relative">
+                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                        <span class="text-xs md:text-sm font-bold">3</span>
+                    </div>
+                    <div class="text-center ml-1 md:ml-2">
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Seat</div>
+                        <div class="text-xs text-gray-500">1-2 min</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
+            <div class="md:hidden flex flex-col items-center mx-1">
+                <div class="text-gray-300 text-lg">↓</div>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="flex items-center text-blue-600 relative">
+                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                        <span class="text-xs md:text-sm font-bold">4</span>
+                    </div>
+                    <div class="text-center ml-1 md:ml-2">
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Payment</div>
+                        <div class="text-xs text-gray-500">&lt; 1 min</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <h1 class="text-2xl sm:text-4xl font-bold text-gray-800 mb-3 sm:mb-4">Booking Successful!</h1>
-        <p class="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto">Thank you for your booking. Your payment has been processed successfully. Your ticket is ready to use!</p>
+    </div>
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-3">Booking Successful!</h1>
+        <p class="text-lg text-gray-600">Thank you for your booking. Your payment has been processed successfully.</p>
+    </div>
         
         <div class="bg-white rounded-xl shadow-md p-4 sm:p-8 mb-6 sm:mb-8 text-left mobile-info-card">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0">

@@ -1,7 +1,7 @@
 ## TODO LIST
 Peningkatan UI/UX untuk Meningkatkan User Engagement
 
-A. Homepage & Navigasi
+<!-- A. Homepage & Navigasi
 
 2. Quick Booking Form yang Lebih Interaktif
 
@@ -11,9 +11,9 @@ A. Homepage & Navigasi
 
 3. Personalisasi Berdasarkan Riwayat Pengguna
     - Menampilkan rute favorit pengguna berdasarkan riwayat booking
-    - Rekomendasi rute berdasarkan lokasi pengguna (dengan permission)
+    - Rekomendasi rute berdasarkan lokasi pengguna (dengan permission) -->
 
-B. Booking Flow Improvements
+<!-- B. Booking Flow Improvements
 
 1. Seat Selection yang Lebih Visual
 
@@ -29,7 +29,7 @@ B. Booking Flow Improvements
 3. Penyederhanaan Formulir
     - Auto-fill informasi penumpang untuk user yang sudah login
     - Penambahan guest checkout untuk pengguna baru
-    - Validasi real-time dan pesan error yang lebih deskriptif
+    - Validasi real-time dan pesan error yang lebih deskriptif -->
 
 C. Mobile Experience
 
@@ -48,11 +48,6 @@ C. Mobile Experience
 
 A. Fitur Customer Engagement
 
-1. Sistem Loyalty Program
-
-    - Point system berdasarkan booking dan referal
-    - Tier membership dengan benefit berbeda (diskon, prioritas boarding)
-    - Digital membership card
 
 2. Real-time Tracking
 
