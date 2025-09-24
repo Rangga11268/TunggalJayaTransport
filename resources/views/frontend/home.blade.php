@@ -98,6 +98,7 @@ use Illuminate\Support\Str;
                        @input.debounce.300ms="filterOrigins()"
                        @focus="filterOrigins(); originDropdownOpen = true"
                        @blur="closeOriginDropdown()"
+                       @keydown="handleOriginKeydown"
                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm"
                        placeholder="Enter origin">
                 
@@ -106,12 +107,21 @@ use Illuminate\Support\Str;
                      @click.outside="closeOriginDropdown()"
                      @focusout="closeOriginDropdown()"
                      class="absolute z-20 mt-1 w-full bg-white shadow-lg rounded-md py-1 text-sm overflow-auto max-h-60 border border-gray-200">
-                    <template x-for="originOption in filteredOrigins" :key="originOption">
+                    <template x-for="(originOption, index) in filteredOrigins" :key="index">
                         <div @click="selectOrigin(originOption); $refs.originInput.blur()" 
-                             class="cursor-pointer px-4 py-2 hover:bg-blue-50 hover:text-blue-700">
+                             @mouseenter="highlightOrigin(index)"
+                             class="cursor-pointer px-4 py-2 hover:bg-blue-50 hover:text-blue-700"
+                             :class="{
+                                 'bg-blue-100 text-blue-700': index === originHighlightedIndex,
+                                 'hover:bg-blue-50 hover:text-blue-700': index !== originHighlightedIndex
+                             }">
                             <span x-text="originOption"></span>
                         </div>
                     </template>
+                    <!-- Loading indicator -->
+                    <div x-show="isFiltering" class="px-4 py-2 text-gray-500 flex items-center">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Searching...
+                    </div>
                 </div>
             </div>
             
@@ -125,6 +135,7 @@ use Illuminate\Support\Str;
                        @input.debounce.300ms="filterDestinations()"
                        @focus="filterDestinations(); destinationDropdownOpen = true"
                        @blur="closeDestinationDropdown()"
+                       @keydown="handleDestinationKeydown"
                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm"
                        placeholder="Enter destination">
                 
@@ -133,12 +144,21 @@ use Illuminate\Support\Str;
                      @click.outside="closeDestinationDropdown()"
                      @focusout="closeDestinationDropdown()"
                      class="absolute z-20 mt-1 w-full bg-white shadow-lg rounded-md py-1 text-sm overflow-auto max-h-60 border border-gray-200">
-                    <template x-for="destinationOption in filteredDestinations" :key="destinationOption">
+                    <template x-for="(destinationOption, index) in filteredDestinations" :key="index">
                         <div @click="selectDestination(destinationOption); $refs.destinationInput.blur()" 
-                             class="cursor-pointer px-4 py-2 hover:bg-blue-50 hover:text-blue-700">
+                             @mouseenter="highlightDestination(index)"
+                             class="cursor-pointer px-4 py-2 hover:bg-blue-50 hover:text-blue-700"
+                             :class="{
+                                 'bg-blue-100 text-blue-700': index === destinationHighlightedIndex,
+                                 'hover:bg-blue-50 hover:text-blue-700': index !== destinationHighlightedIndex
+                             }">
                             <span x-text="destinationOption"></span>
                         </div>
                     </template>
+                    <!-- Loading indicator -->
+                    <div x-show="isFiltering" class="px-4 py-2 text-gray-500 flex items-center">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Searching...
+                    </div>
                 </div>
             </div>
             
@@ -267,63 +287,7 @@ use Illuminate\Support\Str;
         </div>
     </div>
 
-    <!-- Testimonials Carousel -->
-    <div class="mb-8 sm:mb-12">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8 text-center text-gray-800">What Our Customers Say</h2>
-        <div class="swiper myTestimonialsSwiper">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide bg-white rounded-lg shadow-md p-4 sm:p-6 mx-2 sm:mx-4">
-                    <div class="flex items-center mb-3 sm:mb-4">
-                        <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 sm:w-16 sm:h-16"></div>
-                        <div class="ml-3 sm:ml-4">
-                            <p class="font-bold text-base sm:text-lg">John Doe</p>
-                            <div class="flex text-yellow-400 text-sm sm:text-base">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 italic text-sm sm:text-base">"The service was excellent and the bus was very comfortable. I'll definitely use Tunggal Jaya Transport again!"</p>
-                </div>
-                <div class="swiper-slide bg-white rounded-lg shadow-md p-4 sm:p-6 mx-2 sm:mx-4">
-                    <div class="flex items-center mb-3 sm:mb-4">
-                        <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 sm:w-16 sm:h-16"></div>
-                        <div class="ml-3 sm:ml-4">
-                            <p class="font-bold text-base sm:text-lg">Jane Smith</p>
-                            <div class="flex text-yellow-400 text-sm sm:text-base">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 italic text-sm sm:text-base">"Punctual, clean, and affordable. Highly recommended for long-distance travel."</p>
-                </div>
-                <div class="swiper-slide bg-white rounded-lg shadow-md p-4 sm:p-6 mx-2 sm:mx-4">
-                    <div class="flex items-center mb-3 sm:mb-4">
-                        <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 sm:w-16 sm:h-16"></div>
-                        <div class="ml-3 sm:ml-4">
-                            <p class="font-bold text-base sm:text-lg">Robert Johnson</p>
-                            <div class="flex text-yellow-400 text-sm sm:text-base">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 italic text-sm sm:text-base">"Great customer service and comfortable journey. Will book again for my next trip."</p>
-                </div>
-            </div>
-            <div class="swiper-pagination"></div>
-        </div>
-    </div>
+    
 
     <!-- News Section -->
     <div class="mb-8 sm:mb-12">

@@ -162,6 +162,9 @@
                     availableSeats: null,
                     originDropdownOpen: false,
                     destinationDropdownOpen: false,
+                    originHighlightedIndex: -1,
+                    destinationHighlightedIndex: -1,
+                    isFiltering: false,
                     init() {
                         // Check if we're on the home page and have inline data
                         if (typeof window.homepageData !== 'undefined') {
@@ -218,48 +221,125 @@
                         }
                     },
                     filterOrigins() {
-                        if (this.origin === '') {
-                            this.filteredOrigins = this.origins;
-                            this.originDropdownOpen = false;
-                        } else {
-                            this.filteredOrigins = this.origins.filter(o => 
-                                o.toLowerCase().includes(this.origin.toLowerCase())
-                            );
-                            this.originDropdownOpen = true;
-                        }
+                        this.isFiltering = true;
+                        setTimeout(() => {
+                            if (this.origin === '') {
+                                this.filteredOrigins = this.origins;
+                                this.originDropdownOpen = false;
+                                this.originHighlightedIndex = -1;
+                            } else {
+                                this.filteredOrigins = this.origins.filter(o => 
+                                    o.toLowerCase().includes(this.origin.toLowerCase())
+                                );
+                                this.originDropdownOpen = true;
+                                this.originHighlightedIndex = -1;
+                            }
+                            this.isFiltering = false;
+                        }, 100);
                     },
                     filterDestinations() {
-                        if (this.destination === '') {
-                            this.filteredDestinations = this.destinations;
-                            this.destinationDropdownOpen = false;
-                        } else {
-                            this.filteredDestinations = this.destinations.filter(d => 
-                                d.toLowerCase().includes(this.destination.toLowerCase())
-                            );
-                            this.destinationDropdownOpen = true;
-                        }
+                        this.isFiltering = true;
+                        setTimeout(() => {
+                            if (this.destination === '') {
+                                this.filteredDestinations = this.destinations;
+                                this.destinationDropdownOpen = false;
+                                this.destinationHighlightedIndex = -1;
+                            } else {
+                                this.filteredDestinations = this.destinations.filter(d => 
+                                    d.toLowerCase().includes(this.destination.toLowerCase())
+                                );
+                                this.destinationDropdownOpen = true;
+                                this.destinationHighlightedIndex = -1;
+                            }
+                            this.isFiltering = false;
+                        }, 100);
                     },
                     selectOrigin(value) {
                         this.origin = value;
                         this.filteredOrigins = this.origins;
                         this.originDropdownOpen = false;
+                        this.originHighlightedIndex = -1;
                         this.checkAvailability();
                     },
                     selectDestination(value) {
                         this.destination = value;
                         this.filteredDestinations = this.destinations;
                         this.destinationDropdownOpen = false;
+                        this.destinationHighlightedIndex = -1;
                         this.checkAvailability();
                     },
                     closeOriginDropdown() {
+                        // Only close if not interacting with dropdown items
                         setTimeout(() => {
-                            this.originDropdownOpen = false;
-                        }, 150); // Small delay to allow click to register before hiding
+                            if (this.originHighlightedIndex === -1) {
+                                this.originDropdownOpen = false;
+                                this.originHighlightedIndex = -1;
+                            }
+                        }, 150);
                     },
                     closeDestinationDropdown() {
                         setTimeout(() => {
-                            this.destinationDropdownOpen = false;
-                        }, 150); // Small delay to allow click to register before hiding
+                            if (this.destinationHighlightedIndex === -1) {
+                                this.destinationDropdownOpen = false;
+                                this.destinationHighlightedIndex = -1;
+                            }
+                        }, 150);
+                    },
+                    highlightOrigin(index) {
+                        this.originHighlightedIndex = index;
+                    },
+                    highlightDestination(index) {
+                        this.destinationHighlightedIndex = index;
+                    },
+                    handleOriginKeydown(event) {
+                        if (!this.originDropdownOpen || this.filteredOrigins.length === 0) return;
+                        
+                        switch(event.key) {
+                            case 'ArrowDown':
+                                event.preventDefault();
+                                this.originHighlightedIndex = (this.originHighlightedIndex + 1) % this.filteredOrigins.length;
+                                break;
+                            case 'ArrowUp':
+                                event.preventDefault();
+                                this.originHighlightedIndex = this.originHighlightedIndex <= 0 ? 
+                                    this.filteredOrigins.length - 1 : this.originHighlightedIndex - 1;
+                                break;
+                            case 'Enter':
+                                event.preventDefault();
+                                if (this.originHighlightedIndex >= 0 && this.originHighlightedIndex < this.filteredOrigins.length) {
+                                    this.selectOrigin(this.filteredOrigins[this.originHighlightedIndex]);
+                                }
+                                break;
+                            case 'Escape':
+                                this.originDropdownOpen = false;
+                                this.originHighlightedIndex = -1;
+                                break;
+                        }
+                    },
+                    handleDestinationKeydown(event) {
+                        if (!this.destinationDropdownOpen || this.filteredDestinations.length === 0) return;
+                        
+                        switch(event.key) {
+                            case 'ArrowDown':
+                                event.preventDefault();
+                                this.destinationHighlightedIndex = (this.destinationHighlightedIndex + 1) % this.filteredDestinations.length;
+                                break;
+                            case 'ArrowUp':
+                                event.preventDefault();
+                                this.destinationHighlightedIndex = this.destinationHighlightedIndex <= 0 ? 
+                                    this.filteredDestinations.length - 1 : this.destinationHighlightedIndex - 1;
+                                break;
+                            case 'Enter':
+                                event.preventDefault();
+                                if (this.destinationHighlightedIndex >= 0 && this.destinationHighlightedIndex < this.filteredDestinations.length) {
+                                    this.selectDestination(this.filteredDestinations[this.destinationHighlightedIndex]);
+                                }
+                                break;
+                            case 'Escape':
+                                this.destinationDropdownOpen = false;
+                                this.destinationHighlightedIndex = -1;
+                                break;
+                        }
                     }
                 }
             }
