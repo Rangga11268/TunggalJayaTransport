@@ -11,5 +11,5 @@ SOLVED ✅
 
 -- logic untuk jadwal daily sudah diperbaiki karena ketika bus sudah berangkat di hari itu namun ketika jadwal untuk besok sudah ada seat nya sekarang sudah di reset
 
-
+-- hapus template mingguan di admin
 
