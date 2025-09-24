@@ -234,8 +234,9 @@ class ScheduleController extends Controller
             $schedule->delete();
             return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal berhasil dihapus.');
         } else if ($schedule->is_weekly) {
-            // For weekly schedules, we don't allow deletion through this method
-            return redirect()->route('admin.schedules.index')->with('warning', 'Jadwal mingguan tidak bisa dihapus. Silakan nonaktifkan jadwal tersebut.');
+            // For weekly schedules, allow deletion
+            $schedule->delete();
+            return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal mingguan berhasil dihapus.');
         } else {
             // For daily schedules that haven't departed yet
             $schedule->delete();

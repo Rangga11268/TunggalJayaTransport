@@ -102,16 +102,16 @@
                 </div>
 
                 <!-- Transport Management Dropdown -->
-                <div x-data="{ open: {{ request()->routeIs('admin.buses.*') || request()->routeIs('admin.routes.*') || request()->routeIs('admin.schedules.*') || request()->routeIs('admin.schedule-management.*') || request()->routeIs('admin.weekly-schedule-templates.*') ? 'true' : 'false' }} }" class="mb-1">
+                <div x-data="{ open: {{ request()->routeIs('admin.buses.*') || request()->routeIs('admin.routes.*') || request()->routeIs('admin.schedules.*') || request()->routeIs('admin.schedule-management.*') ? 'true' : 'false' }} }" class="mb-1">
                     <button @click="open = !open" 
-                        class="flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.buses.*') || request()->routeIs('admin.routes.*') || request()->routeIs('admin.schedules.*') || request()->routeIs('admin.schedule-management.*') || request()->routeIs('admin.weekly-schedule-templates.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                        class="flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.buses.*') || request()->routeIs('admin.routes.*') || request()->routeIs('admin.schedules.*') || request()->routeIs('admin.schedule-management.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                         <div class="flex items-center">
-                            <i class="fas fa-bus text-lg w-6"></i> 
+                            <i class="fas fa-calendar-week text-lg w-6"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Manajemen Transport</span>
+                                class="transition-opacity duration-300 font-medium">Schedule Management</span>
                         </div>
                         <i :class="{
                                 'fa-chevron-down': open,
@@ -125,50 +125,23 @@
                     </button>
                     
                     <div x-show="open" x-collapse>
-                        <a href="{{ route('admin.buses.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.buses.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                        <a href="{{ route('admin.schedules.index') }}"
+                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedules.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
                             <i class="fas fa-bus text-lg w-6"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Bus</span>
-                        </a>
-                        <a href="{{ route('admin.routes.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.routes.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-route text-lg w-6"></i> 
-                            <span :class="{
-                                    'ml-3 inline': sidebarOpen, 
-                                    'hidden': !sidebarOpen
-                                }" 
-                                class="transition-opacity duration-300">Rute</span>
-                        </a>
-                        <a href="{{ route('admin.schedules.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedules.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-calendar-alt text-lg w-6"></i> 
-                            <span :class="{
-                                    'ml-3 inline': sidebarOpen, 
-                                    'hidden': !sidebarOpen
-                                }" 
-                                class="transition-opacity duration-300">Jadwal</span>
+                                class="transition-opacity duration-300">Schedules</span>
                         </a>
                         <a href="{{ route('admin.schedule-management.index') }}"
                             class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedule-management.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-table text-lg w-6"></i> 
+                            <i class="fas fa-tasks text-lg w-6"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Dashboard Jadwal</span>
-                        </a>
-                        <a href="{{ route('admin.weekly-schedule-templates.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.weekly-schedule-templates.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-calendar-week text-lg w-6"></i> 
-                            <span :class="{
-                                    'ml-3 inline': sidebarOpen, 
-                                    'hidden': !sidebarOpen
-                                }" 
-                                class="transition-opacity duration-300">Template Mingguan</span>
+                                class="transition-opacity duration-300">Schedule Dashboard</span>
                         </a>
                     </div>
                 </div>

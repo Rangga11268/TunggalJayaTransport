@@ -15,7 +15,7 @@ use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ConductorController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ScheduleManagementController;
-use App\Http\Controllers\Admin\WeeklyScheduleTemplateController;
+
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule_manager'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -40,10 +40,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule
     Route::get('/schedule-management', [ScheduleManagementController::class, 'index'])->name('schedule-management.index')->middleware('role:admin,schedule_manager');
     Route::get('/schedule-management/{id}', [ScheduleManagementController::class, 'show'])->name('schedule-management.show')->middleware('role:admin,schedule_manager');
     
-    // Weekly Schedule Template Management (schedule managers can manage templates)
-    Route::resource('weekly-schedule-templates', WeeklyScheduleTemplateController::class)->middleware('role:admin,schedule_manager');
-    Route::get('/weekly-schedule-templates/{weekly_schedule_template}/generate-form', [WeeklyScheduleTemplateController::class, 'showGenerateForm'])->name('weekly-schedule-templates.generate-form')->middleware('role:admin,schedule_manager');
-    Route::post('/weekly-schedule-templates/{weekly_schedule_template}/generate', [WeeklyScheduleTemplateController::class, 'generateSchedules'])->name('weekly-schedule-templates.generate')->middleware('role:admin,schedule_manager');
+    
 
     // Booking Management (only admins can manage bookings)
     Route::resource('bookings', BookingController::class)->middleware('role:admin');

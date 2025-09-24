@@ -11,6 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('weekly_schedule_templates');
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
         Schema::create('weekly_schedule_templates', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -32,13 +40,5 @@ return new class extends Migration
             $table->index('day_of_week');
             $table->index('status');
         });
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('weekly_schedule_templates');
     }
 };
