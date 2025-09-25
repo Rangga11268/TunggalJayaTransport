@@ -1,15 +1,10 @@
-SOLVED ✅
 
-<!-- jadi ada masalah di waktu berangkat dan sampai yaitu dia tidak akurat menginat ini aplikasi berjalan di wib jadi harusnya semua jadwal dari admin sampai frontend harus pakai wib coba fix ini karena masih belum akurat atau bener nih saya cek di database tercatat kolom depature_time dan arival_time nya kacau bahkan menunjukan tahun 2000 dan tentu tanggal dan waktu nya gak bener coba fix it dan pastikan cek ke semua file yang berhubungan
+-- buat responsive ukuran sm 420px kebawah di bagian detail routes khusus nya di bagian Available Schedules agar bisa di buat lebih baik 
 
-yaitu di bookings lebih tepatnya ketika kita user memesan dan masuk payments ada warning bus sudah berangkat padahal masih berangkat besok nya dan tiket juga masih bisa di selesaikan
+-- dan ada minor juga ketika di ukuran 760 - 1024 di bagian bookings lebih tepatnya Search for Schedules tombol search nya agak kurang pas 
 
--->
+-- fix logic harusnya ketika bus sudah berangkat tiket nya ada lagi kesokan harinya dan seat nya ke reset kembali
 
-SOLVED ✅
--- fix tahun karena tahun tanggal hari bulan yang tidak relevan dan tertulis di database sampai di frontend tidak relevan 
+-- hapus file migration yang tidak di butuhkan
 
--- logic untuk jadwal daily sudah diperbaiki karena ketika bus sudah berangkat di hari itu namun ketika jadwal untuk besok sudah ada seat nya sekarang sudah di reset
-
--- hapus template mingguan di admin
-
+-- masih ingin merevisi jadwal 

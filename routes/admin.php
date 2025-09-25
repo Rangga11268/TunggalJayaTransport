@@ -74,8 +74,5 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index')->middleware('role:admin');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update')->middleware('role:admin');
 
-    // Test route for sidebar issues
-    Route::get('/test-sidebar', function () {
-        return view('admin.test-sidebar');
-    })->name('test-sidebar');
+    
 });
