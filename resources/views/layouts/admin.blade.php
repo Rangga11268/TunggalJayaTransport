@@ -79,26 +79,24 @@
                             class="fas transition-transform duration-200 text-sm"></i>
                     </button>
                     
-                    <div x-show="open" x-collapse 
-                         :style="sidebarOpen ? {} : {position: 'absolute', left: '70px', zIndex: 1000, backgroundColor: '#1f2937', borderRadius: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'}"
-                         :class="!sidebarOpen ? 'w-48' : ''">
+                    <div x-show="open" x-collapse class="pl-4">
                         <a href="{{ route('admin.news.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.news.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-newspaper text-lg w-6"></i> 
+                            class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.news.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-newspaper text-base w-4"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Berita</span>
+                                class="transition-opacity duration-300 text-sm ml-4">Berita</span>
                         </a>
                         <a href="{{ route('admin.categories.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.categories.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-tags text-lg w-6"></i> 
+                            class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.categories.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-tags text-base w-4"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Kategori</span>
+                                class="transition-opacity duration-300 text-sm ml-4">Kategori</span>
                         </a>
                     </div>
                 </div>
@@ -126,44 +124,42 @@
                             class="fas transition-transform duration-200 text-sm"></i>
                     </button>
                     
-                    <div x-show="open" x-collapse 
-                         :style="sidebarOpen ? {} : {position: 'absolute', left: '70px', zIndex: 1000, backgroundColor: '#1f2937', borderRadius: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'}"
-                         :class="!sidebarOpen ? 'w-48' : ''">
+                    <div x-show="open" x-collapse class="pl-4">
                         <a href="{{ route('admin.buses.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.buses.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-bus text-lg w-6"></i> 
+                            class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.buses.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-bus text-base w-4"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Manajemen Bus</span>
+                                class="transition-opacity duration-300 text-sm ml-4">Manajemen Bus</span>
                         </a>
                         <a href="{{ route('admin.routes.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.routes.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-route text-lg w-6"></i> 
+                            class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.routes.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-route text-base w-4"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Manajemen Rute</span>
+                                class="transition-opacity duration-300 text-sm ml-4">Manajemen Rute</span>
                         </a>
                         <a href="{{ route('admin.schedules.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedules.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-calendar-alt text-lg w-6"></i> 
+                            class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedules.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-calendar-alt text-base w-4"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Manajemen Jadwal</span>
+                                class="transition-opacity duration-300 text-sm ml-4">Manajemen Jadwal</span>
                         </a>
                         <a href="{{ route('admin.schedule-management.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedule-management.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-tasks text-lg w-6"></i> 
+                            class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.schedule-management.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-tasks text-base w-4"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Dasbor Jadwal</span>
+                                class="transition-opacity duration-300 text-sm ml-4">Dasbor Jadwal</span>
                         </a>
                     </div>
                 </div>
@@ -202,35 +198,33 @@
                             class="fas transition-transform duration-200 text-sm"></i>
                     </button>
                     
-                    <div x-show="open" x-collapse 
-                         :style="sidebarOpen ? {} : {position: 'absolute', left: '70px', zIndex: 1000, backgroundColor: '#1f2937', borderRadius: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'}"
-                         :class="!sidebarOpen ? 'w-48' : ''">
+                    <div x-show="open" x-collapse class="pl-4">
                         <a href="{{ route('admin.users.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.users.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-user text-lg w-6"></i> 
+                            class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.users.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-user text-base w-4"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Pengguna</span>
+                                class="transition-opacity duration-300 text-sm ml-4">Pengguna</span>
                         </a>
                         <a href="{{ route('admin.drivers.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.drivers.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-id-card text-lg w-6"></i> 
+                            class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.drivers.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-id-card text-base w-4"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Driver</span>
+                                class="transition-opacity duration-300 text-sm ml-4">Driver</span>
                         </a>
                         <a href="{{ route('admin.conductors.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.conductors.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-user-tie text-lg w-6"></i> 
+                            class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.conductors.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-user-tie text-base w-4"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Conductor</span>
+                                class="transition-opacity duration-300 text-sm ml-4">Conductor</span>
                         </a>
                     </div>
                 </div>
@@ -280,17 +274,15 @@
                             class="fas transition-transform duration-200 text-sm"></i>
                     </button>
                     
-                    <div x-show="open" x-collapse 
-                         :style="sidebarOpen ? {} : {position: 'absolute', left: '70px', zIndex: 1000, backgroundColor: '#1f2937', borderRadius: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'}"
-                         :class="!sidebarOpen ? 'w-48' : ''">
+                    <div x-show="open" x-collapse class="pl-4">
                         <a href="{{ route('admin.settings.index') }}"
-                            class="flex items-center p-3 pl-12 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.settings.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                            <i class="fas fa-cog text-lg w-6"></i> 
+                            class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.settings.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                            <i class="fas fa-cog text-base w-4"></i> 
                             <span :class="{
                                     'ml-3 inline': sidebarOpen, 
                                     'hidden': !sidebarOpen
                                 }" 
-                                class="transition-opacity duration-300">Pengaturan</span>
+                                class="transition-opacity duration-300 text-sm ml-4">Pengaturan</span>
                         </a>
                     </div>
                 </div>
