@@ -58,17 +58,17 @@ use Illuminate\Support\Str;
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24 lg:py-32">
         <div class="grid grid-cols-1 md:grid-cols-1 gap-8 items-center">
             <div class="text-center md:text-left bg-black bg-opacity-50 backdrop-blur-sm p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl">
-                <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 animate-fade-in-down">Comfortable & Reliable Transportation</h1>
-                <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-blue-100 animate-fade-in-up">Experience safe and comfortable journeys with our modern fleet and professional drivers.</p>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 animate-fade-in-down">Transportasi Nyaman & Terpercaya</h1>
+                <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-blue-100 animate-fade-in-up">Nikmati perjalanan aman dan nyaman bersama armada modern dan sopir profesional kami.</p>
                 
                 
                 
                 <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center md:justify-start">
                     <a href="{{ route('frontend.booking.index') }}" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-full transition duration-300 text-center text-base sm:text-lg transform hover:scale-105 shadow-lg hover:shadow-xl">
-                        <i class="fas fa-ticket-alt mr-2"></i>Book Now
+                        <i class="fas fa-ticket-alt mr-2"></i>Pesan Sekarang
                     </a>
                     <a href="{{ route('frontend.fleet.index') }}" class="bg-transparent border-2 border-white hover:bg-white hover:text-blue-900 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-full transition duration-300 text-center text-base sm:text-lg transform hover:scale-105 shadow-lg">
-                        <i class="fas fa-bus mr-2"></i>View Fleet
+                        <i class="fas fa-bus mr-2"></i>Lihat Armada
                     </a>
                 </div>
             </div>
@@ -82,10 +82,10 @@ use Illuminate\Support\Str;
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md p-4 sm:p-6 mb-8 sm:mb-12 -mt-8 sm:-mt-12 relative z-10 mx-4 sm:mx-6 md:mx-0" 
          x-data="quickBookingForm()"
          x-init="init()">
-        <h2 class="text-xl sm:text-2xl font-bold mb-4 text-center text-gray-800">Quick Booking</h2>
+        <h2 class="text-xl sm:text-2xl font-bold mb-4 text-center text-gray-800">Pemesanan Cepat</h2>
         <form method="GET" action="{{ route('frontend.booking.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
             <div class="relative">
-                <label for="origin" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Origin</label>
+                <label for="origin" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Asal</label>
                 <input type="text" 
                        id="origin" 
                        name="origin" 
@@ -96,7 +96,7 @@ use Illuminate\Support\Str;
                        @blur="closeOriginDropdown()"
                        @keydown="handleOriginKeydown"
                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm"
-                       placeholder="Enter origin">
+                       placeholder="Masukkan asal">
                 
                 <!-- Auto-complete dropdown for origins -->
                 <div x-show="originDropdownOpen && filteredOrigins.length > 0 && origin !== ''" 
@@ -122,7 +122,7 @@ use Illuminate\Support\Str;
             </div>
             
             <div class="relative">
-                <label for="destination" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Destination</label>
+                <label for="destination" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Tujuan</label>
                 <input type="text" 
                        id="destination" 
                        name="destination" 
@@ -133,7 +133,7 @@ use Illuminate\Support\Str;
                        @blur="closeDestinationDropdown()"
                        @keydown="handleDestinationKeydown"
                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 sm:py-3 sm:px-4 text-sm"
-                       placeholder="Enter destination">
+                       placeholder="Masukkan tujuan">
                 
                 <!-- Auto-complete dropdown for destinations -->
                 <div x-show="destinationDropdownOpen && filteredDestinations.length > 0 && destination !== ''" 
@@ -159,7 +159,7 @@ use Illuminate\Support\Str;
             </div>
             
             <div>
-                <label for="date" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label for="date" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Tanggal</label>
                 <input type="date" 
                        id="date" 
                        name="date" 
@@ -169,7 +169,7 @@ use Illuminate\Support\Str;
             </div>
             
             <div>
-                <label for="bus_type" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Bus Type</label>
+                <label for="bus_type" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Jenis Bus</label>
                 <select id="bus_type" 
                         name="bus_type" 
                         x-model="selectedBusType"
@@ -184,7 +184,7 @@ use Illuminate\Support\Str;
             <div class="flex items-end">
                 <button type="submit" 
                         class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-2 px-3 sm:py-3 sm:px-4 rounded-lg transition duration-300 transform hover:scale-105 text-sm sm:text-base flex items-center justify-center">
-                    <i class="fas fa-search mr-1 sm:mr-2"></i>Search
+                    <i class="fas fa-search mr-1 sm:mr-2"></i>Cari
                 </button>
             </div>
         </form>
@@ -198,24 +198,24 @@ use Illuminate\Support\Str;
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
                     <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-5 h-5 mr-2">
-                    <span class="text-sm font-medium text-gray-700">Available Seats:</span>
+                    <span class="text-sm font-medium text-gray-700">Kursi Tersedia:</span>
                 </div>
                 <div class="flex items-center">
                     <span class="text-lg font-bold text-blue-600" x-text="availableSeats"></span>
                     <span class="text-sm text-gray-500 ml-1">seats</span>
                     <div class="ml-3" x-show="availableSeats > 10">
                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            <i class="fas fa-check-circle mr-1"></i> Available
+                            <i class="fas fa-check-circle mr-1"></i> Tersedia
                         </span>
                     </div>
                     <div class="ml-3" x-show="availableSeats <= 10 && availableSeats > 0">
                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            <i class="fas fa-exclamation-circle mr-1"></i> Limited
+                            <i class="fas fa-exclamation-circle mr-1"></i> Terbatas
                         </span>
                     </div>
                     <div class="ml-3" x-show="availableSeats === 0">
                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            <i class="fas fa-times-circle mr-1"></i> Full
+                            <i class="fas fa-times-circle mr-1"></i> Penuh
                         </span>
                     </div>
                 </div>
@@ -225,7 +225,7 @@ use Illuminate\Support\Str;
 
     <!-- Featured Routes -->
     <div class="mb-8 sm:mb-12">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Popular Routes</h2>
+        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Rute Populer</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             @foreach($featuredRoutes as $route)
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
@@ -240,7 +240,7 @@ use Illuminate\Support\Str;
                         <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4"><i class="fas fa-road mr-1 sm:mr-2"></i>{{ $route->distance }} km</p>
                     @endif
                     <a href="{{ route('frontend.routes.show', $route) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm sm:text-base">
-                        View Details <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                        Lihat Detail <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
                     </a>
                 </div>
             </div>
@@ -250,35 +250,35 @@ use Illuminate\Support\Str;
 
     <!-- Company Facilities -->
     <div class="mb-8 sm:mb-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 sm:p-6 md:p-8">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8 text-center text-gray-800">About Tunggal Jaya</h2>
+        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8 text-center text-gray-800">Tentang Tunggal Jaya</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div class="text-center bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                     <i class="fas fa-couch text-blue-600 text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-base sm:text-lg font-bold mb-2">Comfortable Seats</h3>
-                <p class="text-xs sm:text-sm text-gray-600">Ergonomic seating for maximum comfort</p>
+                <h3 class="text-base sm:text-lg font-bold mb-2">Kursi Nyaman</h3>
+                <p class="text-xs sm:text-sm text-gray-600">Desain kursi ergonomis untuk kenyamanan maksimal</p>
             </div>
             <div class="text-center bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                     <i class="fas fa-tv text-blue-600 text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-base sm:text-lg font-bold mb-2">Entertainment System</h3>
-                <p class="text-xs sm:text-sm text-gray-600">LCD TV and entertainment systems</p>
+                <h3 class="text-base sm:text-lg font-bold mb-2">Sistem Hiburan</h3>
+                <p class="text-xs sm:text-sm text-gray-600">TV LCD dan sistem hiburan lengkap</p>
             </div>
             <div class="text-center bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                     <i class="fas fa-wifi text-blue-600 text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-base sm:text-lg font-bold mb-2">Free WiFi</h3>
-                <p class="text-xs sm:text-sm text-gray-600">Stay connected during your journey</p>
+                <h3 class="text-base sm:text-lg font-bold mb-2">WiFi Gratis</h3>
+                <p class="text-xs sm:text-sm text-gray-600">Tetap terhubung selama perjalanan</p>
             </div>
             <div class="text-center bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                     <i class="fas fa-restroom text-blue-600 text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-base sm:text-lg font-bold mb-2">Restroom</h3>
-                <p class="text-xs sm:text-sm text-gray-600">Clean and accessible restrooms</p>
+                <h3 class="text-base sm:text-lg font-bold mb-2">Kamar Mandi</h3>
+                <p class="text-xs sm:text-sm text-gray-600">Kamar mandi yang bersih dan mudah diakses</p>
             </div>
         </div>
     </div>
@@ -288,9 +288,9 @@ use Illuminate\Support\Str;
     <!-- News Section -->
     <div class="mb-8 sm:mb-12">
         <div class="flex justify-between items-center mb-4 sm:mb-8">
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Latest News</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Berita Terbaru</h2>
             <a href="{{ route('frontend.news.index') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 sm:py-2 sm:px-4 rounded-lg transition duration-300 text-sm sm:text-base">
-                <i class="fas fa-newspaper mr-1 sm:mr-2"></i>View All News
+                <i class="fas fa-newspaper mr-1 sm:mr-2"></i>Lihat Semua Berita
             </a>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
@@ -308,7 +308,7 @@ use Illuminate\Support\Str;
                     <p class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3"><i class="far fa-calendar mr-1 sm:mr-2"></i>{{ $article->created_at->format('F j, Y') }}</p>
                     <p class="text-xs sm:text-sm text-gray-700 mb-3 sm:mb-4">{{ Str::limit($article->excerpt ?? strip_tags($article->content), 80) }}</p>
                     <a href="{{ route('frontend.news.show', $article->slug) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm sm:text-base">
-                        Read More <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                        Baca Selengkapnya <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
                     </a>
                 </div>
             </div>
@@ -318,7 +318,7 @@ use Illuminate\Support\Str;
 
     <!-- Bus Fleet Information -->
     <div class="mb-8 sm:mb-12">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Our Bus Fleet</h2>
+        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Armada Bus Kami</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             @forelse($fleet as $bus)
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
@@ -344,14 +344,14 @@ use Illuminate\Support\Str;
                 <div class="flex justify-center mb-4">
                     <i class="fas fa-bus text-blue-600 text-4xl"></i>
                 </div>
-                <h3 class="text-lg sm:text-xl font-bold mb-2 text-gray-800">No buses available at the moment</h3>
-                <p class="text-sm text-gray-600">Please check back later for our fleet information.</p>
+                <h3 class="text-lg sm:text-xl font-bold mb-2 text-gray-800">Saat ini tidak ada bus tersedia</h3>
+                <p class="text-sm text-gray-600">Silakan cek kembali nanti untuk informasi armada kami.</p>
             </div>
             @endforelse
         </div>
         <div class="text-center mt-6">
             <a href="{{ route('frontend.fleet.index') }}" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 text-center text-base sm:text-lg transform hover:scale-105 shadow-lg hover:shadow-xl inline-block">
-                <i class="fas fa-bus mr-2"></i>View All Fleet
+                <i class="fas fa-bus mr-2"></i>Lihat Semua Armada
             </a>
         </div>
     </div>
@@ -387,19 +387,19 @@ use Illuminate\Support\Str;
             window.requestAnimationFrame(step);
         }
     }">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Our Achievements</h2>
+        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Prestasi Kami</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
             <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="text-3xl sm:text-5xl font-bold text-blue-600 mb-2" x-text="fleetCount">0</div>
-                <div class="text-base sm:text-xl text-gray-700">Modern Fleet</div>
+                <div class="text-base sm:text-xl text-gray-700">Armada Modern</div>
             </div>
             <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="text-3xl sm:text-5xl font-bold text-blue-600 mb-2" x-text="routeCount">0</div>
-                <div class="text-base sm:text-xl text-gray-700">Routes</div>
+                <div class="text-base sm:text-xl text-gray-700">Rute</div>
             </div>
             <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="text-3xl sm:text-5xl font-bold text-blue-600 mb-2" x-text="customerCount">0</div>
-                <div class="text-base sm:text-xl text-gray-700">Happy Customers</div>
+                <div class="text-base sm:text-xl text-gray-700">Pelanggan Puas</div>
             </div>
         </div>
     </div>

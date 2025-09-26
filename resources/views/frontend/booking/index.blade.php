@@ -4,8 +4,8 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
     <!-- Header -->
     <div class="text-center mb-10">
-        <h1 class="text-4xl font-bold text-gray-800 mb-3">Book Your Ticket</h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Find and book your next journey with Tunggal Jaya Transport. Comfortable, reliable, and affordable travel options.</p>
+        <h1 class="text-4xl font-bold text-gray-800 mb-3">Pesan Tiket Anda</h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Temukan dan pesan perjalanan Anda berikutnya dengan Tunggal Jaya Transport. Pilihan perjalanan yang nyaman, terpercaya, dan terjangkau.</p>
     </div>
     
     <!-- Link to Complete Schedule -->
@@ -14,7 +14,7 @@
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
-            View Complete Schedule
+            Lihat Jadwal Lengkap
         </a>
     </div>
     
@@ -26,8 +26,8 @@
             </div>
             <div class="ml-3">
                 <p class="text-sm text-blue-700">
-                    <strong>Schedule Information:</strong> Daily schedules reset automatically each day. Weekly schedules repeat on their designated days. Daily recurring schedules are available every day at the same time.
-                    Once a bus has departed, tickets can no longer be purchased for that schedule.
+                    <strong>Informasi Jadwal:</strong> Jadwal harian diatur ulang secara otomatis setiap hari. Jadwal mingguan diulang pada hari-hari yang ditentukan. Jadwal harian berulang tersedia setiap hari pada waktu yang sama.
+                    Setelah bus berangkat, tiket tidak dapat lagi dibeli untuk jadwal tersebut.
                 </p>
             </div>
         </div>
@@ -35,33 +35,33 @@
     
     <!-- Search Form -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-10">
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Search for Schedules</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Cari Jadwal</h2>
         <form method="GET" action="{{ route('frontend.booking.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-6 mobile-search-form">
             <div class="mobile-form-group">
-                <label for="origin" class="block text-sm font-medium text-gray-700 mb-2 mobile-form-label">Origin</label>
+                <label for="origin" class="block text-sm font-medium text-gray-700 mb-2 mobile-form-label">Asal</label>
                 <select id="origin" name="origin" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4 mobile-select">
-                    <option value="">Select Origin</option>
+                    <option value="">Pilih Asal</option>
                     @foreach($origins as $originOption)
                         <option value="{{ $originOption }}" {{ request()->get('origin') == $originOption ? 'selected' : '' }}>{{ $originOption }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="mobile-form-group">
-                <label for="destination" class="block text-sm font-medium text-gray-700 mb-2 mobile-form-label">Destination</label>
+                <label for="destination" class="block text-sm font-medium text-gray-700 mb-2 mobile-form-label">Tujuan</label>
                 <select id="destination" name="destination" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4 mobile-select">
-                    <option value="">Select Destination</option>
+                    <option value="">Pilih Tujuan</option>
                     @foreach($destinations as $destinationOption)
                         <option value="{{ $destinationOption }}" {{ request()->get('destination') == $destinationOption ? 'selected' : '' }}>{{ $destinationOption }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="mobile-form-group">
-                <label for="date" class="block text-sm font-medium text-gray-700 mb-2 mobile-form-label">Date</label>
+                <label for="date" class="block text-sm font-medium text-gray-700 mb-2 mobile-form-label">Tanggal</label>
                 <input type="date" id="date" name="date" value="{{ request()->get('date') }}" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4 mobile-input">
             </div>
             <div class="flex items-end">
                 <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg mobile-btn-full">
-                    <i class="fas fa-search mr-2"></i>Search
+                    <i class="fas fa-search mr-2"></i>Cari
                 </button>
             </div>
         </form>
@@ -71,7 +71,7 @@
     @if(request()->has('origin') && request()->has('destination'))
     <div class="bg-white rounded-xl shadow-lg p-6 mb-10 mobile-booking-summary">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Available Schedules</h2>
+            <h2 class="text-2xl font-bold text-gray-800">Jadwal Tersedia</h2>
             <div class="text-sm text-gray-500">
                 @if(request()->get('date'))
                     {{ \Carbon\Carbon::parse(request()->get('date'))->format('l, F j, Y') }}
@@ -84,9 +84,9 @@
             <div class="text-red-600 text-5xl mb-4">
                 <i class="fas fa-exclamation-circle"></i>
             </div>
-            <p class="text-red-600 font-bold text-xl">No routes available</p>
-            <p class="text-gray-600 mt-2">Between {{ request()->get('origin') }} and {{ request()->get('destination') }}</p>
-            <p class="text-gray-600 mt-4">Please select a different origin/destination combination.</p>
+            <p class="text-red-600 font-bold text-xl">Tidak ada rute tersedia</p>
+            <p class="text-gray-600 mt-2">Antara {{ request()->get('origin') }} dan {{ request()->get('destination') }}</p>
+            <p class="text-gray-600 mt-4">Silakan pilih kombinasi asal/tujuan berbeda.</p>
         </div>
         @elseif(isset($schedules) && $schedules->count() > 0)
         <!-- Mobile responsive table -->
@@ -94,13 +94,13 @@
             <table class="min-w-full divide-y divide-gray-200 mobile-table mobile-booking-table">
                 <thead class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
                     <tr>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Route</th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Departure</th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Arrival</th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Bus Type</th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Available Seats</th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Price</th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Action</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Rute</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Keberangkatan</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Kedatangan</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Jenis Bus</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Kursi Tersedia</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Harga</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -165,15 +165,15 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" data-label="Action">
                             @if($schedule->hasDeparted())
                                 <span class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
-                                    Departed
+                                    Sudah Berangkat
                                 </span>
                             @elseif($schedule->getAvailableSeatsCount() > 0)
                             <a href="{{ route('frontend.booking.show', ['id' => $schedule->id, 'date' => request()->get('date')]) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 border border-transparent rounded-md font-semibold text-white hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm">
-                                Select
+                                Pilih
                             </a>
                             @else
                             <span class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
-                                Full
+                                Penuh
                             </span>
                             @endif
                         </td>
@@ -187,8 +187,8 @@
             <div class="text-gray-400 text-5xl mb-4">
                 <i class="fas fa-search"></i>
             </div>
-            <p class="text-gray-600 text-lg">No schedules found for the selected route.</p>
-            <p class="text-gray-500 mt-2">Please try different origin/destination or date.</p>
+            <p class="text-gray-600 text-lg">Tidak ditemukan jadwal untuk rute yang dipilih.</p>
+            <p class="text-gray-500 mt-2">Silakan coba asal/tujuan atau tanggal berbeda.</p>
         </div>
         @endif
     </div>
