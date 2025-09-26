@@ -56,7 +56,7 @@ use Illuminate\Support\Str;
     </div>
     
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24 lg:py-32">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-8 items-center">
             <div class="text-center md:text-left bg-black bg-opacity-50 backdrop-blur-sm p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl">
                 <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 animate-fade-in-down">Comfortable & Reliable Transportation</h1>
                 <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-blue-100 animate-fade-in-up">Experience safe and comfortable journeys with our modern fleet and professional drivers.</p>
@@ -71,10 +71,6 @@ use Illuminate\Support\Str;
                         <i class="fas fa-bus mr-2"></i>View Fleet
                     </a>
                 </div>
-            </div>
-            <!-- Show image separately on medium and larger screens -->
-            <div class="hidden md:block">
-                <img src="{{ asset('img/heroImg.jpg') }}" alt="Tunggal Jaya Transport" class="w-full h-64 md:h-80 lg:h-96 object-cover rounded-xl shadow-lg transform hover:scale-105 transition duration-500">
             </div>
         </div>
     </div>
@@ -252,9 +248,9 @@ use Illuminate\Support\Str;
         </div>
     </div>
 
-    <!-- Company Highlights -->
+    <!-- Company Facilities -->
     <div class="mb-8 sm:mb-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 sm:p-6 md:p-8">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8 text-center text-gray-800">Why Choose Us</h2>
+        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8 text-center text-gray-800">About Tunggal Jaya</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div class="text-center bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
@@ -265,24 +261,24 @@ use Illuminate\Support\Str;
             </div>
             <div class="text-center bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <i class="fas fa-clock text-blue-600 text-xl sm:text-2xl"></i>
+                    <i class="fas fa-tv text-blue-600 text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-base sm:text-lg font-bold mb-2">On-time Guarantee</h3>
-                <p class="text-xs sm:text-sm text-gray-600">Punctual departures and arrivals</p>
+                <h3 class="text-base sm:text-lg font-bold mb-2">Entertainment System</h3>
+                <p class="text-xs sm:text-sm text-gray-600">LCD TV and entertainment systems</p>
             </div>
             <div class="text-center bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <i class="fas fa-user-friends text-blue-600 text-xl sm:text-2xl"></i>
+                    <i class="fas fa-wifi text-blue-600 text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-base sm:text-lg font-bold mb-2">Friendly Staff</h3>
-                <p class="text-xs sm:text-sm text-gray-600">Professional and courteous service</p>
+                <h3 class="text-base sm:text-lg font-bold mb-2">Free WiFi</h3>
+                <p class="text-xs sm:text-sm text-gray-600">Stay connected during your journey</p>
             </div>
             <div class="text-center bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
                 <div class="bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <i class="fas fa-shield-alt text-blue-600 text-xl sm:text-2xl"></i>
+                    <i class="fas fa-restroom text-blue-600 text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-base sm:text-lg font-bold mb-2">Safe Travel</h3>
-                <p class="text-xs sm:text-sm text-gray-600">Regular maintenance and safety checks</p>
+                <h3 class="text-base sm:text-lg font-bold mb-2">Restroom</h3>
+                <p class="text-xs sm:text-sm text-gray-600">Clean and accessible restrooms</p>
             </div>
         </div>
     </div>
@@ -311,12 +307,52 @@ use Illuminate\Support\Str;
                     <h3 class="text-base sm:text-xl font-bold mb-2 text-gray-800">{{ $article->title }}</h3>
                     <p class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3"><i class="far fa-calendar mr-1 sm:mr-2"></i>{{ $article->created_at->format('F j, Y') }}</p>
                     <p class="text-xs sm:text-sm text-gray-700 mb-3 sm:mb-4">{{ Str::limit($article->excerpt ?? strip_tags($article->content), 80) }}</p>
-                    <a href="{{ route('frontend.news.show', $article) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm sm:text-base">
+                    <a href="{{ route('frontend.news.show', $article->slug) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm sm:text-base">
                         Read More <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
                     </a>
                 </div>
             </div>
             @endforeach
+        </div>
+    </div>
+
+    <!-- Bus Fleet Information -->
+    <div class="mb-8 sm:mb-12">
+        <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Our Bus Fleet</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            @forelse($fleet as $bus)
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
+                <div class="p-4 sm:p-6">
+                    <div class="flex justify-center mb-4">
+                        @if($bus->getFirstMediaUrl('buses'))
+                            <img src="{{ $bus->getFirstMediaUrl('buses') }}" alt="{{ $bus->name }}" class="w-full h-32 object-cover rounded-lg">
+                        @else
+                            <i class="fas fa-bus text-blue-600 text-4xl"></i>
+                        @endif
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-bold mb-2 text-gray-800 text-center">{{ $bus->name ?? 'Bus Name' }}</h3>
+                    <p class="text-sm text-gray-600 mb-3 text-center">Type: {{ $bus->bus_type }}</p>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>{{ $bus->capacity }} seats</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Bus No: {{ $bus->plate_number }}</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Status: {{ ucfirst($bus->status) }}</li>
+                    </ul>
+                </div>
+            </div>
+            @empty
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 transform hover:-translate-y-1 col-span-3 text-center p-8">
+                <div class="flex justify-center mb-4">
+                    <i class="fas fa-bus text-blue-600 text-4xl"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold mb-2 text-gray-800">No buses available at the moment</h3>
+                <p class="text-sm text-gray-600">Please check back later for our fleet information.</p>
+            </div>
+            @endforelse
+        </div>
+        <div class="text-center mt-6">
+            <a href="{{ route('frontend.fleet.index') }}" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 text-center text-base sm:text-lg transform hover:scale-105 shadow-lg hover:shadow-xl inline-block">
+                <i class="fas fa-bus mr-2"></i>View All Fleet
+            </a>
         </div>
     </div>
 
@@ -368,68 +404,6 @@ use Illuminate\Support\Str;
         </div>
     </div>
 </div>
-
-<!-- Favorite Routes Section (for logged in users) -->
-@if(auth()->check() && isset($favoriteRoutes) && $favoriteRoutes->count() > 0)
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12">
-    <div class="flex justify-between items-center mb-4 sm:mb-6">
-        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Your Favorite Routes</h2>
-        <div class="text-sm text-blue-600">
-            <i class="fas fa-heart mr-1"></i>Based on your booking history
-        </div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-        @foreach($favoriteRoutes as $route)
-        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 transform hover:-translate-y-1 border-l-4 border-blue-500 favorite-route-card">
-            <div class="p-4 sm:p-6">
-                <div class="flex justify-between items-center mb-3 sm:mb-4">
-                    <h3 class="text-base sm:text-xl font-bold text-gray-800">{{ $route->origin }}</h3>
-                    <i class="fas fa-arrow-right text-blue-500 text-sm sm:text-base"></i>
-                    <h3 class="text-base sm:text-xl font-bold text-gray-800">{{ $route->destination }}</h3>
-                </div>
-                @if($route->distance)
-                    <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4"><i class="fas fa-road mr-1 sm:mr-2"></i>{{ $route->distance }} km</p>
-                @endif
-                <a href="{{ route('frontend.routes.show', $route) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm sm:text-base">
-                    Book Again <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
-                </a>
-            </div>
-        </div>
-        @endforeach
-    </div>
-</div>
-@endif>
-
-<!-- Recommended Routes Section -->
-@if(isset($recommendedRoutes) && $recommendedRoutes->count() > 0)
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12">
-    <div class="flex justify-between items-center mb-4 sm:mb-6">
-        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Recommended For You</h2>
-        <div class="text-sm text-blue-600">
-            <i class="fas fa-location-dot mr-1"></i>Based on popular routes
-        </div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-        @foreach($recommendedRoutes as $route)
-        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 transform hover:-translate-y-1 border-l-4 border-green-500">
-            <div class="p-4 sm:p-6">
-                <div class="flex justify-between items-center mb-3 sm:mb-4">
-                    <h3 class="text-base sm:text-xl font-bold text-gray-800">{{ $route->origin }}</h3>
-                    <i class="fas fa-arrow-right text-green-500 text-sm sm:text-base"></i>
-                    <h3 class="text-base sm:text-xl font-bold text-gray-800">{{ $route->destination }}</h3>
-                </div>
-                @if($route->distance)
-                    <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4"><i class="fas fa-road mr-1 sm:mr-2"></i>{{ $route->distance }} km</p>
-                @endif
-                <a href="{{ route('frontend.routes.show', $route) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm sm:text-base">
-                    View Details <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
-                </a>
-            </div>
-        </div>
-        @endforeach
-    </div>
-</div>
-@endif
 
 @endsection
 

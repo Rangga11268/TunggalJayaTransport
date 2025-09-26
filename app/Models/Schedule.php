@@ -60,14 +60,14 @@ class Schedule extends Model
     {
         return $this->hasMany(Booking::class);
     }
-    
+
     public function getBookedSeatsCount($forDate = null)
     {
         $query = $this->bookings()
             ->where('booking_status', 'confirmed')
             ->where('payment_status', 'paid')
             ->where('booking_status', '!=', 'cancelled');
-            
+
         // If checking for a specific date, we need to filter by booking_date
         if ($forDate) {
             $query->whereDate('booking_date', $forDate);
@@ -79,19 +79,19 @@ class Schedule extends Model
                 $query->whereDate('booking_date', '>=', Carbon::today());
             }
         }
-        
+
         return $query->sum('number_of_seats');
     }
-    
+
     public function getAvailableSeatsCount($forDate = null)
     {
         // Only count confirmed bookings that are paid and not cancelled
         $bookedSeats = $this->getBookedSeatsCount($forDate);
-        
+
         $available = $this->bus->capacity - $bookedSeats;
         return max(0, $available);
     }
-    
+
     public function getBookedSeatNumbers($forDate = null)
     {
         // Get seat numbers for confirmed bookings that are paid and not cancelled
@@ -100,7 +100,7 @@ class Schedule extends Model
             ->where('payment_status', 'paid')
             ->where('booking_status', '!=', 'cancelled') // Exclude cancelled bookings
             ->whereNotNull('seat_numbers');
-            
+
         // Filter by date if specified
         if ($forDate) {
             $query->whereDate('booking_date', $forDate);
@@ -108,9 +108,9 @@ class Schedule extends Model
             // For recurring schedules without a specific date, consider future bookings only
             $query->whereDate('booking_date', '>=', Carbon::today());
         }
-        
+
         $bookings = $query->pluck('seat_numbers')->toArray();
-            
+
         $seatNumbers = [];
         foreach ($bookings as $seatString) {
             if ($seatString) {
@@ -118,7 +118,7 @@ class Schedule extends Model
                 $seatNumbers = array_merge($seatNumbers, $seats);
             }
         }
-        
+
         return array_map('trim', $seatNumbers);
     }
 
@@ -132,7 +132,7 @@ class Schedule extends Model
     public function getActualDepartureTime($forDate = null)
     {
         $departureTime = null;
-        
+
         if ($this->is_weekly && $this->day_of_week !== null) {
             // For weekly schedules, calculate the departure for the specified date
             if ($forDate) {
@@ -151,7 +151,7 @@ class Schedule extends Model
                     $departureTime = $nextDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
                 } else {
                     // Fallback to today with the time
-                    $departureTime = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+                    $departureTime = Carbon::today('Asia/Jakarta')->setTimeFromTimeString($this->departure_time->format('H:i:s'));
                 }
             }
         } else if ($this->is_daily) {
@@ -159,11 +159,11 @@ class Schedule extends Model
             if ($forDate) {
                 $departureTime = $forDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
             } else {
-                $now = \Carbon\Carbon::now('Asia/Jakarta');
-                $today = \Carbon\Carbon::today('Asia/Jakarta');
+                $now = Carbon::now('Asia/Jakarta');
+                $today = Carbon::today('Asia/Jakarta');
                 // Get today's departure time
                 $todayDeparture = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
-                
+
                 // If departure time hasn't passed yet today, return today
                 if ($todayDeparture->isFuture()) {
                     $departureTime = $todayDeparture;
@@ -176,7 +176,7 @@ class Schedule extends Model
             // For daily schedules, return the stored datetime
             $departureTime = $this->departure_time;
         }
-        
+
         // Convert to WIB timezone for display
         return $departureTime->setTimezone('Asia/Jakarta');
     }
@@ -191,7 +191,7 @@ class Schedule extends Model
     public function getActualArrivalTime($forDate = null)
     {
         $arrivalTime = null;
-        
+
         if ($this->is_weekly && $this->day_of_week !== null) {
             // For weekly schedules, calculate the arrival for the specified date
             if ($forDate) {
@@ -210,7 +210,7 @@ class Schedule extends Model
                     $arrivalTime = $nextDate->copy()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
                 } else {
                     // Fallback to today with the time
-                    $arrivalTime = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
+                    $arrivalTime = Carbon::today('Asia/Jakarta')->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
                 }
             }
         } else if ($this->is_daily) {
@@ -218,12 +218,12 @@ class Schedule extends Model
             if ($forDate) {
                 $arrivalTime = $forDate->copy()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
             } else {
-                $now = \Carbon\Carbon::now('Asia/Jakarta');
-                $today = \Carbon\Carbon::today('Asia/Jakarta');
-                
+                $now = Carbon::now('Asia/Jakarta');
+                $today = Carbon::today('Asia/Jakarta');
+
                 // Get today's departure time
                 $todayDeparture = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
-                
+
                 // If departure time hasn't passed yet today, return today's arrival time
                 if ($todayDeparture->isFuture()) {
                     $arrivalTime = $today->copy()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
@@ -236,7 +236,7 @@ class Schedule extends Model
             // For daily schedules, return the stored datetime
             $arrivalTime = $this->arrival_time;
         }
-        
+
         // Convert to WIB timezone for display
         return $arrivalTime->setTimezone('Asia/Jakarta');
     }
@@ -252,34 +252,34 @@ class Schedule extends Model
     public function hasDeparted($forDate = null)
     {
         // Use local timezone (WIB) for checking departure time
-        $now = \Carbon\Carbon::now('Asia/Jakarta');
-        
+        $now = Carbon::now('Asia/Jakarta');
+
         if ($this->is_weekly && $this->day_of_week !== null) {
             // For weekly schedules, check if the specified occurrence has passed
             $actualDeparture = $this->getActualDepartureTime($forDate);
             // Already in local timezone, no need to convert
             return $actualDeparture->isPast();
         }
-        
+
         if ($this->is_daily) {
             // For daily recurring schedules, check if the specified day's departure has passed
-            $checkDate = $forDate ?: \Carbon\Carbon::today('Asia/Jakarta');
+            $checkDate = $forDate ?: Carbon::today('Asia/Jakarta');
             $checkDeparture = $checkDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
-            
+
             // Check if the specified day's departure time has passed
             return $checkDeparture->isPast();
         }
-        
+
         // For daily schedules, check against stored departure time
         // Make sure we're comparing with the actual datetime
-        if ($this->departure_time instanceof \Carbon\Carbon) {
+        if ($this->departure_time instanceof Carbon) {
             // Already in local timezone, no need to convert
             return $this->departure_time->isPast();
         }
-        
+
         // If it's not a Carbon instance, try to parse it
         try {
-            $departureTime = \Carbon\Carbon::parse($this->departure_time);
+            $departureTime = Carbon::parse($this->departure_time);
             // Already in local timezone, no need to convert
             return $departureTime->isPast();
         } catch (\Exception $e) {
@@ -297,15 +297,15 @@ class Schedule extends Model
             // Use system timezone
             $timezone = Carbon::now()->timezone;
         }
-        
+
         $departureTime = $this->getActualDepartureTime();
         return $departureTime->setTimezone($timezone);
     }
-    
+
     /*-------------------------------------------------------------------------
      * WIB Time Conversion Methods
      *-------------------------------------------------------------------------*/
-    
+
     /**
      * Get departure time in WIB timezone for display purposes
      */
@@ -314,7 +314,7 @@ class Schedule extends Model
         if ($this->departure_time instanceof Carbon) {
             return $this->departure_time->setTimezone('Asia/Jakarta');
         }
-        
+
         try {
             $departureTime = Carbon::parse($this->departure_time);
             return $departureTime->setTimezone('Asia/Jakarta');
@@ -322,7 +322,7 @@ class Schedule extends Model
             return $this->departure_time;
         }
     }
-    
+
     /**
      * Get arrival time in WIB timezone for display purposes
      */
@@ -331,7 +331,7 @@ class Schedule extends Model
         if ($this->arrival_time instanceof Carbon) {
             return $this->arrival_time->setTimezone('Asia/Jakarta');
         }
-        
+
         try {
             $arrivalTime = Carbon::parse($this->arrival_time);
             return $arrivalTime->setTimezone('Asia/Jakarta');
@@ -372,10 +372,10 @@ class Schedule extends Model
 
         $today = \Carbon\Carbon::today('Asia/Jakarta');
         $now = \Carbon\Carbon::now('Asia/Jakarta');
-        
+
         // Get today's departure time for comparison
         $todayDeparture = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
-        
+
         // If today is the scheduled day
         if ($today->dayOfWeek == $this->day_of_week) {
             // If departure time hasn't passed yet today, return today
@@ -385,7 +385,7 @@ class Schedule extends Model
             // If departure time has passed today, return next week's date
             return $today->copy()->addWeek();
         }
-        
+
         // If today is not the scheduled day, get the next occurrence
         // next() returns the next occurrence of the given day of week
         $nextDate = $today->copy()->next($this->day_of_week);
@@ -401,21 +401,21 @@ class Schedule extends Model
         if ($this->is_daily) {
             $startDate = $startDate ? \Carbon\Carbon::parse($startDate) : \Carbon\Carbon::today('Asia/Jakarta');
             $endDate = $endDate ? \Carbon\Carbon::parse($endDate) : $startDate->copy()->addMonths(3); // Default 3 months
-            
+
             $dates = collect();
             $currentDate = $startDate->copy();
             $count = 0;
-            
+
             // Generate dates for each day in the range
             while ($currentDate->lte($endDate) && $count < $limit) {
                 $dates->push($currentDate->copy());
                 $currentDate->addDay();
                 $count++;
             }
-            
+
             return $dates;
         }
-        
+
         // Only applicable for weekly schedules
         if (!$this->is_weekly || $this->day_of_week === null) {
             return collect();
@@ -423,11 +423,11 @@ class Schedule extends Model
 
         $startDate = $startDate ? \Carbon\Carbon::parse($startDate) : \Carbon\Carbon::today('Asia/Jakarta');
         $endDate = $endDate ? \Carbon\Carbon::parse($endDate) : $startDate->copy()->addMonths(3); // Default 3 months
-        
+
         $dates = collect();
         $currentDate = $startDate->copy();
         $count = 0;
-        
+
         // Find the first occurrence
         if ($currentDate->dayOfWeek == $this->day_of_week) {
             // If today is the scheduled day, check if departure time hasn't passed yet
@@ -438,12 +438,12 @@ class Schedule extends Model
             }
             $currentDate->addDay();
         }
-        
+
         // Continue finding occurrences until we reach the limit or end date
         while ($currentDate->lte($endDate) && $count < $limit) {
             // Find the next occurrence of the scheduled day
             $nextDate = $currentDate->copy()->next($this->day_of_week);
-            
+
             // If the next date is within our range, add it
             if ($nextDate->lte($endDate)) {
                 $dates->push($nextDate);
@@ -453,7 +453,7 @@ class Schedule extends Model
                 break;
             }
         }
-        
+
         return $dates;
     }
 
@@ -502,7 +502,7 @@ class Schedule extends Model
     {
         return $query->where('is_weekly', false);
     }
-    
+
     /**
      * Scope for daily recurring schedules
      */
@@ -510,7 +510,7 @@ class Schedule extends Model
     {
         return $query->where('is_daily', true);
     }
-    
+
     /**
      * Get formatted schedule information for display
      */
@@ -518,7 +518,7 @@ class Schedule extends Model
     {
         $departure = $this->getActualDepartureTime();
         $arrival = $this->getActualArrivalTime();
-        
+
         return [
             'departure' => $departure->format('H:i'),
             'arrival' => $arrival->format('H:i'),
