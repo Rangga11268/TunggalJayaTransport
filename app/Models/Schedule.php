@@ -65,17 +65,27 @@ class Schedule extends Model
     {
         $query = $this->bookings()
             ->where('booking_status', 'confirmed')
-            ->where('payment_status', 'paid');
+            ->where('payment_status', 'paid')
+            ->where('booking_status', '!=', 'cancelled');
             
-        // For daily recurring schedules, we may need to consider date-specific bookings
-        // For now, we'll keep the same logic but allow for date filtering if needed in the future
+        // If checking for a specific date, we need to filter by booking_date
+        if ($forDate) {
+            $query->whereDate('booking_date', $forDate);
+        } else {
+            // For recurring schedules, if no specific date provided, we might want to count upcoming bookings
+            // This will help maintain existing behavior for cases where no date is specified
+            if ($this->is_weekly || $this->is_daily) {
+                // For recurring schedules, count bookings for future dates only
+                $query->whereDate('booking_date', '>=', Carbon::today());
+            }
+        }
         
         return $query->sum('number_of_seats');
     }
     
     public function getAvailableSeatsCount($forDate = null)
     {
-        // Only count confirmed bookings that are paid
+        // Only count confirmed bookings that are paid and not cancelled
         $bookedSeats = $this->getBookedSeatsCount($forDate);
         
         $available = $this->bus->capacity - $bookedSeats;
@@ -84,13 +94,22 @@ class Schedule extends Model
     
     public function getBookedSeatNumbers($forDate = null)
     {
-        // Get seat numbers for confirmed bookings that are paid
-        $bookings = $this->bookings()
+        // Get seat numbers for confirmed bookings that are paid and not cancelled
+        $query = $this->bookings()
             ->where('booking_status', 'confirmed')
             ->where('payment_status', 'paid')
-            ->whereNotNull('seat_numbers')
-            ->pluck('seat_numbers')
-            ->toArray();
+            ->where('booking_status', '!=', 'cancelled') // Exclude cancelled bookings
+            ->whereNotNull('seat_numbers');
+            
+        // Filter by date if specified
+        if ($forDate) {
+            $query->whereDate('booking_date', $forDate);
+        } elseif ($this->is_weekly || $this->is_daily) {
+            // For recurring schedules without a specific date, consider future bookings only
+            $query->whereDate('booking_date', '>=', Carbon::today());
+        }
+        
+        $bookings = $query->pluck('seat_numbers')->toArray();
             
         $seatNumbers = [];
         foreach ($bookings as $seatString) {
@@ -115,14 +134,25 @@ class Schedule extends Model
         $departureTime = null;
         
         if ($this->is_weekly && $this->day_of_week !== null) {
-            // For weekly schedules, calculate the next occurrence
-            $nextDate = $this->getNextAvailableDate();
-            if ($nextDate) {
-                // Combine the next date with the stored time
-                $departureTime = $nextDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+            // For weekly schedules, calculate the departure for the specified date
+            if ($forDate) {
+                // Use the provided date to find the specific occurrence
+                $targetDate = $forDate->copy();
+                // Make sure the day of week matches the schedule
+                while ($targetDate->dayOfWeek != $this->day_of_week) {
+                    $targetDate->addDay();
+                }
+                $departureTime = $targetDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
             } else {
-                // Fallback to today with the time
-                $departureTime = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+                // For backward compatibility, calculate the next occurrence from today
+                $nextDate = $this->getNextAvailableDate();
+                if ($nextDate) {
+                    // Combine the next date with the stored time
+                    $departureTime = $nextDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+                } else {
+                    // Fallback to today with the time
+                    $departureTime = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+                }
             }
         } else if ($this->is_daily) {
             // For daily recurring schedules, we show the time for the specified date or the next available time
@@ -163,14 +193,25 @@ class Schedule extends Model
         $arrivalTime = null;
         
         if ($this->is_weekly && $this->day_of_week !== null) {
-            // For weekly schedules, calculate the next occurrence
-            $nextDate = $this->getNextAvailableDate();
-            if ($nextDate) {
-                // Combine the next date with the stored time
-                $arrivalTime = $nextDate->copy()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
+            // For weekly schedules, calculate the arrival for the specified date
+            if ($forDate) {
+                // Use the provided date to find the specific occurrence
+                $targetDate = $forDate->copy();
+                // Make sure the day of week matches the schedule
+                while ($targetDate->dayOfWeek != $this->day_of_week) {
+                    $targetDate->addDay();
+                }
+                $arrivalTime = $targetDate->copy()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
             } else {
-                // Fallback to today with the time
-                $arrivalTime = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
+                // For backward compatibility, calculate the next occurrence from today
+                $nextDate = $this->getNextAvailableDate();
+                if ($nextDate) {
+                    // Combine the next date with the stored time
+                    $arrivalTime = $nextDate->copy()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
+                } else {
+                    // Fallback to today with the time
+                    $arrivalTime = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
+                }
             }
         } else if ($this->is_daily) {
             // For daily recurring schedules, we show the time for the specified date or the next available time
@@ -214,20 +255,19 @@ class Schedule extends Model
         $now = \Carbon\Carbon::now('Asia/Jakarta');
         
         if ($this->is_weekly && $this->day_of_week !== null) {
-            // For weekly schedules, check if the next occurrence has passed
-            $actualDeparture = $this->getActualDepartureTime();
+            // For weekly schedules, check if the specified occurrence has passed
+            $actualDeparture = $this->getActualDepartureTime($forDate);
             // Already in local timezone, no need to convert
             return $actualDeparture->isPast();
         }
         
         if ($this->is_daily) {
-            // For daily recurring schedules, check if today's departure has passed
-            // We calculate today's specific departure time and compare with now
-            $today = \Carbon\Carbon::today('Asia/Jakarta');
-            $todayDeparture = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
+            // For daily recurring schedules, check if the specified day's departure has passed
+            $checkDate = $forDate ?: \Carbon\Carbon::today('Asia/Jakarta');
+            $checkDeparture = $checkDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
             
-            // Check if today's departure time has passed
-            return $todayDeparture->isPast();
+            // Check if the specified day's departure time has passed
+            return $checkDeparture->isPast();
         }
         
         // For daily schedules, check against stored departure time
@@ -316,8 +356,8 @@ class Schedule extends Model
             return false;
         }
 
-        // Check if there are available seats
-        return $this->getAvailableSeatsCount() > 0;
+        // Check if there are available seats for the specific date
+        return $this->getAvailableSeatsCount($forDate) > 0;
     }
 
     /**
@@ -422,10 +462,19 @@ class Schedule extends Model
      */
     public function getBookingsToCancel()
     {
-        return $this->bookings()
-            ->where('booking_status', '!=', 'cancelled') // Not already cancelled
-            ->where('payment_status', 'pending') // Only pending payments
-            ->get();
+        // For daily recurring schedules, return ALL non-cancelled bookings
+        // since the seats need to be available again the next day
+        if ($this->is_daily) {
+            return $this->bookings()
+                ->where('booking_status', '!=', 'cancelled') // Not already cancelled
+                ->get();
+        } else {
+            // For regular schedules, only return pending payments
+            return $this->bookings()
+                ->where('booking_status', '!=', 'cancelled') // Not already cancelled
+                ->where('payment_status', 'pending') // Only pending payments
+                ->get();
+        }
     }
 
     /**

@@ -153,11 +153,19 @@
                                                 </span>
                                             @else
                                                 <div class="text-sm text-gray-900">
-                                                    {{ $schedule->getAvailableSeatsCount() }} /
+                                                    @if(request()->get('date'))
+                                                        {{ $schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) }} /
+                                                    @else
+                                                        {{ $schedule->getAvailableSeatsCount() }} /
+                                                    @endif
                                                     {{ $schedule->bus->capacity }} seats</div>
                                                 <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
                                                     <div class="bg-blue-600 h-2 rounded-full"
-                                                        style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%">
+                                                        @if(request()->get('date'))
+                                                            style="width: {{ ($schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) / max(1, $schedule->bus->capacity)) * 100 }}%">
+                                                        @else
+                                                            style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%">
+                                                        @endif
                                                     </div>
                                                 </div>
                                             @endif
@@ -251,7 +259,7 @@
                                                 seats
                                             </div>
                                             @if ($schedule->getAvailableSeatsCount() > 0 && !$schedule->hasDeparted())
-                                                <a href="{{ route('frontend.booking.show', $schedule->id) }}"
+                                                <a href="{{ route('frontend.booking.show', ['id' => $schedule->id, 'date' => request()->get('date')]) }}"
                                                     class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded font-medium">
                                                     Book Now
                                                 </a>
@@ -261,7 +269,12 @@
                                         </div>
                                         <div class="w-full bg-gray-200 rounded-full h-2">
                                             <div class="bg-blue-600 h-2 rounded-full"
-                                                style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%">
+                                                @if(request()->get('date'))
+                                                    style="width: {{ ($schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) / max(1, $schedule->bus->capacity)) * 100 }}%"
+                                                @else
+                                                    style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%"
+                                                @endif
+                                            >
                                             </div>
                                         </div>
                                     @endif

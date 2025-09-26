@@ -75,13 +75,17 @@
         $departureTime = $booking->schedule->getActualDepartureTime();
         $now = now('Asia/Jakarta');
         $hoursUntilDeparture = $now->diffInHours($departureTime, false);
+        $minutesUntilDeparture = $now->diffInMinutes($departureTime, false);
         $daysUntilDeparture = floor($hoursUntilDeparture / 24);
         
         // Create a clean time display
         if ($daysUntilDeparture > 0) {
             $timeDisplay = $daysUntilDeparture . ' hari';
-        } else {
+        } elseif ($hoursUntilDeparture >= 1) {
             $timeDisplay = round($hoursUntilDeparture) . ' jam';
+        } else {
+            // If less than 1 hour, show in minutes (rounded to whole number)
+            $timeDisplay = round($minutesUntilDeparture) . ' menit';
         }
     @endphp
     

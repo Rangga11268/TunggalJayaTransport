@@ -203,25 +203,30 @@ class BookingController extends Controller
         return view('frontend.booking.schedules', compact('schedules', 'origins', 'destinations', 'origin', 'destination', 'date'));
     }
     
-    public function show($id)
+    public function show($id, Request $request)
     {
         $schedule = Schedule::with('route', 'bus')->findOrFail($id);
         
-        // Additional check: if schedule has already departed, redirect with error
-        if ($schedule->hasDeparted()) {
+        // Get the selected date from the request
+        $selectedDate = $request->get('date');
+        
+        // Check if schedule has departed for the selected date (or today if no specific date)
+        $checkDate = $selectedDate ? Carbon::parse($selectedDate) : null;
+        if ($schedule->hasDeparted($checkDate)) {
             return redirect()->route('frontend.booking.index')
                 ->withErrors(['schedule' => 'This schedule has already departed and is no longer available for booking.'])
                 ->withInput();
         }
         
-        // Check if schedule is available for booking
-        if (!$schedule->isAvailableForBooking()) {
+        // Check if schedule is available for booking on the selected date
+        if (!$schedule->isAvailableForBooking($checkDate)) {
             return redirect()->route('frontend.booking.index')
                 ->withErrors(['schedule' => 'This schedule is no longer available for booking.'])
                 ->withInput();
         }
         
-        return view('frontend.booking.show', compact('schedule'));
+        // Pass the date parameter to the view
+        return view('frontend.booking.show', compact('schedule', 'selectedDate'));
     }
     
     public function store(Request $request)
@@ -251,12 +256,33 @@ class BookingController extends Controller
                 ->withInput();
         }
         
-        // Check if there are enough seats available
-        $availableSeats = $schedule->getAvailableSeatsCount();
+        // If the request came with a specific date, use it
+        if ($request->date) {
+            $bookingDate = Carbon::parse($request->date);
+        } else {
+            // For recurring schedules, calculate the next available date
+            if ($schedule->is_weekly) {
+                $bookingDate = $schedule->getNextAvailableDate();
+            } elseif ($schedule->is_daily) {
+                $bookingDate = Carbon::today();
+                // If today's departure time hasn't passed, use today; otherwise use tomorrow
+                $todayDeparture = $bookingDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                if ($todayDeparture->isPast()) {
+                    $bookingDate = $bookingDate->addDay();
+                }
+            } else {
+                // For regular schedules, use the schedule's departure date
+                $bookingDate = $schedule->departure_time;
+            }
+        }
+        
+        // Check if there are enough seats available for the specific date
+        $availableSeats = $schedule->getAvailableSeatsCount($bookingDate);
         
         if ($request->number_of_seats > $availableSeats) {
+            $dateStr = $bookingDate ? $bookingDate->toDateString() : 'the date';
             return redirect()->back()->withErrors([
-                'number_of_seats' => "Only {$availableSeats} seats are available for this schedule. Please select fewer seats."
+                'number_of_seats' => "Only {$availableSeats} seats are available for this schedule on {$dateStr}. Please select fewer seats."
             ])->withInput();
         }
         
@@ -267,10 +293,16 @@ class BookingController extends Controller
             ])->withInput();
         }
         
+        // Convert bookingDate to string for database storage if it's a Carbon instance
+        if ($bookingDate instanceof Carbon) {
+            $bookingDate = $bookingDate->toDateString();
+        }
+        
         // Create booking
         $booking = new Booking();
         $booking->user_id = auth()->check() ? auth()->id() : null;
         $booking->schedule_id = $schedule->id;
+        $booking->booking_date = $bookingDate; // Set the specific booking date
         $booking->passenger_name = $request->passenger_name;
         $booking->passenger_email = $request->passenger_email;
         $booking->passenger_phone = $request->passenger_phone;
@@ -336,17 +368,17 @@ class BookingController extends Controller
             return response()->json(['success' => false, 'message' => 'Please select exactly ' . $booking->number_of_seats . ' seats.']);
         }
         
-        // Check if there are enough seats available
-        $availableSeats = $booking->schedule->getAvailableSeatsCount();
+        // Check if there are enough seats available for the booking date
+        $availableSeats = $booking->schedule->getAvailableSeatsCount($booking->booking_date);
         // Add back the current booking's seats as they are being reselected
         $availableSeats += $booking->number_of_seats;
         
         if (count($request->seat_numbers) > $availableSeats) {
-            return response()->json(['success' => false, 'message' => "Only {$availableSeats} seats are available for this schedule. Please select fewer seats."]);
+            return response()->json(['success' => false, 'message' => "Only {$availableSeats} seats are available for this schedule on {$booking->booking_date}. Please select fewer seats."]);
         }
         
-        // Check if any of the selected seats are already booked
-        $occupiedSeats = $booking->schedule->getBookedSeatNumbers();
+        // Check if any of the selected seats are already booked for the same date
+        $occupiedSeats = $booking->schedule->getBookedSeatNumbers($booking->booking_date);
         $selectedSeats = array_map('strval', $request->seat_numbers);
         
         // Check for conflicts
@@ -597,7 +629,7 @@ class BookingController extends Controller
         
         // Calculate total available seats from all matching schedules
         foreach ($schedules as $schedule) {
-            $availableSeats = $schedule->getAvailableSeatsCount();
+            $availableSeats = $schedule->getAvailableSeatsCount($searchDate);
             $totalAvailableSeats += $availableSeats;
         }
         

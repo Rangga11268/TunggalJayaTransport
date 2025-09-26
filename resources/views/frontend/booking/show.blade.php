@@ -170,7 +170,11 @@
                                 <div>
                                     <p class="text-sm text-gray-500">Date</p>
                                     <p class="font-medium">
-                                        {{ $schedule->getDepartureTimeWIB()->format('d M Y') }}
+                                        @if(isset($selectedDate) && $selectedDate)
+                                            {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}
+                                        @else
+                                            {{ $schedule->getActualDepartureTime(null)->format('d M Y') }}
+                                        @endif
                                     </p>
                                 </div>
                             </div>
@@ -181,7 +185,11 @@
                                 <div>
                                     <p class="text-sm text-gray-500">Departure</p>
                                     <p class="font-medium">
-                                        {{ $schedule->getDepartureTimeWIB()->format('H:i') }}
+                                        @if(isset($selectedDate) && $selectedDate)
+                                            {{ $schedule->getActualDepartureTime(\Carbon\Carbon::parse($selectedDate))->format('H:i') }}
+                                        @else
+                                            {{ $schedule->getActualDepartureTime(null)->format('H:i') }}
+                                        @endif
                                         <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                     </p>
                                 </div>
@@ -193,7 +201,11 @@
                                 <div>
                                     <p class="text-sm text-gray-500">Arrival</p>
                                     <p class="font-medium">
-                                        {{ $schedule->getArrivalTimeWIB()->format('H:i') }}
+                                        @if(isset($selectedDate) && $selectedDate)
+                                            {{ $schedule->getActualArrivalTime(\Carbon\Carbon::parse($selectedDate))->format('H:i') }}
+                                        @else
+                                            {{ $schedule->getActualArrivalTime(null)->format('H:i') }}
+                                        @endif
                                         <span class="text-xs text-gray-500 ml-1">(WIB)</span>
                                     </p>
                                 </div>
@@ -215,7 +227,13 @@
                     <div class="flex justify-between items-center">
                         <div>
                             <p class="text-sm text-gray-500">Available Seats</p>
-                            <p class="text-xl font-bold text-gray-800">{{ $schedule->getAvailableSeatsCount() }} / {{ $schedule->bus->capacity }}</p>
+                            <p class="text-xl font-bold text-gray-800">
+                                @if(isset($selectedDate) && $selectedDate)
+                                    {{ $schedule->getAvailableSeatsCount(\Carbon\Carbon::parse($selectedDate)) }} / {{ $schedule->bus->capacity }}
+                                @else
+                                    {{ $schedule->getAvailableSeatsCount() }} / {{ $schedule->bus->capacity }}
+                                @endif
+                            </p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Price per seat</p>
@@ -236,6 +254,9 @@
                 <form method="POST" action="{{ route('frontend.booking.store') }}" class="space-y-5">
                     @csrf
                     <input type="hidden" name="schedule_id" value="{{ $schedule->id }}">
+                    @if(isset($selectedDate))
+                        <input type="hidden" name="date" value="{{ $selectedDate }}">
+                    @endif
                     
                     <div class="mobile-form-group">
                         <label for="passenger_name" class="block text-sm font-medium text-gray-700 mb-1 mobile-form-label">Full Name</label>

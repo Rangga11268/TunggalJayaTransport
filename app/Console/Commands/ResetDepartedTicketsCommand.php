@@ -164,12 +164,21 @@ class ResetDepartedTicketsCommand extends Command
         }
         
         try {
-            // Get all bookings for this schedule that are not yet paid or confirmed
-            // We only cancel bookings that are pending payment or not yet confirmed
-            $bookingsToCancel = $schedule->bookings()
-                ->where('booking_status', '!=', 'cancelled') // Not already cancelled
-                ->where('payment_status', 'pending') // Only pending payments
-                ->get();
+            // For daily recurring schedules, cancel ALL bookings that are not yet cancelled
+            // For regular schedules, only cancel pending payments
+            if ($schedule->is_daily) {
+                // For daily recurring schedules, cancel ALL non-cancelled bookings
+                // since the seats need to be available again the next day
+                $bookingsToCancel = $schedule->bookings()
+                    ->where('booking_status', '!=', 'cancelled') // Not already cancelled
+                    ->get();
+            } else {
+                // For regular schedules, only cancel pending payments
+                $bookingsToCancel = $schedule->bookings()
+                    ->where('booking_status', '!=', 'cancelled') // Not already cancelled
+                    ->where('payment_status', 'pending') // Only pending payments
+                    ->get();
+            }
                 
             if ($bookingsToCancel->isEmpty()) {
                 $this->info("  No bookings to cancel for this schedule.");
@@ -269,9 +278,18 @@ class ResetDepartedTicketsCommand extends Command
         }
         
         try {
-            // Get all bookings for this schedule that are not yet paid or confirmed
-            // We only cancel bookings that are pending payment or not yet confirmed
-            $bookingsToCancel = $schedule->getBookingsToCancel();
+            // For daily recurring schedules, we would cancel ALL bookings that are not yet cancelled
+            // For regular schedules, only cancel pending payments
+            if ($schedule->is_daily) {
+                // For daily recurring schedules, cancel ALL non-cancelled bookings
+                // since the seats need to be available again the next day
+                $bookingsToCancel = $schedule->bookings()
+                    ->where('booking_status', '!=', 'cancelled') // Not already cancelled
+                    ->get();
+            } else {
+                // For regular schedules, only cancel pending payments
+                $bookingsToCancel = $schedule->getBookingsToCancel();
+            }
                 
             if ($bookingsToCancel->isEmpty()) {
                 $this->info("  No bookings to cancel for this schedule.");

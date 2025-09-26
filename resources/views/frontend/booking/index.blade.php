@@ -144,10 +144,20 @@
                             <div class="text-sm text-gray-500">{{ $schedule->bus->plate_number }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap" data-label="Available Seats">
-                            <div class="text-sm font-medium text-gray-900">{{ $schedule->getAvailableSeatsCount() }} / {{ $schedule->bus->capacity }}</div>
-                            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: {{ ($schedule->getAvailableSeatsCount() / $schedule->bus->capacity) * 100 }}%"></div>
+                            <div class="text-sm font-medium text-gray-900">
+                                @if(request()->get('date'))
+                                    {{ $schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) }} / {{ $schedule->bus->capacity }}
+                                @else
+                                    {{ $schedule->getAvailableSeatsCount() }} / {{ $schedule->bus->capacity }}
+                                @endif
                             </div>
+                            <div class="bg-blue-600 h-2 rounded-full" 
+                                 @if(request()->get('date'))
+                                     style="width: {{ ($schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) / $schedule->bus->capacity) * 100 }}%"
+                                 @else
+                                     style="width: {{ ($schedule->getAvailableSeatsCount() / $schedule->bus->capacity) * 100 }}%"
+                                 @endif
+                            ></div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap" data-label="Price">
                             <div class="text-lg font-bold text-gray-900">Rp. {{ number_format($schedule->price, 0, ',', '.') }}</div>
@@ -158,7 +168,7 @@
                                     Departed
                                 </span>
                             @elseif($schedule->getAvailableSeatsCount() > 0)
-                            <a href="{{ route('frontend.booking.show', $schedule->id) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 border border-transparent rounded-md font-semibold text-white hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm">
+                            <a href="{{ route('frontend.booking.show', ['id' => $schedule->id, 'date' => request()->get('date')]) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 border border-transparent rounded-md font-semibold text-white hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm">
                                 Select
                             </a>
                             @else

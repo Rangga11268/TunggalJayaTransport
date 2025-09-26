@@ -243,11 +243,20 @@
                                                     </span>
                                                 @else
                                                     <div class="text-sm text-gray-900">
-                                                        {{ $schedule->getAvailableSeatsCount() }} /
+                                                        @if(request()->get('date'))
+                                                            {{ $schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) }} /
+                                                        @else
+                                                            {{ $schedule->getAvailableSeatsCount() }} /
+                                                        @endif
                                                         {{ $schedule->bus->capacity }} seats</div>
                                                     <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
                                                         <div class="bg-green-600 h-2 rounded-full"
-                                                            style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%">
+                                                            @if(request()->get('date'))
+                                                                style="width: {{ ($schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) / max(1, $schedule->bus->capacity)) * 100 }}%"
+                                                            @else
+                                                                style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%"
+                                                            @endif
+                                                        >
                                                         </div>
                                                     </div>
                                                 @endif
@@ -263,7 +272,7 @@
                                                         Departed
                                                     </span>
                                                 @elseif($schedule->getAvailableSeatsCount() > 0 && $schedule->isAvailableForBooking())
-                                                    <a href="{{ route('frontend.booking.show', $schedule->id) }}"
+                                                    <a href="{{ route('frontend.booking.show', ['id' => $schedule->id, 'date' => request()->get('date')]) }}"
                                                         class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-700 border border-transparent rounded-md font-semibold text-white hover:from-green-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition duration-300 transform hover:scale-105">
                                                         <i class="fas fa-ticket-alt mr-1"></i>Book Now
                                                     </a>
@@ -414,12 +423,21 @@
                                         @else
                                             <div class="flex items-center">
                                                 <div class="text-sm text-gray-900 mr-2">
-                                                    {{ $schedule->getAvailableSeatsCount() }} /
+                                                    @if(request()->get('date'))
+                                                        {{ $schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) }} /
+                                                    @else
+                                                        {{ $schedule->getAvailableSeatsCount() }} /
+                                                    @endif
                                                     {{ $schedule->bus->capacity }} seats</div>
                                                 <div class="flex-1 ml-2">
                                                     <div class="w-full bg-gray-200 rounded-full h-2">
                                                         <div class="bg-green-600 h-2 rounded-full"
-                                                            style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%">
+                                                            @if(request()->get('date'))
+                                                                style="width: {{ ($schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) / max(1, $schedule->bus->capacity)) * 100 }}%"
+                                                            @else
+                                                                style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%"
+                                                            @endif
+                                                        >
                                                         </div>
                                                     </div>
                                                 </div>
@@ -434,7 +452,7 @@
                                                 Departed
                                             </button>
                                         @elseif($schedule->getAvailableSeatsCount() > 0 && $schedule->isAvailableForBooking())
-                                            <a href="{{ route('frontend.booking.show', $schedule->id) }}"
+                                            <a href="{{ route('frontend.booking.show', ['id' => $schedule->id, 'date' => request()->get('date')]) }}"
                                                 class="w-full inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-700 border border-transparent rounded-md font-semibold text-white hover:from-green-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition duration-300 text-sm">
                                                 <i class="fas fa-ticket-alt mr-1"></i>Book Now
                                             </a>
