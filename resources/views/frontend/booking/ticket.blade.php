@@ -482,7 +482,7 @@
             <div class="header">
                 <div class="logo-section">
                     <div class="logo">TJT</div>
-                    <div class="document-type">BUS TICKET</div>
+                    <div class="document-type">TIKET BUS</div>
                 </div>
                 <div class="company-name">TUNGGAL JAYA TRANSPORT</div>
                 <div class="tagline">Reliable. Comfortable. On-Time.</div>
@@ -554,7 +554,7 @@
             
             <!-- Barcode Section -->
             <div class="barcode-section">
-                <div class="barcode-label">Ticket Barcode - Scan at Boarding Point</div>
+                <div class="barcode-label">Barcode Tiket - Pindai di Titik Keberangkatan</div>
                 <div class="barcode-container">
                     @php
                         use Milon\Barcode\DNS1D;
@@ -596,7 +596,7 @@
             </div>
         </div>
         
-        <button onclick="window.print()" class="print-button">🖨️ Print Bus Ticket</button>
+        <button onclick="window.print()" class="print-button">🖨️ Cetak Tiket Bus</button>
         
         <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
             <a href="{{ route('frontend.booking.download-ticket', $booking->id) }}" 
@@ -605,7 +605,7 @@
             </a>
             <a href="{{ route('frontend.booking.index') }}" 
                style="display: inline-block; padding: 12px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); transition: all 0.3s ease;">
-                🚌 Book Another Ticket
+                🚌 Pesan Tiket Lainnya
             </a>
         </div>
     </div>

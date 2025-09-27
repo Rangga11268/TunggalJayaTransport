@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
-    <!-- Stepper Progress with Time Estimates -->
+    <!-- Progres Stepper dengan Estimasi Waktu -->
     <div class="mb-8 overflow-x-auto">
         <div class="flex items-center justify-center min-w-max">
             <div class="flex flex-col items-center">
@@ -11,7 +11,7 @@
                         <span class="text-xs md:text-sm font-bold">1</span>
                     </div>
                     <div class="text-center ml-1 md:ml-2">
-                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Schedule</div>
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Jadwal</div>
                         <div class="text-xs text-gray-500">&lt; 1 min</div>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                         <span class="text-xs md:text-sm font-bold">2</span>
                     </div>
                     <div class="text-center ml-1 md:ml-2">
-                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Passenger</div>
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Penumpang</div>
                         <div class="text-xs text-gray-500">&lt; 1 min</div>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                         <span class="text-xs md:text-sm font-bold">3</span>
                     </div>
                     <div class="text-center ml-1 md:ml-2">
-                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Seat</div>
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Kursi</div>
                         <div class="text-xs text-gray-500">1-2 min</div>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                         <span class="text-xs md:text-sm font-bold">4</span>
                     </div>
                     <div class="text-center ml-1 md:ml-2">
-                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Payment</div>
+                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Pembayaran</div>
                         <div class="text-xs text-gray-500">&lt; 1 min</div>
                     </div>
                 </div>
@@ -66,8 +66,8 @@
 
     <!-- Header -->
     <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-3">Booking Confirmation</h1>
-        <p class="text-lg text-gray-600">Please select your seats to complete the booking</p>
+        <h1 class="text-4xl font-bold text-gray-800 mb-3">Konfirmasi Pemesanan</h1>
+        <p class="text-lg text-gray-600">Silakan pilih kursi Anda untuk menyelesaikan pemesanan</p>
     </div>
     
     <!-- Departure Reminder -->
@@ -141,33 +141,33 @@
                 </div>
                 <div class="ml-3">
                     <p class="text-sm text-red-700">
-                        <strong>Warning:</strong> This schedule has already departed. 
-                        Please contact customer service for assistance.
+                        <strong>Peringatan:</strong> Jadwal ini sudah berangkat. 
+                        Silakan hubungi layanan pelanggan untuk bantuan.
                     </p>
                 </div>
             </div>
         </div>
     @endif
     
-    <!-- Booking Summary -->
+    <!-- Ringkasan Pemesanan -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-8 mobile-booking-summary">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Booking Details</h2>
+            <h2 class="text-2xl font-bold text-gray-800">Detail Pemesanan</h2>
             <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                <i class="fas fa-receipt mr-1"></i>Booking #{{ $booking->booking_code }}
+                <i class="fas fa-receipt mr-1"></i>Pemesanan #{{ $booking->booking_code }}
             </div>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="bg-white p-6 rounded-lg shadow-sm mobile-info-card">
-                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Route Information</h3>
+                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Informasi Rute</h3>
                 <div class="space-y-4">
                     <div class="flex items-center">
                         <div class="bg-blue-100 p-3 rounded-full mr-4">
                             <i class="fas fa-route text-blue-600"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500">Route</p>
+                            <p class="text-sm text-gray-500">Rute</p>
                             <p class="font-medium text-lg">{{ $booking->schedule->route->origin }} <i class="fas fa-arrow-right mx-2 text-blue-500"></i> {{ $booking->schedule->route->destination }}</p>
                         </div>
                     </div>
@@ -176,7 +176,7 @@
                             <i class="fas fa-calendar-alt text-blue-600"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500">Date</p>
+                            <p class="text-sm text-gray-500">Tanggal</p>
                             <p class="font-medium">
                                 {{ $booking->schedule->getActualDepartureTime()->format('l, F j, Y') }}
                             </p>
@@ -188,7 +188,7 @@
                                 <i class="fas fa-sign-out-alt text-blue-600"></i>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Departure</p>
+                                <p class="text-sm text-gray-500">Keberangkatan</p>
                                 <p class="font-medium">
                                     {{ $booking->schedule->getActualDepartureTime()->format('H:i') }}
                                     <span class="text-xs text-gray-500 ml-1">(WIB)</span>
@@ -200,7 +200,7 @@
                                 <i class="fas fa-sign-in-alt text-blue-600"></i>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Arrival</p>
+                                <p class="text-sm text-gray-500">Kedatangan</p>
                                 <p class="font-medium">
                                     {{ $booking->schedule->getActualArrivalTime()->format('H:i') }}
                                     <span class="text-xs text-gray-500 ml-1">(WIB)</span>
@@ -213,22 +213,22 @@
                             <i class="fas fa-bus text-blue-600"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500">Bus Type</p>
-                            <p class="font-medium">{{ $booking->schedule->bus->bus_type ?? 'Standard' }}</p>
+                            <p class="text-sm text-gray-500">Tipe Bus</p>
+                            <p class="font-medium">{{ $booking->schedule->bus->bus_type ?? 'Standar' }}</p>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="bg-white p-6 rounded-lg shadow-sm mobile-info-card">
-                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Passenger Information</h3>
+                <h3 class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Informasi Penumpang</h3>
                 <div class="space-y-4">
                     <div class="flex items-center">
                         <div class="bg-blue-100 p-3 rounded-full mr-4">
                             <i class="fas fa-user text-blue-600"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500">Name</p>
+                            <p class="text-sm text-gray-500">Nama</p>
                             <p class="font-medium text-lg">{{ $booking->passenger_name }}</p>
                         </div>
                     </div>
@@ -246,7 +246,7 @@
                             <i class="fas fa-phone text-blue-600"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500">Phone</p>
+                            <p class="text-sm text-gray-500">Telepon</p>
                             <p class="font-medium">{{ $booking->passenger_phone }}</p>
                         </div>
                     </div>
@@ -256,7 +256,7 @@
                                 <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-5 h-5 text-blue-600">
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Seats</p>
+                                <p class="text-sm text-gray-500">Jumlah Kursi</p>
                                 <p class="font-medium">{{ $booking->number_of_seats }}</p>
                             </div>
                         </div>
@@ -266,7 +266,7 @@
                                 <i class="fas fa-hashtag text-blue-600"></i>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Seat Numbers</p>
+                                <p class="text-sm text-gray-500">Nomor Kursi</p>
                                 <p class="font-medium">{{ $booking->seat_numbers }}</p>
                             </div>
                         </div>
@@ -279,8 +279,8 @@
         <div class="mt-8 pt-6 border-t border-gray-200 bg-white p-6 rounded-lg shadow-sm mobile-info-card">
             <div class="flex justify-between items-center">
                 <div>
-                    <p class="text-gray-600">Total Price ({{ $booking->number_of_seats }} seats)</p>
-                    <p class="text-sm text-gray-500">+ Service Fee: Rp. 5,000</p>
+                    <p class="text-gray-600">Total Harga ({{ $booking->number_of_seats }} kursi)</p>
+                    <p class="text-sm text-gray-500">+ Biaya Layanan: Rp. 5.000</p>
                 </div>
                 <div class="text-right">
                     <p class="text-3xl font-bold text-blue-600">Rp. {{ number_format($booking->total_price + 5000, 0, ',', '.') }}</p>
@@ -289,14 +289,14 @@
         </div>
     </div>
 
-    <!-- Payment Options -->
+    <!-- Pilihan Pembayaran -->
     <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-8 mobile-booking-card">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6 mobile-info-card-title">Payment Method</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 mobile-info-card-title">Metode Pembayaran</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mobile-payment-options">
             <div class="border-2 border-gray-200 rounded-lg p-4 sm:p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="credit_card">
                 <div class="flex items-center">
                     <input type="radio" id="credit-card" name="payment" class="h-5 w-5 text-blue-600">
-                    <label for="credit-card" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">Credit/Debit Card</label>
+                    <label for="credit-card" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">Kartu Kredit/Debit</label>
                 </div>
                 <div class="mt-4 flex space-x-2">
                     <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
@@ -307,7 +307,7 @@
             <div class="border-2 border-gray-200 rounded-lg p-4 sm:p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="bank_transfer">
                 <div class="flex items-center">
                     <input type="radio" id="bank-transfer" name="payment" class="h-5 w-5 text-blue-600">
-                    <label for="bank-transfer" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">Bank Transfer</label>
+                    <label for="bank-transfer" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">Transfer Bank</label>
                 </div>
                 <div class="mt-4 flex space-x-2">
                     <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
@@ -330,7 +330,7 @@
         
         <div class="mt-6 sm:mt-8">
             <button id="pay-button" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg text-base mobile-btn-full flex items-center justify-center">
-                <i class="fas fa-lock mr-2"></i> Proceed to Secure Payment
+                <i class="fas fa-lock mr-2"></i> Proses ke Pembayaran Aman
             </button>
         </div>
     </div>

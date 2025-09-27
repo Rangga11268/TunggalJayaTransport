@@ -1,0 +1,6 @@
+{
+  "skipLoopDetection": true,
+  "experimental": {
+    "visionModelPreview": false
+  }
+}
