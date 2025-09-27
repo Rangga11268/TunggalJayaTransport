@@ -34,6 +34,31 @@ class NewsController extends Controller
             ->where('is_published', true)
             ->firstOrFail();
             
-        return view('frontend.news.show', compact('article'));
+        // Fetch related articles from the same category, excluding the current article
+        $relatedArticles = collect();
+        if ($article->category_id) {
+            $relatedArticles = NewsArticle::with(['category', 'author'])
+                ->where('category_id', $article->category_id)
+                ->where('id', '!=', $article->id)
+                ->where('is_published', true)
+                ->limit(3)
+                ->latest()
+                ->get();
+        }
+        
+        // If there are not enough articles in the same category, get from other categories
+        if ($relatedArticles->count() < 3) {
+            $additionalArticles = NewsArticle::with(['category', 'author'])
+                ->where('id', '!=', $article->id)
+                ->where('is_published', true)
+                ->whereNotIn('id', $relatedArticles->pluck('id'))
+                ->limit(3 - $relatedArticles->count())
+                ->latest()
+                ->get();
+                
+            $relatedArticles = $relatedArticles->concat($additionalArticles);
+        }
+            
+        return view('frontend.news.show', compact('article', 'relatedArticles'));
     }
 }

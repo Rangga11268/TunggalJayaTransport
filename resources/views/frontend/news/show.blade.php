@@ -1,5 +1,7 @@
 @extends('frontend.layouts.app')
 
+@use(Illuminate\Support\Str)
+
 @section('content')
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
     <article class="bg-white rounded-xl shadow-lg overflow-hidden mb-10">
@@ -63,27 +65,43 @@
     <!-- Related Articles -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-8 mb-10">
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Related Articles</h2>
+        @if($relatedArticles && $relatedArticles->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Placeholder for related articles -->
-            <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-4"></div>
-                <h3 class="text-lg font-bold mb-2">Related Article 1</h3>
-                <p class="text-gray-600 text-sm mb-3">Brief description of the related article</p>
-                <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Read More</a>
+            @foreach($relatedArticles as $relatedArticle)
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                @if($relatedArticle->getFirstMediaUrl('featured_images'))
+                    <img src="{{ $relatedArticle->getFirstMediaUrl('featured_images') }}" alt="{{ $relatedArticle->title }}" class="w-full h-32 object-cover rounded-lg mb-4">
+                @else
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-32 mb-4"></div>
+                @endif
+                <h3 class="text-lg font-bold mb-2">
+                    <a href="{{ route('frontend.news.show', $relatedArticle->slug) }}" class="hover:text-blue-600">
+                        {{ Str::limit($relatedArticle->title, 50) }}
+                    </a>
+                </h3>
+                <p class="text-gray-600 text-sm mb-3">
+                    {{ Str::limit(strip_tags($relatedArticle->excerpt ?: $relatedArticle->content), 100) }}
+                </p>
+                <a href="{{ route('frontend.news.show', $relatedArticle->slug) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center">
+                    Read More
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
             </div>
-            <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-4"></div>
-                <h3 class="text-lg font-bold mb-2">Related Article 2</h3>
-                <p class="text-gray-600 text-sm mb-3">Brief description of the related article</p>
-                <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Read More</a>
-            </div>
-            <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-4"></div>
-                <h3 class="text-lg font-bold mb-2">Related Article 3</h3>
-                <p class="text-gray-600 text-sm mb-3">Brief description of the related article</p>
-                <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Read More</a>
-            </div>
+            @endforeach
         </div>
+        @else
+        <div class="text-center py-8">
+            <div class="flex justify-center mb-4">
+                <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No Related Articles</h3>
+            <p class="text-gray-500">We couldn't find any related articles at the moment. Check back later for more content.</p>
+        </div>
+        @endif
     </div>
     
     <!-- Back to News -->

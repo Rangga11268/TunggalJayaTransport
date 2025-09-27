@@ -14,4 +14,3 @@
 sekarang ganti di frontend kebanyakan masih menggunakan bahasa inggris ganti dengan bahasa indonesia namun jangan terlalu kaku dan kalau memang kondisi nya lebih baik menggunakan bahasa inggris saja yaudah pakai inggris saja dan ingat kalu mau pakai bahasa indonesia jangan kaku dan coba pakai bahasa komersil utnuk kesluruhan frontend mungkin mulai dari section home dan  booking 
 
 
-bagian detail news ada Related Articles yang sepertinya belum sesuai dengan database coba cek
