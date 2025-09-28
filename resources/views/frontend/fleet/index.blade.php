@@ -47,7 +47,7 @@
                     <p class="text-gray-600 mb-4">{{ $bus->description ?? 'Tidak ada deskripsi tersedia untuk bus ini.' }}</p>
                     <div class="flex flex-wrap gap-2">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            <i class="fas fa-gas-pump mr-1"></i>Bahan Bakar: {{ $bus->fuel_type ?? 'Solar' }}
+                            <i class="fas fa-gas-pump mr-1"></i>Bahan Bakar: Solar
                         </span>
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             <i class="fas fa-calendar-alt mr-1"></i>Tahun: {{ $bus->year ?? 'N/A' }}

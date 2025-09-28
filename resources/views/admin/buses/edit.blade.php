@@ -46,6 +46,14 @@
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                                     @enderror
                                 </div>
+                                
+                                <div class="mb-4">
+                                    <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                                    <input type="number" name="year" id="year" min="1900" max="{{ date('Y') + 2 }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" value="{{ old('year', $bus->year) }}">
+                                    @error('year')
+                                        <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
                             
                             <div>

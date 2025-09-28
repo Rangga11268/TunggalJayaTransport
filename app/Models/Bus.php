@@ -17,6 +17,7 @@ class Bus extends Model implements HasMedia
         'capacity',
         'description',
         'status',
+        'year',
     ];
 
     public function schedules()
