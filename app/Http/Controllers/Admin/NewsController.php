@@ -36,7 +36,7 @@ class NewsController extends Controller
             'content' => 'required',
             'excerpt' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $article = new NewsArticle();
@@ -86,7 +86,7 @@ class NewsController extends Controller
             'content' => 'required',
             'excerpt' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $article = NewsArticle::findOrFail($id);

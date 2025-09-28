@@ -37,7 +37,7 @@ class ConductorController extends Controller
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
             'status' => 'required|in:active,inactive',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $conductor = Conductor::create($request->except('image'));
@@ -81,7 +81,7 @@ class ConductorController extends Controller
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
             'status' => 'required|in:active,inactive',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $conductor->update($request->except('image'));

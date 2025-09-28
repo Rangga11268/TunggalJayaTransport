@@ -41,7 +41,7 @@ class DriverController extends Controller
                 'email' => 'nullable|email|max:255',
                 'address' => 'nullable|string',
                 'status' => 'required|in:active,inactive',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             ], [
                 'employee_id.unique' => 'Employee ID has already been taken.',
                 'license_number.unique' => 'License Number has already been taken.'
@@ -121,7 +121,7 @@ class DriverController extends Controller
                 'email' => 'nullable|email|max:255',
                 'address' => 'nullable|string',
                 'status' => 'required|in:active,inactive',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             ], [
                 'employee_id.unique' => 'Employee ID has already been taken.',
                 'license_number.unique' => 'License Number has already been taken.'

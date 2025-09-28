@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Bus;
 use App\Models\Driver;
 use App\Models\Conductor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 
 class BusController extends Controller
 {
@@ -36,6 +37,17 @@ class BusController extends Controller
      */
     public function store(Request $request)
     {
+        // Add debugging for image upload
+        if ($request->hasFile('image')) {
+            Log::info('Image upload info:', [
+                'file' => $request->file('image')->getClientOriginalName(),
+                'extension' => $request->file('image')->getClientOriginalExtension(),
+                'mimeType' => $request->file('image')->getMimeType(),
+                'size' => $request->file('image')->getSize(),
+                'isValid' => $request->file('image')->isValid()
+            ]);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'plate_number' => 'required|string|unique:buses',
@@ -47,13 +59,13 @@ class BusController extends Controller
             'drivers.*' => 'exists:drivers,id',
             'conductors' => 'nullable|array',
             'conductors.*' => 'exists:conductors,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         // Check if any selected drivers or conductors are already assigned
         $assignedDrivers = $this->getAssignedDrivers();
         $assignedConductors = $this->getAssignedConductors();
-        
+
         if ($request->has('drivers')) {
             $selectedDrivers = $request->input('drivers');
             $conflictingDrivers = array_intersect($selectedDrivers, $assignedDrivers);
@@ -64,7 +76,7 @@ class BusController extends Controller
                 ])->withInput();
             }
         }
-        
+
         if ($request->has('conductors')) {
             $selectedConductors = $request->input('conductors');
             $conflictingConductors = array_intersect($selectedConductors, $assignedConductors);
@@ -101,13 +113,13 @@ class BusController extends Controller
                     'drivers' => 'One or more drivers are already assigned to another bus.'
                 ])->withInput();
             }
-            
+
             if (strpos($e->getMessage(), 'unique_conductor_per_bus') !== false) {
                 return redirect()->back()->withErrors([
                     'conductors' => 'One or more conductors are already assigned to another bus.'
                 ])->withInput();
             }
-            
+
             // Re-throw the exception if it's not related to our constraints
             throw $e;
         }
@@ -142,6 +154,17 @@ class BusController extends Controller
     {
         $bus = Bus::findOrFail($id);
 
+        // Add debugging for image upload
+        if ($request->hasFile('image')) {
+            Log::info('Image upload info:', [
+                'file' => $request->file('image')->getClientOriginalName(),
+                'extension' => $request->file('image')->getClientOriginalExtension(),
+                'mimeType' => $request->file('image')->getMimeType(),
+                'size' => $request->file('image')->getSize(),
+                'isValid' => $request->file('image')->isValid()
+            ]);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'plate_number' => 'required|string|unique:buses,plate_number,' . $bus->id,
@@ -153,13 +176,13 @@ class BusController extends Controller
             'drivers.*' => 'exists:drivers,id',
             'conductors' => 'nullable|array',
             'conductors.*' => 'exists:conductors,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         // Check if any selected drivers or conductors are already assigned
         $assignedDrivers = $this->getAssignedDrivers($bus->id);
         $assignedConductors = $this->getAssignedConductors($bus->id);
-        
+
         if ($request->has('drivers')) {
             $selectedDrivers = $request->input('drivers');
             $conflictingDrivers = array_intersect($selectedDrivers, $assignedDrivers);
@@ -170,7 +193,7 @@ class BusController extends Controller
                 ])->withInput();
             }
         }
-        
+
         if ($request->has('conductors')) {
             $selectedConductors = $request->input('conductors');
             $conflictingConductors = array_intersect($selectedConductors, $assignedConductors);
@@ -214,13 +237,13 @@ class BusController extends Controller
                     'drivers' => 'One or more drivers are already assigned to another bus.'
                 ])->withInput();
             }
-            
+
             if (strpos($e->getMessage(), 'unique_conductor_per_bus') !== false) {
                 return redirect()->back()->withErrors([
                     'conductors' => 'One or more conductors are already assigned to another bus.'
                 ])->withInput();
             }
-            
+
             // Re-throw the exception if it's not related to our constraints
             throw $e;
         }
@@ -243,20 +266,20 @@ class BusController extends Controller
     private function getAssignedDrivers($excludeBusId = null)
     {
         $query = Bus::with('drivers');
-        
+
         if ($excludeBusId) {
             $query->where('id', '!=', $excludeBusId);
         }
-        
+
         $buses = $query->get();
         $assignedDriverIds = [];
-        
+
         foreach ($buses as $bus) {
             foreach ($bus->drivers as $driver) {
                 $assignedDriverIds[] = $driver->id;
             }
         }
-        
+
         return array_unique($assignedDriverIds);
     }
 
@@ -266,20 +289,20 @@ class BusController extends Controller
     private function getAssignedConductors($excludeBusId = null)
     {
         $query = Bus::with('conductors');
-        
+
         if ($excludeBusId) {
             $query->where('id', '!=', $excludeBusId);
         }
-        
+
         $buses = $query->get();
         $assignedConductorIds = [];
-        
+
         foreach ($buses as $bus) {
             foreach ($bus->conductors as $conductor) {
                 $assignedConductorIds[] = $conductor->id;
             }
         }
-        
+
         return array_unique($assignedConductorIds);
     }
 }
