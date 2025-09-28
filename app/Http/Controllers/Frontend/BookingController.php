@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Http\Controllers\Controller;
-use App\Models\Route as BusRoute;
-use App\Models\Schedule;
+use Carbon\Carbon;
 use App\Models\Booking;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
+use App\Models\Route as BusRoute;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class BookingController extends Controller
@@ -404,7 +405,7 @@ class BookingController extends Controller
     {
         try {
             // Log request details for debugging
-            \Log::info('Payment processing request', [
+            Log::info('Payment processing request', [
                 'all_request_data' => $request->all(),
                 'headers' => $request->headers->all(),
                 'content_type' => $request->header('Content-Type'),
@@ -417,7 +418,7 @@ class BookingController extends Controller
                 'payment_method' => 'required|string|in:credit_card,bank_transfer,e_wallet'
             ]);
             
-            \Log::info('Validation passed', ['validated_data' => $validatedData]);
+            Log::info('Validation passed', ['validated_data' => $validatedData]);
             
             $booking = Booking::findOrFail($validatedData['booking_id']);
             
@@ -451,14 +452,14 @@ class BookingController extends Controller
                 return response()->json(['success' => false, 'message' => 'Failed to process payment. Please try again.']);
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Payment validation error', [
+            Log::error('Payment validation error', [
                 'errors' => $e->errors(),
                 'request_data' => $request->all()
             ]);
             
             return response()->json(['success' => false, 'message' => 'Validation failed: ' . json_encode($e->errors())]);
         } catch (\Exception $e) {
-            \Log::error('Payment processing error', [
+            Log::error('Payment processing error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all()
