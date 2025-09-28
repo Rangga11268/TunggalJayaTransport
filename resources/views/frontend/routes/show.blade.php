@@ -6,16 +6,16 @@
         <div class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-800 mb-3">
                 {{ $route->name ?? $route->origin . ' - ' . $route->destination }}</h1>
-            <p class="text-lg text-gray-600">Detailed information about this route and available schedules</p>
+            <p class="text-lg text-gray-600">Informasi terperinci tentang rute ini dan jadwal yang tersedia</p>
         </div>
 
         <!-- Route Information -->
         <div class="mobile-info-card">
             <div class="mobile-info-card-header">
                 <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Route Details</h2>
+                    <h2 class="text-2xl font-bold text-gray-800">Detail Rute</h2>
                     <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                        <i class="fas fa-info-circle mr-1"></i>Route Info
+                        <i class="fas fa-info-circle mr-1"></i>Info Rute
                     </div>
                 </div>
             </div>
@@ -24,14 +24,14 @@
                     <div class="bg-white p-6 rounded-lg shadow-sm mobile-info-card">
                         <h3
                             class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">
-                            Route Overview</h3>
+                            Gambaran Umum Rute</h3>
                         <div class="space-y-4">
                             <div class="flex items-center">
                                 <div class="bg-blue-100 p-3 rounded-full mr-4">
                                     <i class="fas fa-map-marker-alt text-blue-600"></i>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500">Origin</p>
+                                    <p class="text-sm text-gray-500">Asal</p>
                                     <p class="font-medium text-lg">{{ $route->origin }}</p>
                                 </div>
                             </div>
@@ -40,7 +40,7 @@
                                     <i class="fas fa-map-pin text-blue-600"></i>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500">Destination</p>
+                                    <p class="text-sm text-gray-500">Tujuan</p>
                                     <p class="font-medium text-lg">{{ $route->destination }}</p>
                                 </div>
                             </div>
@@ -50,7 +50,7 @@
                                         <i class="fas fa-road text-blue-600"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500">Distance</p>
+                                        <p class="text-sm text-gray-500">Jarak</p>
                                         <p class="font-medium">{{ $route->distance }} km</p>
                                     </div>
                                 </div>
@@ -59,7 +59,7 @@
                                         <i class="fas fa-clock text-blue-600"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500">Duration</p>
+                                        <p class="text-sm text-gray-500">Durasi</p>
                                         <p class="font-medium">{{ $route->formatted_duration }}</p>
                                     </div>
                                 </div>
@@ -70,17 +70,17 @@
                     <div class="bg-white p-6 rounded-lg shadow-sm mobile-info-card">
                         <h3
                             class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">
-                            Description</h3>
+                            Deskripsi</h3>
                         <div class="prose max-w-none">
                             <p class="text-gray-700">
-                                {{ $route->description ?? 'No detailed description available for this route. Our buses operate regularly on this route with comfortable seating and professional drivers to ensure a pleasant journey.' }}
+                                {{ $route->description ?? 'Tidak ada deskripsi terperinci tersedia untuk rute ini. Bus kami beroperasi secara rutin di rute ini dengan kursi yang nyaman dan pengemudi profesional untuk memastikan perjalanan yang menyenangkan.' }}
                             </p>
                         </div>
 
                         <div class="mt-6 pt-4 border-t border-gray-200">
                             <div class="flex items-center text-sm text-gray-600">
                                 <i class="fas fa-sync-alt mr-2 text-blue-500"></i>
-                                <span>Regular service with multiple departure times daily</span>
+                                <span>Layanan reguler dengan berbagai waktu keberangkatan setiap hari</span>
                             </div>
                         </div>
                     </div>
@@ -92,9 +92,9 @@
         <div class="mobile-route-map-container">
             <div class="mobile-route-map-header">
                 <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Route Map</h2>
+                    <h2 class="text-2xl font-bold text-gray-800">Peta Rute</h2>
                     <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                        <i class="fas fa-map-marked-alt mr-1"></i>Visualize Route
+                        <i class="fas fa-map-marked-alt mr-1"></i>Lihat Rute
                     </div>
                 </div>
             </div>
@@ -103,15 +103,15 @@
                 @if ($route->origin_lat && $route->origin_lng && $route->destination_lat && $route->destination_lng)
                     <div id="route-map" style="height: 400px; width: 100%; border-radius: 0.5rem; z-index: 10;"></div>
                     <div class="mt-4 text-sm text-gray-600">
-                        <p><i class="fas fa-mouse-pointer mr-2"></i>Click and drag to pan the map</p>
+                        <p><i class="fas fa-mouse-pointer mr-2"></i>Klik dan seret untuk menggeser peta</p>
                     </div>
                 @else
                     <div class="bg-white rounded-xl shadow-sm p-8 text-center">
                         <div class="text-gray-400 text-5xl mb-4">
                             <i class="fas fa-map"></i>
                         </div>
-                        <p class="text-gray-600 text-lg">Map information is not available for this route.</p>
-                        <p class="text-gray-500 mt-2">Please check back later for updates.</p>
+                        <p class="text-gray-600 text-lg">Informasi peta tidak tersedia untuk rute ini.</p>
+                        <p class="text-gray-500 mt-2">Silakan periksa kembali nanti untuk pembaruan.</p>
                     </div>
                 @endif
             </div>
@@ -121,15 +121,15 @@
         <div class="schedule-legend">
             <div class="schedule-legend-item">
                 <div class="schedule-legend-color daily"></div>
-                <span class="schedule-legend-text">Daily Schedule</span>
+                <span class="schedule-legend-text">Jadwal Harian</span>
             </div>
             <div class="schedule-legend-item">
                 <div class="schedule-legend-color weekly"></div>
-                <span class="schedule-legend-text">Weekly Schedule</span>
+                <span class="schedule-legend-text">Jadwal Mingguan</span>
             </div>
             <div class="schedule-legend-item">
                 <div class="schedule-legend-color departed"></div>
-                <span class="schedule-legend-text">Departed</span>
+                <span class="schedule-legend-text">Sudah Berangkat</span>
             </div>
         </div>
 
@@ -137,9 +137,9 @@
         <div class="mobile-info-card">
             <div class="mobile-info-card-header">
                 <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Available Schedules</h2>
+                    <h2 class="text-2xl font-bold text-gray-800">Jadwal Yang Tersedia</h2>
                     <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                        <i class="fas fa-calendar-alt mr-1"></i>{{ $route->schedules->count() }} Schedules
+                        <i class="fas fa-calendar-alt mr-1"></i>{{ $route->schedules->count() }} Jadwal
                     </div>
                 </div>
             </div>
@@ -154,24 +154,24 @@
                                     <tr>
                                         <th scope="col"
                                             class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">
-                                            Schedule Type</th>
+                                            Jenis Jadwal</th>
                                         <th scope="col"
                                             class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">
-                                            Departure</th>
+                                            Keberangkatan</th>
                                         <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Arrival
+                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Kedatangan
                                         </th>
                                         <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Bus
-                                            Type</th>
+                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Jenis
+                                            Bus</th>
                                         <th scope="col"
                                             class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">
-                                            Availability</th>
+                                            Ketersediaan</th>
                                         <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Price
+                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Harga
                                         </th>
                                         <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Action
+                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Tindakan
                                         </th>
                                     </tr>
                                 </thead>
@@ -187,7 +187,7 @@
                                                     </div>
                                                     <div class="ml-3">
                                                         <div class="text-sm font-medium text-gray-900">
-                                                            {{ $schedule->is_weekly ? 'Weekly' : 'Daily' }}</div>
+                                                            {{ $schedule->is_weekly ? 'Mingguan' : 'Harian' }}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -228,7 +228,7 @@
                                                     </div>
                                                     <div>
                                                         <div class="text-sm font-medium text-gray-900">
-                                                            {{ $schedule->bus->name ?? ($schedule->bus->bus_type ?? 'Standard') }}
+                                                            {{ $schedule->bus->name ?? ($schedule->bus->bus_type ?? 'Standar') }}
                                                         </div>
                                                         <div class="text-sm text-gray-500">
                                                             {{ $schedule->bus->plate_number }}</div>
@@ -248,7 +248,7 @@
                                                         @else
                                                             {{ $schedule->getAvailableSeatsCount() }} /
                                                         @endif
-                                                        {{ $schedule->bus->capacity }} seats</div>
+                                                        {{ $schedule->bus->capacity }} kursi</div>
                                                     <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
                                                         <div class="bg-green-600 h-2 rounded-full"
                                                             @if(request()->get('date'))
@@ -269,22 +269,22 @@
                                                 @if ($schedule->hasDeparted())
                                                     <span
                                                         class="inline-flex items-center px-3 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
-                                                        Departed
+                                                        Sudah Berangkat
                                                     </span>
                                                 @elseif($schedule->getAvailableSeatsCount() > 0 && $schedule->isAvailableForBooking())
                                                     <a href="{{ route('frontend.booking.show', ['id' => $schedule->id, 'date' => request()->get('date')]) }}"
                                                         class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-700 border border-transparent rounded-md font-semibold text-white hover:from-green-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition duration-300 transform hover:scale-105">
-                                                        <i class="fas fa-ticket-alt mr-1"></i>Book Now
+                                                        <i class="fas fa-ticket-alt mr-1"></i>Pesan Sekarang
                                                     </a>
                                                 @elseif($schedule->getAvailableSeatsCount() == 0)
                                                     <span
                                                         class="inline-flex items-center px-3 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
-                                                        Full
+                                                        Penuh
                                                     </span>
                                                 @else
                                                     <span
                                                         class="inline-flex items-center px-3 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
-                                                        Not Available
+                                                        Tidak Tersedia
                                                     </span>
                                                 @endif
                                             </td>
@@ -310,7 +310,7 @@
                                             </div>
                                             <div class="ml-2">
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    {{ $schedule->is_weekly ? 'Weekly' : 'Daily' }}</div>
+                                                    {{ $schedule->is_weekly ? 'Mingguan' : 'Harian' }}</div>
                                             </div>
                                         </div>
                                         <div
@@ -321,7 +321,7 @@
                                                 </span>
                                             @else
                                                 <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                                                    Active
+                                                    Aktif
                                                 </span>
                                             @endif
                                         </div>
@@ -331,7 +331,7 @@
                                 <div class="p-4">
                                     <div class="grid grid-cols-2 gap-4 mb-4">
                                         <div>
-                                            <div class="text-xs text-gray-500">Departure</div>
+                                            <div class="text-xs text-gray-500">Keberangkatan</div>
                                             <div class="flex items-center mt-1">
                                                 <div class="bg-green-100 p-1 rounded-full mr-2">
                                                     <i class="fas fa-sign-out-alt text-green-600 text-xs"></i>
@@ -372,7 +372,7 @@
                                         </div>
 
                                         <div>
-                                            <div class="text-xs text-gray-500">Arrival</div>
+                                            <div class="text-xs text-gray-500">Kedatangan</div>
                                             <div class="flex items-center mt-1">
                                                 <div class="bg-green-100 p-1 rounded-full mr-2">
                                                     <i class="fas fa-sign-in-alt text-green-600 text-xs"></i>
@@ -398,7 +398,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-sm font-medium text-gray-900 truncate">
-                                                        {{ $schedule->bus->name ?? ($schedule->bus->bus_type ?? 'Standard') }}
+                                                        {{ $schedule->bus->name ?? ($schedule->bus->bus_type ?? 'Standar') }}
                                                     </div>
                                                     <div class="text-xs text-gray-500">{{ $schedule->bus->plate_number }}
                                                     </div>
@@ -407,14 +407,14 @@
                                         </div>
 
                                         <div>
-                                            <div class="text-xs text-gray-500">Price</div>
+                                            <div class="text-xs text-gray-500">Harga</div>
                                             <div class="text-lg font-bold text-gray-900 mt-1">Rp.
                                                 {{ number_format($schedule->price, 0, ',', '.') }}</div>
                                         </div>
                                     </div>
 
                                     <div class="mb-4">
-                                        <div class="text-xs text-gray-500 mb-1">Availability</div>
+                                        <div class="text-xs text-gray-500 mb-1">Ketersediaan</div>
                                         @if ($schedule->hasDeparted())
                                             <span
                                                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -428,7 +428,7 @@
                                                     @else
                                                         {{ $schedule->getAvailableSeatsCount() }} /
                                                     @endif
-                                                    {{ $schedule->bus->capacity }} seats</div>
+                                                    {{ $schedule->bus->capacity }} kursi</div>
                                                 <div class="flex-1 ml-2">
                                                     <div class="w-full bg-gray-200 rounded-full h-2">
                                                         <div class="bg-green-600 h-2 rounded-full"
@@ -449,22 +449,22 @@
                                         @if ($schedule->hasDeparted())
                                             <button
                                                 class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed text-sm">
-                                                Departed
+                                                Sudah Berangkat
                                             </button>
                                         @elseif($schedule->getAvailableSeatsCount() > 0 && $schedule->isAvailableForBooking())
                                             <a href="{{ route('frontend.booking.show', ['id' => $schedule->id, 'date' => request()->get('date')]) }}"
                                                 class="w-full inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-700 border border-transparent rounded-md font-semibold text-white hover:from-green-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition duration-300 text-sm">
-                                                <i class="fas fa-ticket-alt mr-1"></i>Book Now
+                                                <i class="fas fa-ticket-alt mr-1"></i>Pesan Sekarang
                                             </a>
                                         @elseif($schedule->getAvailableSeatsCount() == 0)
                                             <button
                                                 class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed text-sm">
-                                                Full
+                                                Penuh
                                             </button>
                                         @else
                                             <button
                                                 class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed text-sm">
-                                                Not Available
+                                                Tidak Tersedia
                                             </button>
                                         @endif
                                     </div>
@@ -477,8 +477,8 @@
                         <div class="text-gray-400 text-5xl mb-4">
                             <i class="fas fa-calendar-times"></i>
                         </div>
-                        <p class="text-gray-600 text-lg">No schedules available for this route at the moment.</p>
-                        <p class="text-gray-500 mt-2">Please check back later for updates or contact our customer service.
+                        <p class="text-gray-600 text-lg">Tidak ada jadwal tersedia untuk rute ini saat ini.</p>
+                        <p class="text-gray-500 mt-2">Silakan periksa kembali nanti untuk pembaruan atau hubungi layanan pelanggan kami.
                         </p>
                     </div>
                 @endif
@@ -492,10 +492,10 @@
                     <i class="fas fa-info-circle"></i>
                 </div>
                 <div class="mobile-info-section-text">
-                    <div class="mobile-info-section-title">Schedule Information</div>
+                    <div class="mobile-info-section-title">Informasi Jadwal</div>
                     <div class="mobile-info-section-description">
-                        Daily schedules reset automatically each day. Weekly schedules repeat on their designated days.
-                        Once a bus has departed, tickets can no longer be purchased for that schedule.
+                        Jadwal harian diatur ulang secara otomatis setiap hari. Jadwal mingguan diulang pada hari yang ditentukan.
+                        Setelah bus berangkat, tiket tidak dapat lagi dibeli untuk jadwal tersebut.
                     </div>
                 </div>
             </div>
@@ -601,7 +601,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
-                Back to Routes
+                Kembali ke Rute
             </a>
         </div>
     </div>

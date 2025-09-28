@@ -13,6 +13,8 @@ Catatan ini digunakan untuk melacak progres terjemahan dari bahasa Inggris ke ba
 -   [x] Halaman dashboard (admin dan user) (`resources/views/dashboard.blade.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/schedule-management/index.blade.php`)
 -   [x] Halaman konfirmasi pembayaran (`resources/views/frontend/booking/confirmation.blade.php`)
 -   [x] Halaman tiket (`resources/views/frontend/booking/partials/ticket-preview.blade.php`, `resources/views/frontend/booking/ticket.blade.php`)
+-   [x] Halaman routes show (`resources/views/frontend/routes/show.blade.php`)
+-   [x] Halaman fleet index (`resources/views/frontend/fleet/index.blade.php`)
 
 ## Status Keseluruhan
 
@@ -28,8 +30,8 @@ Catatan ini digunakan untuk melacak progres terjemahan dari bahasa Inggris ke ba
 
 ## Halaman Yang Belum Diterjemahkan
 
--   [ ] Halaman routes
--   [ ] Halaman fleet
+-   [x] Halaman routes
+-   [x] Halaman fleet
 -   [ ] Halaman news
 -   [ ] Halaman about us
 -   [ ] Halaman contact

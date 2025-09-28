@@ -4,8 +4,8 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
     <!-- Header -->
     <div class="text-center mb-10">
-        <h1 class="text-4xl font-bold text-gray-800 mb-3">Our Routes</h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Explore our extensive network of routes connecting cities and towns across the region</p>
+        <h1 class="text-4xl font-bold text-gray-800 mb-3">Rute Kami</h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Jelajahi jaringan rute luas kami yang menghubungkan kota-kota dan kabupaten di seluruh wilayah</p>
     </div>
     
     <!-- Info about schedule reset -->
@@ -15,10 +15,10 @@
                 <i class="fas fa-info-circle"></i>
             </div>
             <div class="mobile-info-section-text">
-                <div class="mobile-info-section-title">Route Information</div>
+                <div class="mobile-info-section-title">Informasi Rute</div>
                 <div class="mobile-info-section-description">
-                    Our routes operate with daily and weekly schedules. 
-                    Daily schedules reset automatically each day, while weekly schedules repeat on their designated days.
+                    Rute-rute kami beroperasi dengan jadwal harian dan mingguan. 
+                    Jadwal harian diatur ulang secara otomatis setiap hari, sedangkan jadwal mingguan berulang pada hari-hari yang ditentukan.
                 </div>
             </div>
         </div>
@@ -28,16 +28,16 @@
     <div class="mobile-route-map-container">
         <div class="mobile-route-map-header">
             <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
-                <h2 class="text-2xl font-bold text-gray-800">Route Network Map</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Peta Jaringan Rute</h2>
                 <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                    <i class="fas fa-map-marked-alt mr-1"></i>{{ $routes->count() }} Routes
+                    <i class="fas fa-map-marked-alt mr-1"></i>{{ $routes->count() }} Rute
                 </div>
             </div>
         </div>
         <div class="mobile-route-map-content">
             <div id="routes-map" style="height: 500px; width: 100%; border-radius: 0.5rem; z-index: 10;"></div>
             <div class="mt-4 text-sm text-gray-600">
-                <p><i class="fas fa-mouse-pointer mr-2"></i>Click and drag to pan the map</p>
+                <p><i class="fas fa-mouse-pointer mr-2"></i>Klik dan seret untuk menggeser peta</p>
             </div>
         </div>
     </div>
@@ -45,9 +45,9 @@
     <!-- Route List -->
     <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-6">
         <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
-            <h2 class="text-2xl font-bold text-gray-800">All Routes</h2>
+            <h2 class="text-2xl font-bold text-gray-800">Semua Rute</h2>
             <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                <i class="fas fa-route mr-1"></i>{{ $routes->count() }} Routes
+                <i class="fas fa-route mr-1"></i>{{ $routes->count() }} Rute
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -67,7 +67,7 @@
                                 <i class="fas fa-road text-green-600"></i>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Distance</p>
+                                <p class="text-sm text-gray-500">Jarak</p>
                                 <p class="font-medium">{{ $route->distance }} km</p>
                             </div>
                         </div>
@@ -76,13 +76,13 @@
                                 <i class="fas fa-clock text-green-600"></i>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Duration</p>
+                                <p class="text-sm text-gray-500">Durasi</p>
                                 <p class="font-medium">{{ $route->formatted_duration }}</p>
                             </div>
                         </div>
                     </div>
                     <a href="{{ route('frontend.routes.show', $route->id) }}" class="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-md flex items-center justify-center mobile-btn-full">
-                        <i class="fas fa-calendar-alt mr-2"></i>View Schedule
+                        <i class="fas fa-calendar-alt mr-2"></i>Lihat Jadwal
                     </a>
                 </div>
             </div>
@@ -92,8 +92,8 @@
                     <div class="text-gray-400 text-5xl mb-4">
                         <i class="fas fa-route"></i>
                     </div>
-                    <p class="text-gray-600 text-lg">No routes available at the moment.</p>
-                    <p class="text-gray-500 mt-2">Please check back later for updates.</p>
+                    <p class="text-gray-600 text-lg">Tidak ada rute tersedia saat ini.</p>
+                    <p class="text-gray-500 mt-2">Silakan periksa kembali nanti untuk pembaruan.</p>
                 </div>
             </div>
             @endforelse
