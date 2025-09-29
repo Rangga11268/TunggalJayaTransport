@@ -35,22 +35,13 @@
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">Schedule Type:</span>
                                     <span class="font-medium">
-                                        @if($schedule->is_weekly)
-                                            Weekly Schedule
-                                        @elseif($schedule->is_daily)
+                                        @if($schedule->is_daily)
                                             Daily Recurring Schedule
                                         @else
                                             Daily Schedule
                                         @endif
                                     </span>
                                 </div>
-                                
-                                @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Day of Week:</span>
-                                    <span class="font-medium">{{ Carbon\Carbon::create()->dayOfWeek($schedule->day_of_week)->format('l') }}</span>
-                                </div>
-                                @endif
                                 
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">Departure Time:</span>
@@ -225,7 +216,7 @@
                             Edit Schedule
                         </a>
                         
-                        @if($schedule->hasDeparted() && $schedule->is_daily && !$schedule->is_weekly)
+                        @if($schedule->hasDeparted() && $schedule->is_daily)
                             <form action="{{ route('admin.schedules.create-next-day', $schedule) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">

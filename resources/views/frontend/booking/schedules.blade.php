@@ -8,9 +8,6 @@
                 <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full mb-2 md:mb-0">
                     <i class="fas fa-sync-alt mr-1"></i>Atur Ulang Harian
                 </span>
-                <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full mb-2 md:mb-0">
-                    <i class="fas fa-calendar-week mr-1"></i>Jadwal Mingguan
-                </span>
             </div>
         </div>
 
@@ -65,13 +62,9 @@
                     <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
                     <span class="text-sm">Jadwal Harian (Tanggal spesifik)</span>
                 </div>
-                <div class="flex items-center mb-2 md:mb-0">
+                <div class="flex items-center">
                     <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
                     <span class="text-sm">Jadwal Harian Berulang (Tersedia setiap hari)</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                    <span class="text-sm">Jadwal Mingguan</span>
                 </div>
             </div>
         </div>
@@ -108,9 +101,9 @@
                                         <td class="px-4 py-3 whitespace-nowrap" data-label="Schedule">
                                             <div class="flex items-center">
                                                 <div
-                                                    class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center {{ $schedule->is_weekly ? 'bg-green-100' : ($schedule->is_daily ? 'bg-yellow-100' : 'bg-blue-100') }}">
+                                                    class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center {{ $schedule->is_daily ? 'bg-yellow-100' : 'bg-blue-100' }}">
                                                     <i
-                                                        class="fas fa-{{ $schedule->is_weekly ? 'calendar-week' : ($schedule->is_daily ? 'sync-alt' : 'clock') }} text-{{ $schedule->is_weekly ? 'green' : ($schedule->is_daily ? 'yellow-600' : 'blue') }}-600"></i>
+                                                        class="fas fa-{{ $schedule->is_daily ? 'sync-alt' : 'clock' }} text-{{ $schedule->is_daily ? 'yellow-600' : 'blue' }}-600"></i>
                                                 </div>
                                                 <div class="ml-3">
                                                     <div class="text-sm font-medium text-gray-900">
@@ -202,9 +195,9 @@
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center">
                                         <div
-                                            class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center {{ $schedule->is_weekly ? 'bg-green-100' : ($schedule->is_daily ? 'bg-yellow-100' : 'bg-blue-100') }}">
+                                            class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center {{ $schedule->is_daily ? 'bg-yellow-100' : 'bg-blue-100' }}">
                                             <i
-                                                class="fas fa-{{ $schedule->is_weekly ? 'calendar-week' : ($schedule->is_daily ? 'sync-alt' : 'clock') }} text-{{ $schedule->is_weekly ? 'green' : ($schedule->is_daily ? 'yellow-600' : 'blue') }}-600"></i>
+                                                class="fas fa-{{ $schedule->is_daily ? 'sync-alt' : 'clock' }} text-{{ $schedule->is_daily ? 'yellow-600' : 'blue' }}-600"></i>
                                         </div>
                                         <div class="ml-3">
                                             <div class="text-sm font-medium text-gray-900">

@@ -44,21 +44,14 @@
                                 <select name="schedule_id" id="schedule_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Select Schedule</option>
                                     @foreach(App\Models\Schedule::with('route', 'bus')->where('status', 'active')->get() as $schedule)
-                                        @if($schedule->is_weekly)
-                                            <option value="{{ $schedule->id }}" {{ old('schedule_id') == $schedule->id ? 'selected' : '' }}>
-                                                {{ $schedule->route->origin }} → {{ $schedule->route->destination }} ({{ $schedule->bus->name ?? 'Bus' }}) - Weekly on {{ date('l', strtotime("Sunday + {$schedule->day_of_week} days")) }} at {{ $schedule->departure_time->format('H:i') }}
-                                            </option>
-                                        @else
-                                            @if(!$schedule->hasDeparted())
-                                                <option value="{{ $schedule->id }}" {{ old('schedule_id') == $schedule->id ? 'selected' : '' }}>
-                                                    {{ $schedule->route->origin }} → {{ $schedule->route->destination }} ({{ $schedule->bus->name ?? 'Bus' }}) - {{ $schedule->departure_time->format('d M Y H:i') }}
-                                                </option>
-                                            @endif
-                                        @endif
+                                        @if(!$schedule->hasDeparted())
+                                        <option value="{{ $schedule->id }}" {{ old('schedule_id') == $schedule->id ? 'selected' : '' }}>
+                                            {{ $schedule->route->origin }} → {{ $schedule->route->destination }} ({{ $schedule->bus->name ?? 'Bus' }}) - {{ $schedule->departure_time->format('d M Y H:i') }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 <div class="text-sm text-gray-500 mt-1">
-                                    Note: Schedules that have already departed are not available for selection. Weekly schedules are available on their designated days.
+                                    Note: Schedules that have already departed are not available for selection.
                                 </div>
                                 @error('schedule_id')
                                     <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>

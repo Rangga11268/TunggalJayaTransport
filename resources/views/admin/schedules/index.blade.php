@@ -111,18 +111,7 @@
                                             <div class="text-sm text-gray-500">{{ $schedule->route->origin }} → {{ $schedule->route->destination }}</div>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                                @php
-                                                    $nextDate = $schedule->is_weekly && $schedule->day_of_week !== null ? $schedule->getNextAvailableDate() : null;
-                                                    if ($nextDate) {
-                                                        $displayDateTime = $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
-                                                        echo $displayDateTime->format('d M Y H:i');
-                                                    } else {
-                                                        echo $schedule->departure_time->format('d M Y H:i');
-                                                    }
-                                                    echo ' <span class="text-xs text-gray-500 ml-1">(WIB)</span>';
-                                                @endphp
-                                            @elseif($schedule->is_daily)
+                                            @if($schedule->is_daily)
                                                 @php
                                                     // For daily recurring schedules, show today or tomorrow based on time
                                                     $today = \Carbon\Carbon::today('Asia/Jakarta');
@@ -137,6 +126,9 @@
                                                     }
                                                     echo ' <span class="text-xs text-gray-500 ml-1">(WIB)</span>';
                                                 @endphp
+                                                <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">
+                                                    DAILY
+                                                </span>
                                             @else
                                                 {{ $schedule->getDepartureTimeWIB()->format('d M Y H:i') }}
                                                 <span class="text-xs text-gray-500 ml-1">(WIB)</span>
@@ -146,19 +138,9 @@
                                                     DEPARTED
                                                 </span>
                                             @endif
-                                            @if($schedule->is_weekly)
-                                                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded">
-                                                    WEEKLY
-                                                </span>
-                                            @elseif($schedule->is_daily)
-                                                <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">
-                                                    DAILY
-                                                </span>
-                                            @endif
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $schedule->getArrivalTimeWIB()->format('H:i') }}
-                                            <span class="text-xs text-gray-500 ml-1">(WIB)</span>
+                                            {{ $schedule->getArrivalTimeWIB()->format('H:i') }} (WIB)
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                             Rp. {{ number_format($schedule->price, 0, ',', '.') }}
@@ -191,7 +173,7 @@
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 
-                                                @if($schedule->hasDeparted() && $schedule->is_daily && !$schedule->is_weekly)
+                                                @if($schedule->hasDeparted() && $schedule->is_daily)
                                                     <form id="create-next-day-form-{{ $schedule->id }}" action="{{ route('admin.schedules.create-next-day', $schedule) }}" method="POST" class="inline">
                                                         @csrf
                                                         <button type="button" class="text-green-600 hover:text-green-900" onclick="handleDelete('create-next-day-form-{{ $schedule->id }}', 'Buat Jadwal Hari Berikutnya?', 'Apakah Anda yakin ingin membuat jadwal untuk hari berikutnya berdasarkan jadwal ini?')" title="Create Next Day Schedule">

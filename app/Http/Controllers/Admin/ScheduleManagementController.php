@@ -33,12 +33,10 @@ class ScheduleManagementController extends Controller
         }
         
         if ($request->filled('type')) {
-            if ($request->type == 'weekly') {
-                $query->where('is_weekly', true);
-            } elseif ($request->type == 'daily_recurring') {
-                $query->where('is_daily', true)->where('is_weekly', false);
+            if ($request->type == 'daily_recurring') {
+                $query->where('is_daily', true);
             } elseif ($request->type == 'daily') {
-                $query->where('is_daily', false)->where('is_weekly', false);
+                $query->where('is_daily', false);
             }
         }
         

@@ -74,8 +74,7 @@ use Carbon\Carbon;
                                     <option value="daily_recurring"
                                         {{ request('type') == 'daily_recurring' ? 'selected' : '' }}>Harian Berulang
                                     </option>
-                                    <option value="weekly" {{ request('type') == 'weekly' ? 'selected' : '' }}>Mingguan
-                                    </option>
+                                    
                                 </select>
                             </div>
 
@@ -116,7 +115,7 @@ use Carbon\Carbon;
                                 @php
                                     $departedCount = 0;
                                     foreach ($schedules as $schedule) {
-                                        if ($schedule->hasDeparted() && !$schedule->is_weekly) {
+                                        if ($schedule->hasDeparted()) {
                                             $departedCount++;
                                         }
                                     }
@@ -202,16 +201,7 @@ use Carbon\Carbon;
                                             @endif
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap">
-                                            @if ($schedule->is_weekly)
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                                    MINGGUAN
-                                                </span>
-                                                <div class="text-xs text-gray-500 mt-1">
-                                                    Hari:
-                                                    {{ \Carbon\Carbon::create()->dayOfWeek($schedule->day_of_week)->format('l') }}
-                                                </div>
-                                            @elseif($schedule->is_daily)
+                                            @if($schedule->is_daily)
                                                 <span
                                                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                                                     HARIAN BERULANG
@@ -224,24 +214,7 @@ use Carbon\Carbon;
                                             @endif
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            @if ($schedule->is_weekly && $schedule->day_of_week !== null)
-                                                @php
-                                                    $nextDate =
-                                                        $schedule->is_weekly && $schedule->day_of_week !== null
-                                                            ? $schedule->getNextAvailableDate()
-                                                            : null;
-                                                    if ($nextDate) {
-                                                        $displayDateTime = $nextDate
-                                                            ->copy()
-                                                            ->setTimeFromTimeString(
-                                                                $schedule->departure_time->format('H:i:s'),
-                                                            );
-                                                        echo $displayDateTime->format('d M Y H:i') . ' (WIB)';
-                                                    } else {
-                                                        echo $schedule->departure_time->format('d M Y H:i') . ' (WIB)';
-                                                    }
-                                                @endphp
-                                            @elseif($schedule->is_daily)
+                                            @if($schedule->is_daily)
                                                 @php
                                                     // For daily recurring schedules, show today or tomorrow based on time
                                                     $today = \Carbon\Carbon::today('Asia/Jakarta');
@@ -314,7 +287,7 @@ use Carbon\Carbon;
                                                     <i class="fas fa-edit"></i>
                                                 </a>
 
-                                                @if ($schedule->hasDeparted() && $schedule->is_daily && !$schedule->is_weekly)
+                                                @if ($schedule->hasDeparted() && $schedule->is_daily)
                                                     <form id="create-next-day-form-{{ $schedule->id }}"
                                                         action="{{ route('admin.schedules.create-next-day', $schedule) }}"
                                                         method="POST" class="inline">

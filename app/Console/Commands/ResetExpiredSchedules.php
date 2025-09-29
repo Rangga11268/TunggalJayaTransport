@@ -20,7 +20,7 @@ class ResetExpiredSchedules extends Command
      *
      * @var string
      */
-    protected $description = 'Reset expired schedules and prepare them for next day/week';
+    protected $description = 'Reset expired schedules and prepare them for next day';
 
     /**
      * Execute the console command.
@@ -65,32 +65,8 @@ class ResetExpiredSchedules extends Command
             $this->info("Processed daily recurring schedule ID {$schedule->id} - available every day");
         }
 
-        // Get all weekly schedules that have already departed this week
-        $expiredWeeklySchedules = Schedule::weekly()
-            ->where('departure_time', '<', Carbon::now())
-            ->get();
+        
 
-        $this->info("Found {$expiredWeeklySchedules->count()} expired weekly schedules.");
-
-        // Reset expired weekly schedules for next week
-        $weeklyResetCount = 0;
-        foreach ($expiredWeeklySchedules as $schedule) {
-            // Calculate next occurrence based on day of week
-            $nextDeparture = Carbon::now()->next($schedule->day_of_week);
-            $nextArrival = $nextDeparture->copy()->addHours(
-                $schedule->arrival_time->diffInHours($schedule->departure_time)
-            );
-
-            // Create new schedule for next week
-            $newSchedule = $schedule->replicate();
-            $newSchedule->departure_time = $nextDeparture;
-            $newSchedule->arrival_time = $nextArrival;
-            $newSchedule->save();
-
-            $this->info("Reset weekly schedule ID {$schedule->id} to " . $nextDeparture->format('Y-m-d H:i'));
-            $weeklyResetCount++;
-        }
-
-        $this->info("Schedule reset process completed. Reset {$dailyResetCount} daily schedules, processed {$dailyRecurringSchedules->count()} daily recurring schedules, and reset {$weeklyResetCount} weekly schedules.");
+        $this->info("Schedule reset process completed. Reset {$dailyResetCount} daily schedules and processed {$dailyRecurringSchedules->count()} daily recurring schedules.");
     }
 }

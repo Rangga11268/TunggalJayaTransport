@@ -95,25 +95,7 @@
     
     @else
     
-    @if($schedule->is_weekly && $schedule->day_of_week !== null)
-        @php
-            $nextDate = $schedule->is_weekly && $schedule->day_of_week !== null ? $schedule->getNextAvailableDate() : null;
-        @endphp
-        @if($nextDate)
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-8">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-info-circle text-blue-500"></i>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-blue-700">
-                            <strong>Jadwal Berikutnya:</strong> Jadwal mingguan ini berikutnya tersedia pada {{ $nextDate->format('l, F j, Y') }}.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        @endif
-    @endif
+    
     
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Schedule Information -->

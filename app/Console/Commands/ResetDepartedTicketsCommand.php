@@ -136,16 +136,6 @@ class ResetDepartedTicketsCommand extends Command
             return;
         }
         
-        // For weekly schedules, check if it's the correct day
-        if ($schedule->is_weekly && $schedule->day_of_week !== null) {
-            // For weekly schedules, we only reset if it's the correct day of the week
-            $today = Carbon::now()->dayOfWeek;
-            if ($today != $schedule->day_of_week) {
-                $this->info("  Weekly schedule but not the correct day. Skipping...");
-                return;
-            }
-        }
-        
         // For daily recurring schedules, check if it's the correct day
         if ($schedule->is_daily) {
             // For daily recurring schedules, we check if the current time has passed the departure time today
@@ -248,16 +238,6 @@ class ResetDepartedTicketsCommand extends Command
         if (!$schedule->hasDeparted() && !$this->option('force')) {
             $this->info("  Schedule has not departed yet. Skipping...");
             return;
-        }
-        
-        // For weekly schedules, check if it's the correct day
-        if ($schedule->is_weekly && $schedule->day_of_week !== null) {
-            // For weekly schedules, we only reset if it's the correct day of the week
-            $today = Carbon::now()->dayOfWeek;
-            if ($today != $schedule->day_of_week) {
-                $this->info("  Weekly schedule but not the correct day. Skipping...");
-                return;
-            }
         }
         
         // For daily recurring schedules, check if it's the correct day

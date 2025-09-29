@@ -99,18 +99,7 @@
                                             <div class="text-sm text-gray-500">{{ $schedule->bus->plate_number }}</div>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                                @php
-                                                    $nextDate = $schedule->is_weekly && $schedule->day_of_week !== null ? $schedule->getNextAvailableDate() : null;
-                                                    if ($nextDate) {
-                                                        $displayDateTime = $nextDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
-                                                        echo $displayDateTime->format('d M Y H:i');
-                                                    } else {
-                                                        echo $schedule->departure_time->format('d M Y H:i');
-                                                    }
-                                                    echo ' <span class="text-xs text-gray-500 ml-1">(WIB)</span>';
-                                                @endphp
-                                            @elseif($schedule->is_daily)
+                                            @if($schedule->is_daily)
                                                 @php
                                                     // For daily recurring schedules, show today or tomorrow based on time
                                                     $today = \Carbon\Carbon::today('Asia/Jakarta');
@@ -134,11 +123,7 @@
                                                     DEPARTED
                                                 </span>
                                             @endif
-                                            @if($schedule->is_weekly)
-                                                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded">
-                                                    WEEKLY
-                                                </span>
-                                            @elseif($schedule->is_daily)
+                                            @if($schedule->is_daily)
                                                 <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">
                                                     DAILY
                                                 </span>

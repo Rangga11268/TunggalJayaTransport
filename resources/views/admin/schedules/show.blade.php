@@ -17,12 +17,7 @@
                                 THIS SCHEDULE HAS ALREADY DEPARTED
                             </div>
                         @endif
-                        @if($schedule->is_weekly)
-                            <div class="mt-2 bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-2 rounded inline-flex items-center">
-                                <i class="fas fa-calendar-alt mr-2"></i>
-                                WEEKLY SCHEDULE
-                            </div>
-                        @elseif($schedule->is_daily)
+                        @if($schedule->is_daily)
                             <div class="mt-2 bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-2 rounded inline-flex items-center">
                                 <i class="fas fa-sync-alt mr-2"></i>
                                 DAILY RECURRING SCHEDULE
@@ -82,9 +77,7 @@
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Departure Time:</dt>
                                 <dd class="text-gray-900">
-                                    @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                        <div class="text-sm text-gray-500">{{ date('l', strtotime("Sunday + {$schedule->day_of_week} days")) }} at {{ $schedule->departure_time->format('H:i') }}</div>
-                                    @elseif($schedule->is_daily)
+                                    @if($schedule->is_daily)
                                         <div class="text-sm text-gray-500">Daily at {{ $schedule->getDepartureTimeWIB()->format('H:i') }} (WIB)</div>
                                     @else
                                         <div class="text-sm text-gray-500">{{ $schedule->getDepartureTimeWIB()->format('l, F j, Y H:i') }} (WIB)</div>
@@ -94,32 +87,12 @@
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Arrival Time:</dt>
                                 <dd class="text-gray-900">
-                                    @if($schedule->is_weekly && $schedule->day_of_week !== null)
-                                        @php
-                                            $nextDate = $schedule->is_weekly && $schedule->day_of_week !== null ? $schedule->getNextAvailableDate() : null;
-                                            if ($nextDate) {
-                                                $displayDateTime = $nextDate->copy()->setTimeFromTimeString($schedule->arrival_time->format('H:i:s'));
-                                                echo $displayDateTime->format('d M Y H:i');
-                                            } else {
-                                                echo $schedule->arrival_time->format('d M Y H:i');
-                                            }
-                                        @endphp
-                                    @else
+                                    @if($schedule->is_daily)
                                         {{ $schedule->arrival_time->format('d M Y H:i') }}
                                     @endif
                                 </dd>
                             </div>
-                            @if($schedule->is_weekly)
-                            <div class="flex">
-                                <dt class="font-medium text-gray-500 w-32">Day of Week:</dt>
-                                <dd class="text-gray-900">
-                                    @php
-                                        $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                                    @endphp
-                                    {{ $days[$schedule->day_of_week] ?? 'Not set' }}
-                                </dd>
-                            </div>
-                            @endif
+                                                            @if($schedule->is_daily)
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Price:</dt>
                                 <dd class="text-gray-900">Rp. {{ number_format($schedule->price, 0, ',', '.') }}</dd>

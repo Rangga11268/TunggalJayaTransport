@@ -59,13 +59,11 @@ class ScheduleController extends Controller
             'arrival_time' => 'required|date_format:H:i',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:active,cancelled,delayed',
-            'schedule_type' => 'required|in:daily,weekly,daily_recurring',
+            'schedule_type' => 'required|in:daily,daily_recurring',
         ];
 
         // Tambahkan validasi tambahan berdasarkan jenis jadwal
-        if ($request->schedule_type == 'weekly') {
-            $rules['day_of_week'] = 'required|integer|min:0|max:6';
-        } else if ($request->schedule_type == 'daily') {
+        if ($request->schedule_type == 'daily') {
             $rules['departure_date'] = 'required|date';
         }
 
@@ -77,24 +75,9 @@ class ScheduleController extends Controller
         ]);
 
         // Handle departure date and time based on schedule type
-        if ($request->schedule_type == 'weekly') {
-            // For weekly schedules, we store only the time part
-            // The date part will be calculated dynamically when needed
-            $data['is_weekly'] = true;
-            $data['is_daily'] = false;
-            $data['day_of_week'] = $request->day_of_week;
-            
-            // For weekly schedules, we store just the time without a specific date
-            // Using a base date that won't interfere with calculations
-            $baseDate = '2000-01-01';
-            // Store times in WIB directly without converting to UTC
-            $data['departure_time'] = $baseDate . ' ' . $request->departure_time . ':00';
-            $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';
-        } else if ($request->schedule_type == 'daily_recurring') {
+        if ($request->schedule_type == 'daily_recurring') {
             // For daily recurring schedules, we store only the time part
-            $data['is_weekly'] = false;
             $data['is_daily'] = true;
-            $data['day_of_week'] = null;
             
             // Using a base date that won't interfere with calculations
             $baseDate = '2000-01-01';
@@ -103,9 +86,7 @@ class ScheduleController extends Controller
             $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';
         } else {
             // For daily schedules, combine date and time
-            $data['is_weekly'] = false;
             $data['is_daily'] = false;
-            $data['day_of_week'] = null;
             // Store datetime in WIB directly without converting to UTC
             $data['departure_time'] = $request->departure_date . ' ' . $request->departure_time . ':00';
             $data['arrival_time'] = $request->departure_date . ' ' . $request->arrival_time . ':00';
@@ -133,7 +114,7 @@ class ScheduleController extends Controller
         $schedule = Schedule::findOrFail($id);
         
         // Check if schedule has already departed
-        if ($schedule->hasDeparted() && !$schedule->is_weekly) {
+        if ($schedule->hasDeparted()) {
             return redirect()->route('admin.schedules.index')
                 ->with('warning', 'This schedule has already departed and cannot be edited. You can create a new schedule for tomorrow or delete this one.');
         }
@@ -151,7 +132,7 @@ class ScheduleController extends Controller
         $schedule = Schedule::findOrFail($id);
 
         // Check if schedule has already departed
-        if ($schedule->hasDeparted() && !$schedule->is_weekly) {
+        if ($schedule->hasDeparted()) {
             return redirect()->route('admin.schedules.index')
                 ->with('warning', 'This schedule has already departed and cannot be updated. You can create a new schedule for tomorrow or delete this one.');
         }
@@ -164,13 +145,11 @@ class ScheduleController extends Controller
             'arrival_time' => 'required|date_format:H:i',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:active,cancelled,delayed',
-            'schedule_type' => 'required|in:daily,weekly,daily_recurring',
+            'schedule_type' => 'required|in:daily,daily_recurring',
         ];
 
         // Tambahkan validasi tambahan berdasarkan jenis jadwal
-        if ($request->schedule_type == 'weekly') {
-            $rules['day_of_week'] = 'required|integer|min:0|max:6';
-        } else if ($request->schedule_type == 'daily') {
+        if ($request->schedule_type == 'daily') {
             $rules['departure_date'] = 'required|date';
         }
 
@@ -182,24 +161,9 @@ class ScheduleController extends Controller
         ]);
 
         // Handle departure date and time based on schedule type
-        if ($request->schedule_type == 'weekly') {
-            // For weekly schedules, we store only the time part
-            // The date part will be calculated dynamically when needed
-            $data['is_weekly'] = true;
-            $data['is_daily'] = false;
-            $data['day_of_week'] = $request->day_of_week;
-            
-            // For weekly schedules, we store just the time without a specific date
-            // Using a base date that won't interfere with calculations
-            $baseDate = '2000-01-01';
-            // Store times in WIB directly without converting to UTC
-            $data['departure_time'] = $baseDate . ' ' . $request->departure_time . ':00';
-            $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';
-        } else if ($request->schedule_type == 'daily_recurring') {
+        if ($request->schedule_type == 'daily_recurring') {
             // For daily recurring schedules, we store only the time part
-            $data['is_weekly'] = false;
             $data['is_daily'] = true;
-            $data['day_of_week'] = null;
             
             // Using a base date that won't interfere with calculations
             $baseDate = '2000-01-01';
@@ -208,9 +172,7 @@ class ScheduleController extends Controller
             $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';
         } else {
             // For daily schedules, combine date and time
-            $data['is_weekly'] = false;
             $data['is_daily'] = false;
-            $data['day_of_week'] = null;
             // Store datetime in WIB directly without converting to UTC
             $data['departure_time'] = $request->departure_date . ' ' . $request->departure_time . ':00';
             $data['arrival_time'] = $request->departure_date . ' ' . $request->arrival_time . ':00';
@@ -229,16 +191,12 @@ class ScheduleController extends Controller
         $schedule = Schedule::findOrFail($id);
         
         // Check if schedule has already departed
-        if ($schedule->hasDeparted() && !$schedule->is_weekly) {
-            // For non-weekly schedules that have departed, we can delete them
+        if ($schedule->hasDeparted()) {
+            // For schedules that have departed, we can delete them
             $schedule->delete();
             return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal berhasil dihapus.');
-        } else if ($schedule->is_weekly) {
-            // For weekly schedules, allow deletion
-            $schedule->delete();
-            return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal mingguan berhasil dihapus.');
         } else {
-            // For daily schedules that haven't departed yet
+            // For schedules that haven't departed yet
             $schedule->delete();
             return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal berhasil dihapus.');
         }
@@ -270,9 +228,7 @@ class ScheduleController extends Controller
         $newSchedule->arrival_time = $tomorrow->format('Y-m-d') . ' ' . $schedule->arrival_time->format('H:i:s');
         $newSchedule->price = $schedule->price;
         $newSchedule->status = 'active';
-        $newSchedule->is_weekly = false;
         $newSchedule->is_daily = false; // This is a specific daily schedule, not recurring
-        $newSchedule->day_of_week = null;
         $newSchedule->save();
         
         return redirect()->route('admin.schedules.index')->with('create_success', 'Jadwal untuk hari besok berhasil dibuat.');

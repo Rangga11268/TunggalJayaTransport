@@ -124,8 +124,7 @@
                 <span class="schedule-legend-text">Jadwal Harian</span>
             </div>
             <div class="schedule-legend-item">
-                <div class="schedule-legend-color weekly"></div>
-                <span class="schedule-legend-text">Jadwal Mingguan</span>
+                
             </div>
             <div class="schedule-legend-item">
                 <div class="schedule-legend-color departed"></div>
@@ -181,13 +180,13 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
                                                     <div
-                                                        class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center {{ $schedule->is_weekly ? 'bg-green-100' : 'bg-blue-100' }}">
+                                                        class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center {{ $schedule->is_daily ? 'bg-yellow-100' : 'bg-blue-100' }}">
                                                         <i
-                                                            class="fas fa-{{ $schedule->is_weekly ? 'calendar-week' : 'clock' }} text-{{ $schedule->is_weekly ? 'green' : 'blue' }}-600"></i>
+                                                            class="fas fa-{{ $schedule->is_daily ? 'sync-alt' : 'clock' }} text-{{ $schedule->is_daily ? 'yellow-600' : 'blue' }}-600"></i>
                                                     </div>
                                                     <div class="ml-3">
                                                         <div class="text-sm font-medium text-gray-900">
-                                                            {{ $schedule->is_weekly ? 'Mingguan' : 'Harian' }}</div>
+                                                            {{ $schedule->is_daily ? 'Harian Berulang' : 'Harian' }}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -300,17 +299,17 @@
                         @foreach ($route->schedules as $schedule)
                             <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                                 <div
-                                    class="p-4 border-b border-gray-200 bg-gradient-to-r {{ $schedule->is_weekly ? 'from-green-50 to-emerald-50' : 'from-blue-50 to-indigo-50' }}">
+                                    class="p-4 border-b border-gray-200 bg-gradient-to-r {{ $schedule->is_daily ? 'from-yellow-50 to-amber-50' : 'from-blue-50 to-indigo-50' }}">
                                     <div class="flex justify-between items-center">
                                         <div class="flex items-center">
                                             <div
-                                                class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center {{ $schedule->is_weekly ? 'bg-green-100' : 'bg-blue-100' }}">
+                                                class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center {{ $schedule->is_daily ? 'bg-yellow-100' : 'bg-blue-100' }}">
                                                 <i
-                                                    class="fas fa-{{ $schedule->is_weekly ? 'calendar-week' : 'clock' }} text-{{ $schedule->is_weekly ? 'green' : 'blue' }}-600 text-sm"></i>
+                                                    class="fas fa-{{ $schedule->is_daily ? 'sync-alt' : 'clock' }} text-{{ $schedule->is_daily ? 'yellow-600' : 'blue' }}-600 text-sm"></i>
                                             </div>
                                             <div class="ml-2">
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    {{ $schedule->is_weekly ? 'Mingguan' : 'Harian' }}</div>
+                                                    {{ $schedule->is_daily ? 'Harian Berulang' : 'Harian' }}</div>
                                             </div>
                                         </div>
                                         <div
@@ -338,31 +337,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-sm font-medium text-gray-900">
-                                                        @if ($schedule->is_weekly && $schedule->day_of_week !== null)
-                                                            @php
-                                                                $nextDate =
-                                                                    $schedule->is_weekly &&
-                                                                    $schedule->day_of_week !== null
-                                                                        ? $schedule->getNextAvailableDate()
-                                                                        : null;
-                                                                if ($nextDate) {
-                                                                    $displayTime = $nextDate
-                                                                        ->copy()
-                                                                        ->setTimeFromTimeString(
-                                                                            $schedule->departure_time->format('H:i:s'),
-                                                                        );
-                                                                    echo $displayTime
-                                                                        ->setTimezone('Asia/Jakarta')
-                                                                        ->format('H:i');
-                                                                } else {
-                                                                    echo $schedule
-                                                                        ->getDepartureTimeWIB()
-                                                                        ->format('H:i');
-                                                                }
-                                                            @endphp
-                                                        @else
                                                             {{ $schedule->getDepartureTimeWIB()->format('H:i') }}
-                                                        @endif
                                                     </div>
                                                     <div>
                                                         {{ $schedule->getActualDepartureTime()->format('M j') }}
