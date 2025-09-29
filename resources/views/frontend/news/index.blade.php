@@ -56,7 +56,7 @@
             <div class="p-6">
                 <div class="flex items-center text-gray-500 text-sm mb-3">
                     <i class="far fa-calendar mr-2"></i>
-                    <span>{{ $article->published_at ? $article->published_at->format('F j, Y') : 'N/A' }}</span>
+                    <span>{{ $article->published_at ? $article->published_at->format('F j, Y') : ($article->created_at ? $article->created_at->format('F j, Y') : 'N/A') }}</span>
                 </div>
                 <h3 class="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{{ $article->title }}</h3>
                 <p class="text-gray-600 mb-4 line-clamp-3">{{ $article->excerpt ?? Str::limit(strip_tags($article->content), 100) }}</p>

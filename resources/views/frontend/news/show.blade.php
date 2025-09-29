@@ -20,7 +20,7 @@
                         </div>
                         <div class="flex items-center mr-6 mb-2">
                             <i class="far fa-calendar-alt mr-2"></i>
-                            <span>{{ $article->published_at ? $article->published_at->format('F j, Y') : 'N/A' }}</span>
+                            <span>{{ $article->published_at ? $article->published_at->format('F j, Y') : ($article->created_at ? $article->created_at->format('F j, Y') : 'N/A') }}</span>
                         </div>
                         @if($article->category)
                         <div class="flex items-center mb-2">
@@ -43,7 +43,7 @@
                     </div>
                     <div class="flex items-center mr-6 mb-2">
                         <i class="far fa-calendar-alt mr-2"></i>
-                        <span>{{ $article->published_at ? $article->published_at->format('F j, Y') : 'N/A' }}</span>
+                        <span>{{ $article->published_at ? $article->published_at->format('F j, Y') : ($article->created_at ? $article->created_at->format('F j, Y') : 'N/A') }}</span>
                     </div>
                     @if($article->category)
                     <div class="flex items-center mb-2">
