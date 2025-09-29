@@ -4,21 +4,21 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
     <!-- Header -->
     <div class="text-center mb-10">
-        <h1 class="text-4xl font-bold text-gray-800 mb-3">News & Updates</h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Stay informed with the latest news, announcements, and updates from Tunggal Jaya Transport</p>
+        <h1 class="text-4xl font-bold text-gray-800 mb-3">Berita & Pembaruan</h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Tetap terinformasi dengan berita terbaru, pengumuman, dan pembaruan dari Tunggal Jaya Transport</p>
     </div>
     
-    <!-- Category Filter -->
+    <!-- Filter Kategori -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-10">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Filter by Category</h2>
+            <h2 class="text-2xl font-bold text-gray-800">Filter berdasarkan Kategori</h2>
             <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                <i class="fas fa-filter mr-1"></i>{{ $articles->count() }} Articles
+                <i class="fas fa-filter mr-1"></i>{{ $articles->count() }} Artikel
             </div>
         </div>
         <div class="flex flex-wrap gap-3">
             <a href="{{ route('frontend.news.index') }}" class="px-5 py-2 {{ !request()->get('category') ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md' : 'bg-white text-gray-800 hover:bg-gray-100 shadow-sm' }} rounded-full font-medium transition duration-300">
-                All
+                Semua
             </a>
             @isset($categories)
                 @foreach($categories as $category)
@@ -61,7 +61,7 @@
                 <h3 class="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{{ $article->title }}</h3>
                 <p class="text-gray-600 mb-4 line-clamp-3">{{ $article->excerpt ?? Str::limit(strip_tags($article->content), 100) }}</p>
                 <a href="{{ route('frontend.news.show', $article->slug) }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
-                    Read More 
+                    Baca Selengkapnya 
                     <i class="fas fa-chevron-right ml-2 text-sm"></i>
                 </a>
             </div>
@@ -72,8 +72,8 @@
                 <div class="text-gray-400 text-6xl mb-6">
                     <i class="fas fa-newspaper"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">No News Articles Found</h3>
-                <p class="text-gray-600 max-w-md mx-auto">There are currently no news articles available. Please check back later for updates.</p>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Tidak Ada Artikel Berita Ditemukan</h3>
+                <p class="text-gray-600 max-w-md mx-auto">Saat ini tidak ada artikel berita yang tersedia. Silakan periksa kembali nanti untuk pembaruan.</p>
             </div>
         </div>
         @endforelse
@@ -88,21 +88,21 @@
     </div>
     @endif
 
-    <!-- Newsletter Subscription -->
+    <!-- Berlangganan Newsletter -->
     <div class="bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl shadow-lg p-8 mt-12">
         <div class="max-w-2xl mx-auto text-center">
             <div class="text-purple-500 text-4xl mb-4">
                 <i class="fas fa-envelope-open-text"></i>
             </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-3">Subscribe to Our Newsletter</h2>
-            <p class="text-gray-600 mb-6">Stay updated with our latest news, promotions, and travel tips. No spam, just useful information.</p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">Berlangganan Newsletter Kami</h2>
+            <p class="text-gray-600 mb-6">Tetap terbaru dengan berita terbaru, promosi, dan tips perjalanan kami. Tidak ada spam, hanya informasi yang berguna.</p>
             <form class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-                <input type="email" placeholder="Your email address" class="flex-grow px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm">
+                <input type="email" placeholder="Alamat email Anda" class="flex-grow px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm">
                 <button type="submit" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-violet-700 text-white font-bold rounded-lg hover:from-purple-700 hover:to-violet-800 shadow-lg transition duration-300 transform hover:scale-105">
-                    <i class="fas fa-paper-plane mr-2"></i>Subscribe
+                    <i class="fas fa-paper-plane mr-2"></i>Berlangganan
                 </button>
             </form>
-            <p class="text-gray-500 text-sm mt-4">By subscribing, you agree to our Privacy Policy and consent to receive updates.</p>
+            <p class="text-gray-500 text-sm mt-4">Dengan berlangganan, Anda menyetujui Kebijakan Privasi kami dan menyetujui untuk menerima pembaruan.</p>
         </div>
     </div>
 </div>

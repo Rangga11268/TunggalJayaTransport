@@ -14,4 +14,6 @@
 sekarang ganti di frontend kebanyakan masih menggunakan bahasa inggris ganti dengan bahasa indonesia namun jangan terlalu kaku dan kalau memang kondisi nya lebih baik menggunakan bahasa inggris saja yaudah pakai inggris saja dan ingat kalu mau pakai bahasa indonesia jangan kaku dan coba pakai bahasa komersil utnuk kesluruhan frontend mungkin mulai dari section home dan  booking 
 
 
-~
+-- mitra meminta agar ada alogritma nya atau fitur yang sebelum nya yang bisa mendeteksi jika user sering memesan tiket tertentu maka tiket itu akan muncul di rekomendasi atau ada diskon teretentu jika user telah mesan banyak tiket
+
+-- dan ada fitur chatbot ai dimana si chatbot ini berfungsi seperti costumer service bisa menjawab segala macam jawaban mengenai website ini mulai nanya pemesanan tikett dll

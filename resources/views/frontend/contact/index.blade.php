@@ -9,12 +9,12 @@
     </div>
     
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <!-- Contact Information -->
+        <!-- Informasi Kontak -->
         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-8">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-800">Get in Touch</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Hubungi Kami</h2>
                 <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                    <i class="fas fa-headset mr-1"></i>Contact Info
+                    <i class="fas fa-headset mr-1"></i>Info Kontak
                 </div>
             </div>
             
@@ -26,9 +26,9 @@
                         </svg>
                     </div>
                     <div class="ml-5">
-                        <h3 class="text-lg font-bold text-gray-800">Phone</h3>
+                        <h3 class="text-lg font-bold text-gray-800">Telepon</h3>
                         <p class="text-gray-600 mt-1">+62 21 1234 5678</p>
-                        <p class="text-gray-500 text-sm mt-1">Mon-Fri: 8AM - 8PM, Sat-Sun: 9AM - 5PM</p>
+                        <p class="text-gray-500 text-sm mt-1">Senin-Jumat: 8 pagi - 8 malam, Sabtu-Minggu: 9 pagi - 5 sore</p>
                     </div>
                 </div>
                 
@@ -41,7 +41,7 @@
                     <div class="ml-5">
                         <h3 class="text-lg font-bold text-gray-800">Email</h3>
                         <p class="text-gray-600 mt-1">info@tunggaljayatransport.com</p>
-                        <p class="text-gray-500 text-sm mt-1">We typically respond within 24 hours</p>
+                        <p class="text-gray-500 text-sm mt-1">Kami biasanya merespon dalam waktu 24 jam</p>
                     </div>
                 </div>
                 
@@ -53,26 +53,26 @@
                         </svg>
                     </div>
                     <div class="ml-5">
-                        <h3 class="text-lg font-bold text-gray-800">Office</h3>
+                        <h3 class="text-lg font-bold text-gray-800">Kantor</h3>
                         <p class="text-gray-600 mt-1">Jl. Transportation No. 123, Jakarta 12345</p>
-                        <p class="text-gray-500 text-sm mt-1">Main Headquarters</p>
+                        <p class="text-gray-500 text-sm mt-1">Kantor Pusat</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Branch Locations -->
-            <h2 class="text-2xl font-bold text-gray-800 mt-10 mb-6">Branch Locations</h2>
+            <!-- Lokasi Cabang -->
+            <h2 class="text-2xl font-bold text-gray-800 mt-10 mb-6">Lokasi Cabang</h2>
             <div class="bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl w-full h-72 flex items-center justify-center">
                 <div class="text-center">
                     <i class="fas fa-map-marked-alt text-gray-500 text-5xl mb-3"></i>
-                    <p class="text-2xl text-gray-500 font-bold">Interactive Map</p>
-                    <p class="text-gray-600 mt-2">View all our branch locations</p>
+                    <p class="text-2xl text-gray-500 font-bold">Peta Interaktif</p>
+                    <p class="text-gray-600 mt-2">Lihat semua lokasi cabang kami</p>
                 </div>
             </div>
             
-            <!-- Social Media -->
+            <!-- Media Sosial -->
             <div class="mt-8">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">Follow Us</h3>
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Ikuti Kami</h3>
                 <div class="flex space-x-4">
                     <a href="#" class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition duration-300">
                         <i class="fab fa-facebook-f"></i>
@@ -90,12 +90,12 @@
             </div>
         </div>
 
-        <!-- Contact Form -->
+        <!-- Formulir Kontak -->
         <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl shadow-lg p-8">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-800">Send us a Message</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Kirim Pesan kepada Kami</h2>
                 <div class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-                    <i class="fas fa-envelope mr-1"></i>Message
+                    <i class="fas fa-envelope mr-1"></i>Pesan
                 </div>
             </div>
             
@@ -108,7 +108,7 @@
             <form method="POST" action="{{ route('frontend.contact.store') }}" class="space-y-6">
                 @csrf
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
                     <input type="text" id="name" name="name" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4">
                     @error('name')
                         <p class="mt-1 text-sm text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
@@ -124,7 +124,7 @@
                 </div>
                 
                 <div>
-                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subjek</label>
                     <input type="text" id="subject" name="subject" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4">
                     @error('subject')
                         <p class="mt-1 text-sm text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
@@ -132,7 +132,7 @@
                 </div>
                 
                 <div>
-                    <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                    <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Pesan</label>
                     <textarea id="message" name="message" rows="5" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-3 px-4"></textarea>
                     @error('message')
                         <p class="mt-1 text-sm text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
@@ -141,15 +141,15 @@
                 
                 <div>
                     <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
-                        <i class="fas fa-paper-plane mr-2"></i>Send Message
+                        <i class="fas fa-paper-plane mr-2"></i>Kirim Pesan
                     </button>
                 </div>
             </form>
             
-            <!-- Support Info -->
+            <!-- Info Bantuan -->
             <div class="mt-8 pt-6 border-t border-gray-200">
-                <h3 class="text-lg font-bold text-gray-800 mb-3">Need Immediate Assistance?</h3>
-                <p class="text-gray-600 mb-4">For urgent matters, please call our 24/7 customer service hotline:</p>
+                <h3 class="text-lg font-bold text-gray-800 mb-3">Butuh Bantuan Segera?</h3>
+                <p class="text-gray-600 mb-4">Untuk masalah mendesak, silakan hubungi layanan pelanggan kami 24/7:</p>
                 <div class="bg-blue-50 p-4 rounded-lg">
                     <div class="flex items-center">
                         <div class="bg-blue-100 p-3 rounded-full mr-4">
@@ -157,7 +157,7 @@
                         </div>
                         <div>
                             <p class="text-xl font-bold text-gray-800">+62 21 1234 5678</p>
-                            <p class="text-gray-600">24/7 Customer Service</p>
+                            <p class="text-gray-600">Layanan Pelanggan 24/7</p>
                         </div>
                     </div>
                 </div>
@@ -165,38 +165,38 @@
         </div>
     </div>
     
-    <!-- Additional Contact Options -->
+    <!-- Opsi Kontak Tambahan -->
     <div class="mt-12 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-8">
-        <h2 class="text-2xl font-bold text-gray-800 text-center mb-8">Other Ways to Connect</h2>
+        <h2 class="text-2xl font-bold text-gray-800 text-center mb-8">Cara Lain untuk Terhubung</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white p-6 rounded-lg shadow-sm text-center hover:shadow-md transition duration-300">
                 <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-comments text-green-600 text-2xl"></i>
                 </div>
                 <h3 class="text-lg font-bold mb-2">Live Chat</h3>
-                <p class="text-gray-600 mb-3">Chat with our support team in real-time</p>
+                <p class="text-gray-600 mb-3">Berbicara langsung dengan tim dukungan kami secara real-time</p>
                 <button class="text-green-600 hover:text-green-800 font-medium">
-                    Start Chat <i class="fas fa-chevron-right ml-1 text-sm"></i>
+                    Mulai Chat <i class="fas fa-chevron-right ml-1 text-sm"></i>
                 </button>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm text-center hover:shadow-md transition duration-300">
                 <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-question-circle text-green-600 text-2xl"></i>
                 </div>
-                <h3 class="text-lg font-bold mb-2">Help Center</h3>
-                <p class="text-gray-600 mb-3">Browse our comprehensive FAQ and guides</p>
+                <h3 class="text-lg font-bold mb-2">Pusat Bantuan</h3>
+                <p class="text-gray-600 mb-3">Jelajahi FAQ dan panduan lengkap kami</p>
                 <button class="text-green-600 hover:text-green-800 font-medium">
-                    Visit Help Center <i class="fas fa-chevron-right ml-1 text-sm"></i>
+                    Kunjungi Pusat Bantuan <i class="fas fa-chevron-right ml-1 text-sm"></i>
                 </button>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm text-center hover:shadow-md transition duration-300">
                 <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-mobile-alt text-green-600 text-2xl"></i>
                 </div>
-                <h3 class="text-lg font-bold mb-2">Mobile App</h3>
-                <p class="text-gray-600 mb-3">Download our app for easier access</p>
+                <h3 class="text-lg font-bold mb-2">Aplikasi Mobile</h3>
+                <p class="text-gray-600 mb-3">Unduh aplikasi kami untuk akses yang lebih mudah</p>
                 <button class="text-green-600 hover:text-green-800 font-medium">
-                    Download App <i class="fas fa-chevron-right ml-1 text-sm"></i>
+                    Unduh Aplikasi <i class="fas fa-chevron-right ml-1 text-sm"></i>
                 </button>
             </div>
         </div>

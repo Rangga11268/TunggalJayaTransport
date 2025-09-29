@@ -15,7 +15,7 @@
                         <div class="flex items-center mr-6 mb-2">
                             <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10 mr-3"></div>
                             <div>
-                                <p class="font-medium">By {{ $article->author->name ?? 'Admin' }}</p>
+                                <p class="font-medium">Oleh {{ $article->author->name ?? 'Admin' }}</p>
                             </div>
                         </div>
                         <div class="flex items-center mr-6 mb-2">
@@ -38,7 +38,7 @@
                     <div class="flex items-center mr-6 mb-2">
                         <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10 mr-3"></div>
                         <div>
-                            <p class="font-medium">By {{ $article->author->name ?? 'Admin' }}</p>
+                            <p class="font-medium">Oleh {{ $article->author->name ?? 'Admin' }}</p>
                         </div>
                     </div>
                     <div class="flex items-center mr-6 mb-2">
@@ -62,9 +62,9 @@
         </div>
     </article>
     
-    <!-- Related Articles -->
+    <!-- Artikel Terkait -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-8 mb-10">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Related Articles</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Artikel Terkait</h2>
         @if($relatedArticles && $relatedArticles->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach($relatedArticles as $relatedArticle)
@@ -83,7 +83,7 @@
                     {{ Str::limit(strip_tags($relatedArticle->excerpt ?: $relatedArticle->content), 100) }}
                 </p>
                 <a href="{{ route('frontend.news.show', $relatedArticle->slug) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center">
-                    Read More
+                    Baca Selengkapnya
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
@@ -98,19 +98,19 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
                 </svg>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-1">No Related Articles</h3>
-            <p class="text-gray-500">We couldn't find any related articles at the moment. Check back later for more content.</p>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">Tidak Ada Artikel Terkait</h3>
+            <p class="text-gray-500">Kami tidak dapat menemukan artikel terkait saat ini. Periksa kembali nanti untuk konten lainnya.</p>
         </div>
         @endif
     </div>
     
-    <!-- Back to News -->
+    <!-- Kembali ke Berita -->
     <div class="mb-12">
         <a href="{{ route('frontend.news.index') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold rounded-lg transition duration-300 shadow-lg transform hover:scale-105">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
-            Back to News
+            Kembali ke Berita
         </a>
     </div>
 </div>

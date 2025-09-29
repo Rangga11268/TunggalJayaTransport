@@ -15,6 +15,10 @@ Catatan ini digunakan untuk melacak progres terjemahan dari bahasa Inggris ke ba
 -   [x] Halaman tiket (`resources/views/frontend/booking/partials/ticket-preview.blade.php`, `resources/views/frontend/booking/ticket.blade.php`)
 -   [x] Halaman routes show (`resources/views/frontend/routes/show.blade.php`)
 -   [x] Halaman fleet index (`resources/views/frontend/fleet/index.blade.php`)
+-   [x] Halaman news index (`resources/views/frontend/news/index.blade.php`)
+-   [x] Halaman news show (`resources/views/frontend/news/show.blade.php`)
+-   [x] Halaman about us (`resources/views/frontend/about/index.blade.php`)
+-   [x] Halaman about us (`resources/views/frontend/about/show.blade.php`)
 
 ## Status Keseluruhan
 
@@ -32,8 +36,8 @@ Catatan ini digunakan untuk melacak progres terjemahan dari bahasa Inggris ke ba
 
 -   [x] Halaman routes
 -   [x] Halaman fleet
--   [ ] Halaman news
--   [ ] Halaman about us
+-   [x] Halaman news
+-   [x] Halaman about us
 -   [ ] Halaman contact
 -   [ ] Halaman di admin panel lain nya
 -   [ ] Dan halaman-halaman lainnya
