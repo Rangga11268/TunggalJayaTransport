@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Category Management') }}
+            {{ __('Manajemen Kategori') }}
         </h2>
     </x-slot>
 
@@ -10,21 +10,21 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <h3 class="text-lg font-bold">Categories</h3>
+                        <h3 class="text-lg font-bold">Kategori</h3>
                         <button onclick="openCreateModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full md:w-auto touch-friendly">
-                            Add New Category
+                            Tambah Kategori Baru
                         </button>
                     </div>
 
-                    <!-- Categories Table -->
+                    <!-- Tabel Kategori -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parent Category</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori Induk</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -34,7 +34,7 @@
                                             <div class="text-sm font-medium text-gray-900">{{ $category->name }}</div>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $category->description ?? 'No description' }}
+                                            {{ $category->description ?? 'Tidak ada deskripsi' }}
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ $category->parent ? $category->parent->name : '-' }}
@@ -44,7 +44,7 @@
                                                 <button onclick="openEditModal({{ $category->id }}, '{{ $category->name }}', '{{ $category->description ?? '' }}', {{ $category->parent_id ?? 'null' }})" class="edit-icon" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button onclick="deleteCategory({{ $category->id }})" class="delete-icon" title="Delete">
+                                                <button onclick="deleteCategory({{ $category->id }})" class="delete-icon" title="Hapus">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
@@ -53,7 +53,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="4" class="px-4 py-4 text-center text-sm text-gray-500">
-                                            No categories found.
+                                            Tidak ada kategori ditemukan.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -61,7 +61,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
+                    <!-- Paginasi -->
                     <div class="mt-6">
                         {{ $categories->links() }}
                     </div>
@@ -70,28 +70,28 @@
         </div>
     </div>
 
-    <!-- Create Category Modal -->
+    <!-- Modal Buat Kategori -->
     <div id="createModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Create New Category</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Buat Kategori Baru</h3>
                 <form id="createCategoryForm">
                     @csrf
                     <div class="mb-4">
-                        <label for="create_name" class="block text-sm font-medium text-gray-700">Name</label>
+                        <label for="create_name" class="block text-sm font-medium text-gray-700">Nama</label>
                         <input type="text" name="name" id="create_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" required>
                         <p id="create_name_error" class="text-red-500 text-xs italic mt-1 hidden"></p>
                     </div>
                     
                     <div class="mb-4">
-                        <label for="create_description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <label for="create_description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
                         <textarea name="description" id="create_description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly"></textarea>
                     </div>
                     
                     <div class="mb-4">
-                        <label for="create_parent_id" class="block text-sm font-medium text-gray-700">Parent Category</label>
+                        <label for="create_parent_id" class="block text-sm font-medium text-gray-700">Kategori Induk</label>
                         <select name="parent_id" id="create_parent_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly">
-                            <option value="">None</option>
+                            <option value="">Tidak Ada</option>
                             @foreach(App\Models\Category::whereNull('parent_id')->get() as $parent)
                                 <option value="{{ $parent->id }}">{{ $parent->name }}</option>
                             @endforeach
@@ -100,10 +100,10 @@
                     
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
                         <button type="button" onclick="closeCreateModal()" class="text-gray-600 hover:text-gray-800 w-full sm:w-auto touch-friendly">
-                            Cancel
+                            Batal
                         </button>
                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto touch-friendly">
-                            Create Category
+                            Buat Kategori
                         </button>
                     </div>
                 </form>
@@ -111,30 +111,30 @@
         </div>
     </div>
 
-    <!-- Edit Category Modal -->
+    <!-- Modal Edit Kategori -->
     <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Edit Category</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Edit Kategori</h3>
                 <form id="editCategoryForm">
                     @csrf
                     @method('PUT')
                     <input type="hidden" id="edit_id" name="id">
                     <div class="mb-4">
-                        <label for="edit_name" class="block text-sm font-medium text-gray-700">Name</label>
+                        <label for="edit_name" class="block text-sm font-medium text-gray-700">Nama</label>
                         <input type="text" name="name" id="edit_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" required>
                         <p id="edit_name_error" class="text-red-500 text-xs italic mt-1 hidden"></p>
                     </div>
                     
                     <div class="mb-4">
-                        <label for="edit_description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <label for="edit_description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
                         <textarea name="description" id="edit_description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly"></textarea>
                     </div>
                     
                     <div class="mb-4">
-                        <label for="edit_parent_id" class="block text-sm font-medium text-gray-700">Parent Category</label>
+                        <label for="edit_parent_id" class="block text-sm font-medium text-gray-700">Kategori Induk</label>
                         <select name="parent_id" id="edit_parent_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly">
-                            <option value="">None</option>
+                            <option value="">Tidak Ada</option>
                             @foreach(App\Models\Category::whereNull('parent_id')->get() as $parent)
                                 <option value="{{ $parent->id }}">{{ $parent->name }}</option>
                             @endforeach
@@ -143,10 +143,10 @@
                     
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
                         <button type="button" onclick="closeEditModal()" class="text-gray-600 hover:text-gray-800 w-full sm:w-auto touch-friendly">
-                            Cancel
+                            Batal
                         </button>
                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto touch-friendly">
-                            Update Category
+                            Perbarui Kategori
                         </button>
                     </div>
                 </form>

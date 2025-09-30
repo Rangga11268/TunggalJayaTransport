@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('View News Article') }}
+            {{ __('Lihat Artikel Berita') }}
         </h2>
     </x-slot>
 
@@ -11,24 +11,24 @@
                 <div class="p-6">
                     @if($article->getFirstMediaUrl('featured_images'))
                         <div class="mb-6">
-                            <img src="{{ $article->getFirstMediaUrl('featured_images') }}" alt="Featured Image" class="w-full h-64 object-cover rounded-md">
+                            <img src="{{ $article->getFirstMediaUrl('featured_images') }}" alt="Gambar Unggulan" class="w-full h-64 object-cover rounded-md">
                         </div>
                     @endif
                     
                     <div class="mb-4">
                         <h1 class="text-2xl font-bold">{{ $article->title }}</h1>
                         <div class="mt-2 text-sm text-gray-500">
-                            <span>By {{ $article->author->name ?? 'Unknown' }}</span>
+                            <span>Oleh {{ $article->author->name ?? 'Tidak Diketahui' }}</span>
                             <span class="mx-2">•</span>
-                            <span>{{ $article->created_at->format('M d, Y') }}</span>
+                            <span>{{ $article->created_at->format('d M Y') }}</span>
                             <span class="mx-2">•</span>
                             @if($article->is_published)
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    Published
+                                    Diterbitkan
                                 </span>
                             @else
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                    Draft
+                                    Draf
                                 </span>
                             @endif
                         </div>
@@ -46,7 +46,7 @@
                     
                     <div class="mt-8 flex items-center justify-between">
                         <a href="{{ route('admin.news.index') }}" class="text-gray-600 hover:text-gray-800">
-                            ← Back to News
+                            ← Kembali ke Berita
                         </a>
                         <div>
                             <a href="{{ route('admin.news.edit', $article) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
@@ -56,7 +56,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="event.preventDefault(); handleDelete('delete-form', 'Hapus Artikel?', 'Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.')">
-                                    Delete
+                                    Hapus
                                 </button>
                             </form>
                         </div>

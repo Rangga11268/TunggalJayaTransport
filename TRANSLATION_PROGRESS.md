@@ -19,6 +19,7 @@ Catatan ini digunakan untuk melacak progres terjemahan dari bahasa Inggris ke ba
 -   [x] Halaman news show (`resources/views/frontend/news/show.blade.php`)
 -   [x] Halaman about us (`resources/views/frontend/about/index.blade.php`)
 -   [x] Halaman about us (`resources/views/frontend/about/show.blade.php`)
+-   [x] Halaman about us (`resources/views/frontend/contact/index.blade.php`)
 
 ## Status Keseluruhan
 
@@ -38,9 +39,10 @@ Catatan ini digunakan untuk melacak progres terjemahan dari bahasa Inggris ke ba
 -   [x] Halaman fleet
 -   [x] Halaman news
 -   [x] Halaman about us
--   [ ] Halaman contact
+-   [x] Halaman contact
+-   [x] Halaman news di admin panel (index, create, edit, show)
+-   [x] Halaman categories di admin panel (index)
 -   [ ] Halaman di admin panel lain nya
--   [ ] Dan halaman-halaman lainnya
 
 ## Catatan Penting
 
