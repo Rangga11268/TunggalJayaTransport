@@ -27,7 +27,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login' => ['required', 'string'],
+            'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
         ];
     }
@@ -41,42 +41,15 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $loginType = $this->getLoginType();
-        
-        // Attempt to authenticate using email or phone
-        $credentials = [
-            $loginType => $this->login,
-            'password' => $this->password,
-        ];
-
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
+        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
-            $errorMessage = $loginType === 'email' ? 'email' : 'phone';
-            
             throw ValidationException::withMessages([
-                'login' => trans('auth.failed'),
+                'email' => trans('auth.failed'),
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
-    }
-
-    /**
-     * Get the login type (email or phone) based on the input.
-     */
-    protected function getLoginType(): string
-    {
-        $login = $this->login;
-        
-        // Check if input is a phone number (contains only digits, +, -, or parentheses)
-        $isPhone = preg_match('/^[0-9+\-\s\(\)]+$/', $login);
-        
-        if ($isPhone) {
-            return 'phone';
-        }
-        
-        return 'email';
     }
 
     /**
@@ -95,7 +68,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'login' => trans('auth.throttle', [
+            'email' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -107,6 +80,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('login')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
     }
 }

@@ -5,12 +5,12 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Alamat Email -->
+        <!-- Alamat Email atau Nomor Telepon -->
         <div>
-            <x-input-label for="email" :value="'Email'" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required
+            <x-input-label for="login" :value="'Email atau Nomor Telepon'" />
+            <x-text-input id="login" class="block mt-1 w-full" type="text" name="login" :value="old('login')" required
                 autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-input-error :messages="$errors->get('login')" class="mt-2" />
         </div>
 
         <!-- Kata Sandi -->

@@ -32,30 +32,19 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'phone' => ['required', 'string', 'max:15', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request->phone,
             'password' => Hash::make($request->password),
         ]);
-
-        // Assign role 'user' to new registered users
-        try {
-            $user->assignRole('user');
-        } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
-            // Jika role 'user' tidak ditemukan, lewati assign role
-            // Role seharusnya sudah dibuat di seeder
-        }
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        // Redirect ke halaman verifikasi telepon setelah register
-        return redirect()->route('verification.phone.show');
+        return redirect(route('dashboard', absolute: false));
     }
 }

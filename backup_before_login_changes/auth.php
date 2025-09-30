@@ -7,7 +7,6 @@ use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\PhoneVerificationController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
@@ -37,7 +36,6 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    // Email verification routes
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
@@ -49,20 +47,6 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:6,1')
         ->name('verification.send');
 
-    // Phone verification routes
-    Route::get('verify-phone', [PhoneVerificationController::class, 'show'])
-        ->name('verification.phone.show');
-    
-    Route::post('verify-phone/otp', [PhoneVerificationController::class, 'sendOtp'])
-        ->name('verification.phone.send');
-    
-    Route::post('verify-phone', [PhoneVerificationController::class, 'verifyOtp'])
-        ->name('verification.phone.verify');
-        
-    Route::post('verify-phone/resend', [PhoneVerificationController::class, 'resendOtp'])
-        ->name('verification.phone.resend');
-
-    // Other auth routes
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
         ->name('password.confirm');
 

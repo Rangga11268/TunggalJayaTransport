@@ -21,7 +21,6 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'phone',
         'password',
     ];
 
@@ -44,9 +43,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_verified' => 'boolean',
         ];
     }
 
@@ -58,15 +55,5 @@ class User extends Authenticatable
     public function bookings()
     {
         return $this->hasMany(Booking::class);
-    }
-
-    public function hasPhoneVerified(): bool
-    {
-        return !is_null($this->phone_verified_at);
-    }
-
-    public function isFullyVerified(): bool
-    {
-        return $this->hasVerifiedEmail() && $this->hasPhoneVerified() && $this->is_verified;
     }
 }
