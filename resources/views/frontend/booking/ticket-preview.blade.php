@@ -14,6 +14,18 @@
             background-color: #f8fafc;
         }
         
+        /* Landscape-friendly styles */
+        @media screen and (min-width: 1024px) {
+            .landscape-layout {
+                transform: rotate(90deg);
+                transform-origin: center center;
+                width: 100vh;
+                height: 100vw;
+                margin: auto;
+                overflow: hidden;
+            }
+        }
+        
         @media print {
             .no-print {
                 display: none !important;
@@ -28,6 +40,30 @@
             .ticket-container {
                 box-shadow: none;
                 border-radius: 0;
+                max-width: 100% !important;
+                margin: 0 !important;
+            }
+            
+            /* Optimize layout for printing */
+            .ticket-container {
+                box-shadow: none;
+            }
+            
+            .border, .shadow-xl {
+                box-shadow: none !important;
+                border-width: 1px !important;
+            }
+            
+            /* Adjust grid layout for print */
+            .grid.grid-cols-1.md\\:grid-cols-2 {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+            }
+            
+            /* Ensure text is clear in print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
         }
     </style>
@@ -96,48 +132,51 @@
                     </div>
                 </div>
 
-                <!-- Passenger & Booking Details -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-                        <h3 class="text-md font-semibold text-gray-700 uppercase mb-4 pb-2 border-b border-gray-100">Passenger Information</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-xs text-gray-500 uppercase font-medium">Full Name</p>
-                                <p class="font-medium text-gray-800 text-lg">{{ $booking->passenger_name }}</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500 uppercase font-medium">Email Address</p>
-                                <p class="text-gray-700">{{ $booking->passenger_email }}</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500 uppercase font-medium">Phone Number</p>
-                                <p class="text-gray-700">{{ $booking->passenger_phone }}</p>
+                <!-- Passenger & Booking Details - Changed to horizontal layout for landscape -->
+                <div class="mb-8">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Passenger & Booking Details</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                            <h3 class="text-md font-semibold text-gray-700 uppercase mb-4 pb-2 border-b border-gray-100">Passenger Information</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-medium">Full Name</p>
+                                    <p class="font-medium text-gray-800">{{ $booking->passenger_name }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-medium">Email Address</p>
+                                    <p class="text-gray-700 break-words">{{ $booking->passenger_email }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-medium">Phone Number</p>
+                                    <p class="text-gray-700">{{ $booking->passenger_phone }}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-                        <h3 class="text-md font-semibold text-gray-700 uppercase mb-4 pb-2 border-b border-gray-100">Booking Details</h3>
-                        <div class="space-y-3">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Booking Code:</span>
-                                <span class="font-bold text-gray-800">{{ $booking->booking_code }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Bus Information:</span>
-                                <span class="font-medium text-gray-800">{{ $booking->schedule->bus->name ?? 'Standard Bus' }} ({{ $booking->schedule->bus->plate_number ?? 'N/A' }})</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Bus Type:</span>
-                                <span class="font-medium text-gray-800">{{ $booking->schedule->bus->bus_type ?? 'Standard' }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Seat Numbers:</span>
-                                <span class="font-bold text-blue-600">{{ $booking->seat_numbers }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Number of Seats:</span>
-                                <span class="font-medium text-gray-800">{{ $booking->number_of_seats }}</span>
+                        
+                        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                            <h3 class="text-md font-semibold text-gray-700 uppercase mb-4 pb-2 border-b border-gray-100">Booking Details</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-medium">Booking Code</p>
+                                    <p class="font-medium text-gray-800">{{ $booking->booking_code }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-medium">Bus Information</p>
+                                    <p class="text-gray-700">{{ $booking->schedule->bus->name ?? 'Standard Bus' }} ({{ $booking->schedule->bus->plate_number ?? 'N/A' }})</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-medium">Bus Type</p>
+                                    <p class="text-gray-700">{{ $booking->schedule->bus->bus_type ?? 'Standard' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-medium">Seat Numbers</p>
+                                    <p class="font-medium text-blue-600">{{ $booking->seat_numbers }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-medium">Number of Seats</p>
+                                    <p class="text-gray-700">{{ $booking->number_of_seats }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -161,19 +200,35 @@
                     </div>
                 </div>
 
-                <!-- Barcode Section -->
-                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 mb-8">
-                    <h3 class="text-md font-semibold text-gray-700 uppercase mb-4 pb-2 border-b border-gray-100 text-center">Boarding Pass - Scan at Terminal</h3>
-                    <div class="flex flex-col items-center">
-                        <div class="bg-gray-50 p-6 rounded-xl mb-4">
-                            @php
-                                use Milon\Barcode\DNS1D;
-                                $dns1d = new DNS1D();
-                                echo $dns1d->getBarcodeSVG($booking->booking_code, 'C128', 2.5, 70);
-                            @endphp
+                <!-- Barcode & QR Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <!-- Barcode Section -->
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                        <h3 class="text-md font-semibold text-gray-700 uppercase mb-4 pb-2 border-b border-gray-100 text-center">Boarding Pass - Scan at Terminal</h3>
+                        <div class="flex flex-col items-center">
+                            <div class="bg-gray-50 p-4 rounded-xl mb-4">
+                                @php
+                                    use Milon\Barcode\DNS1D;
+                                    $dns1d = new DNS1D();
+                                    echo $dns1d->getBarcodeSVG($booking->booking_code, 'C128', 2, 50);
+                                @endphp
+                            </div>
+                            <p class="font-mono text-lg font-bold text-gray-800 tracking-wider break-all">{{ $booking->booking_code }}</p>
+                            <p class="text-sm text-gray-600 mt-2 text-center">Present this barcode at the boarding gate</p>
                         </div>
-                        <p class="font-mono text-xl font-bold text-gray-800 tracking-widest">{{ $booking->booking_code }}</p>
-                        <p class="text-sm text-gray-600 mt-2 text-center">Present this barcode at the boarding gate</p>
+                    </div>
+
+                    <!-- QR Code Section -->
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex flex-col items-center justify-center">
+                        <h3 class="text-md font-semibold text-gray-700 uppercase mb-4 pb-2 border-b border-gray-100 text-center">QR Code</h3>
+                        <div class="flex flex-col items-center">
+                            @php
+                                use Milon\Barcode\DNS2D;
+                                $dns2d = new DNS2D();
+                                echo $dns2d->getBarcodeSVG($booking->booking_code, 'QRCODE', 4, 4, ['fgcolor'=>array(0,0,0)]);
+                            @endphp
+                            <p class="text-sm text-gray-600 mt-2 text-center">Scan for quick verification</p>
+                        </div>
                     </div>
                 </div>
 

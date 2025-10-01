@@ -592,51 +592,6 @@
         </div>
     </div>
     
-    <!-- Ticket Preview and Download -->
-    <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mobile-booking-card">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-4">
-            <div>
-                <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Ticket Preview</h2>
-                <p class="text-gray-600 text-sm sm:text-base">Your ticket will be available after payment</p>
-            </div>
-            @if($booking->seat_numbers)
-            <a href="{{ route('frontend.booking.download-ticket', $booking->id) }}" target="_blank" class="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg inline-flex items-center transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 mobile-action-button text-sm sm:text-base">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                </svg>
-                Download Ticket
-            </a>
-            @endif
-        </div>
-        
-        @if($booking->seat_numbers)
-            @include('frontend.booking.partials.ticket-preview', [
-                'passengerName' => $booking->passenger_name,
-                'passengerEmail' => $booking->passenger_email,
-                'passengerPhone' => $booking->passenger_phone,
-                'bookingCode' => $booking->booking_code,
-                'bookingId' => $booking->id,
-                'origin' => $booking->schedule->route->origin,
-                'destination' => $booking->schedule->route->destination,
-                'departureDate' => $booking->schedule->getActualDepartureTime()->format('d M Y'),
-                'departureTime' => $booking->schedule->getActualDepartureTime()->format('H:i'),
-                'arrivalTime' => $booking->schedule->getActualArrivalTime()->format('H:i'),
-                'seatNumber' => $booking->seat_numbers,
-                'busType' => $booking->schedule->bus->bus_type ?? 'Standard',
-                'price' => 'Rp. ' . number_format($booking->total_price, 0, ',', '.'),
-            ])
-        @else
-            <div class="text-center py-12 bg-gray-50 rounded-xl">
-                <div class="text-gray-400 text-5xl mb-4">
-                    <i class="fas fa-ticket-alt"></i>
-                </div>
-                <p class="text-gray-600 text-lg">Please select and save your seat to view and download your ticket.</p>
-                <p class="text-gray-500 mt-2">Your ticket will be available after payment is completed.</p>
-            </div>
-        @endif
-    </div>
-</div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Seat selection functionality

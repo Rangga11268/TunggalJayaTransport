@@ -4,30 +4,37 @@
     <title>Ticket - {{ $booking->booking_code }}</title>
     <meta charset="utf-8">
     <style>
+        @page {
+            size: A4 landscape;
+            margin: 0.5cm;
+        }
+        
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f8f9fa;
+            padding: 0;
+            background-color: white;
+            font-size: 12px; /* Default font size for better print */
         }
         
         .ticket-container {
-            display: flex;
-            justify-content: center;
             width: 100%;
+            max-width: 297mm; /* A4 landscape width */
+            margin: 0 auto;
+            padding: 10mm;
         }
         
         .ticket {
-            width: 567px; /* 15cm */
-            height: 265px; /* 7cm */
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            width: 100%;
+            min-height: 180mm;
+            background: white;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             padding: 15px;
             font-family: Arial, sans-serif;
             position: relative;
             overflow: hidden;
+            box-sizing: border-box;
         }
         
         .perforation-top,
@@ -97,12 +104,12 @@
         
         .ticket-info-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 8px;
         }
         
         .info-item {
-            font-size: 11px;
+            font-size: 10px;
         }
         
         .info-item label {
@@ -110,38 +117,42 @@
             font-weight: bold;
             color: #475569;
             margin-bottom: 2px;
+            font-size: 9px;
         }
         
         .info-item .info-value {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #1e293b;
             background: #f1f5f9;
             padding: 4px 6px;
             border-radius: 4px;
+            word-break: break-word;
         }
         
         .info-item .seat-number {
             background: #dbeafe;
             color: #1e40af;
-            font-size: 14px;
+            font-size: 12px;
         }
         
         .info-item .price {
             color: #dc2626;
-            font-size: 14px;
+            font-size: 12px;
             background: #fef2f2;
         }
         
         .ticket-footer {
             border-top: 1px dashed #cbd5e1;
             padding-top: 12px;
+            margin-top: 12px;
         }
         
         .barcode-section {
             display: flex;
             justify-content: space-between;
             margin-bottom: 12px;
+            align-items: flex-start;
         }
         
         .barcode-placeholder {
@@ -168,15 +179,16 @@
         }
         
         .barcode-number {
-            font-size: 10px;
+            font-size: 9px;
             font-family: 'Courier New', monospace;
             letter-spacing: 1px;
             text-align: center;
         }
         
         .qr-code-placeholder {
-            width: 80px;
-            padding: 5px;
+            width: 55px;
+            height: 55px;
+            padding: 3px;
             background: white;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
@@ -188,7 +200,7 @@
         .qr-grid {
             display: inline-block;
             border: 1px solid #94a3b8;
-            padding: 2px;
+            padding: 1px;
         }
         
         .qr-row {
@@ -196,8 +208,8 @@
         }
         
         .qr-cell {
-            width: 2px;
-            height: 2px;
+            width: 1.5px;
+            height: 1.5px;
             background: #e2e8f0;
         }
         
@@ -206,14 +218,14 @@
         }
         
         .qr-label {
-            font-size: 8px;
+            font-size: 7px;
             color: #64748b;
-            margin-top: 4px;
+            margin-top: 2px;
             text-align: center;
         }
         
         .instructions {
-            font-size: 9px;
+            font-size: 8px;
             color: #64748b;
             margin-bottom: 8px;
             line-height: 1.3;
@@ -225,12 +237,32 @@
         
         .contact-info {
             text-align: center;
-            font-size: 9px;
+            font-size: 8px;
             color: #475569;
         }
         
         .contact-info p {
             margin: 1px 0;
+        }
+        
+        /* Print-specific styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .ticket {
+                box-shadow: none;
+                border: 1px solid #cbd5e1;
+            }
+            
+            .qr-cell {
+                background: #e2e8f0 !important;
+            }
+            
+            .qr-cell.filled {
+                background: #0f172a !important;
+            }
         }
     </style>
 </head>
