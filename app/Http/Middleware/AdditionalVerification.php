@@ -26,9 +26,10 @@ class AdditionalVerification
                 return $next($request);
             }
             
-            // Check if user is fully verified (email, phone, and additional verification)
-            if (!$user->isFullyVerified()) {
-                // Redirect to verification page if not fully verified
+            // Check if user has verified their phone number
+            // After initial registration/verification, users shouldn't be blocked from accessing the app
+            if (!$user->hasPhoneVerified()) {
+                // Redirect to verification page if phone is not verified
                 return redirect()->route('verification.phone.show');
             }
         }

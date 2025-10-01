@@ -219,6 +219,11 @@ class BookingController extends Controller
     
     public function store(Request $request)
     {
+        // Ensure user is authenticated before creating a booking
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to make a booking.');
+        }
+        
         $request->validate([
             'schedule_id' => 'required|exists:schedules,id',
             'passenger_name' => 'required|string|max:255',
@@ -286,7 +291,7 @@ class BookingController extends Controller
         
         // Create booking
         $booking = new Booking();
-        $booking->user_id = auth()->check() ? auth()->id() : null;
+        $booking->user_id = auth()->id(); // User is guaranteed to be authenticated at this point
         $booking->schedule_id = $schedule->id;
         $booking->booking_date = $bookingDate; // Set the specific booking date
         $booking->passenger_name = $request->passenger_name;
@@ -308,6 +313,11 @@ class BookingController extends Controller
     public function confirmation($id)
     {
         $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
+        
+        // Check if the current user owns this booking or is authenticated
+        if (auth()->check() && $booking->user_id !== auth()->id()) {
+            abort(403, 'You do not have permission to access this booking.');
+        }
         
         // Check if the schedule has already departed
         if ($booking->schedule->hasDeparted()) {
@@ -458,6 +468,11 @@ class BookingController extends Controller
     {
         $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
         
+        // Check if the current user owns this booking or is authenticated
+        if (auth()->check() && $booking->user_id !== auth()->id()) {
+            abort(403, 'You do not have permission to access this booking.');
+        }
+        
         // Ensure the booking is valid for success page
         if ($booking->booking_status !== 'confirmed') {
             abort(404, 'Invalid booking');
@@ -494,6 +509,11 @@ class BookingController extends Controller
     {
         $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
         
+        // Check if the current user owns this booking or is authenticated
+        if (auth()->check() && $booking->user_id !== auth()->id()) {
+            abort(403, 'You do not have permission to access this booking.');
+        }
+        
         // Ensure the booking has seat numbers
         if (empty($booking->seat_numbers)) {
             abort(404, 'Ticket not available. Please select seats first.');
@@ -520,6 +540,11 @@ class BookingController extends Controller
     public function viewTicket($id)
     {
         $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
+        
+        // Check if the current user owns this booking or is authenticated
+        if (auth()->check() && $booking->user_id !== auth()->id()) {
+            abort(403, 'You do not have permission to access this booking.');
+        }
         
         // Ensure the booking has seat numbers
         if (empty($booking->seat_numbers)) {

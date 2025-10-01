@@ -8,11 +8,13 @@ Dokumen ini menjelaskan langkah-langkah untuk melakukan rollback ke sistem login
 1. `app/Models/OtpCode.php`
 2. `app/Services/OtpService.php`
 3. `app/Http/Middleware/AdditionalVerification.php`
-4. `app/Http/Controllers/Auth/PhoneVerificationController.php`
-5. `database/migrations/2025_01_01_000000_create_otp_codes_table.php`
-6. `database/migrations/2025_01_01_000001_add_phone_verification_to_users_table.php`
-7. `resources/views/auth/verify-phone.blade.php`
-8. `app/Http/Kernel.php` (file ini diganti)
+4. `app/Http/Middleware/VerifiedUserForBooking.php` (telah dihapus)
+5. `app/Http/Middleware/EnsureFullyVerified.php`
+6. `app/Http/Controllers/Auth/PhoneVerificationController.php`
+7. `database/migrations/2025_01_01_000000_create_otp_codes_table.php`
+8. `database/migrations/2025_01_01_000001_add_phone_verification_to_users_table.php`
+9. `resources/views/auth/verify-phone.blade.php`
+10. `app/Http/Kernel.php` (file ini diganti)
 
 ### File yang Dimodifikasi
 1. `app/Models/User.php`
@@ -22,6 +24,10 @@ Dokumen ini menjelaskan langkah-langkah untuk melakukan rollback ke sistem login
 5. `resources/views/auth/register.blade.php`
 6. `app/Http/Requests/Auth/LoginRequest.php`
 7. `resources/views/auth/login.blade.php`
+8. `routes/web.php`
+9. `app/Http/Kernel.php`
+10. `app/Http/Controllers/Frontend/BookingController.php`
+11. `app/Http/Controllers/Auth/PhoneVerificationController.php`
 
 ## Langkah-Langkah Rollback
 
@@ -35,6 +41,8 @@ rm app/Services/OtpService.php
 
 # Hapus middleware verifikasi tambahan
 rm app/Http/Middleware/AdditionalVerification.php
+rm app/Http/Middleware/VerifiedUserForBooking.php  # Jika masih ada
+rm app/Http/Middleware/EnsureFullyVerified.php
 
 # Hapus controller verifikasi phone
 rm app/Http/Controllers/Auth/PhoneVerificationController.php
@@ -70,6 +78,9 @@ cp backup_before_login_changes/LoginRequest.php app/Http/Requests/Auth/LoginRequ
 
 # Kembalikan view login
 cp backup_before_login_changes/login.blade.php resources/views/auth/login.blade.php
+
+# Kembalikan route web
+cp backup_before_login_changes/web.php routes/web.php
 ```
 
 ### 3. Rollback Migration Database
@@ -83,9 +94,11 @@ Perintah di atas akan:
 - Menghapus kolom `phone`, `phone_verified_at`, dan `is_verified` dari tabel `users`
 
 ### 4. Hapus Middleware dari Kernel (jika Kernel tidak diganti)
-Jika Anda menggunakan Kernel asli Laravel, hapus baris ini dari `app/Http/Kernel.php`:
+Jika Anda menggunakan Kernel asli Laravel, hapus baris-baris ini dari `app/Http/Kernel.php`:
 ```php
 'additional.verification' => \App\Http\Middleware\AdditionalVerification::class,
+'verified.user.booking' => \App\Http\Middleware\VerifiedUserForBooking::class,  # Jika masih ada
+'ensure.fully.verified' => \App\Http\Middleware\EnsureFullyVerified::class,
 ```
 
 ### 5. Hapus Route yang Ditambahkan (jika tidak menggunakan Kernel baru)
@@ -105,6 +118,15 @@ Route::post('verify-phone/resend', [PhoneVerificationController::class, 'resendO
     ->name('verification.phone.resend');
 ```
 
+### 6. Kembalikan Route Booking (jika mengganti file web.php)
+Jika Anda menyimpan backup file web.php sebelumnya, kembalikan ke kondisi aslinya, atau hapus middleware dari route booking:
+```php
+// Hapus middleware dari route booking
+Route::prefix('booking')->group(function () {
+    // ... semua route booking tanpa middleware verified.user.booking
+});
+```
+
 ## Validasi Setelah Rollback
 
 Setelah melakukan rollback, pastikan untuk:
@@ -112,6 +134,7 @@ Setelah melakukan rollback, pastikan untuk:
 2. Menguji proses login dengan email seperti sebelumnya
 3. Menguji registrasi user baru
 4. Memastikan admin tetap bisa login ke dashboard
+5. Memastikan proses booking dan payment bisa diakses tanpa verifikasi tambahan
 
 ## Catatan Penting
 
@@ -128,3 +151,22 @@ Jika Anda hanya ingin menghapus sebagian fitur (misalnya hanya OTP, tapi tetap i
    - Migration OTP
 2. Hapus route, controller, dan view OTP
 3. Jaga modifikasi pada User model, LoginRequest, dan login view
+
+## Rollback Lengkap ke Kondisi Sebelum Implementasi Booking Verifikasi
+
+Jika Anda ingin mengembalikan sistem ke kondisi sebelum implementasi booking verifikasi, lakukan semua langkah di atas, termasuk:
+
+1. Hapus middleware yang terkait dengan booking verifikasi:
+   - `app/Http/Middleware/AdditionalVerification.php`
+   - `app/Http/Middleware/EnsureFullyVerified.php` (jika masih ada)
+
+2. Hapus perubahan pada route booking di `routes/web.php`:
+   - Kembalikan struktur route booking ke kondisi aslinya
+   - Hapus middleware auth dari beberapa route jika diperlukan
+
+3. Kembalikan controller Booking ke kondisi aslinya:
+   - Hapus method `checkUserVerification()`
+   - Hapus semua panggilan ke `checkUserVerification()` 
+   - Kembalikan method-method ke kondisi sebelum ditambahi verifikasi
+
+4. Hapus perubahan pada PhoneVerificationController jika ingin menghapus sistem verifikasi tambahan

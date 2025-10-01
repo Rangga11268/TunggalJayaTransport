@@ -16,9 +16,9 @@ Route::prefix('')->name('frontend.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\BookingController::class, 'index'])->name('booking.index');
         Route::get('/schedules', [App\Http\Controllers\Frontend\BookingController::class, 'schedules'])->name('booking.schedules');
         Route::get('/{id}', [App\Http\Controllers\Frontend\BookingController::class, 'show'])->name('booking.show');
-        Route::post('/', [App\Http\Controllers\Frontend\BookingController::class, 'store'])->name('booking.store');
-        Route::post('/select-seats', [App\Http\Controllers\Frontend\BookingController::class, 'selectSeats'])->name('booking.select-seats');
-        Route::post('/process-payment', [App\Http\Controllers\Frontend\BookingController::class, 'processPayment'])->name('booking.process-payment');
+        Route::post('/', [App\Http\Controllers\Frontend\BookingController::class, 'store'])->middleware('auth')->name('booking.store');
+        Route::post('/select-seats', [App\Http\Controllers\Frontend\BookingController::class, 'selectSeats'])->middleware('auth')->name('booking.select-seats');
+        Route::post('/process-payment', [App\Http\Controllers\Frontend\BookingController::class, 'processPayment'])->middleware('auth')->name('booking.process-payment');
         Route::post('/check-availability', [App\Http\Controllers\Frontend\BookingController::class, 'checkAvailability'])->name('check-availability');
         
         Route::get('/confirmation/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'confirmation'])->name('booking.confirmation');

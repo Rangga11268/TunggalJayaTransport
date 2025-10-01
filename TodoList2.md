@@ -13,4 +13,9 @@ wajib benerin roles dan user login terleibih dahulu
 
 
 
-coba di sesuaikan dulu dengan website kita lalu coba implementasi kan karena kita akan membuat fitur rekomendasi , diskon ketika sering beli tiket ,  dan notes nya jangan lupa sediakan rollback untuk kembali ke sebelum implementasi ini di lakukan                                                                                                          
+-- coba di sesuaikan dulu dengan website kita lalu coba implementasi kan karena kita akan membuat fitur rekomendasi , diskon ketika sering beli tiket ,  dan notes nya jangan lupa sediakan rollback untuk kembali ke sebelum implementasi ini di lakukan                        
+
+
+-- hanya admin role atau schedule manager saja yang bisa melihat opsi admin dashboard di dropdown
+
+<!-- -- juga adakan opsi verivikasi via email dimana user di kirim kan link verifikasi dengan fitur laravel 12 -->

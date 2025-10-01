@@ -28,14 +28,10 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Cek apakah user perlu verifikasi tambahan
+        // Get the authenticated user
         $user = Auth::user();
-        if (!$user->isFullyVerified()) {
-            // Redirect ke halaman verifikasi telepon
-            return redirect()->route('verification.phone.show');
-        }
 
-        // Redirect berdasarkan role user
+        // Redirect berdasarkan role user - no verification check after login
         if ($user->hasRole('admin') || $user->hasRole('schedule_manager')) {
             return redirect()->intended(route('admin.dashboard', absolute: false));
         } else {

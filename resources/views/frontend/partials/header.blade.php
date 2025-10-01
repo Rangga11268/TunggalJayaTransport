@@ -60,9 +60,11 @@
 
                     <x-slot name="content">
                         @auth
-                            <x-dropdown-link :href="route('dashboard')" class="hover:bg-blue-50">
-                                {{ __('Admin Dashboard') }}
-                            </x-dropdown-link>
+                            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('schedule_manager'))
+                                <x-dropdown-link :href="route('dashboard')" class="hover:bg-blue-50">
+                                    {{ __('Admin Dashboard') }}
+                                </x-dropdown-link>
+                            @endif
 
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">
@@ -134,9 +136,11 @@
 
             <div class="mt-3 space-y-1">
                 @auth
-                    <x-responsive-nav-link :href="route('dashboard')" class="text-white hover:bg-blue-700">
-                        {{ __('Admin Dashboard') }}
-                    </x-responsive-nav-link>
+                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('schedule_manager'))
+                        <x-responsive-nav-link :href="route('dashboard')" class="text-white hover:bg-blue-700">
+                            {{ __('Admin Dashboard') }}
+                        </x-responsive-nav-link>
+                    @endif
 
                     <!-- Authentication -->
                     <form method="POST" action="{{ route('logout') }}">
