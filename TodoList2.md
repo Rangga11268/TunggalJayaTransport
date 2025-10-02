@@ -2,7 +2,7 @@
 
 -- dan ada fitur chatbot ai dimana si chatbot ini berfungsi seperti costumer service bisa menjawab segala macam jawaban mengenai website ini mulai nanya pemesanan tikett dll
 
--- ganti tampilan tiket jadi landscape dan buat agar freandly di pdf kan artinya kalo di pdf kan atau mau di cetak hasilnya bagus
+-- oke sekarang yang pertama adalah intgrasikan antara tiket di tampilan frontend dengan tiket yang di cetak atau unduh pdf karena bagaikan langit dan bumi dan lagi design nya kalu bisa tiket bus itu selalu landscape atau bisa di bilang nih mirip dengan tiket pesawat atau kereta di indonesia jadi tolong perbaiki itu dan kalau bisa tamnbahkan gambar yang ada di @public/img/heroImg.jpg dan logo tunggal jaya untuk di tiket kerjakan dengan baik dan benar !  
 
 -- user wajib login ketika ingin melakukan pemesanan karena tiket akan di kirim melalui email atau telpon
 wajib benerin roles dan user login terleibih dahulu
