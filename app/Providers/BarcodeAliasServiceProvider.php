@@ -21,18 +21,8 @@ class BarcodeAliasServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Register DNS1D alias
-        if (!function_exists('DNS1D')) {
-            function DNS1D() {
-                return new DNS1D();
-            }
-        }
-
-        // Register DNS2D alias
-        if (!function_exists('DNS2D')) {
-            function DNS2D() {
-                return new DNS2D();
-            }
-        }
+        // Helper functions previously defined here were causing conflicts
+        // They are not being used in the application, so they have been removed
+        // Classes DNS1D and DNS2D are used directly in views
     }
 }

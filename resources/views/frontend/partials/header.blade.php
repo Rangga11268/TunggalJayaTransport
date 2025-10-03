@@ -65,6 +65,11 @@
                                     {{ __('Admin Dashboard') }}
                                 </x-dropdown-link>
                             @endif
+                            
+                            <!-- User Features -->
+                            <x-dropdown-link :href="route('booking-history.index')" class="hover:bg-blue-50">
+                                {{ __('Booking History') }}
+                            </x-dropdown-link>
 
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">
@@ -141,6 +146,11 @@
                             {{ __('Admin Dashboard') }}
                         </x-responsive-nav-link>
                     @endif
+                    
+                    <!-- User Features -->
+                    <x-responsive-nav-link :href="route('booking-history.index')" class="text-white hover:bg-blue-700">
+                        {{ __('Booking History') }}
+                    </x-responsive-nav-link>
 
                     <!-- Authentication -->
                     <form method="POST" action="{{ route('logout') }}">

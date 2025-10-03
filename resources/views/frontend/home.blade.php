@@ -71,6 +71,14 @@ use Illuminate\Support\Str;
                         <i class="fas fa-bus mr-2"></i>Lihat Armada
                     </a>
                 </div>
+                
+                @auth
+                <div class="mt-4 flex justify-center md:justify-start">
+                    <a href="{{ route('recommendations.show') }}" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full transition duration-300 text-center text-sm sm:text-base transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-compass mr-1 sm:mr-2"></i>Rekomendasi Destinasi
+                    </a>
+                </div>
+                @endauth
             </div>
         </div>
     </div>

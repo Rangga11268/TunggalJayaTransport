@@ -54,6 +54,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Booking History Routes
+    Route::prefix('booking-history')->name('booking-history.')->group(function () {
+        Route::get('/', [App\Http\Controllers\BookingHistoryController::class, 'index'])->name('index');
+        Route::get('/{id}', [App\Http\Controllers\BookingHistoryController::class, 'show'])->name('show');
+    });
+    
+    // Recommendation Routes
+    Route::prefix('recommendations')->name('recommendations.')->group(function () {
+        Route::get('/', [App\Http\Controllers\RecommendationController::class, 'show'])->name('show');
+    });
 });
 
 // Admin Routes

@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        // Tambahkan kolom year ke tabel buses jika belum ada
+        if (!Schema::hasColumn('buses', 'year')) {
+            Schema::table('buses', function (Blueprint $table) {
+                $table->year('year')->nullable()->after('description');
+            });
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        if (Schema::hasColumn('buses', 'year')) {
+            Schema::table('buses', function (Blueprint $table) {
+                $table->dropColumn('year');
+            });
+        }
+    }
+};

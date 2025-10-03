@@ -255,16 +255,7 @@ class Schedule extends Model
      */
     public function getDepartureTimeWIB()
     {
-        if ($this->departure_time instanceof Carbon) {
-            return $this->departure_time->setTimezone('Asia/Jakarta');
-        }
-
-        try {
-            $departureTime = Carbon::parse($this->departure_time);
-            return $departureTime->setTimezone('Asia/Jakarta');
-        } catch (\Exception $e) {
-            return $this->departure_time;
-        }
+        return $this->getActualDepartureTime()->setTimezone('Asia/Jakarta');
     }
 
     /**
@@ -272,16 +263,7 @@ class Schedule extends Model
      */
     public function getArrivalTimeWIB()
     {
-        if ($this->arrival_time instanceof Carbon) {
-            return $this->arrival_time->setTimezone('Asia/Jakarta');
-        }
-
-        try {
-            $arrivalTime = Carbon::parse($this->arrival_time);
-            return $arrivalTime->setTimezone('Asia/Jakarta');
-        } catch (\Exception $e) {
-            return $this->arrival_time;
-        }
+        return $this->getActualArrivalTime()->setTimezone('Asia/Jakarta');
     }
 
     /**
