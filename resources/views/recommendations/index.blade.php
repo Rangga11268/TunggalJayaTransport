@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('frontend.layouts.app')
 
 @section('title', 'Destination Recommendations')
 
@@ -29,11 +29,11 @@
                         <div class="mt-4 space-y-2">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Departure:</span>
-                                <span class="font-medium">{{ $schedule->departure_time ? $schedule->departure_time->format('H:i') : 'N/A' }}</span>
+                                <span class="font-medium">{{ $schedule->getDepartureTimeWIB() ? $schedule->getDepartureTimeWIB()->format('H:i') : 'N/A' }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Arrival:</span>
-                                <span class="font-medium">{{ $schedule->arrival_time ? $schedule->arrival_time->format('H:i') : 'N/A' }}</span>
+                                <span class="font-medium">{{ $schedule->getArrivalTimeWIB() ? $schedule->getArrivalTimeWIB()->format('H:i') : 'N/A' }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Duration:</span>
@@ -50,7 +50,7 @@
                         </div>
                         
                         <div class="mt-6">
-                            <a href="{{ route('booking.show', $schedule->id) }}" class="w-full flex justify-center items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                            <a href="{{ route('frontend.booking.show', $schedule->id) }}" class="w-full flex justify-center items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
                                 Book Now
                             </a>
                         </div>

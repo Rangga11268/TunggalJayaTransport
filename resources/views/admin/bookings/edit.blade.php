@@ -57,7 +57,7 @@
                                     @foreach(App\Models\Schedule::with('route', 'bus')->get() as $schedule)
                                         @if(!$schedule->hasDeparted() || $schedule->id == $booking->schedule_id)
                                             <option value="{{ $schedule->id }}" {{ old('schedule_id', $booking->schedule_id) == $schedule->id ? 'selected' : '' }} {{ $schedule->hasDeparted() && $schedule->id != $booking->schedule_id ? 'disabled' : '' }}>
-                                                {{ $schedule->route->origin }} → {{ $schedule->route->destination }} ({{ $schedule->bus->name ?? 'Bus' }}) - {{ $schedule->departure_time->format('d M Y H:i') }}
+                                                {{ $schedule->route->origin }} → {{ $schedule->route->destination }} ({{ $schedule->bus->name ?? 'Bus' }}) - {{ $schedule->getActualDepartureTime()->format('d M Y H:i') }}
                                                 @if($schedule->hasDeparted() && $schedule->id != $booking->schedule_id)
                                                     (DEPARTED - Not Available)
                                                 @endif

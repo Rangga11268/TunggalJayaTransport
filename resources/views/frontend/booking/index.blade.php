@@ -136,7 +136,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap" data-label="Arrival">
-                            <div class="text-sm font-medium text-gray-900">{{ $schedule->arrival_time->format('H:i') }}</div>
+                            <div class="text-sm font-medium text-gray-900">{{ $schedule->getActualArrivalTime()->format('H:i') }}</div>
                             <div class="text-sm text-gray-500">Terminal {{ $schedule->arrival_terminal ?? '1' }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap" data-label="Bus Type">

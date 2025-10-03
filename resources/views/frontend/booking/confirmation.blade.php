@@ -490,34 +490,6 @@
                         @endif
                     @endfor
                 </div>
-                
-                <!-- Enhanced seat legend -->
-                <div class="seat-legend grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 sm:mb-8 mobile-legend">
-                    <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
-                        <div class="w-5 h-5 bg-gradient-to-br from-green-400 to-green-600 rounded mr-2 flex items-center justify-center">
-                            <img src="{{ asset('img/car-seat.png') }}" alt="Available Seat" class="w-3 h-3 sm:w-4 sm:h-4 object-contain filter brightness-90">
-                        </div>
-                        <span class="text-xs sm:text-sm font-medium">Available</span>
-                    </div>
-                    <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
-                        <div class="w-5 h-5 bg-red-100 rounded mr-2 flex items-center justify-center">
-                            <i class="fas fa-times text-red-500 text-xs sm:text-sm"></i>
-                        </div>
-                        <span class="text-xs sm:text-sm font-medium">Occupied</span>
-                    </div>
-                    <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
-                        <div class="w-5 h-5 bg-gradient-to-br from-blue-400 to-blue-600 rounded mr-2 flex items-center justify-center">
-                            <img src="{{ asset('img/car-seat.png') }}" alt="Selected Seat" class="w-3 h-3 sm:w-4 sm:h-4 object-contain filter brightness-125">
-                        </div>
-                        <span class="text-xs sm:text-sm font-medium">Selected</span>
-                    </div>
-                    <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg shadow-sm">
-                        <div class="w-6 sm:w-8 h-1 flex items-center justify-center">
-                            <div class="w-4 h-0.5 sm:h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>
-                        </div>
-                        <span class="text-xs sm:text-sm font-medium ml-1 sm:ml-2">Aisle</span>
-                    </div>
-                </div>
             </div>
         </div>
         
@@ -546,21 +518,6 @@
                     <div class="w-4 h-0.5 sm:h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>
                 </div>
                 <span class="text-xs sm:text-sm font-medium ml-1 sm:ml-2">Aisle</span>
-            </div>
-        </div>
-        
-        <!-- Seat Preferences -->
-        <div class="seat-preferences mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-5">
-            <h3 class="text-lg font-medium mb-3 text-gray-800 border-b border-gray-200 pb-2">Seat Preferences</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div class="flex items-center">
-                    <input type="checkbox" id="window-seat" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500">
-                    <label for="window-seat" class="ml-2 text-sm text-gray-700">Window Seat</label>
-                </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="aisle-seat" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500">
-                    <label for="aisle-seat" class="ml-2 text-sm text-gray-700">Aisle Seat</label>
-                </div>
             </div>
         </div>
         
@@ -659,9 +616,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get available seats with preferences
         const availableSeats = Array.from(seats).map(seat => parseInt(seat.getAttribute('data-seat'))).filter(seat => !selectedSeats.includes(seat));
         
-        // Filter by preferences
+        // Filter by preferences (only if checkboxes exist)
         let preferredSeats = availableSeats;
-        if (windowSeatCheckbox.checked) {
+        if (windowSeatCheckbox && windowSeatCheckbox.checked) {
             preferredSeats = preferredSeats.filter(seat => {
                 // Window seats are typically 1st and 3rd in each row (2-3 layout)
                 const seatPositionInRow = ((seat - 1) % 5) + 1;
@@ -669,7 +626,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        if (aisleSeatCheckbox.checked) {
+        if (aisleSeatCheckbox && aisleSeatCheckbox.checked) {
             preferredSeats = preferredSeats.filter(seat => {
                 // Aisle seats are typically 2nd and 5th in each row (2-3 layout)
                 const seatPositionInRow = ((seat - 1) % 5) + 1;

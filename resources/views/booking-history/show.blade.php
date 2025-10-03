@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('frontend.layouts.app')
 
 @section('title', 'Booking Details')
 
@@ -82,11 +82,11 @@
                     </div>
                     <div class="flex justify-between border-b pb-2">
                         <span class="text-gray-600">Departure Time:</span>
-                        <span class="font-medium">{{ $booking->schedule->departure_time ? $booking->schedule->departure_time->format('d M Y, H:i') : 'N/A' }}</span>
+                        <span class="font-medium">{{ $booking->schedule->getDepartureTimeWIB() ? $booking->schedule->getDepartureTimeWIB()->format('d M Y, H:i') : 'N/A' }}</span>
                     </div>
                     <div class="flex justify-between border-b pb-2">
                         <span class="text-gray-600">Arrival Time:</span>
-                        <span class="font-medium">{{ $booking->schedule->arrival_time ? $booking->schedule->arrival_time->format('d M Y, H:i') : 'N/A' }}</span>
+                        <span class="font-medium">{{ $booking->schedule->getArrivalTimeWIB() ? $booking->schedule->getArrivalTimeWIB()->format('d M Y, H:i') : 'N/A' }}</span>
                     </div>
                     <div class="flex justify-between border-b pb-2">
                         <span class="text-gray-600">Bus:</span>

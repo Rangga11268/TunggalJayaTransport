@@ -121,7 +121,7 @@
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Departure:</dt>
                                 <dd class="text-gray-900">
-                                    {{ $booking->schedule->departure_time->format('d M Y H:i') }}
+                                    {{ $booking->schedule->getActualDepartureTime()->format('d M Y H:i') }}
                                     @if($booking->schedule->hasDeparted())
                                         <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded">
                                             DEPARTED
@@ -131,7 +131,7 @@
                             </div>
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Arrival:</dt>
-                                <dd class="text-gray-900">{{ $booking->schedule->arrival_time->format('d M Y H:i') }}</dd>
+                                <dd class="text-gray-900">{{ $booking->schedule->getActualArrivalTime()->format('d M Y H:i') }}</dd>
                             </div>
                             @if($booking->schedule->hasDeparted())
                                 <div class="flex md:col-span-2">

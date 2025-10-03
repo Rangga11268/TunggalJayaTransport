@@ -50,7 +50,7 @@
                                         <td class="px-4 py-3 sm:py-4">
                                             <div class="text-sm font-medium text-gray-900">{{ $booking->schedule->route->origin }} → {{ $booking->schedule->route->destination }}</div>
                                             <div class="text-sm text-gray-500">
-                                                {{ $booking->schedule->departure_time->format('d M Y H:i') }}
+                                                {{ $booking->schedule->getActualDepartureTime()->format('d M Y H:i') }}
                                                 @if($booking->schedule->hasDeparted())
                                                     <span class="text-red-600 font-semibold">(Departed)</span>
                                                 @endif

@@ -73,7 +73,7 @@ class BookingController extends Controller
         $booking->booking_status = $request->booking_status;
         $booking->save();
 
-        return redirect()->route('admin.bookings.index')->with('create_success', 'Booking created successfully. Please note that the schedule departs on ' . $schedule->departure_time->format('d M Y H:i'));
+        return redirect()->route('admin.bookings.index')->with('create_success', 'Booking created successfully. Please note that the schedule departs on ' . $schedule->getActualDepartureTime()->format('d M Y H:i'));
     }
 
     /**
@@ -143,7 +143,7 @@ class BookingController extends Controller
         
         $booking->save();
 
-        return redirect()->route('admin.bookings.index')->with('update_success', 'Booking updated successfully. Please note that the schedule departs on ' . $booking->schedule->departure_time->format('d M Y H:i'));
+        return redirect()->route('admin.bookings.index')->with('update_success', 'Booking updated successfully. Please note that the schedule departs on ' . $booking->schedule->getActualDepartureTime()->format('d M Y H:i'));
     }
 
     /**

@@ -198,4 +198,3 @@ The Tunggal Jaya Transport system is a Laravel-based bus booking platform with:
 - Better user engagement and satisfaction
 
 ---
-s

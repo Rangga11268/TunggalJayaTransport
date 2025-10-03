@@ -505,7 +505,7 @@
             <div class="trip-details">
                 <div class="trip-detail-item">
                     <div class="detail-label">Date</div>
-                    <div class="detail-value date-value">{{ $booking->schedule->departure_time->format('d M Y') }}</div>
+                    <div class="detail-value date-value">{{ $booking->schedule->getDepartureTimeWIB()->format('d M Y') }}</div>
                 </div>
                 <div class="trip-detail-item">
                     <div class="detail-label">Booking Code</div>
@@ -569,11 +569,11 @@
             <div class="boarding-info">
                 <div class="boarding-item">
                     <div class="boarding-label">Departure Time</div>
-                    <div class="boarding-value">{{ $booking->schedule->departure_time->format('H:i') }}</div>
+                    <div class="boarding-value">{{ $booking->schedule->getDepartureTimeWIB()->format('H:i') }}</div>
                 </div>
                 <div class="boarding-item">
                     <div class="boarding-label">Arrival Time</div>
-                    <div class="boarding-value">{{ $booking->schedule->arrival_time->format('H:i') }}</div>
+                    <div class="boarding-value">{{ $booking->schedule->getArrivalTimeWIB()->format('H:i') }}</div>
                 </div>
                 <div class="boarding-item">
                     <div class="boarding-label">Boarding Point</div>

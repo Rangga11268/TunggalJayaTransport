@@ -107,7 +107,7 @@ class GenerateDepartedBookingsReportCommand extends Command
                 '"' . $booking->passenger_phone . '"',
                 '"' . $booking->schedule->route->origin . ' → ' . $booking->schedule->route->destination . '"',
                 '"' . $booking->schedule->bus->name . '"',
-                '"' . $booking->schedule->getActualDepartureTime()->format('d M Y H:i') . '"',
+                '"' . $booking->schedule->departure_time->format('d M Y H:i') . '"',
                 '"' . $booking->payment_status . '"',
                 '"' . $booking->booking_status . '"',
                 '"' . $booking->total_price . '"'
@@ -138,7 +138,7 @@ class GenerateDepartedBookingsReportCommand extends Command
                     'passenger_phone' => $booking->passenger_phone,
                     'route' => $booking->schedule->route->origin . ' → ' . $booking->schedule->route->destination,
                     'bus' => $booking->schedule->bus->name,
-                    'departure_time' => $booking->schedule->getActualDepartureTime()->toISOString(),
+                    'departure_time' => $booking->schedule->departure_time->toISOString(),
                     'payment_status' => $booking->payment_status,
                     'booking_status' => $booking->booking_status,
                     'total_price' => $booking->total_price
