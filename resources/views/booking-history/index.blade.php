@@ -81,7 +81,7 @@
             <h3 class="mt-2 text-lg font-medium text-gray-900">No bookings found</h3>
             <p class="mt-1 text-gray-500">You don't have any booking history yet.</p>
             <div class="mt-6">
-                <a href="{{ route('schedules.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
+                <a href="{{ route('frontend.booking.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
                     Book a Trip
                 </a>
             </div>

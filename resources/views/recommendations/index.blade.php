@@ -5,7 +5,11 @@
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-2">Recommended Destinations</h1>
-    <p class="text-gray-600 mb-6">Based on your recent trip from {{ $origin }}, here are destinations you might like</p>
+    @if($origin)
+        <p class="text-gray-600 mb-6">Based on your recent trip from {{ $origin }}, here are destinations you might like</p>
+    @else
+        <p class="text-gray-600 mb-6">Here are destinations you might like based on your previous bookings</p>
+    @endif
     
     @if($recommendedRoutes->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -66,7 +70,7 @@
             <h3 class="mt-2 text-lg font-medium text-gray-900">No recommendations available</h3>
             <p class="mt-1 text-gray-500">We couldn't find any destinations matching your criteria.</p>
             <div class="mt-6">
-                <a href="{{ route('schedules.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
+                <a href="{{ route('frontend.booking.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
                     Browse All Routes
                 </a>
             </div>

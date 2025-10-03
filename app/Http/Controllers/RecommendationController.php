@@ -32,7 +32,10 @@ class RecommendationController extends Controller
         }
         
         if (!$origin) {
-            return redirect()->route('schedules.index')->with('error', 'No origin location specified for recommendations.');
+            // If no origin is specified, show an empty recommendations page with a message
+            $recommendedRoutes = collect(); // Empty collection
+            $origin = null; // Set to null to indicate no specific origin
+            return view('recommendations.index', compact('recommendedRoutes', 'origin'))->with('info', 'No previous bookings found. Recommendations are based on your last completed booking destination.');
         }
         
         // Cari rute dengan asal yang sama dengan destinasi terakhir user
@@ -46,22 +49,18 @@ class RecommendationController extends Controller
      */
     private function getRecommendations($origin)
     {
-        // Ambil semua rute yang asalnya sama dengan destinasi yang diberikan
+        // Ambil semua rute yang asalnya sama dengan destinasi terakhir user (kemungkinan destinasi berikutnya)
         $routesFromOrigin = Route::where('origin', 'LIKE', '%' . $origin . '%')
-            ->orWhere('destination', 'LIKE', '%' . $origin . '%')
             ->get();
-            
-        // Ambil semua rute dengan destinasi yang sama (untuk algoritma kolaboratif)
-        $routesWithSameDestination = Route::where('destination', 'LIKE', '%' . $origin . '%')->get();
         
         $recommendedRoutes = collect();
         
-        // Tambahkan rute-rute yang asalnya sama dengan destinasi user
-        foreach ($routesWithSameDestination as $route) {
+        // Tambahkan rute-rute yang asalnya sama dengan destinasi user (tempat user baru saja tiba)
+        foreach ($routesFromOrigin as $route) {
             // Dapatkan jadwal untuk rute ini
             $schedules = Schedule::where('route_id', $route->id)
                 ->where('status', 'active')
-                ->with('bus')
+                ->with(['bus'])
                 ->get();
                 
             foreach ($schedules as $schedule) {

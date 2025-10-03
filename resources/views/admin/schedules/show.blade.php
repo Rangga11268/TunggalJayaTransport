@@ -77,22 +77,15 @@
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Departure Time:</dt>
                                 <dd class="text-gray-900">
-                                    @if($schedule->is_daily)
-                                        <div class="text-sm text-gray-500">Daily at {{ $schedule->getDepartureTimeWIB()->format('H:i') }} (WIB)</div>
-                                    @else
-                                        <div class="text-sm text-gray-500">{{ $schedule->getDepartureTimeWIB()->format('l, F j, Y H:i') }} (WIB)</div>
-                                    @endif
+                                    {{ $schedule->getActualDepartureTime()->format('d M Y H:i') }}
                                 </dd>
                             </div>
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Arrival Time:</dt>
                                 <dd class="text-gray-900">
-                                    @if($schedule->is_daily)
-                                        {{ $schedule->arrival_time->format('d M Y H:i') }}
-                                    @endif
+                                    {{ $schedule->getActualArrivalTime()->format('d M Y H:i') }}
                                 </dd>
                             </div>
-                                                            @if($schedule->is_daily)
                             <div class="flex">
                                 <dt class="font-medium text-gray-500 w-32">Price:</dt>
                                 <dd class="text-gray-900">Rp. {{ number_format($schedule->price, 0, ',', '.') }}</dd>
