@@ -233,20 +233,44 @@ class HomeController extends Controller
         
         if ($similarUsers->isNotEmpty()) {
             // Get routes frequently booked by similar users but not yet booked by current user
-            $similarBookings = Booking::whereIn('user_id', $similarUsers->pluck('id'))
-                ->whereHas('schedule', function($q) {
-                    $q->where('status', 'active');
-                })
-                ->with(['schedule.route', 'schedule.bus'])
+            $similarBookings = Booking::join('schedules', 'bookings.schedule_id', '=', 'schedules.id')
+                ->join('routes', 'schedules.route_id', '=', 'routes.id')
+                ->join('buses', 'schedules.bus_id', '=', 'buses.id')
+                ->whereIn('bookings.user_id', $similarUsers->pluck('id'))
+                ->where('schedules.status', 'active')
+                ->select('bookings.user_id as booking_user_id', 'schedules.*', 'routes.*', 'buses.*', 'bookings.schedule_id')
                 ->get();
             
-            foreach ($similarBookings as $booking) {
-                $route = $booking->schedule->route;
-                $schedule = $booking->schedule;
+            foreach ($similarBookings as $bookingData) {
+                // Create temporary objects to match expected structure
+                $route = new \App\Models\Route();
+                $route->id = $bookingData->route_id;
+                $route->name = $bookingData->name;
+                $route->origin = $bookingData->origin;
+                $route->destination = $bookingData->destination;
+                $route->distance = $bookingData->distance;
+                $route->duration = $bookingData->duration;
+                $route->description = $bookingData->description;
+                
+                $bus = new \App\Models\Bus();
+                $bus->id = $bookingData->bus_id;
+                $bus->name = $bookingData->name;
+                $bus->bus_type = $bookingData->bus_type;
+                $bus->capacity = $bookingData->capacity;
+                $bus->facilities = $bookingData->facilities;
+                
+                $schedule = new \App\Models\Schedule();
+                $schedule->id = $bookingData->schedule_id;
+                $schedule->bus_id = $bookingData->bus_id;
+                $schedule->route_id = $bookingData->route_id;
+                $schedule->price = $bookingData->price;
+                $schedule->status = $bookingData->status;
+                $schedule->bus = $bus;
+                $schedule->route = $route;
                 
                 if ($route && $schedule) {
                     // Calculate a collaborative filtering score based on similarity 
-                    $similarityScore = $similarUsers->firstWhere('id', $booking->user_id)['similarity'] ?? 1;
+                    $similarityScore = $similarUsers->firstWhere('id', $bookingData->booking_user_id)['similarity'] ?? 1;
                     $collaborativeScore = $similarityScore * 50; // Base collaborative score
                     
                     $recommendations->push([
@@ -269,7 +293,8 @@ class HomeController extends Controller
     {
         // This is a simplified version - in a real implementation you'd use more sophisticated similarity algorithms
         $currentUserBookings = Booking::where('user_id', auth()->id())
-            ->pluck('schedule.route_id')
+            ->join('schedules', 'bookings.schedule_id', '=', 'schedules.id')
+            ->pluck('schedules.route_id')
             ->toArray();
             
         // Find users who have booked similar routes
@@ -309,18 +334,17 @@ class HomeController extends Controller
         $recommendations = collect();
         
         // Get most popular routes overall
-        $popularRoutes = Booking::whereHas('schedule', function($q) {
-                $q->where('status', 'active');
-            })
-            ->with(['schedule.route', 'schedule.bus'])
-            ->selectRaw('schedule_id, count(*) as booking_count')
-            ->groupBy('schedule_id')
+        $popularSchedules = Booking::join('schedules', 'bookings.schedule_id', '=', 'schedules.id')
+            ->join('routes', 'schedules.route_id', '=', 'routes.id')
+            ->where('schedules.status', 'active')
+            ->selectRaw('schedules.id as schedule_id, count(*) as booking_count')
+            ->groupBy('schedules.id')
             ->orderByDesc('booking_count')
             ->limit(20)
-            ->get();
+            ->get(['schedules.id']);
         
-        foreach ($popularRoutes as $booking) {
-            $schedule = $booking->schedule;
+        foreach ($popularSchedules as $scheduleData) {
+            $schedule = \App\Models\Schedule::with(['route', 'bus'])->find($scheduleData->schedule_id);
             if ($schedule && $schedule->route) {
                 $score = $this->calculateRecommendationScore($schedule->route, $schedule) + 50; // Additional popularity bonus
                 
