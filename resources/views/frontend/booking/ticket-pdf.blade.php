@@ -342,9 +342,9 @@
                         <div class="barcode-content">
                             <!-- Barcode will be generated here -->
                             @php
-                                \Milon\Barcode\DNS1D;
-                                $dns1d = new DNS1D();
-                                echo $dns1d->getBarcodeSVG($booking->booking_code, 'C128', 1.2, 25);
+                                $generator = new Milon\Barcode\DNS1D();
+                                
+                                echo $generator->getBarcodeSVG($booking->booking_code, 'C128', 1.2, 25);
                             @endphp
                         </div>
                         <div class="barcode-number">{{ $booking->booking_code }}</div>
@@ -356,9 +356,9 @@
                     <div class="qr-code-placeholder">
                         <div class="qr-content">
                             @php
-                                \Milon\Barcode\DNS2D;
-                                $dns2d = new DNS2D();
-                                echo $dns2d->getBarcodeSVG($booking->booking_code, 'QRCODE', 3, 3, ['fgcolor'=>array(0,0,0)]);
+                                $qr_generator = new Milon\Barcode\DNS2D();
+                                
+                                echo $qr_generator->getBarcodeSVG($booking->booking_code, 'QRCODE', 3, 3);
                             @endphp
                         </div>
                     </div>
