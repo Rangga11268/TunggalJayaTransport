@@ -105,17 +105,10 @@
         </div>
     </div>
     
-    <div class="flex justify-between">
+    <div class="flex justify-center">
         <a href="{{ route('booking-history.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
             ← Back to History
         </a>
-        
-        <!-- Recommendation section will be added here after booking -->
-        @if($booking->booking_status === 'completed')
-            <a href="{{ route('recommendations.show', ['origin' => $booking->schedule->route->destination]) }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-                View Recommendations →
-            </a>
-        @endif
     </div>
 </div>
 @endsection

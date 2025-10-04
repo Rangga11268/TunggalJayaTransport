@@ -72,13 +72,7 @@ use Illuminate\Support\Str;
                     </a>
                 </div>
                 
-                @auth
-                <div class="mt-4 flex justify-center md:justify-start">
-                    <a href="{{ route('recommendations.show') }}" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full transition duration-300 text-center text-sm sm:text-base transform hover:scale-105 shadow-lg hover:shadow-xl">
-                        <i class="fas fa-compass mr-1 sm:mr-2"></i>Rekomendasi Destinasi
-                    </a>
-                </div>
-                @endauth
+
             </div>
         </div>
     </div>
@@ -231,7 +225,46 @@ use Illuminate\Support\Str;
         </div>
     </div>
 
-    <!-- Featured Routes -->
+    <!-- Personalized Recommendations for logged-in users -->
+    @auth
+        @if($personalizedRecommendations && $personalizedRecommendations->count() > 0)
+        <div class="mb-8 sm:mb-12">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Rekomendasi Destinasi</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                @foreach($personalizedRecommendations as $item)
+                    @php 
+                        $route = $item['route'];
+                        $schedule = $item['schedule'];
+                    @endphp
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
+                        <div class="bg-gradient-to-r from-purple-400 to-pink-500 h-1 sm:h-2"></div>
+                        <div class="p-4 sm:p-6">
+                            <div class="flex justify-between items-center mb-3 sm:mb-4">
+                                <h3 class="text-base sm:text-xl font-bold text-gray-800">{{ $route->origin }}</h3>
+                                <i class="fas fa-arrow-right text-purple-500 text-sm sm:text-base"></i>
+                                <h3 class="text-base sm:text-xl font-bold text-gray-800">{{ $route->destination }}</h3>
+                            </div>
+                            @if($route->distance)
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2"><i class="fas fa-road mr-1 sm:mr-2"></i>{{ $route->distance }} km</p>
+                            @endif
+                            @if($route->duration)
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2"><i class="fas fa-clock mr-1 sm:mr-2"></i>{{ round($route->duration / 60, 1) }} jam</p>
+                            @endif
+                            @if($schedule)
+                                <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4"><i class="fas fa-tag mr-1 sm:mr-2"></i>Rp {{ number_format($schedule->price, 0, ',', '.') }}</p>
+                            @endif
+                            <a href="{{ route('frontend.booking.index', ['origin' => $route->origin, 'destination' => $route->destination]) }}" class="text-purple-600 hover:text-purple-800 font-medium flex items-center text-sm sm:text-base">
+                                Pesan Sekarang <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+    @endauth
+
+    <!-- Featured Routes (Rute Populer for all users) -->
     <div class="mb-8 sm:mb-12">
         <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Rute Populer</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">

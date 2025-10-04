@@ -1,5 +1,7 @@
 # Qwen V1 Update: Fitur Rekomendasi & History Pemesanan
 
+##### JANGAN ASAL ME ROLLBACK MIGRASI JIKA INGINME ROLLBACK INGAT KANMIGRASI APA SAJA YANG TEROLLBACK DAN KEMBALIKAN 
+
 ## Overview
 Dokumen ini merinci rencana dan implementasi untuk menambahkan dua fitur penting ke sistem Tunggal Jaya Transport:
 1. Fitur history pemesanan

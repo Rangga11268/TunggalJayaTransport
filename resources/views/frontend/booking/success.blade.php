@@ -212,15 +212,7 @@
             ])
         </div>
         
-        <!-- Recommendation Section -->
-        <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl shadow-md p-6 mb-6 sm:mb-8 text-center">
-            <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-3">Mungkin Anda Juga Tertarik</h2>
-            <p class="text-gray-600 mb-4">Berdasarkan destinasi yang baru Anda pesan, berikut rekomendasi destinasi menarik lainnya</p>
-            <a href="{{ route('recommendations.show', ['origin' => $booking->schedule->route->destination]) }}" 
-               class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 inline-flex items-center">
-                <i class="fas fa-compass mr-2"></i> Lihat Rekomendasi Destinasi
-            </a>
-        </div>
+
         
         <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-6 sm:mt-8 mobile-button-group">
             <a href="{{ route('frontend.booking.view-ticket', $booking->id) }}" 

@@ -61,10 +61,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}', [App\Http\Controllers\BookingHistoryController::class, 'show'])->name('show');
     });
     
-    // Recommendation Routes
-    Route::prefix('recommendations')->name('recommendations.')->group(function () {
-        Route::get('/', [App\Http\Controllers\RecommendationController::class, 'show'])->name('show');
-    });
+
 });
 
 // Admin Routes

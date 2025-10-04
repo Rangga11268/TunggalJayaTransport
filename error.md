@@ -197,4 +197,9 @@ The Tunggal Jaya Transport system is a Laravel-based bus booking platform with:
 - Improved customer lifetime value
 - Better user engagement and satisfaction
 
----
+---saya kasih notes tambahan ketika ada prosess yang berbau rollback migrasi tolong konfirmasi ke saya dulu   
+
+
+-- Fitur rekomendasi masih belum optimal
+
+##### JANGAN ASAL ME ROLLBACK MIGRASI JIKA INGINME ROLLBACK INGAT KANMIGRASI APA SAJA YANG TEROLLBACK DAN KEMBALIKAN 
