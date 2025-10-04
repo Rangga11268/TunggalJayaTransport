@@ -42,6 +42,8 @@ Catatan ini digunakan untuk melacak progres terjemahan dari bahasa Inggris ke ba
 -   [x] Halaman contact
 -   [x] Halaman news di admin panel (index, create, edit, show)
 -   [x] Halaman categories di admin panel (index)
+-   [x] Halaman bus di admin panel (index, create, edit, show)
+-   [x] Halaman rute di admin panel (index, create, edit, show)
 -   [ ] Halaman di admin panel lain nya
 
 ## Catatan Penting

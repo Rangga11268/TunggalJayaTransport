@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Add New Bus') }}
+            {{ __('Tambah Bus Baru') }}
         </h2>
     </x-slot>
 
@@ -15,7 +15,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <div class="mb-4">
-                                    <label for="name" class="block text-sm font-medium text-gray-700">Bus Name</label>
+                                    <label for="name" class="block text-sm font-medium text-gray-700">Nama Bus</label>
                                     <input type="text" name="name" id="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" value="{{ old('name') }}" required>
                                     @error('name')
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -23,7 +23,7 @@
                                 </div>
                                 
                                 <div class="mb-4">
-                                    <label for="plate_number" class="block text-sm font-medium text-gray-700">Plate Number</label>
+                                    <label for="plate_number" class="block text-sm font-medium text-gray-700">Nomor Plat</label>
                                     <input type="text" name="plate_number" id="plate_number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" value="{{ old('plate_number') }}" required>
                                     @error('plate_number')
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -31,7 +31,7 @@
                                 </div>
                                 
                                 <div class="mb-4">
-                                    <label for="bus_type" class="block text-sm font-medium text-gray-700">Bus Type</label>
+                                    <label for="bus_type" class="block text-sm font-medium text-gray-700">Tipe Bus</label>
                                     <input type="text" name="bus_type" id="bus_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" value="{{ old('bus_type') }}" required>
                                     @error('bus_type')
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -39,7 +39,7 @@
                                 </div>
                                 
                                 <div class="mb-4">
-                                    <label for="capacity" class="block text-sm font-medium text-gray-700">Capacity</label>
+                                    <label for="capacity" class="block text-sm font-medium text-gray-700">Kapasitas</label>
                                     <input type="number" name="capacity" id="capacity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" value="{{ old('capacity') }}" required>
                                     @error('capacity')
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -47,7 +47,7 @@
                                 </div>
                                 
                                 <div class="mb-4">
-                                    <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                                    <label for="year" class="block text-sm font-medium text-gray-700">Tahun</label>
                                     <input type="number" name="year" id="year" min="1900" max="{{ date('Y') + 2 }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" value="{{ old('year') }}">
                                     @error('year')
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -57,7 +57,7 @@
                             
                             <div>
                                 <div class="mb-4">
-                                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                                    <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
                                     <textarea name="description" id="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly">{{ old('description') }}</textarea>
                                     @error('description')
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -67,9 +67,9 @@
                                 <div class="mb-4">
                                     <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                                     <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly" required>
-                                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                                        <option value="maintenance" {{ old('status') == 'maintenance' ? 'selected' : '' }}>Maintenance</option>
-                                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                                        <option value="maintenance" {{ old('status') == 'maintenance' ? 'selected' : '' }}>Perawatan</option>
+                                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Tidak Aktif</option>
                                     </select>
                                     @error('status')
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -77,7 +77,7 @@
                                 </div>
                                 
                                 <div class="mb-4">
-                                    <label for="image" class="block text-sm font-medium text-gray-700">Bus Image</label>
+                                    <label for="image" class="block text-sm font-medium text-gray-700">Gambar Bus</label>
                                     <input type="file" name="image" id="image" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 touch-friendly">
                                     @error('image')
                                         <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -86,10 +86,10 @@
                             </div>
                         </div>
                         
-                        <!-- Drivers Selection -->
+                        <!-- Seleksi Driver -->
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Drivers</label>
-                            <p class="text-sm text-gray-500 mb-2">Note: Each driver can only be assigned to one bus at a time.</p>
+                            <label class="block text-sm font-medium text-gray-700">Driver</label>
+                            <p class="text-sm text-gray-500 mb-2">Catatan: Setiap driver hanya dapat ditugaskan ke satu bus pada satu waktu.</p>
                             <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                 @foreach($drivers as $driver)
                                     @php
@@ -107,7 +107,7 @@
                                         <label for="driver_{{ $driver->id }}" class="ml-2 text-sm text-gray-700">
                                             {{ $driver->name }} ({{ $driver->license_number }})
                                             @if($isAssignedToOtherBus)
-                                                <span class="text-red-500 text-xs">(Already assigned)</span>
+                                                <span class="text-red-500 text-xs">(Sudah ditugaskan)</span>
                                             @endif
                                         </label>
                                     </div>
@@ -118,10 +118,10 @@
                             @enderror
                         </div>
                         
-                        <!-- Conductors Selection -->
+                        <!-- Seleksi Kondektur -->
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Conductors</label>
-                            <p class="text-sm text-gray-500 mb-2">Note: Each conductor can only be assigned to one bus at a time.</p>
+                            <label class="block text-sm font-medium text-gray-700">Kondektur</label>
+                            <p class="text-sm text-gray-500 mb-2">Catatan: Setiap kondektur hanya dapat ditugaskan ke satu bus pada satu waktu.</p>
                             <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                 @foreach($conductors as $conductor)
                                     @php
@@ -139,7 +139,7 @@
                                         <label for="conductor_{{ $conductor->id }}" class="ml-2 text-sm text-gray-700">
                                             {{ $conductor->name }} ({{ $conductor->employee_id }})
                                             @if($isAssignedToOtherBus)
-                                                <span class="text-red-500 text-xs">(Already assigned)</span>
+                                                <span class="text-red-500 text-xs">(Sudah ditugaskan)</span>
                                             @endif
                                         </label>
                                     </div>
@@ -152,10 +152,10 @@
                         
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
                             <a href="{{ route('admin.buses.index') }}" class="text-gray-600 hover:text-gray-800 w-full sm:w-auto text-center touch-friendly">
-                                ← Back to Buses
+                                ← Kembali ke Bus
                             </a>
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto touch-friendly">
-                                Add Bus
+                                Tambah Bus
                             </button>
                         </div>
                     </form>
@@ -178,8 +178,8 @@
                 e.preventDefault();
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Plate Number Required',
-                    text: 'Please enter a plate number.',
+                    title: 'Nomor Plat Diperlukan',
+                    text: 'Silakan masukkan nomor plat.',
                     confirmButtonColor: '#3085d6'
                 });
                 return;

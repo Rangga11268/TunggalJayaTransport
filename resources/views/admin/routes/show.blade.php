@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('View Route') }}
+            {{ __('Lihat Rute') }}
         </h2>
     </x-slot>
 
@@ -15,18 +15,18 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <h3 class="text-lg font-medium mb-2">Route Details</h3>
+                            <h3 class="text-lg font-medium mb-2">Detail Rute</h3>
                             <dl class="grid grid-cols-1 gap-2">
                                 <div class="flex">
-                                    <dt class="font-medium text-gray-500 w-32">Origin:</dt>
+                                    <dt class="font-medium text-gray-500 w-32">Asal:</dt>
                                     <dd class="text-gray-900">{{ $route->origin }}</dd>
                                 </div>
                                 <div class="flex">
-                                    <dt class="font-medium text-gray-500 w-32">Destination:</dt>
+                                    <dt class="font-medium text-gray-500 w-32">Tujuan:</dt>
                                     <dd class="text-gray-900">{{ $route->destination }}</dd>
                                 </div>
                                 <div class="flex">
-                                    <dt class="font-medium text-gray-500 w-32">Distance:</dt>
+                                    <dt class="font-medium text-gray-500 w-32">Jarak:</dt>
                                     <dd class="text-gray-900">
                                         @if($route->distance)
                                             {{ $route->distance }} km
@@ -36,10 +36,10 @@
                                     </dd>
                                 </div>
                                 <div class="flex">
-                                    <dt class="font-medium text-gray-500 w-32">Duration:</dt>
+                                    <dt class="font-medium text-gray-500 w-32">Durasi:</dt>
                                     <dd class="text-gray-900">
                                         @if($route->duration)
-                                            {{ $route->duration }} minutes
+                                            {{ $route->duration }} menit
                                         @else
                                             N/A
                                         @endif
@@ -49,18 +49,18 @@
                         </div>
                         
                         <div>
-                            <h3 class="text-lg font-medium mb-2">Description</h3>
+                            <h3 class="text-lg font-medium mb-2">Deskripsi</h3>
                             @if($route->description)
                                 <p class="text-gray-600">{{ $route->description }}</p>
                             @else
-                                <p class="text-gray-500 italic">No description provided.</p>
+                                <p class="text-gray-500 italic">Tidak ada deskripsi yang disediakan.</p>
                             @endif
                         </div>
                     </div>
                     
                     <div class="mt-8 flex items-center justify-between">
                         <a href="{{ route('admin.routes.index') }}" class="text-gray-600 hover:text-gray-800">
-                            ← Back to Routes
+                            ← Kembali ke Rute
                         </a>
                         <div>
                             <a href="{{ route('admin.routes.edit', $route) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
@@ -70,25 +70,25 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="event.preventDefault(); handleDelete('delete-form', 'Hapus Rute?', 'Apakah Anda yakin ingin menghapus rute ini? Tindakan ini tidak dapat dibatalkan.')">
-                                    Delete
+                                    Hapus
                                 </button>
                             </form>
                         </div>
                     </div>
                     
-                    <!-- Related Schedules -->
+                    <!-- Jadwal Terkait -->
                     @if($route->schedules->count() > 0)
                     <div class="mt-8">
-                        <h3 class="text-lg font-medium mb-4">Related Schedules</h3>
+                        <h3 class="text-lg font-medium mb-4">Jadwal Terkait</h3>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bus</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keberangkatan</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
                                         <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -120,12 +120,12 @@
                                             @endif
                                             @if($schedule->hasDeparted() && !$schedule->is_daily)
                                                 <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded">
-                                                    DEPARTED
+                                                    BERANGKAT
                                                 </span>
                                             @endif
                                             @if($schedule->is_daily)
                                                 <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">
-                                                    DAILY
+                                                    HARIAN
                                                 </span>
                                             @endif
                                         </td>
@@ -135,20 +135,20 @@
                                         <td class="px-4 py-4 whitespace-nowrap">
                                             @if($schedule->status === 'active')
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                    Active
+                                                    Aktif
                                                 </span>
                                             @elseif($schedule->status === 'cancelled')
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                    Cancelled
+                                                    Dibatalkan
                                                 </span>
                                             @else
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                    Delayed
+                                                    Tertunda
                                                 </span>
                                             @endif
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('admin.schedules.show', $schedule) }}" class="text-blue-600 hover:text-blue-900 mr-2" title="View">
+                                            <a href="{{ route('admin.schedules.show', $schedule) }}" class="text-blue-600 hover:text-blue-900 mr-2" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <a href="{{ route('admin.schedules.edit', $schedule) }}" class="text-yellow-600 hover:text-yellow-900 mr-2" title="Edit">

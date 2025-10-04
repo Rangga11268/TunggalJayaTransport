@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Route Management') }}
+            {{ __('Manajemen Rute') }}
         </h2>
     </x-slot>
 
@@ -10,23 +10,23 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <h3 class="text-lg font-bold">Routes</h3>
+                        <h3 class="text-lg font-bold">Rute</h3>
                         <a href="{{ route('admin.routes.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full md:w-auto text-center touch-friendly">
-                            Add New Route
+                            Tambah Rute Baru
                         </a>
                     </div>
 
-                    <!-- Routes Table -->
+                    <!-- Tabel Rute -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Origin</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Distance</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asal</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tujuan</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jarak Tempuh</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lama Waktu</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -50,7 +50,7 @@
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                             @if($route->duration)
-                                                {{ $route->duration }} mins
+                                                {{ $route->duration }} menit
                                             @else
                                                 N/A
                                             @endif
@@ -73,7 +73,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="6" class="px-4 py-4 text-center text-sm text-gray-500">
-                                            No routes found.
+                                            Tidak ada rute ditemukan.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -81,7 +81,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
+                    <!-- Paginasi -->
                     <div class="mt-6">
                         {{ $routes->links() }}
                     </div>

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('View Bus') }}
+            {{ __('Lihat Bus') }}
         </h2>
     </x-slot>
 
@@ -16,15 +16,15 @@
                                 <div class="mt-2">
                                     @if($bus->status === 'active')
                                         <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            Active
+                                            Aktif
                                         </span>
                                     @elseif($bus->status === 'maintenance')
                                         <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                            Maintenance
+                                            Perawatan
                                         </span>
                                     @else
                                         <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                            Inactive
+                                            Tidak Aktif
                                         </span>
                                     @endif
                                 </div>
@@ -37,7 +37,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full touch-friendly" onclick="handleDelete('delete-form', 'Hapus Bus?', 'Apakah Anda yakin ingin menghapus bus ini? Tindakan ini tidak dapat dibatalkan.')">
-                                        Delete
+                                        Hapus
                                     </button>
                                 </form>
                             </div>
@@ -46,34 +46,34 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium mb-4">Details</h3>
+                            <h3 class="text-lg font-medium mb-4">Detail</h3>
                             <dl class="grid grid-cols-1 gap-3">
                                 <div class="flex">
-                                    <dt class="font-medium text-gray-500 w-32">Plate Number:</dt>
+                                    <dt class="font-medium text-gray-500 w-32">Nomor Plat:</dt>
                                     <dd class="text-gray-900">{{ $bus->plate_number }}</dd>
                                 </div>
                                 <div class="flex">
-                                    <dt class="font-medium text-gray-500 w-32">Bus Type:</dt>
+                                    <dt class="font-medium text-gray-500 w-32">Tipe Bus:</dt>
                                     <dd class="text-gray-900">{{ $bus->bus_type }}</dd>
                                 </div>
                                 <div class="flex">
-                                    <dt class="font-medium text-gray-500 w-32">Capacity:</dt>
-                                    <dd class="text-gray-900">{{ $bus->capacity }} seats</dd>
+                                    <dt class="font-medium text-gray-500 w-32">Kapasitas:</dt>
+                                    <dd class="text-gray-900">{{ $bus->capacity }} kursi</dd>
                                 </div>
                                 <div class="flex">
                                     <dt class="font-medium text-gray-500 w-32">Status:</dt>
                                     <dd class="text-gray-900">
                                         @if($bus->status === 'active')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                Active
+                                                Aktif
                                             </span>
                                         @elseif($bus->status === 'maintenance')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                Maintenance
+                                                Perawatan
                                             </span>
                                         @else
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                Inactive
+                                                Tidak Aktif
                                             </span>
                                         @endif
                                     </dd>
@@ -82,25 +82,25 @@
                         </div>
                         
                         <div>
-                            <h3 class="text-lg font-medium mb-4">Description</h3>
+                            <h3 class="text-lg font-medium mb-4">Deskripsi</h3>
                             @if($bus->description)
                                 <p class="text-gray-600 bg-gray-50 p-4 rounded-lg">{{ $bus->description }}</p>
                             @else
-                                <p class="text-gray-500 italic bg-gray-50 p-4 rounded-lg">No description provided.</p>
+                                <p class="text-gray-500 italic bg-gray-50 p-4 rounded-lg">Tidak ada deskripsi yang disediakan.</p>
                             @endif
                             
                             @if($bus->getFirstMediaUrl('buses'))
                                 <div class="mt-4">
-                                    <h3 class="text-lg font-medium mb-2">Bus Image</h3>
-                                    <img src="{{ $bus->getFirstMediaUrl('buses') }}" alt="Bus Image" class="w-full max-w-md h-auto rounded-lg shadow">
+                                    <h3 class="text-lg font-medium mb-2">Gambar Bus</h3>
+                                    <img src="{{ $bus->getFirstMediaUrl('buses') }}" alt="Gambar Bus" class="w-full max-w-md h-auto rounded-lg shadow">
                                 </div>
                             @endif
                         </div>
                     </div>
                     
-                    <!-- Drivers Section -->
+                    <!-- Bagian Driver -->
                     <div class="mt-8">
-                        <h3 class="text-lg font-medium mb-4">Assigned Drivers</h3>
+                        <h3 class="text-lg font-medium mb-4">Driver yang Ditugaskan</h3>
                         @if($bus->drivers->count() > 0)
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                 @foreach($bus->drivers as $driver)
@@ -111,13 +111,13 @@
                                 @endforeach
                             </div>
                         @else
-                            <p class="text-gray-500 italic bg-gray-50 p-4 rounded-lg">No drivers assigned to this bus.</p>
+                            <p class="text-gray-500 italic bg-gray-50 p-4 rounded-lg">Tidak ada driver yang ditugaskan ke bus ini.</p>
                         @endif
                     </div>
                     
-                    <!-- Conductors Section -->
+                    <!-- Bagian Kondektur -->
                     <div class="mt-8">
-                        <h3 class="text-lg font-medium mb-4">Assigned Conductors</h3>
+                        <h3 class="text-lg font-medium mb-4">Kondektur yang Ditugaskan</h3>
                         @if($bus->conductors->count() > 0)
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                 @foreach($bus->conductors as $conductor)
@@ -128,13 +128,13 @@
                                 @endforeach
                             </div>
                         @else
-                            <p class="text-gray-500 italic bg-gray-50 p-4 rounded-lg">No conductors assigned to this bus.</p>
+                            <p class="text-gray-500 italic bg-gray-50 p-4 rounded-lg">Tidak ada kondektur yang ditugaskan ke bus ini.</p>
                         @endif
                     </div>
                     
                     <div class="mt-8">
                         <a href="{{ route('admin.buses.index') }}" class="text-gray-600 hover:text-gray-800 touch-friendly">
-                            ← Back to Buses
+                            ← Kembali ke Bus
                         </a>
                     </div>
                 </div>
