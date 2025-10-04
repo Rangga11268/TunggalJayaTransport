@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <style>
         @page {
-            size: {{ $settings->paper_size ?? 'A4' }} landscape;
+            size: {{ $settings->paper_size ?? 'A4' }} portrait;
             margin: 0.4cm;
         }
 
@@ -20,8 +20,8 @@
 
         .ticket-container {
             width: 100%;
-            max-width: 297mm; /* A4 landscape width */
-            height: 210mm; /* A4 landscape height */
+            max-width: 210mm; /* A4 portrait width */
+            height: 297mm; /* A4 portrait height */
             margin: 0 auto;
             padding: 5mm;
             box-sizing: border-box;
@@ -33,7 +33,7 @@
             background: {{ $settings->color_scheme['background'] ?? '#ffffff' }};
             border: 1px solid {{ $settings->color_scheme['secondary'] ?? '#3b82f6' }};
             border-radius: 8px;
-            padding: 8px;
+            padding: 10px;
             font-family: '{{ $settings->font_settings['family'] ?? 'Arial, sans-serif' }}';
             position: relative;
             overflow: hidden;
@@ -47,8 +47,8 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px dashed {{ $settings->color_scheme['secondary'] ?? '#3b82f6' }};
-            padding-bottom: 8px;
-            margin-bottom: 8px;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
         }
 
         .company-logo {
@@ -96,36 +96,36 @@
 
         .ticket-info-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            margin-bottom: 8px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .info-item {
-            font-size: 9px;
+            font-size: 10px;
         }
 
         .info-item label {
             display: block;
             font-weight: bold;
             color: {{ $settings->color_scheme['primary'] ?? '#1e40af' }};
-            margin-bottom: 1px;
-            font-size: 8px;
+            margin-bottom: 2px;
+            font-size: 9px;
         }
 
         .info-item .info-value {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
             color: #1e293b;
-            padding: 3px 4px;
-            border-radius: 3px;
+            padding: 4px 6px;
+            border-radius: 4px;
             word-break: break-word;
         }
 
         .info-item .seat-number {
             background: {{ $settings->color_scheme['accent'] ?? '#10b981' }}20;
             color: {{ $settings->color_scheme['accent'] ?? '#10b981' }};
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .info-item .price {
@@ -137,44 +137,47 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 8px 0;
-            padding: 8px 0;
+            margin: 10px 0;
+            padding: 10px 0;
+            background: {{ $settings->color_scheme['primary'] ?? '#1e40af' }}10;
+            border-radius: 6px;
+            margin-bottom: 15px;
         }
 
         .route-text {
             flex: 1;
             text-align: center;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 16px;
             color: {{ $settings->color_scheme['primary'] ?? '#1e40af' }};
         }
 
         .route-arrow {
-            font-size: 16px;
+            font-size: 18px;
             color: {{ $settings->color_scheme['secondary'] ?? '#3b82f6' }};
-            margin: 0 10px;
+            margin: 0 15px;
         }
 
         .ticket-footer {
             border-top: 1px dashed {{ $settings->color_scheme['secondary'] ?? '#3b82f6' }};
-            padding-top: 8px;
-            margin-top: 8px;
+            padding-top: 10px;
+            margin-top: 10px;
         }
 
         .barcode-section {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            align-items: flex-start;
+            margin-bottom: 10px;
+            align-items: center;
         }
 
         .barcode-placeholder {
             flex: 1;
-            padding: 6px;
+            padding: 8px;
             background: white;
             border: 1px solid {{ $settings->color_scheme['secondary'] ?? '#3b82f6' }};
             border-radius: 4px;
-            margin-right: 8px;
+            margin-right: 10px;
         }
 
         .barcode-content {
@@ -182,15 +185,15 @@
         }
 
         .barcode-number {
-            font-size: 9px;
+            font-size: 10px;
             font-family: 'Courier New', monospace;
             letter-spacing: 1px;
         }
 
         .qr-code-placeholder {
-            width: 50px;
-            height: 50px;
-            padding: 2px;
+            width: 60px;
+            height: 60px;
+            padding: 3px;
             background: white;
             border: 1px solid {{ $settings->color_scheme['secondary'] ?? '#3b82f6' }};
             border-radius: 4px;
@@ -205,29 +208,29 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 6px;
+            font-size: 7px;
             color: {{ $settings->color_scheme['primary'] ?? '#1e40af' }};
         }
 
         .instructions {
-            font-size: 7px;
+            font-size: 8px;
             color: #64748b;
-            margin-bottom: 6px;
-            line-height: 1.2;
+            margin-bottom: 8px;
+            line-height: 1.3;
         }
 
         .instructions p {
-            margin: 1px 0;
+            margin: 2px 0;
         }
 
         .contact-info {
             text-align: center;
-            font-size: 7px;
+            font-size: 8px;
             color: #475569;
         }
 
         .contact-info p {
-            margin: 1px 0;
+            margin: 2px 0;
         }
 
         /* Watermark */
@@ -344,7 +347,7 @@
                             @php
                                 \Milon\Barcode\DNS1D;
                                 $dns1d = new DNS1D();
-                                echo $dns1d->getBarcodeSVG($booking->booking_code, 'C128', 1.2, 25);
+                                echo $dns1d->getBarcodeSVG($booking->booking_code, 'C128', 1.5, 30);
                             @endphp
                         </div>
                         <div class="barcode-number">{{ $booking->booking_code }}</div>
@@ -358,7 +361,7 @@
                             @php
                                 \Milon\Barcode\DNS2D;
                                 $dns2d = new DNS2D();
-                                echo $dns2d->getBarcodeSVG($booking->booking_code, 'QRCODE', 3, 3, ['fgcolor'=>array(0,0,0)]);
+                                echo $dns2d->getBarcodeSVG($booking->booking_code, 'QRCODE', 4, 4, ['fgcolor'=>array(0,0,0)]);
                             @endphp
                         </div>
                     </div>

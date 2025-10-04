@@ -67,6 +67,11 @@ use Illuminate\Support\Str;
                     <a href="{{ route('frontend.booking.index') }}" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-full transition duration-300 text-center text-base sm:text-lg transform hover:scale-105 shadow-lg hover:shadow-xl">
                         <i class="fas fa-ticket-alt mr-2"></i>Pesan Sekarang
                     </a>
+                    @auth
+                    <a href="{{ route('booking-history.index') }}" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-full transition duration-300 text-center text-base sm:text-lg transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-history mr-2"></i>Riwayat Pemesanan
+                    </a>
+                    @endauth
                     <a href="{{ route('frontend.fleet.index') }}" class="bg-transparent border-2 border-white hover:bg-white hover:text-blue-900 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-full transition duration-300 text-center text-base sm:text-lg transform hover:scale-105 shadow-lg">
                         <i class="fas fa-bus mr-2"></i>Lihat Armada
                     </a>

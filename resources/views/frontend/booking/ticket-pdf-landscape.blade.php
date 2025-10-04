@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Ticket - {{ $booking->booking_code }}</title>
     <meta charset="utf-8">
@@ -20,8 +21,10 @@
 
         .ticket-container {
             width: 100%;
-            max-width: 297mm; /* A4 landscape width */
-            height: 210mm; /* A4 landscape height */
+            max-width: 297mm;
+            /* A4 landscape width */
+            height: 210mm;
+            /* A4 landscape height */
             margin: 0 auto;
             padding: 5mm;
             box-sizing: border-box;
@@ -257,24 +260,25 @@
         }
     </style>
 </head>
+
 <body>
     <div class="ticket-container">
         <div class="ticket">
-            @if($settings->enable_watermark && $settings->watermark_text)
+            @if ($settings->enable_watermark && $settings->watermark_text)
                 <div class="watermark">{{ $settings->watermark_text }}</div>
             @endif
 
             <!-- Ticket Header -->
-            @if($settings->show_company_logo)
-            <div class="ticket-header">
-                <div class="company-logo">
-                    <div class="logo-placeholder">🚌</div>
-                    <div class="company-info">
-                        <h1 class="company-name">TUNGGAL JAYA TRANSPORT</h1>
-                        <p class="company-tagline">Perjalanan Aman dan Nyaman</p>
+            @if ($settings->show_company_logo)
+                <div class="ticket-header">
+                    <div class="company-logo">
+                        <div class="logo-placeholder">🚌</div>
+                        <div class="company-info">
+                            <h1 class="company-name">TUNGGAL JAYA TRANSPORT</h1>
+                            <p class="company-tagline">Perjalanan Aman dan Nyaman</p>
+                        </div>
                     </div>
                 </div>
-            </div>
             @endif
 
             <!-- Ticket Body -->
@@ -300,14 +304,16 @@
                     <div class="info-item">
                         <label>Departure</label>
                         <div class="info-value">
-                            {{ $booking->schedule->getDepartureTimeWIB()->format('M j, Y') }} | {{ $booking->schedule->getDepartureTimeWIB()->format('H:i') }} (WIB)
+                            {{ $booking->schedule->getDepartureTimeWIB()->format('M j, Y') }} |
+                            {{ $booking->schedule->getDepartureTimeWIB()->format('H:i') }} (WIB)
                         </div>
                     </div>
 
                     <div class="info-item">
                         <label>Arrival</label>
                         <div class="info-value">
-                            {{ $booking->schedule->getActualArrivalTime()->format('M j, Y') }} | {{ $booking->schedule->getActualArrivalTime()->format('H:i') }} (WIB)
+                            {{ $booking->schedule->getActualArrivalTime()->format('M j, Y') }} |
+                            {{ $booking->schedule->getActualArrivalTime()->format('H:i') }} (WIB)
                         </div>
                     </div>
 
@@ -335,35 +341,37 @@
 
             <!-- Ticket Footer -->
             <div class="ticket-footer">
-                @if($settings->show_barcode || $settings->show_qr_code)
-                <div class="barcode-section">
-                    @if($settings->show_barcode)
-                    <div class="barcode-placeholder">
-                        <div class="barcode-content">
-                            <!-- Barcode will be generated here -->
-                            @php
-                                \Milon\Barcode\DNS1D;
-                                $dns1d = new DNS1D();
-                                echo $dns1d->getBarcodeSVG($booking->booking_code, 'C128', 1.2, 25);
-                            @endphp
-                        </div>
-                        <div class="barcode-number">{{ $booking->booking_code }}</div>
-                    </div>
-                    @endif
+                @if ($settings->show_barcode || $settings->show_qr_code)
+                    <div class="barcode-section">
+                        @if ($settings->show_barcode)
+                            <div class="barcode-placeholder">
+                                <div class="barcode-content">
+                                    <!-- Barcode will be generated here -->
+                                    @php
+                                        \Milon\Barcode\DNS1D;
+                                        $dns1d = new DNS1D();
+                                        echo $dns1d->getBarcodeSVG($booking->booking_code, 'C128', 1.2, 25);
+                                    @endphp
+                                </div>
+                                <div class="barcode-number">{{ $booking->booking_code }}</div>
+                            </div>
+                        @endif
 
-                    @if($settings->show_qr_code)
-                    <!-- QR Code -->
-                    <div class="qr-code-placeholder">
-                        <div class="qr-content">
-                            @php
-                                \Milon\Barcode\DNS2D;
-                                $dns2d = new DNS2D();
-                                echo $dns2d->getBarcodeSVG($booking->booking_code, 'QRCODE', 3, 3, ['fgcolor'=>array(0,0,0)]);
-                            @endphp
-                        </div>
+                        @if ($settings->show_qr_code)
+                            <!-- QR Code -->
+                            <div class="qr-code-placeholder">
+                                <div class="qr-content">
+                                    @php
+                                        \Milon\Barcode\DNS2D;
+                                        $dns2d = new DNS2D();
+                                        echo $dns2d->getBarcodeSVG($booking->booking_code, 'QRCODE', 3, 3, [
+                                            'fgcolor' => [0, 0, 0],
+                                        ]);
+                                    @endphp
+                                </div>
+                            </div>
+                        @endif
                     </div>
-                    @endif
-                </div>
                 @endif
 
                 <div class="instructions">
@@ -380,4 +388,5 @@
         </div>
     </div>
 </body>
+
 </html>

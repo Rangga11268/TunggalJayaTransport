@@ -1,86 +1,94 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
-    <!-- Stepper Progress with Time Estimates -->
-    <div class="mb-8 overflow-x-auto">
-        <div class="flex items-center justify-center min-w-max">
-            <div class="flex flex-col items-center">
-                <div class="flex items-center text-blue-600 relative">
-                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
-                        <span class="text-xs md:text-sm font-bold">1</span>
-                    </div>
-                    <div class="text-center ml-1 md:ml-2">
-                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Jadwal</div>
-                        <div class="text-xs text-gray-500">&lt; 1 min</div>
-                    </div>
-                </div>
-            </div>
-            <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
-            <div class="md:hidden flex flex-col items-center mx-1">
-                <div class="text-gray-300 text-lg">↓</div>
-            </div>
-            <div class="flex flex-col items-center">
-                <div class="flex items-center text-blue-600 relative">
-                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
-                        <span class="text-xs md:text-sm font-bold">2</span>
-                    </div>
-                    <div class="text-center ml-1 md:ml-2">
-                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Penumpang</div>
-                        <div class="text-xs text-gray-500">&lt; 1 min</div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
+        <!-- Stepper Progress with Time Estimates -->
+        <div class="mb-8 overflow-x-auto">
+            <div class="flex items-center justify-center min-w-max">
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center text-blue-600 relative">
+                        <div
+                            class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                            <span class="text-xs md:text-sm font-bold">1</span>
+                        </div>
+                        <div class="text-center ml-1 md:ml-2">
+                            <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Jadwal</div>
+                            <div class="text-xs text-gray-500">&lt; 1 min</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
-            <div class="md:hidden flex flex-col items-center mx-1">
-                <div class="text-gray-300 text-lg">↓</div>
-            </div>
-            <div class="flex flex-col items-center">
-                <div class="flex items-center text-blue-600 relative">
-                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
-                        <span class="text-xs md:text-sm font-bold">3</span>
-                    </div>
-                    <div class="text-center ml-1 md:ml-2">
-                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Kursi</div>
-                        <div class="text-xs text-gray-500">1-2 min</div>
+                <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
+                <div class="md:hidden flex flex-col items-center mx-1">
+                    <div class="text-gray-300 text-lg">↓</div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center text-blue-600 relative">
+                        <div
+                            class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                            <span class="text-xs md:text-sm font-bold">2</span>
+                        </div>
+                        <div class="text-center ml-1 md:ml-2">
+                            <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Penumpang</div>
+                            <div class="text-xs text-gray-500">&lt; 1 min</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
-            <div class="md:hidden flex flex-col items-center mx-1">
-                <div class="text-gray-300 text-lg">↓</div>
-            </div>
-            <div class="flex flex-col items-center">
-                <div class="flex items-center text-blue-600 relative">
-                    <div class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
-                        <span class="text-xs md:text-sm font-bold">4</span>
+                <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
+                <div class="md:hidden flex flex-col items-center mx-1">
+                    <div class="text-gray-300 text-lg">↓</div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center text-blue-600 relative">
+                        <div
+                            class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                            <span class="text-xs md:text-sm font-bold">3</span>
+                        </div>
+                        <div class="text-center ml-1 md:ml-2">
+                            <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Kursi</div>
+                            <div class="text-xs text-gray-500">1-2 min</div>
+                        </div>
                     </div>
-                    <div class="text-center ml-1 md:ml-2">
-                        <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Pembayaran</div>
-                        <div class="text-xs text-gray-500">&lt; 1 min</div>
+                </div>
+                <div class="hidden md:flex flex-auto border-t-2 border-blue-600 mx-1 md:mx-4"></div>
+                <div class="md:hidden flex flex-col items-center mx-1">
+                    <div class="text-gray-300 text-lg">↓</div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center text-blue-600 relative">
+                        <div
+                            class="rounded-full h-8 w-8 md:h-10 md:w-10 py-2 md:py-3 border-2 border-blue-600 flex items-center justify-center">
+                            <span class="text-xs md:text-sm font-bold">4</span>
+                        </div>
+                        <div class="text-center ml-1 md:ml-2">
+                            <div class="text-xs md:text-xs font-medium uppercase tracking-wide">Pembayaran</div>
+                            <div class="text-xs text-gray-500">&lt; 1 min</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Header -->
-    <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-3">Pemesanan Berhasil!</h1>
-        <p class="text-lg text-gray-600">Terima kasih atas pemesanan Anda. Pembayaran Anda telah diproses dengan sukses.</p>
-    </div>
-        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-3">Pemesanan Berhasil!</h1>
+            <p class="text-lg text-gray-600">Terima kasih atas pemesanan Anda. Pembayaran Anda telah diproses dengan sukses.
+            </p>
+        </div>
+
         <div class="bg-white rounded-xl shadow-md p-4 sm:p-8 mb-6 sm:mb-8 text-left mobile-info-card">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0">
                 <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Detail Pemesanan</h2>
-                <div class="bg-green-100 text-green-800 px-3 py-1 sm:px-4 sm:py-2 rounded-full font-bold text-sm sm:text-base inline-flex items-center">
+                <div
+                    class="bg-green-100 text-green-800 px-3 py-1 sm:px-4 sm:py-2 rounded-full font-bold text-sm sm:text-base inline-flex items-center">
                     <i class="fas fa-check mr-1 sm:mr-2"></i>Dikonfirmasi
                 </div>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
                 <div class="bg-gray-50 p-4 sm:p-5 rounded-lg mobile-info-card">
-                    <h3 class="text-base sm:text-lg font-medium mb-3 sm:mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Informasi Perjalanan</h3>
+                    <h3
+                        class="text-base sm:text-lg font-medium mb-3 sm:mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">
+                        Informasi Perjalanan</h3>
                     <div class="space-y-3">
                         <div class="flex items-center">
                             <div class="bg-green-100 p-2 rounded-full mr-3">
@@ -97,7 +105,9 @@
                             </div>
                             <div>
                                 <p class="text-xs sm:text-sm text-gray-500">Rute</p>
-                                <p class="font-medium text-sm sm:text-base">{{ $booking->schedule->route->origin }} <i class="fas fa-arrow-right mx-1 sm:mx-2 text-green-500"></i> {{ $booking->schedule->route->destination }}</p>
+                                <p class="font-medium text-sm sm:text-base">{{ $booking->schedule->route->origin }} <i
+                                        class="fas fa-arrow-right mx-1 sm:mx-2 text-green-500"></i>
+                                    {{ $booking->schedule->route->destination }}</p>
                             </div>
                         </div>
                         <div class="flex items-center">
@@ -125,9 +135,11 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="bg-gray-50 p-4 sm:p-5 rounded-lg mobile-info-card">
-                    <h3 class="text-base sm:text-lg font-medium mb-3 sm:mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">Informasi Penumpang</h3>
+                    <h3
+                        class="text-base sm:text-lg font-medium mb-3 sm:mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">
+                        Informasi Penumpang</h3>
                     <div class="space-y-3">
                         <div class="flex items-center">
                             <div class="bg-green-100 p-2 rounded-full mr-3">
@@ -159,7 +171,8 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div class="flex items-center">
                                 <div class="bg-green-100 p-2 rounded-full mr-3">
-                                    <img src="{{ asset('img/car-seat.png') }}" alt="Seat" class="w-5 h-5 text-green-600">
+                                    <img src="{{ asset('img/car-seat.png') }}" alt="Seat"
+                                        class="w-5 h-5 text-green-600">
                                 </div>
                                 <div>
                                     <p class="text-xs sm:text-sm text-gray-500">Jumlah Kursi</p>
@@ -179,19 +192,22 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+
+            <div
+                class="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="text-center sm:text-left">
-                    <p class="text-gray-600 text-sm sm:text-base">Status Pembayaran: <span class="font-bold text-green-600">Selesai</span></p>
+                    <p class="text-gray-600 text-sm sm:text-base">Status Pembayaran: <span
+                            class="font-bold text-green-600">Selesai</span></p>
                     <p class="text-xs sm:text-sm text-gray-500 mt-1">+ Biaya Layanan: Rp. 5.000</p>
                 </div>
                 <div class="text-center sm:text-right">
                     <p class="text-gray-600 text-sm sm:text-base">Total Dibayar:</p>
-                    <p class="text-2xl sm:text-3xl font-bold text-green-600">Rp. {{ number_format($booking->total_price + 5000, 0, ',', '.') }}</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-green-600">Rp.
+                        {{ number_format($booking->total_price + 5000, 0, ',', '.') }}</p>
                 </div>
             </div>
         </div>
-        
+
         <!-- Ticket Preview -->
         <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-6 sm:mb-8 mobile-info-card">
             <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Tiket Anda</h2>
@@ -211,30 +227,19 @@
                 'price' => 'Rp. ' . number_format($booking->total_price, 0, ',', '.'),
             ])
         </div>
-        
 
-        
         <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-6 sm:mt-8 mobile-button-group">
-            <a href="{{ route('frontend.booking.view-ticket', $booking->id) }}" 
-               class="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center mobile-action-button text-sm sm:text-base"
-               target="_blank">
-                <i class="fas fa-eye mr-1 sm:mr-2"></i> Lihat Tiket
-            </a>
-            <a href="{{ route('frontend.booking.download-ticket', $booking->id) }}" 
-               class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center mobile-action-button text-sm sm:text-base">
-                <i class="fas fa-download mr-1 sm:mr-2"></i> Unduh Tiket (PDF)
-            </a>
-            <a href="{{ route('frontend.booking.index') }}" 
-               class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center mobile-action-button text-sm sm:text-base">
+            <a href="{{ route('frontend.booking.index') }}"
+                class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center mobile-action-button text-sm sm:text-base">
                 <i class="fas fa-bus mr-1 sm:mr-2"></i> Pesan Tiket Lain
             </a>
-            <a href="{{ route('frontend.home') }}" 
-               class="bg-gradient-to-r from-purple-600 to-violet-700 hover:from-purple-700 hover:to-violet-800 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center mobile-action-button text-sm sm:text-base">
+            <a href="{{ route('frontend.home') }}"
+                class="bg-gradient-to-r from-purple-600 to-violet-700 hover:from-purple-700 hover:to-violet-800 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center mobile-action-button text-sm sm:text-base">
                 <i class="fas fa-home mr-1 sm:mr-2"></i> Kembali ke Beranda
             </a>
         </div>
     </div>
-    
+
     <!-- Additional Information -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-4 sm:p-8 mb-6 sm:mb-10">
         <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">Langkah Selanjutnya</h2>
@@ -244,23 +249,26 @@
                     <i class="fas fa-print"></i>
                 </div>
                 <h3 class="text-base sm:text-lg font-bold mb-2">Cetak Tiket Anda</h3>
-                <p class="text-gray-600 text-xs sm:text-sm">Unduh dan cetak tiket Anda atau simpan di perangkat mobile Anda untuk akses mudah.</p>
+                <p class="text-gray-600 text-xs sm:text-sm">Unduh dan cetak tiket Anda atau simpan di perangkat mobile Anda
+                    untuk akses mudah.</p>
             </div>
             <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm text-center mobile-info-card">
                 <div class="text-blue-500 text-3xl sm:text-4xl mb-3 sm:mb-4">
                     <i class="fas fa-clock"></i>
                 </div>
                 <h3 class="text-base sm:text-lg font-bold mb-2">Datang Lebih Awal</h3>
-                <p class="text-gray-600 text-xs sm:text-sm">Harap datang ke tempat keberangkatan minimal 30 menit sebelum waktu keberangkatan.</p>
+                <p class="text-gray-600 text-xs sm:text-sm">Harap datang ke tempat keberangkatan minimal 30 menit sebelum
+                    waktu keberangkatan.</p>
             </div>
             <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm text-center mobile-info-card">
                 <div class="text-blue-500 text-3xl sm:text-4xl mb-3 sm:mb-4">
                     <i class="fas fa-headset"></i>
                 </div>
                 <h3 class="text-base sm:text-lg font-bold mb-2">Hubungi Kami</h3>
-                <p class="text-gray-600 text-xs sm:text-sm">Jika Anda memiliki pertanyaan, hubungi layanan pelanggan kami di +62 123 456 789.</p>
+                <p class="text-gray-600 text-xs sm:text-sm">Jika Anda memiliki pertanyaan, hubungi layanan pelanggan kami
+                    di +62 123 456 789.</p>
             </div>
         </div>
     </div>
-</div>
+    </div>
 @endsection

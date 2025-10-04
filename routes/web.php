@@ -20,7 +20,7 @@ Route::prefix('')->name('frontend.')->group(function () {
         Route::post('/select-seats', [App\Http\Controllers\Frontend\BookingController::class, 'selectSeats'])->middleware('auth')->name('booking.select-seats');
         Route::post('/process-payment', [App\Http\Controllers\Frontend\BookingController::class, 'processPayment'])->middleware('auth')->name('booking.process-payment');
         Route::post('/check-availability', [App\Http\Controllers\Frontend\BookingController::class, 'checkAvailability'])->name('check-availability');
-        
+
         Route::get('/confirmation/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'confirmation'])->name('booking.confirmation');
         Route::get('/success/{id}', [App\Http\Controllers\Frontend\BookingController::class, 'success'])->name('booking.success');
         Route::get('/ticket/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'downloadTicket'])->name('booking.download-ticket');
@@ -42,7 +42,7 @@ Route::prefix('')->name('frontend.')->group(function () {
     Route::get('/contact', function () {
         return view('frontend.contact.index');
     })->name('contact');
-    
+
     Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'store'])->name('contact.store');
 });
 
@@ -54,17 +54,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
+
     // Booking History Routes
     Route::prefix('booking-history')->name('booking-history.')->group(function () {
         Route::get('/', [App\Http\Controllers\BookingHistoryController::class, 'index'])->name('index');
         Route::get('/{id}', [App\Http\Controllers\BookingHistoryController::class, 'show'])->name('show');
     });
     
-
+    // Ticket Settings Routes
+    Route::prefix('ticket-settings')->group(function () {
+        Route::put('/update', [App\Http\Controllers\Frontend\BookingController::class, 'updateTicketSettings'])->name('ticket.settings.update');
+        Route::get('/get', [App\Http\Controllers\Frontend\BookingController::class, 'getTicketSettings'])->name('ticket.settings.get');
+    });
 });
 
 // Admin Routes
-require __DIR__.'/admin.php';
+require __DIR__ . '/admin.php';
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
