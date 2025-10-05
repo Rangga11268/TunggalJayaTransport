@@ -1,347 +1,487 @@
-# Qwen V1 Update: Fitur Rekomendasi & History Pemesanan
-
-##### JANGAN ASAL ME ROLLBACK MIGRASI JIKA INGINME ROLLBACK INGAT KANMIGRASI APA SAJA YANG TEROLLBACK DAN KEMBALIKAN 
-
-## Rollback Information: Ticket System Refactoring
-
-### 1. Database Changes
-- Migration: `2025_10_04_130024_create_ticket_customizations_table.php`
-  - Created `ticket_customizations` table with fields for layout, paper size, appearance settings, etc.
-  - Added default settings record with ID=1
-  - To rollback: Drop the `ticket_customizations` table
-
-### 2. New Files Created
-- `app/Models/TicketCustomization.php` - Model for ticket settings
-- `app/Services/TicketPdfService.php` - Service for PDF ticket generation
-- `resources/views/frontend/booking/ticket-pdf-landscape.blade.php` - Landscape PDF ticket view
-- `resources/views/frontend/booking/ticket-pdf-portrait.blade.php` - Portrait PDF ticket view
-- `resources/views/frontend/ticket-settings.blade.php` - Settings management page
-
-### 3. Files Modified
-- `app/Http/Controllers/Frontend/BookingController.php`
-  - Updated `downloadTicket()` method to use `TicketPdfService`
-  - Added `updateTicketSettings()` and `getTicketSettings()` methods
-- `resources/views/booking-history/show.blade.php`
-  - Removed recommendation link
-- `resources/views/frontend/booking/success.blade.php`
-  - Removed duplicate "Lihat Tiket" and "Unduh Tiket (PDF)" buttons
-- `resources/views/frontend/booking/ticket-preview.blade.php`
-  - Converted from standalone HTML to Laravel blade template
-  - Uncommented the viewTicket route in web.php
-- `resources/views/frontend/home.blade.php`
-  - Added booking history button for authenticated users
-- `routes/web.php`
-  - Added ticket settings routes
-  - Uncommented the viewTicket route
-
-### 4. Migration Rollback Command
-```bash
-php artisan migrate:rollback --step=1
-```
-This will rollback the ticket customization table migration.
-
-### 5. Manual Cleanup (if needed)
-If you need to completely rollback the changes:
-1. Delete the new files mentioned above
-2. Revert modifications in the modified files to their original state
-3. Remove the added routes from web.php
-4. Remove the new controller methods from BookingController
+# Qwen V1 Update: Chatbot AI Implementation Plan for Tunggal Jaya Transport
 
 ## Overview
-Dokumen ini merinci rencana dan implementasi untuk menambahkan dua fitur penting ke sistem Tunggal Jaya Transport:
-1. Fitur history pemesanan
-2. Fitur rekomendasi destinasi setelah pemesanan
-
-## Analisis Struktur Database Saat Ini
-
-Setelah menganalisis migrasi database yang ada, berikut adalah struktur tabel utama:
-
-### Tabel `bookings`
-- `id`: Primary key
-- `user_id`: Foreign key ke users
-- `schedule_id`: Foreign key ke schedules
-- `booking_code`: Kode unik pemesanan
-- `passenger_name`: Nama penumpang
-- `passenger_phone`: Nomor telepon penumpang
-- `passenger_email`: Email penumpang
-- `seat_numbers`: Nomor kursi yang dipesan
-- `total_price`: Total harga
-- `payment_status`: Status pembayaran (pending, paid, failed, refunded)
-- `booking_status`: Status pemesanan (pending, confirmed, cancelled, completed)
-- `created_at`, `updated_at`: Timestamp
-
-### Tabel `schedules`
-- `id`: Primary key
-- `bus_id`: Foreign key ke buses
-- `route_id`: Foreign key ke routes
-- `departure_time`: Waktu keberangkatan
-- `arrival_time`: Waktu kedatangan
-- `price`: Harga tiket
-- `status`: Status jadwal (active, cancelled, delayed)
-
-### Tabel `routes`
-- `id`: Primary key
-- `name`: Nama rute
-- `origin`: Asal keberangkatan
-- `destination`: Tujuan
-- `distance`: Jarak dalam km
-- `duration`: Durasi perjalanan dalam menit
-- `description`: Deskripsi rute
-
-### Tabel `users`
-- `id`: Primary key
-- `name`: Nama pengguna
-- `email`: Email pengguna
-- `password`: Kata sandi
-- `created_at`, `updated_at`: Timestamp
-
-## Rencana Implementasi
-
-### 1. Fitur History Pemesanan
-
-Untuk fitur history pemesanan, kita sebenarnya sudah memiliki sebagian besar struktur yang diperlukan melalui tabel `bookings`. Namun, kita mungkin ingin menambahkan beberapa kolom tambahan untuk meningkatkan pengalaman pengguna:
 
-#### A. Tabel `bookings` (penambahan)
-Kita mungkin ingin menambahkan kolom berikut:
-- `booking_date`: Tanggal pemesanan (sudah ditambahkan di migrasi 2025_09_26_120000)
-- Kolom tambahan yang mungkin berguna (akan ditentukan lebih lanjut)
+Dokumen ini merinci rencana implementasi untuk fitur chatbot AI pada website Tunggal Jaya Transport. Chatbot ini akan berfungsi sebagai customer service digital yang dapat menjawab berbagai pertanyaan seputar website, jadwal perjalanan, layanan, dan informasi lainnya terkait transportasi.
 
-#### B. Relasi dan Model
-- Model `Booking` sudah ada, dengan relasi ke `User` dan `Schedule`
-- Model `Route` dan `Schedule` juga sudah ada, dengan relasi yang sesuai
-- Membuat controller untuk menampilkan history pemesanan
+## Business Requirements
 
-#### C. UI/UX
-- Membuat antarmuka untuk menampilkan history pemesanan
-- Membuat detail pemesanan
+Chatbot AI harus mampu:
 
-### 2. Fitur Rekomendasi Destinasi
+1. Menjawab pertanyaan umum seputar jadwal, rute, harga tiket, dan layanan
+2. Membantu proses booking dan memberikan panduan kepada pengguna
+3. Memberikan informasi terkait armada dan fasilitas yang tersedia
+4. Menjawab pertanyaan seputar kebijakan perusahaan (refund, bagasi, dll.)
+5. Menyediakan rekomendasi destinasi berdasarkan preferensi pengguna
+6. Berintegrasi dengan sistem booking untuk menyediakan informasi real-time
 
-Untuk fitur rekomendasi, kita memiliki beberapa pendekatan yang bisa digunakan:
+## Technical Architecture
 
-#### A. Berdasarkan Destinasi Asal yang Sama
-- Rekomendasikan destinasi lain dengan asal keberangkatan yang sama dengan destinasi yang baru dipesan
+### A. Backend Components
 
-#### B. Berdasarkan Frekuensi Pemesanan
-- Menampilkan destinasi yang sering dipesan oleh pengguna lain setelah memesan destinasi tertentu
+1. **Laravel Controller**: `ChatBotController` untuk menangani permintaan chat
+2. **Natural Language Processing**: Integrasi dengan OpenAI API atau solusi berbasis aturan
+3. **Knowledge Base**: Tabel database untuk menyimpan FAQ dan data pelatihan
+4. **Session Management**: Untuk menjaga konteks percakapan
+5. **Logging System**: Untuk melacak interaksi chat untuk perbaikan
 
-#### C. Berdasarkan Pola Perjalanan
-- Menggunakan data historis untuk menentukan pola perjalanan umum
+### B. Frontend Components
 
-#### D. Tabel tambahan (opsional)
-Jika diperlukan pendekatan lebih kompleks, kita bisa membuat tabel tambahan seperti:
-- `booking_recommendations` atau
-- `destination_patterns` untuk menyimpan data rekomendasi
+1. **Chat Interface**: Widget mengambang di semua halaman
+2. **Message Display**: Tampilan percakapan real-time
+3. **Input Handling**: Input teks dengan fungsi kirim
+4. **Indikator Pengetikan**: Umpan balik visual saat pemrosesan
 
-## Struktur Model Yang Tersedia
+## Database Schema
 
-Setelah memeriksa struktur aplikasi, berikut model-model yang sudah tersedia:
+### A. Tabel Statik Informasi (`chatbot_knowledge`)
 
-### Model `Booking`
-- Relasi ke `User` (belongsTo)
-- Relasi ke `Schedule` (belongsTo)
-- Atribut penting: `user_id`, `schedule_id`, `booking_code`, `passenger_name`, `passenger_phone`, `passenger_email`, `seat_numbers`, `total_price`, `payment_status`, `booking_status`, `booking_date`
+-   `id` (bigint, primary key)
+-   `category` (string) - booking, fleet, routes, policies, contact, dll.
+-   `question` (text) - pertanyaan dari pengguna
+-   `answer` (text) - jawaban dari sistem
+-   `keywords` (json/array) - kata kunci terkait
+-   `priority` (integer) - prioritas jawaban
+-   `is_active` (boolean) - status aktif/non-aktif
 
-### Model `Schedule`
-- Relasi ke `Bus` (belongsTo)
-- Relasi ke `Route` (belongsTo)
-- Relasi ke `Booking` (hasMany)
-- Atribut penting: `bus_id`, `route_id`, `departure_time`, `arrival_time`, `price`, `status`, `is_daily`
+### B. Tabel Riwayat Percakapan (`chatbot_conversations`)
 
-### Model `Route`
-- Relasi ke `Schedule` (hasMany)
-- Atribut penting: `name`, `origin`, `destination`, `distance`, `duration`, `description`
+-   `id` (bigint, primary key)
+-   `user_id` (foreign key, nullable) - jika pengguna login
+-   `session_id` (string) - untuk pengguna tidak login
+-   `created_at`, `updated_at` (timestamp)
 
-### Model `User`
-- Relasi ke `Booking` (hasMany)
-- Atribut penting: `id`, `name`, `email`
+### C. Tabel Pesan Individu (`chatbot_messages`)
 
-## Algoritma Rekomendasi Destinasi
+-   `id` (bigint, primary key)
+-   `conversation_id` (foreign key)
+-   `sender_type` (enum: 'user', 'bot')
+-   `message` (text)
+-   `intent` (string, nullable) - maksud dari pesan
+-   `created_at` (timestamp)
 
-Setelah menganalisis kebutuhan, kita akan mengimplementasikan kombinasi dari beberapa pendekatan untuk mendapatkan rekomendasi yang relevan:
+## Core Logic Components
 
-### 1. Pendekatan Berbasis Konten (Content-Based Filtering)
-- Analisis destinasi yang baru dipesan oleh pengguna
-- Rekomendasikan destinasi dengan asal/destinasi yang serupa
-- Gunakan informasi dari tabel `routes`
+### A. Pengenalan Maksud (Intent Recognition)
 
-### 2. Pendekatan Kolaboratif (Collaborative Filtering)
-- Temukan pengguna dengan pola pemesanan serupa
-- Rekomendasikan destinasi yang sering dipesan oleh pengguna dengan pola serupa
-- Gunakan data historis dari tabel `bookings`
+Chatbot akan menggunakan kombinasi:
 
-### 3. Pendekatan Berbasis Populeritas
-- Menampilkan destinasi populer yang sering dipesan setelah destinasi tertentu
-- Gunakan data agregatif dari histori pemesanan
+1. **Pencocokan Kata Kunci**: Untuk pertanyaan umum tentang rute, jadwal, harga
+2. **API Pembelajaran Mesin**: Untuk pertanyaan kompleks (menggunakan OpenAI atau sejenisnya)
+3. **Respons Berbasis Aturan**: Untuk logika bisnis tertentu (prosedur booking, kebijakan)
 
-### 4. Implementasi Spesifik Algoritma
+### B. Generasi Respons
 
-Berikut langkah-langkah spesifik untuk mengimplementasikan algoritma rekomendasi:
+1. **Respons Statis**: Untuk pertanyaan sering diajukan
+2. **Respons Dinamis**: Mengambil data langsung (jadwal, ketersediaan)
+3. **Respons Cadangan**: Saat tidak dapat memahami permintaan
 
-#### A. Identifikasi destinasi terbaru yang dipesan oleh pengguna
-- Dapatkan destinasi terbaru dari tabel `bookings` berdasarkan `user_id`
-- Gunakan relasi `booking->schedule->route` untuk mendapatkan informasi destinasi
+### C. Fungsi Utama
 
-#### B. Hitung rekomendasi berdasarkan destinasi asal
-- Temukan destinasi lain yang memiliki asal keberangkatan (`origin`) yang sama dengan destinasi tujuan (`destination`) dari pemesanan terakhir
-- Gunakan relasi antara `bookings` → `schedules` → `routes`
+#### 1. Kueri Informasi
 
-#### C. Hitung rekomendasi berdasarkan pola pengguna serupa
-- Temukan pengguna lain yang pernah memesan destinasi yang sama
-- Ambil destinasi yang sering dipesan oleh pengguna tersebut setelah destinasi tertentu
+-   Informasi rute dan jadwal
+-   Detail harga
+-   Spesifikasi armada
+-   Informasi perusahaan
 
-#### D. Pemberian skor pada rekomendasi
-- Prioritaskan destinasi berdasarkan frekuensi kemunculan dalam pola
-- Berikan bobot tambahan untuk destinasi dengan rating tinggi atau popularitas tinggi
+#### 2. Bantuan Pemesanan
 
-#### E. Menyajikan hasil rekomendasi
-- Tampilkan 3-5 destinasi teratas berdasarkan skor rekomendasi
-- Sertakan informasi relevan seperti harga, durasi perjalanan, dan jam keberangkatan
+-   Panduan proses booking
+-   Rekomendasi jadwal
+-   Bantuan pembayaran
 
-## Implementasi Fitur
+#### 3. Dukungan Akun Pengguna
 
-### A. Fitur History Pemesanan
+-   Pencarian riwayat booking
+-   Bantuan manajemen profil
+-   Bantuan reset sandi
 
-Telah diimplementasikan dengan:
+#### 4. Resolusi Masalah
 
-#### 1. Controller
-- Membuat `BookingHistoryController` dengan metode `index()` dan `show()`
-- Menggunakan middleware `auth` untuk memastikan hanya pengguna terotentikasi yang bisa mengakses fitur
-- Menyediakan fungsi untuk menampilkan daftar booking dan detail booking
+-   Penanganan FAQ
+-   Resolusi masalah umum
+-   Eskalasi ke customer service manusia bila diperlukan
+
+## Implementation Plan
+
+### Phase 1: Persiapan Database dan Model (Hari 1-2)
+
+1. Buat tabel database yang diperlukan
+    - `chatbot_knowledge`
+    - `chatbot_conversations`
+    - `chatbot_messages`
+2. Buat model-model terkait
+    - `ChatbotKnowledge`
+    - `ChatbotConversation`
+    - `ChatbotMessage`
+
+### Phase 2: Pengembangan API Backend (Hari 3-4)
+
+1. Buat `ChatBotController` dengan:
+    - Metode `sendMessage` - untuk memproses input pengguna dan mengembalikan respons yang sesuai
+    - Metode `getSuggestions` - menyediakan saran balasan cepat
+    - Metode `trainBot` - memungkinkan admin menambahkan/memperbarui basis pengetahuan
+2. Integrasikan layanan NLP:
+    - Pilihan 1: Integrasi OpenAI API untuk pemahaman canggih
+    - Pilihan 2: Sistem berbasis aturan untuk solusi hemat biaya
+    - Pendekatan hibrida menggabungkan keduanya
+3. Buat `ChatbotService` dengan:
+    - Logika pengenalan maksud
+    - Generasi respons
+    - Fungsi pencarian basis pengetahuan
+
+### Phase 3: Pengembangan Frontend (Hari 5-6)
 
-#### 2. View
-- Membuat `resources/views/booking-history/index.blade.php` untuk menampilkan daftar booking
-- Membuat `resources/views/booking-history/show.blade.php` untuk menampilkan detail booking
-- Menampilkan informasi lengkap termasuk rute, waktu keberangkatan, status, dan harga
+1. Buat widget chat:
+    - Tombol mengambang yang memperluas ke antarmuka chat penuh
+    - Desain responsif untuk desktop dan mobile
+    - Integrasi dengan perlindungan CSRF Laravel
+2. Implementasikan pesan real-time:
+    - Gunakan Laravel Echo dengan Pusher untuk pembaruan real-time
+    - Indikator pengetikan
+    - Indikator status pesan
+3. Tambahkan riwayat chat:
+    - Simpan percakapan di localStorage browser
+    - Muat interaksi terbaru saat pengguna kembali
 
-#### 3. Routing
-- Menambahkan rute `/booking-history` dan `/booking-history/{id}` di `routes/web.php`
-- Menggunakan prefix dan naming convention yang konsisten
+### Phase 4: Populasi Basis Pengetahuan (Hari 7-8)
 
-### B. Fitur Rekomendasi Destinasi
+1. Isi dengan pertanyaan umum:
+    - Ekstrak FAQ dari konten yang ada
+    - Tambahkan informasi rute dan jadwal
+    - Sertakan panduan proses pemesanan
+2. Latih sistem:
+    - Buat dataset awal untuk model AI
+    - Uji akurasi respons
+    - Sempurnakan algoritma pencocokan
 
-Telah diimplementasikan dengan:
+### Phase 5: Integrasi dan Pengujian (Hari 9-10)
 
-#### 1. Controller
-- Membuat `RecommendationController` dengan metode `show()`
-- Mengimplementasikan algoritma rekomendasi dengan beberapa faktor penilaian
-- Menyediakan fungsi untuk menampilkan destinasi rekomendasi berdasarkan asal perjalanan
+1. Integrasi ke halaman yang ada:
+    - Tambahkan widget chat ke semua halaman publik
+    - Hubungkan ke informasi akun pengguna
+    - Tautkan ke riwayat booking saat pengguna login
+2. Pengujian:
+    - Uji unit untuk logika backend
+    - Uji integrasi untuk alur penuh
+    - Uji penerimaan pengguna
 
-#### 2. Algoritma Rekomendasi
-- Mencari rute berdasarkan destinasi asal yang sama
-- Menghitung skor berdasarkan popularitas, harga, durasi, dan jenis bus
-- Menyortir hasil berdasarkan skor tertinggi
+### Phase 6: Fitur Lanjutan (Hari 11-12)
 
-#### 3. View
-- Membuat `resources/views/recommendations/index.blade.php` untuk menampilkan destinasi rekomendasi
-- Menampilkan informasi penting seperti harga, durasi, waktu keberangkatan, dan jenis bus
-- Memberikan tombol untuk langsung memesan perjalanan
+1. Personalisasi:
+    - Tampilkan respons yang dipersonalisasi berdasarkan riwayat booking
+    - Ingat preferensi pengguna
+2. Alih tangan ke agen manusia:
+    - Deteksi kapan intervensi manusia diperlukan
+    - Sediakan opsi untuk terhubung ke customer service
 
-#### 4. Routing
-- Menambahkan rute `/recommendations` di `routes/web.php`
-- Menggunakan prefix dan naming convention yang konsisten
+## Teknologi yang Digunakan
 
-## Testing dan Verifikasi Fungsionalitas
+-   **Backend**: Laravel 12 dengan PHP 8.2+
+-   **Frontend**: Alpine.js untuk interaktivitas, Tailwind CSS untuk styling
+-   **AI/ML**: OpenAI API atau sistem berbasis aturan
+-   **Real-time**: Laravel Echo, Pusher atau Laravel WebSockets
+-   **Database**: MySQL (seperti yang digunakan dalam proyek saat ini)
 
-### A. Testing Unit
+## Pertimbangan Keamanan
 
-Telah dibuat test case untuk memverifikasi fungsionalitas dari kedua fitur:
+1. Terapkan pembatasan laju untuk permintaan chat
+2. Sanitasi input pengguna untuk mencegah serangan XSS
+3. Pastikan riwayat chat hanya dapat diakses oleh pengguna yang terotentikasi
+4. Enkripsi informasi sensitif pengguna dalam log chat
 
-#### 1. Testing Controller History Pemesanan
-- Menguji bahwa pengguna dapat melihat history pemesanan mereka
-- Menguji bahwa pengguna dapat melihat detail dari pemesanan tertentu
-- Menguji bahwa guest tidak dapat mengakses fitur history pemesanan
+## Pertimbangan Kinerja
 
-#### 2. Testing Controller Rekomendasi
-- Menguji bahwa halaman rekomendasi dapat ditampilkan dengan parameter origin
-- Menguji bahwa halaman rekomendasi dapat menampilkan rekomendasi berdasarkan booking terakhir pengguna
-- Menguji bahwa halaman rekomendasi mengalihkan ke halaman booking jika tidak ada origin
+1. Terapkan caching untuk pertanyaan sering diajukan
+2. Gunakan sistem antrian untuk permintaan API AI agar tidak memblokir
+3. Optimalkan kueri database untuk pencarian basis pengetahuan
 
-### B. Testing Fungsional
+## Integrasi dengan Fitur yang Ada
 
-Fitur-fitur yang telah diimplementasikan telah diverifikasi secara fungsional:
+### A. Integrasi dengan Sistem Booking
 
-#### 1. Fitur History Pemesanan
-- Pengguna dapat mengakses halaman history setelah login
-- Halaman history menampilkan semua pemesanan milik pengguna
-- Detail pemesanan ditampilkan dengan lengkap
-- Pengguna dapat melihat status booking, harga, dan informasi perjalanan
+Chatbot akan terintegrasi dengan sistem booking untuk:
 
-#### 2. Fitur Rekomendasi
-- Algoritma rekomendasi bekerja sesuai dengan rancangan
-- Menampilkan destinasi berdasarkan destinasi akhir dari perjalanan terakhir
-- Menyediakan informasi lengkap tentang destinasi rekomendasi
-- Menyediakan tombol untuk langsung memesan perjalanan yang direkomendasikan
+-   Memberikan informasi real-time tentang ketersediaan jadwal
+-   Mendapatkan informasi booking pengguna saat login
+-   Memberikan rekomendasi berdasarkan riwayat booking
 
-### C. Integrasi
-- Link menuju fitur history pemesanan ditambahkan di dropdown menu pengguna
-- Link menuju fitur rekomendasi ditambahkan di halaman utama untuk pengguna yang login
-- Link rekomendasi juga ditambahkan di halaman sukses booking
-- Semua link berfungsi sesuai dengan rancangan dan mengarah ke rute yang benar
+### B. Integrasi dengan Rekomendasi
 
-## Implementasi Detail
+-   Menggunakan algoritma rekomendasi yang sudah ada untuk memberikan saran destinasi
+-   Memperkaya rekomendasi berdasarkan dialog dengan pengguna
 
-### A. Fitur History Pemesanan
+### C. Integrasi dengan Multi-bahasa
 
-1. Membuat model `Booking` (jika belum ada)
-2. Mengembangkan controller `BookingController` dengan fungsi:
-   - `index()`: Menampilkan daftar pemesanan pengguna
-   - `show()`: Menampilkan detail pemesanan
-3. Membuat middleware untuk memastikan hanya pengguna terotentikasi yang bisa melihat history
-4. Membuat view untuk history pemesanan
+-   Mendukung bahasa Indonesia dan Inggris sesuai dengan sistem terjemahan yang sudah ada
 
-### B. Fitur Rekomendasi Destinasi
+## Evaluasi dan Pengembangan Berkelanjutan
 
-1. Membuat algoritma rekomendasi
-2. Membuat fungsi di controller untuk menampilkan rekomendasi berdasarkan pemesanan terakhir
-3. Membuat view untuk menampilkan rekomendasi
+1. Kumpulkan umpan balik dari pengguna
+2. Analisis interaksi chat untuk mengidentifikasi area perbaikan
+3. Perbarui basis pengetahuan secara berkala
+4. Tingkatkan akurasi respons melalui machine learning
 
-## Algoritma Rekomendasi Detail
+## Potensi Tantangan dan Solusi
 
-### Pendekatan Kolaboratif Filtering Sederhana
-1. Menemukan pengguna dengan pola pemesanan serupa
-2. Rekomendasikan destinasi yang sering dipesan oleh pengguna dengan pola serupa
+1. **Pemahaman bahasa alami**: Gunakan kombinasi NLP dan basis pengetahuan statis
+2. **Respons yang tidak akurat**: Sediakan fitur pelaporan dan mekanisme perbaikan
+3. **Ketersediaan data real-time**: Integrasi langsung dengan sistem booking dan jadwal
+4. **Pemrosesan bahasa lokal**: Tambahkan kamus dan frasa lokal ke basis pengetahuan
 
-### Pendekatan Berbasis Isi (Content-Based)
-1. Analisis destinasi yang pernah dipesan oleh pengguna
-2. Rekomendasikan destinasi dengan karakteristik serupa (asal/destinasi yang sama)
+## Rollback Plan
 
-### Kombinasi Pendekatan
-1. Gunakan pendekatan hibrida untuk hasil rekomendasi yang lebih akurat
+Jika dalam proses implementasi atau setelah implementasi Anda berubah pikiran dan ingin menghapus fitur chatbot, berikut adalah rencana rollback yang dapat diikuti:
 
-## Struktur Tabel Tambahan (Jika Diperlukan)
+### A. Menghapus Migrasi Database
 
-Jika pendekatan sederhana tidak cukup, kita bisa membuat tabel tambahan:
+-   Migration: `create_chatbot_knowledge_table`, `create_chatbot_conversations_table`, `create_chatbot_messages_table`
+    -   Untuk menghapus: `php artisan migrate:rollback --step=3`
+    -   Atau secara manual drop tabel: `chatbot_knowledge`, `chatbot_conversations`, `chatbot_messages`
 
-```sql
--- Tabel untuk menyimpan pola rekomendasi
-CREATE TABLE destination_recommendations (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    route_from_id BIGINT UNSIGNED NOT NULL,
-    route_to_id BIGINT UNSIGNED NOT NULL,
-    recommendation_score DOUBLE DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (route_from_id) REFERENCES routes(id),
-    FOREIGN KEY (route_to_id) REFERENCES routes(id)
-);
-```
+### B. Menghapus File yang Dibuat
 
-## Rencana Implementasi Langkah demi Langkah
+-   `app/Models/ChatbotKnowledge.php` - Model untuk basis pengetahuan
+-   `app/Models/ChatbotConversation.php` - Model untuk percakapan
+-   `app/Models/ChatbotMessage.php` - Model untuk pesan individual
+-   `app/Http/Controllers/ChatBotController.php` - Controller utama chatbot
+-   `app/Services/ChatbotService.php` - Service untuk logika chatbot
+-   `resources/views/components/chatbot.blade.php` - Komponen chatbot frontend
+-   `resources/js/chatbot.js` - File JavaScript untuk fungsionalitas chatbot
 
-1. Rancang struktur database untuk history pemesanan ✓
-2. Rancang algoritma rekomendasi destinasi
-3. Buat model untuk pemesanan dan destinasi
-4. Implementasi fitur history pemesanan
-5. Implementasi fitur rekomendasi destinasi
-6. Integrasi fitur ke dalam sistem existing
-7. Testing dan verifikasi fungsionalitas
+### C. Menghapus Konfigurasi dan Route
 
-## Tabel `bookings` Sudah Lengkap
-Setelah menganalisis migrasi yang ada, ternyata tabel `bookings` sudah memiliki semua informasi penting untuk history pemesanan. Ada penambahan kolom `booking_date` di migrasi 2025_09_26_120000, yang menunjukkan bahwa fitur history sebenarnya sudah direncanakan sejak awal.
+-   Dalam `routes/web.php` atau `routes/api.php`: hapus rute chatbot
+-   Dalam `config/services.php`: hapus konfigurasi API (jika ada)
+-   Dalam `.env`: hapus variabel lingkungan untuk API chatbot (jika ada)
 
-## Langkah Berikutnya
-Sekarang kita akan melanjutkan dengan:
-1. Membuat model `Booking`
-2. Membuat algoritma rekomendasi
-3. Mengimplementasikan fitur dalam controller dan view
+### D. Menghapus Integrasi Frontend
+
+-   Dalam `resources/views/layouts/app.blade.php` atau file layout utama: hapus script chatbot
+-   Dalam file-fie halaman utama: hapus panggilan komponen chatbot
+
+### E. Membersihkan Referensi Kode
+
+-   Dalam controller yang terintegrasi: hapus panggilan ke service chatbot
+-   Dalam middleware (jika ada): hapus middleware terkait chatbot
+-   Dalam file konfigurasi lainnya: hapus konfigurasi yang terkait
+
+## Verifikasi Rollback
+
+Setelah melaksanakan rollback, pastikan:
+
+1. Tidak ada error saat menjalankan `php artisan migrate:status`
+2. Aplikasi tetap berjalan normal tanpa fitur chatbot
+3. Tidak ada file sisa yang terkait dengan chatbot
+4. Tidak ada konfigurasi atau route yang mengarah ke fitur yang sudah dihapus
+
+Chatbot ini akan menjadi bagian penting dari pengalaman pengguna di Tunggal Jaya Transport, meningkatkan layanan pelanggan dan efisiensi operasional sambil menyediakan informasi yang akurat dan real-time kepada pengguna.
+
+# Catatan Penting: Migrasi dan Rollback
+
+## Kebijakan Migrasi dan Rollback
+
+Dalam pengerjaan proyek Tunggal Jaya Transport, penting untuk diingat bahwa:
+
+### 1. Catatan Migrasi
+- Setiap perubahan yang melibatkan migrasi database harus dicatat secara rinci
+- Catat tabel yang dibuat, dimodifikasi, atau dihapus
+- Catat perubahan struktur database yang terjadi
+
+### 2. Prosedur Rollback
+- Harus selalu diingat apa yang dirollback dan bagaimana caranya
+- Simpan catatan rinci tentang langkah-langkah rollback
+- Pastikan setiap komponen yang dihapus bisa dimigrasi kembali jika diperlukan
+
+### 3. Konfirmasi Rollback
+- Sebelum dan setelah melakukan rollback, konfirmasi ke pengguna tentang:
+  - Apa yang telah dirollback
+  - Apa yang masih bisa dimigrasi kembali
+  - Jalur migrasi kembali yang tersedia
+
+### 4. Dokumentasi
+- Pastikan dokumentasi migrasi dan rollback selalu diperbarui
+- Simpan informasi dalam tempat yang mudah diakses untuk referensi masa depan
+
+# Qwen V1.1 Update: Improving PDF Ticket Design for Tunggal Jaya Transport
+
+## Overview
+Rekomendasi ini memberikan peningkatan terhadap tampilan tiket PDF pada website Tunggal Jaya Transport. Saat ini, tampilan tiket PDF masih sederhana dan perlu ditingkatkan agar lebih profesional, informatif, dan menarik secara visual bagi pengguna.
+
+## Business Requirements
+Tiket PDF harus:
+1. Tampil lebih profesional dan menarik secara visual
+2. Menyertakan informasi yang lengkap dan mudah dibaca
+3. Menampilkan logo dan identitas perusahaan dengan baik
+4. Dapat dipindai dengan mudah (barcode dan QR code yang jelas)
+5. Menyediakan informasi penting seperti aturan, kontak layanan, dan titik boarding
+6. Konsisten dengan desain brand perusahaan
+
+## Technical Implementation
+
+### A. Backend Components
+1. **TicketPdfService**: Memperbarui kelas untuk mendukung desain baru
+2. **TicketCustomization Model**: Menyesuaikan skema untuk mendukung elemen desain tambahan
+3. **BookingController**: Memperbarui fungsi generateTicket untuk menggunakan desain baru
+
+### B. Frontend Components (View)
+1. **ticket-pdf.blade.php**: Perbarui tampilan tiket PDF landscape
+2. **ticket-pdf-portrait.blade.php**: Perbarui tampilan tiket PDF portrait
+3. **CSS Styling**: Terapkan gaya modern dan responsif dalam format PDF
+
+## Design Improvements
+
+### A. Layout dan Struktur
+1. **Header Tiket**
+   - Logo perusahaan yang lebih besar dan menonjol
+   - Warna latar belakang gradient yang sesuai dengan brand
+   - Informasi nama perusahaan dan slogan dalam ukuran yang lebih besar
+   - Tambahkan elemen desain visual seperti garis dekoratif atau ikon
+
+2. **Bagian Utama (Body)**
+   - Grid informasi yang lebih rapi dan mudah dibaca
+   - Bagian rute perjalanan yang lebih besar dan menonjol
+   - Pemisah antar informasi dengan elemen visual yang menarik
+   - Gunakan ikon kecil untuk setiap informasi (penumpang, kode booking, keberangkatan, dll.)
+
+3. **Footer Tiket**
+   - Barcode dan QR code yang lebih besar dan jelas untuk pemindaian
+   - Informasi kontak dan alamat website yang lebih mudah terlihat
+   - Instruksi perjalanan dalam bentuk checklist visual
+
+### B. Penambahan Fitur Desain
+1. **Desain Visual**
+   - Tambahkan elemen border atau garis dekoratif di sekeliling tiket
+   - Gunakan warna yang konsisten dengan brand perusahaan
+   - Tambahkan background pattern atau watermark yang tidak mengganggu pembacaan
+
+2. **Tata Letak Informasi**
+   - Prioritaskan informasi penting (rute, tanggal, jam keberangkatan)
+   - Gunakan ukuran font yang berbeda untuk menonjolkan informasi penting
+   - Atur jarak antar elemen agar lebih lega dan mudah dibaca
+
+3. **Pemilihan Warna**
+   - Gunakan skema warna yang konsisten dengan identitas brand
+   - Jaga kontras yang cukup untuk kemudahan pembacaan
+   - Terapkan sistem warna untuk status dan informasi khusus
+
+### C. Fungsi dan Fitur Tambahan
+
+#### 1. Pemilihan Warna Dinamis
+- Gunakan sistem konfigurasi warna sesuai dengan `TicketCustomization`
+- Tambahkan preset warna sesuai dengan tema yang berbeda
+
+#### 2. Tampilan Khusus untuk Rute Tertentu
+- Tambahkan background gambar dengan pemandangan khas tujuan
+- Gunakan warna yang berbeda untuk rute-rute tertentu
+
+#### 3. Mode Malam/Hari
+- Tambahkan opsi tema gelap untuk kenyamanan saat perjalanan malam
+- Sesuaikan kontras dan warna untuk kenyamanan visual
+
+## Implementation Plan
+
+### Phase 1: Persiapan (Hari 1-2)
+1. Buat perencanaan desain tiket baru
+   - Buat wireframe desain baru
+   - Persiapkan elemen visual (ikon, logo, warna brand)
+   - Siapkan contoh tampilan dalam format landscape dan portrait
+2. Review dan validasi desain yang dibuat dengan stakeholder
+
+### Phase 2: Pengembangan Backend (Hari 3-4)
+1. Tingkatkan `TicketCustomization` model
+   - Tambahkan field untuk elemen desain baru
+   - Perbarui validasi dan struktur data
+2. Perbarui `TicketPdfService`
+   - Tambahkan metode untuk menangani elemen desain baru
+   - Implementasi logika untuk tema dinamis
+3. Uji fungsi dasar generate PDF dengan perubahan baru
+
+### Phase 3: Pengembangan Frontend (Hari 5-6)
+1. Implementasikan desain baru di view tiket
+   - Perbarui `ticket-pdf.blade.php` dengan layout baru
+   - Tambahkan elemen visual sesuai rencana desain
+2. Implementasi desain responsif untuk format PDF
+   - Pastikan tampilan tetap bagus di format landscape dan portrait
+   - Uji tampilan pada berbagai ukuran kertas
+3. Tambahkan opsi tema dan layout dinamis
+
+### Phase 4: Testing dan Validasi (Hari 7-8)
+1. Uji coba tampilan PDF di berbagai perangkat dan pembaca PDF
+2. Validasi kualitas barcode dan QR code untuk kemudahan scanning
+3. Uji aksesibilitas dan kemudahan membaca informasi
+4. Kumpulkan feedback dari tim dan user testing
+
+### Phase 5: Penyempurnaan dan Peluncuran (Hari 9-10)
+1. Lakukan perbaikan berdasarkan hasil testing
+2. Pastikan kompatibilitas dengan sistem booking yang ada
+3. Deploy ke staging dan uji secara menyeluruh
+4. Deploy ke production dengan pengawasan ketat
+
+## Teknologi yang Digunakan
+- **Backend**: Laravel 12 dengan PHP 8.2+
+- **PDF Generation**: DomPDF untuk pembuatan tiket PDF
+- **Frontend**: Blade template, CSS3 untuk styling
+- **Barcode/QR Generation**: Milon/barcode package
+- **Database**: MySQL untuk menyimpan pengaturan desain
+
+## Pertimbangan Desain
+
+### A. Keterbacaan
+1. Gunakan ukuran font yang cukup besar dan kontras yang baik
+2. Jaga jarak antar informasi agar tidak terlalu padat
+3. Gunakan warna yang kontras antara teks dan latar belakang
+
+### B. Pemindaian
+1. Pastikan barcode dan QR code memiliki ukuran yang cukup besar
+2. Jaga margin yang cukup di sekitar barcode/QR code
+3. Gunakan warna yang memungkinkan pemindaian yang mudah
+
+### C. Estetika
+1. Gunakan layout yang seimbang dan proporsional
+2. Terapkan prinsip desain visual (alignment, proximity, contrast, repetition)
+3. Gunakan warna yang mencerminkan profesionalisme perusahaan
+
+## Integrasi dengan Fitur yang Ada
+
+### A. Integrasi dengan Sistem Booking
+- Tetap jaga kompatibilitas dengan proses booking yang sudah ada
+- Pastikan informasi yang ditampilkan tetap akurat dan sinkron
+
+### B. Integrasi dengan Admin Panel
+- Tambahkan opsi untuk mengelola pengaturan desain tiket di admin panel
+- Sediakan preview tampilan tiket sebelum disimpan
+
+### C. Integrasi dengan Multi-bahasa
+- Pastikan elemen teks dalam tiket dapat diubah sesuai bahasa
+- Tambahkan dukungan untuk layout right-to-left jika diperlukan
+
+## Evaluasi dan Pengembangan Berkelanjutan
+1. Kumpulkan umpan balik dari pengguna terkait tampilan tiket baru
+2. Analisis tingkat keberhasilan pemindaian barcode/QR code
+3. Evaluasi tingkat kepuasan pengguna terhadap tampilan tiket
+4. Lakukan peningkatan berkelanjutan berdasarkan data dan umpan balik
+
+## Potensi Tantangan dan Solusi
+1. **Kompatibilitas PDF Reader**: Gunakan teknik CSS yang didukung secara luas oleh DomPDF
+2. **Pemrosesan Waktu**: Optimalkan ukuran file dan elemen visual agar tidak membebani server
+3. **Pengaturan Cetak**: Pastikan desain tetap bagus dalam mode cetak hitam-putih
+4. **Ukuran File**: Optimalkan gambar dan elemen visual agar tidak membuat file PDF terlalu besar
+
+## Rollback Plan
+Jika implementasi desain baru bermasalah, berikut adalah rencana rollback:
+
+### A. Mengembalikan View Lama
+- Kembalikan file `ticket-pdf.blade.php` dan `ticket-pdf-portrait.blade.php` ke versi sebelumnya
+- Hapus atau nonaktifkan perubahan yang tidak diperlukan
+
+### B. Mengembalikan Fungsi Lama
+- Kembalikan `TicketPdfService` ke versi sebelumnya
+- Hapus perubahan pada `BookingController` yang terkait dengan desain baru
+
+### C. Membersihkan Data Tambahan
+- Hapus field tambahan dari model `TicketCustomization` jika diperlukan
+- Hapus konfigurasi desain baru jika menyebabkan masalah
+
+Desain tiket PDF yang ditingkatkan ini akan memberikan pengalaman yang lebih baik bagi pengguna, dengan tampilan yang lebih profesional dan informasi yang lebih mudah dibaca dan dipahami.

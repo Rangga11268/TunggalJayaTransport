@@ -529,86 +529,13 @@ class BookingController extends Controller
             abort(404, 'Ticket not available. Invalid booking status.');
         }
         
-        // Use the TicketPdfService to generate the ticket
-        $ticketService = app(\App\Services\TicketPdfService::class);
-        $pdf = $ticketService->generateTicket($booking);
+        // Generate PDF ticket using the original method (without TicketPdfService)
+        $pdf = Pdf::loadView('frontend.booking.ticket-pdf', compact('booking'));
         
         return $pdf->download('ticket-' . $booking->booking_code . '.pdf');
     }
     
-    /**
-     * Update ticket customization settings
-     */
-    public function updateTicketSettings(Request $request)
-    {
-        $ticketService = app(\App\Services\TicketPdfService::class);
-        $validatedData = $request->validate([
-            'layout_type' => 'sometimes|in:landscape,portrait',
-            'paper_size' => 'sometimes|in:A4,A5,letter,legal,A3',
-            'show_company_logo' => 'sometimes|boolean',
-            'show_passenger_photo' => 'sometimes|boolean',
-            'show_barcode' => 'sometimes|boolean',
-            'show_qr_code' => 'sometimes|boolean',
-            'show_route_map' => 'sometimes|boolean',
-            'show_terms' => 'sometimes|boolean',
-            'color_scheme' => 'sometimes|array',
-            'color_scheme.primary' => 'sometimes|string',
-            'color_scheme.secondary' => 'sometimes|string',
-            'color_scheme.accent' => 'sometimes|string',
-            'color_scheme.background' => 'sometimes|string',
-            'font_settings' => 'sometimes|array',
-            'font_settings.family' => 'sometimes|string',
-            'font_settings.size' => 'sometimes|integer',
-            'font_settings.headings' => 'sometimes|integer',
-            'enable_watermark' => 'sometimes|boolean',
-            'watermark_text' => 'sometimes|string|nullable',
-            'custom_fields' => 'sometimes|array',
-        ]);
 
-        $ticketService->updateSettings($validatedData);
-
-        return response()->json(['message' => 'Ticket settings updated successfully']);
-    }
-    
-    /**
-     * Get current ticket customization settings
-     */
-    public function getTicketSettings()
-    {
-        $ticketService = app(\App\Services\TicketPdfService::class);
-        
-        return response()->json([
-            'settings' => $ticketService->settings
-        ]);
-    }
-    
-    public function viewTicket($id)
-    {
-        $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
-        
-        // Check if the current user owns this booking or is authenticated
-        if (auth()->check() && $booking->user_id !== auth()->id()) {
-            abort(403, 'You do not have permission to access this booking.');
-        }
-        
-        // Ensure the booking has seat numbers
-        if (empty($booking->seat_numbers)) {
-            abort(404, 'Ticket not available. Please select seats first.');
-        }
-        
-        // Check if the schedule has already departed
-        if ($booking->schedule->hasDeparted()) {
-            abort(404, 'Ticket not available. The schedule has already departed.');
-        }
-        
-        // Check if the booking is valid
-        if ($booking->booking_status !== 'confirmed' || $booking->payment_status !== 'paid') {
-            abort(404, 'Ticket not available. Invalid booking status.');
-        }
-        
-        // Return the ticket view for online viewing
-        return view('frontend.booking.ticket-preview', compact('booking'));
-    }
     
     public function checkAvailability(Request $request)
     {
