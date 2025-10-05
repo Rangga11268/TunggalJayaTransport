@@ -13,7 +13,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
             <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Kisah Kami</h2>
             <div class="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold">
-                <i class="fas fa-history mr-2"></i>Sejak 2005
+                <i class="fas fa-history mr-2"></i>Sejak 1973
             </div>
         </div>
         <div class="flex flex-col lg:flex-row gap-6 items-center">
@@ -32,26 +32,26 @@
                         </video>
                     </div>
                     <div class="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-3 sm:p-6 rounded-xl shadow-lg">
-                        <div class="text-2xl sm:text-3xl font-bold">18+</div>
+                        <div class="text-2xl sm:text-3xl font-bold">50+</div>
                         <div class="text-xs sm:text-sm">Years Experience</div>
                     </div>
                 </div>
             </div>
             <div class="lg:w-3/5 w-full">
                 <p class="text-gray-700 text-base sm:text-lg mb-4">
-                    Tunggal Jaya Transport telah menyediakan layanan transportasi yang andal dan nyaman sejak 2005. 
-                    Dengan pengalaman lebih dari 18 tahun, kami telah berkembang menjadi salah satu perusahaan bus 
-                    yang paling dipercaya di kawasan ini.
+                    Tunggal Jaya Transport bermula dari perjalanan luar biasa H. Asim pada tahun 1973. Bermula dari 
+                    usaha kecil menjual ubi dengan sepeda dari Sumatera ke Jakarta, H. Asim bermimpi memiliki 
+                    bisnis transportasi yang sukses.
                 </p>
                 <p class="text-gray-700 text-base sm:text-lg mb-4">
-                    Komitmen kami terhadap keselamatan, ketepatan waktu, dan kepuasan pelanggan telah menjadikan 
-                    kami pilihan utama bagi ribuan pelancong setiap harinya. Kami percaya dalam memberikan lebih 
-                    dari sekadar transportasi - kami memberikan pengalaman.
+                    Dengan modal Rp100 juta, H. Asim membeli satu unit bus ukuran medium seharga Rp49 juta dan 
+                    memulai perjalanan bisnisnya melayani rute-rute di Sumatera. Nama "Tunggal Jaya" diambil 
+                    dari nama ayahnya, sebagai simbol harapan bahwa usaha yang dilakukannya akan sukses.
                 </p>
                 <p class="text-gray-700 text-base sm:text-lg mb-6">
-                    Kami terus berinvestasi dalam armada dan pelatihan staf kami untuk memastikan 
-                    memberikan layanan terbaik bagi pelanggan kami yang terhormat. Bus-bus modern kami dilengkapi 
-                    dengan fasilitas terbaru untuk kenyamanan dan keselamatan Anda.
+                    Kini, setelah lebih dari 50 tahun beroperasi, Tunggal Jaya Transport telah menjadi perusahaan 
+                    otobus yang maju. H. Asim telah menyerahkan estafet perusahaan kepada anaknya, Didi, untuk 
+                    melanjutkan perjuangan dan mewujudkan visi perusahaan ke depan.
                 </p>
                 <div class="flex flex-col sm:flex-row flex-wrap gap-3">
                     <div class="flex items-center bg-white p-3 rounded-lg shadow-sm mb-2 sm:mb-0">
@@ -59,17 +59,17 @@
                             <i class="fas fa-bus text-blue-600"></i>
                         </div>
                         <div>
-                            <div class="font-bold text-gray-800 text-sm sm:text-base">Armada Modern</div>
-                            <div class="text-xs sm:text-sm text-gray-600">Bus yang terawat baik</div>
+                            <div class="font-bold text-gray-800 text-sm sm:text-base">Pewaris Bisnis</div>
+                            <div class="text-xs sm:text-sm">Estafet ke generasi muda</div>
                         </div>
                     </div>
                     <div class="flex items-center bg-white p-3 rounded-lg shadow-sm">
                         <div class="bg-blue-100 p-2 rounded-full mr-3">
-                            <i class="fas fa-user-tie text-blue-600"></i>
+                            <i class="fas fa-hand-holding-heart text-blue-600"></i>
                         </div>
                         <div>
-                            <div class="font-bold text-gray-800 text-sm sm:text-base">Staf Profesional</div>
-                            <div class="text-xs sm:text-sm text-gray-600">Sopir & awak yang terlatih</div>
+                            <div class="font-bold text-gray-800 text-sm sm:text-base">Nilai Kemanusiaan</div>
+                            <div class="text-xs sm:text-sm">Kebaikan hati dalam bisnis</div>
                         </div>
                     </div>
                 </div>
