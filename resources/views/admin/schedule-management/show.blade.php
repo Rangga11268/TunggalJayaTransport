@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Schedule Details') }}
+            Detail Jadwal
         </h2>
     </x-slot>
 
@@ -10,16 +10,16 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold">Schedule #{{ $schedule->id }}</h3>
+                        <h3 class="text-lg font-bold">Jadwal #{{ $schedule->id }}</h3>
                         <a href="{{ route('admin.schedule-management.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                            Back to Schedules
+                            Kembali ke Jadwal
                         </a>
                     </div>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Schedule Information -->
                         <div class="bg-gray-50 rounded-lg p-6">
-                            <h4 class="text-md font-bold mb-4 text-gray-800">Schedule Information</h4>
+                            <h4 class="text-md font-bold mb-4 text-gray-800">Informasi Jadwal</h4>
                             
                             <div class="space-y-4">
                                 <div class="flex justify-between">
@@ -28,33 +28,33 @@
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Route:</span>
+                                    <span class="text-gray-600">Rute:</span>
                                     <span class="font-medium">{{ $schedule->route->origin }} → {{ $schedule->route->destination }}</span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Schedule Type:</span>
+                                    <span class="text-gray-600">Tipe Jadwal:</span>
                                     <span class="font-medium">
                                         @if($schedule->is_daily)
-                                            Daily Recurring Schedule
+                                            Jadwal Harian Berulang
                                         @else
-                                            Daily Schedule
+                                            Jadwal Harian
                                         @endif
                                     </span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Departure Time:</span>
+                                    <span class="text-gray-600">Waktu Keberangkatan:</span>
                                     <span class="font-medium">{{ $schedule->getDepartureTimeWIB()->format('d M Y H:i') }} (WIB)</span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Arrival Time:</span>
+                                    <span class="text-gray-600">Waktu Kedatangan:</span>
                                     <span class="font-medium">{{ $schedule->getArrivalTimeWIB()->format('d M Y H:i') }} (WIB)</span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Price:</span>
+                                    <span class="text-gray-600">Harga:</span>
                                     <span class="font-medium">Rp. {{ number_format($schedule->price, 0, ',', '.') }}</span>
                                 </div>
                                 
@@ -63,38 +63,38 @@
                                     <span class="font-medium">
                                         @if($schedule->status === 'active')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                Active
+                                                Aktif
                                             </span>
                                         @elseif($schedule->status === 'cancelled')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                Cancelled
+                                                Dibatalkan
                                             </span>
                                         @else
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                Delayed
+                                                Tertunda
                                             </span>
                                         @endif
                                     </span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Has Departed:</span>
+                                    <span class="text-gray-600">Sudah Berangkat:</span>
                                     <span class="font-medium">
                                         @if($hasDeparted)
-                                            <span class="text-red-600 font-bold">YES</span>
+                                            <span class="text-red-600 font-bold">YA</span>
                                         @else
-                                            <span class="text-green-600 font-bold">NO</span>
+                                            <span class="text-green-600 font-bold">TIDAK</span>
                                         @endif
                                     </span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Available for Booking:</span>
+                                    <span class="text-gray-600">Tersedia untuk Pemesanan:</span>
                                     <span class="font-medium">
                                         @if($isAvailable)
-                                            <span class="text-green-600 font-bold">YES</span>
+                                            <span class="text-green-600 font-bold">YA</span>
                                         @else
-                                            <span class="text-red-600 font-bold">NO</span>
+                                            <span class="text-red-600 font-bold">TIDAK</span>
                                         @endif
                                     </span>
                                 </div>
@@ -103,22 +103,22 @@
                         
                         <!-- Capacity Information -->
                         <div class="bg-gray-50 rounded-lg p-6">
-                            <h4 class="text-md font-bold mb-4 text-gray-800">Capacity Information</h4>
+                            <h4 class="text-md font-bold mb-4 text-gray-800">Informasi Kapasitas</h4>
                             
                             <div class="space-y-4">
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Bus Capacity:</span>
-                                    <span class="font-medium">{{ $schedule->bus->capacity ?? 0 }} seats</span>
+                                    <span class="text-gray-600">Kapasitas Bus:</span>
+                                    <span class="font-medium">{{ $schedule->bus->capacity ?? 0 }} kursi</span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Booked Seats:</span>
-                                    <span class="font-medium">{{ $bookedSeats }} seats</span>
+                                    <span class="text-gray-600">Kursi Dipesan:</span>
+                                    <span class="font-medium">{{ $bookedSeats }} kursi</span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Available Seats:</span>
-                                    <span class="font-medium">{{ $availableSeats }} seats</span>
+                                    <span class="text-gray-600">Kursi Tersedia:</span>
+                                    <span class="font-medium">{{ $availableSeats }} kursi</span>
                                 </div>
                                 
                                 <div class="w-full bg-gray-200 rounded-full h-4">
@@ -128,7 +128,7 @@
                                 </div>
                                 
                                 <div class="text-sm text-gray-500 mt-2">
-                                    {{ round(($availableSeats / max(1, $schedule->bus->capacity ?? 1)) * 100, 1) }}% available
+                                    {{ round(($availableSeats / max(1, $schedule->bus->capacity ?? 1)) * 100, 1) }}% tersedia
                                 </div>
                             </div>
                         </div>
@@ -136,18 +136,18 @@
                     
                     <!-- Bookings Section -->
                     <div class="mt-8">
-                        <h4 class="text-md font-bold mb-4 text-gray-800">Bookings ({{ $schedule->bookings->count() }})</h4>
+                        <h4 class="text-md font-bold mb-4 text-gray-800">Pemesanan ({{ $schedule->bookings->count() }})</h4>
                         
                         @if($schedule->bookings->count() > 0)
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking Code</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Passenger</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Seats</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode Pemesanan</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penumpang</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kursi</th>
                                         <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -161,7 +161,7 @@
                                             <div class="text-xs">{{ $booking->passenger_email }}</div>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $booking->number_of_seats }} seats
+                                            {{ $booking->number_of_seats }} kursi
                                             @if($booking->seat_numbers)
                                             <div class="text-xs">({{ $booking->seat_numbers }})</div>
                                             @endif
@@ -169,29 +169,29 @@
                                         <td class="px-4 py-4 whitespace-nowrap">
                                             @if($booking->booking_status === 'confirmed')
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                    Confirmed
+                                                    Dikonfirmasi
                                                 </span>
                                             @elseif($booking->booking_status === 'cancelled')
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                    Cancelled
+                                                    Dibatalkan
                                                 </span>
                                             @else
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                    {{ ucfirst($booking->booking_status) }}
+                                                    {{ ucfirst(__($booking->booking_status)) }}
                                                 </span>
                                             @endif
                                             
                                             @if($booking->payment_status === 'paid')
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 ml-1">
-                                                    Paid
+                                                    Dibayar
                                                 </span>
                                             @elseif($booking->payment_status === 'pending')
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 ml-1">
-                                                    Pending
+                                                    Tertunda
                                                 </span>
                                             @else
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 ml-1">
-                                                    {{ ucfirst($booking->payment_status) }}
+                                                    {{ ucfirst(__($booking->payment_status)) }}
                                                 </span>
                                             @endif
                                         </td>
@@ -205,7 +205,7 @@
                         </div>
                         @else
                         <div class="text-center py-4 text-gray-500">
-                            No bookings found for this schedule.
+                            Tidak ada pemesanan ditemukan untuk jadwal ini.
                         </div>
                         @endif
                     </div>
@@ -213,14 +213,14 @@
                     <!-- Action Buttons -->
                     <div class="mt-6 flex gap-2">
                         <a href="{{ route('admin.schedules.edit', $schedule) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Edit Schedule
+                            Edit Jadwal
                         </a>
                         
                         @if($schedule->hasDeparted() && $schedule->is_daily)
                             <form action="{{ route('admin.schedules.create-next-day', $schedule) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                    Create Next Day Schedule
+                                    Buat Jadwal Hari Berikutnya
                                 </button>
                             </form>
                         @endif
@@ -230,7 +230,7 @@
                             @method('DELETE')
                             <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" 
                                     onclick="event.preventDefault(); handleDelete('delete-form', 'Hapus Jadwal?', 'Apakah Anda yakin ingin menghapus jadwal ini? Tindakan ini tidak dapat dibatalkan.')">
-                                Delete Schedule
+                                Hapus Jadwal
                             </button>
                         </form>
                     </div>
