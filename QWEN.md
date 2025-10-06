@@ -285,203 +285,254 @@ Chatbot ini akan menjadi bagian penting dari pengalaman pengguna di Tunggal Jaya
 Dalam pengerjaan proyek Tunggal Jaya Transport, penting untuk diingat bahwa:
 
 ### 1. Catatan Migrasi
-- Setiap perubahan yang melibatkan migrasi database harus dicatat secara rinci
-- Catat tabel yang dibuat, dimodifikasi, atau dihapus
-- Catat perubahan struktur database yang terjadi
+
+-   Setiap perubahan yang melibatkan migrasi database harus dicatat secara rinci
+-   Catat tabel yang dibuat, dimodifikasi, atau dihapus
+-   Catat perubahan struktur database yang terjadi
 
 ### 2. Prosedur Rollback
-- Harus selalu diingat apa yang dirollback dan bagaimana caranya
-- Simpan catatan rinci tentang langkah-langkah rollback
-- Pastikan setiap komponen yang dihapus bisa dimigrasi kembali jika diperlukan
+
+-   Harus selalu diingat apa yang dirollback dan bagaimana caranya
+-   Simpan catatan rinci tentang langkah-langkah rollback
+-   Pastikan setiap komponen yang dihapus bisa dimigrasi kembali jika diperlukan
 
 ### 3. Konfirmasi Rollback
-- Sebelum dan setelah melakukan rollback, konfirmasi ke pengguna tentang:
-  - Apa yang telah dirollback
-  - Apa yang masih bisa dimigrasi kembali
-  - Jalur migrasi kembali yang tersedia
+
+-   Sebelum dan setelah melakukan rollback, konfirmasi ke pengguna tentang:
+    -   Apa yang telah dirollback
+    -   Apa yang masih bisa dimigrasi kembali
+    -   Jalur migrasi kembali yang tersedia
 
 ### 4. Dokumentasi
-- Pastikan dokumentasi migrasi dan rollback selalu diperbarui
-- Simpan informasi dalam tempat yang mudah diakses untuk referensi masa depan
+
+-   Pastikan dokumentasi migrasi dan rollback selalu diperbarui
+-   Simpan informasi dalam tempat yang mudah diakses untuk referensi masa depan
 
 # Qwen V1.1 Update: Improving PDF Ticket Design for Tunggal Jaya Transport
 
 ## Overview
-Rekomendasi ini memberikan peningkatan terhadap tampilan tiket PDF pada website Tunggal Jaya Transport. Saat ini, tampilan tiket PDF masih sederhana dan perlu ditingkatkan agar lebih profesional, informatif, dan menarik secara visual bagi pengguna.
+
+Rekomendasi ini memberikan peningkatan terhadap tampilan tiket PDF pada website Tunggal Jaya Transport. Saat ini, tampilan tiket PDF masih sederhana dan perlu ditingkatkan agar lebih profesional, informatif, dan menarik secara visual bagi pengguna. Integrasi antara tampilan tiket frontend dengan PDF perlu ditingkatkan untuk konsistensi pengalaman pengguna.
 
 ## Business Requirements
+
 Tiket PDF harus:
+
 1. Tampil lebih profesional dan menarik secara visual
 2. Menyertakan informasi yang lengkap dan mudah dibaca
-3. Menampilkan logo dan identitas perusahaan dengan baik
+3. Menampilkan logo dan identitas perusahaan dengan baik `@public/img/logoNoBg`
 4. Dapat dipindai dengan mudah (barcode dan QR code yang jelas)
 5. Menyediakan informasi penting seperti aturan, kontak layanan, dan titik boarding
 6. Konsisten dengan desain brand perusahaan
+7. Menggunakan format landscape yang mirip dengan tiket pesawat/kereta di Indonesia
+8. Menampilkan gambar dari `@public/img/heroImg.jpg` dan logo Tunggal Jaya secara menarik
 
 ## Technical Implementation
 
 ### A. Backend Components
-1. **TicketPdfService**: Memperbarui kelas untuk mendukung desain baru
-2. **TicketCustomization Model**: Menyesuaikan skema untuk mendukung elemen desain tambahan
-3. **BookingController**: Memperbarui fungsi generateTicket untuk menggunakan desain baru
+
+1. **TicketPdfService**: Buat kelas baru untuk menggantikan pendekatan sebelumnya
+2. **BookingController**: Perbarui fungsi `downloadTicket` untuk menggunakan kelas baru
+3. **PDF Generation**: Gunakan DOMPDF dengan pendekatan blade template untuk kemudahan kustomisasi
 
 ### B. Frontend Components (View)
-1. **ticket-pdf.blade.php**: Perbarui tampilan tiket PDF landscape
-2. **ticket-pdf-portrait.blade.php**: Perbarui tampilan tiket PDF portrait
+
+1. **ticket-pdf.blade.php**: Buat tiket PDF landscape baru dengan elemen visual yang lebih menarik
+2. **Konsistensi tampilan**: Pastikan tampilan frontend dan PDF serupa
 3. **CSS Styling**: Terapkan gaya modern dan responsif dalam format PDF
 
 ## Design Improvements
 
-### A. Layout dan Struktur
+### A. Layout dan Struktur (Landscape)
+
 1. **Header Tiket**
-   - Logo perusahaan yang lebih besar dan menonjol
-   - Warna latar belakang gradient yang sesuai dengan brand
-   - Informasi nama perusahaan dan slogan dalam ukuran yang lebih besar
-   - Tambahkan elemen desain visual seperti garis dekoratif atau ikon
+
+    - Logo Tunggal Jaya dalam ukuran lebih besar dan posisi menonjol
+    - Warna latar belakang gradient yang sesuai dengan brand
+    - Informasi nama perusahaan dan slogan dalam ukuran yang lebih besar
+    - Tambahkan elemen desain visual seperti garis dekoratif atau ikon
+    - Background image dari `public/img/heroImg.jpg` dengan opacity rendah
 
 2. **Bagian Utama (Body)**
-   - Grid informasi yang lebih rapi dan mudah dibaca
-   - Bagian rute perjalanan yang lebih besar dan menonjol
-   - Pemisah antar informasi dengan elemen visual yang menarik
-   - Gunakan ikon kecil untuk setiap informasi (penumpang, kode booking, keberangkatan, dll.)
 
-3. **Footer Tiket**
-   - Barcode dan QR code yang lebih besar dan jelas untuk pemindaian
-   - Informasi kontak dan alamat website yang lebih mudah terlihat
-   - Instruksi perjalanan dalam bentuk checklist visual
+    - Layout grid untuk informasi penting (rute, penumpang, kursi, dll.)
+    - Bagian rute perjalanan yang lebih besar dan menonjol
+    - Pemisah antar informasi dengan elemen visual yang menarik
+    - Gunakan ikon kecil untuk setiap informasi (penumpang, kode booking, keberangkatan, dll.)
+    - Tampilkan informasi bus secara lebih mencolok
+
+3. **Bagian Kode Pemindaian**
+
+    - Barcode dan QR code yang lebih besar dan jelas untuk pemindaian
+    - Kode booking besar dan mudah dibaca
+
+4. **Footer Tiket**
+    - Informasi kontak dan alamat website yang lebih mudah terlihat
+    - Instruksi perjalanan dalam bentuk visual yang menarik
 
 ### B. Penambahan Fitur Desain
+
 1. **Desain Visual**
-   - Tambahkan elemen border atau garis dekoratif di sekeliling tiket
-   - Gunakan warna yang konsisten dengan brand perusahaan
-   - Tambahkan background pattern atau watermark yang tidak mengganggu pembacaan
+
+    - Tambahkan elemen border atau garis dekoratif di sekeliling tiket
+    - Gunakan warna yang konsisten dengan brand perusahaan
+    - Tambahkan background pattern atau watermark dari `public/img/heroImg.jpg` secara halus
 
 2. **Tata Letak Informasi**
-   - Prioritaskan informasi penting (rute, tanggal, jam keberangkatan)
-   - Gunakan ukuran font yang berbeda untuk menonjolkan informasi penting
-   - Atur jarak antar elemen agar lebih lega dan mudah dibaca
+
+    - Prioritaskan informasi penting (rute, tanggal, jam keberangkatan)
+    - Gunakan ukuran font yang berbeda untuk menonjolkan informasi penting
+    - Atur jarak antar elemen agar lebih lega dan mudah dibaca
+    - Gunakan layout landscape yang menyerupai tiket pesawat/kereta
 
 3. **Pemilihan Warna**
-   - Gunakan skema warna yang konsisten dengan identitas brand
-   - Jaga kontras yang cukup untuk kemudahan pembacaan
-   - Terapkan sistem warna untuk status dan informasi khusus
+    - Gunakan skema warna yang konsisten dengan identitas brand
+    - Jaga kontras yang cukup untuk kemudahan pembacaan
+    - Terapkan sistem warna untuk status dan informasi khusus
 
 ### C. Fungsi dan Fitur Tambahan
 
-#### 1. Pemilihan Warna Dinamis
-- Gunakan sistem konfigurasi warna sesuai dengan `TicketCustomization`
-- Tambahkan preset warna sesuai dengan tema yang berbeda
+#### 1. Konsistensi dengan Tampilan Frontend
 
-#### 2. Tampilan Khusus untuk Rute Tertentu
-- Tambahkan background gambar dengan pemandangan khas tujuan
-- Gunakan warna yang berbeda untuk rute-rute tertentu
+-   Pastikan desain tiket PDF mencerminkan tampilan frontend
+-   Gunakan elemen dan warna yang serupa antara frontend dan PDF
+-   Jaga keseragaman tipografi dan tata letak informasi
 
-#### 3. Mode Malam/Hari
-- Tambahkan opsi tema gelap untuk kenyamanan saat perjalanan malam
-- Sesuaikan kontras dan warna untuk kenyamanan visual
+#### 2. Background Image
+
+-   Gunakan gambar `public/img/heroImg.jpg` sebagai elemen dekoratif di tiket
+-   Terapkan dengan opacity rendah agar tidak mengganggu pembacaan informasi
+
+#### 3. Peningkatan Informasi
+
+-   Tambahkan informasi bus secara lebih lengkap (nomor kendaraan, tipe, dll.)
+-   Tambahkan informasi boarding point secara lebih menonjol
+-   Tambahkan informasi estimasi durasi perjalanan
 
 ## Implementation Plan
 
-### Phase 1: Persiapan (Hari 1-2)
+### Phase 1: Persiapan (Hari 1)
+
 1. Buat perencanaan desain tiket baru
-   - Buat wireframe desain baru
-   - Persiapkan elemen visual (ikon, logo, warna brand)
-   - Siapkan contoh tampilan dalam format landscape dan portrait
-2. Review dan validasi desain yang dibuat dengan stakeholder
+    - Buat wireframe desain tiket landscape
+    - Persiapkan elemen visual (ikon, logo, background dari `public/img/heroImg.jpg`)
+    - Siapkan contoh layout dalam format landscape
+2. Review dan validasi desain dengan stakeholder
 
-### Phase 2: Pengembangan Backend (Hari 3-4)
-1. Tingkatkan `TicketCustomization` model
-   - Tambahkan field untuk elemen desain baru
-   - Perbarui validasi dan struktur data
-2. Perbarui `TicketPdfService`
-   - Tambahkan metode untuk menangani elemen desain baru
-   - Implementasi logika untuk tema dinamis
-3. Uji fungsi dasar generate PDF dengan perubahan baru
+### Phase 2: Pengembangan Backend (Hari 2-3)
 
-### Phase 3: Pengembangan Frontend (Hari 5-6)
-1. Implementasikan desain baru di view tiket
-   - Perbarui `ticket-pdf.blade.php` dengan layout baru
-   - Tambahkan elemen visual sesuai rencana desain
+1. Buat kelas `TicketPdfService`
+    - Implementasi fungsi generate tiket PDF
+    - Gunakan DOMPDF untuk konversi HTML ke PDF
+2. Perbarui `BookingController`
+    - Perbarui fungsi `downloadTicket` untuk menggunakan kelas baru
+3. Uji fungsi dasar generate PDF
+
+### Phase 3: Pengembangan Frontend - PDF (Hari 4-5)
+
+1. Implementasikan desain baru di view tiket PDF
+    - Buat `ticket-pdf.blade.php` baru dengan layout landscape
+    - Tambahkan elemen visual sesuai rencana desain
 2. Implementasi desain responsif untuk format PDF
-   - Pastikan tampilan tetap bagus di format landscape dan portrait
-   - Uji tampilan pada berbagai ukuran kertas
-3. Tambahkan opsi tema dan layout dinamis
+    - Pastikan tampilan tetap bagus dalam format landscape
+    - Uji tampilan pada berbagai ukuran kertas
+3. Tambahkan background image dari `public/img/heroImg.jpg`
 
-### Phase 4: Testing dan Validasi (Hari 7-8)
+### Phase 4: Konsistensi dengan Frontend (Hari 6-7)
+
+1. Bandingkan dan sesuaikan tampilan tiket PDF dengan tampilan frontend
+    - Gunakan warna dan elemen yang serupa
+    - Pastikan informasi ditampilkan dengan cara yang konsisten
+2. Tambahkan elemen dari partial tiket frontend ke PDF
+3. Uji konsistensi tampilan dan informasi
+
+### Phase 5: Testing dan Validasi (Hari 8-9)
+
 1. Uji coba tampilan PDF di berbagai perangkat dan pembaca PDF
 2. Validasi kualitas barcode dan QR code untuk kemudahan scanning
 3. Uji aksesibilitas dan kemudahan membaca informasi
 4. Kumpulkan feedback dari tim dan user testing
 
-### Phase 5: Penyempurnaan dan Peluncuran (Hari 9-10)
+### Phase 6: Penyempurnaan dan Peluncuran (Hari 10)
+
 1. Lakukan perbaikan berdasarkan hasil testing
 2. Pastikan kompatibilitas dengan sistem booking yang ada
 3. Deploy ke staging dan uji secara menyeluruh
 4. Deploy ke production dengan pengawasan ketat
 
 ## Teknologi yang Digunakan
-- **Backend**: Laravel 12 dengan PHP 8.2+
-- **PDF Generation**: DomPDF untuk pembuatan tiket PDF
-- **Frontend**: Blade template, CSS3 untuk styling
-- **Barcode/QR Generation**: Milon/barcode package
-- **Database**: MySQL untuk menyimpan pengaturan desain
+
+-   **Backend**: Laravel 12 dengan PHP 8.2+
+-   **PDF Generation**: DomPDF untuk pembuatan tiket PDF
+-   **Frontend**: Blade template, CSS3 untuk styling
+-   **Barcode/QR Generation**: Milon/barcode package
+-   **Database**: MySQL untuk menyimpan informasi booking
 
 ## Pertimbangan Desain
 
 ### A. Keterbacaan
+
 1. Gunakan ukuran font yang cukup besar dan kontras yang baik
 2. Jaga jarak antar informasi agar tidak terlalu padat
 3. Gunakan warna yang kontras antara teks dan latar belakang
 
 ### B. Pemindaian
+
 1. Pastikan barcode dan QR code memiliki ukuran yang cukup besar
 2. Jaga margin yang cukup di sekitar barcode/QR code
 3. Gunakan warna yang memungkinkan pemindaian yang mudah
 
 ### C. Estetika
-1. Gunakan layout yang seimbang dan proporsional
+
+1. Gunakan layout landscape yang seimbang dan proporsional
 2. Terapkan prinsip desain visual (alignment, proximity, contrast, repetition)
 3. Gunakan warna yang mencerminkan profesionalisme perusahaan
+4. Integrasi background `public/img/heroImg.jpg` dengan tepat
 
 ## Integrasi dengan Fitur yang Ada
 
 ### A. Integrasi dengan Sistem Booking
-- Tetap jaga kompatibilitas dengan proses booking yang sudah ada
-- Pastikan informasi yang ditampilkan tetap akurat dan sinkron
 
-### B. Integrasi dengan Admin Panel
-- Tambahkan opsi untuk mengelola pengaturan desain tiket di admin panel
-- Sediakan preview tampilan tiket sebelum disimpan
+-   Tetap jaga kompatibilitas dengan proses booking yang sudah ada
+-   Pastikan informasi yang ditampilkan tetap akurat dan sinkron
+
+### B. Integrasi dengan Tampilan Frontend
+
+-   Gunakan elemen desain yang serupa antara halaman sukses booking dan tiket PDF
+-   Jaga konsistensi informasi dan posisi elemen antara frontend dan PDF
 
 ### C. Integrasi dengan Multi-bahasa
-- Pastikan elemen teks dalam tiket dapat diubah sesuai bahasa
-- Tambahkan dukungan untuk layout right-to-left jika diperlukan
+
+-   Pastikan elemen teks dalam tiket dapat diubah sesuai bahasa
+-   Tambahkan dukungan untuk layout right-to-left jika diperlukan
 
 ## Evaluasi dan Pengembangan Berkelanjutan
+
 1. Kumpulkan umpan balik dari pengguna terkait tampilan tiket baru
 2. Analisis tingkat keberhasilan pemindaian barcode/QR code
 3. Evaluasi tingkat kepuasan pengguna terhadap tampilan tiket
 4. Lakukan peningkatan berkelanjutan berdasarkan data dan umpan balik
 
 ## Potensi Tantangan dan Solusi
+
 1. **Kompatibilitas PDF Reader**: Gunakan teknik CSS yang didukung secara luas oleh DomPDF
 2. **Pemrosesan Waktu**: Optimalkan ukuran file dan elemen visual agar tidak membebani server
 3. **Pengaturan Cetak**: Pastikan desain tetap bagus dalam mode cetak hitam-putih
-4. **Ukuran File**: Optimalkan gambar dan elemen visual agar tidak membuat file PDF terlalu besar
+4. **Ukuran File**: Optimalkan gambar background agar tidak membuat file PDF terlalu besar
+5. **Konsistensi Tampilan**: Gunakan pendekatan komponen yang sama antara frontend dan PDF
 
 ## Rollback Plan
+
 Jika implementasi desain baru bermasalah, berikut adalah rencana rollback:
 
-### A. Mengembalikan View Lama
-- Kembalikan file `ticket-pdf.blade.php` dan `ticket-pdf-portrait.blade.php` ke versi sebelumnya
-- Hapus atau nonaktifkan perubahan yang tidak diperlukan
+### A. Mengembalikan Fungsi Lama
 
-### B. Mengembalikan Fungsi Lama
-- Kembalikan `TicketPdfService` ke versi sebelumnya
-- Hapus perubahan pada `BookingController` yang terkait dengan desain baru
+-   Kembalikan BookingController ke versi sebelumnya sebelum implementasi `TicketPdfService`
+-   Hapus file `TicketPdfService.php` jika telah dibuat
 
-### C. Membersihkan Data Tambahan
-- Hapus field tambahan dari model `TicketCustomization` jika diperlukan
-- Hapus konfigurasi desain baru jika menyebabkan masalah
+### B. Mengembalikan View Lama
 
-Desain tiket PDF yang ditingkatkan ini akan memberikan pengalaman yang lebih baik bagi pengguna, dengan tampilan yang lebih profesional dan informasi yang lebih mudah dibaca dan dipahami.
+-   Kembalikan file `ticket-pdf.blade.php` ke versi sebelumnya
+-   Hapus perubahan yang tidak diperlukan
+
+Desain tiket PDF yang ditingkatkan ini akan memberikan pengalaman yang lebih baik bagi pengguna, dengan tampilan yang lebih profesional dan informasi yang lebih mudah dibaca dan dipahami, serta konsisten antara tampilan frontend dan PDF.
