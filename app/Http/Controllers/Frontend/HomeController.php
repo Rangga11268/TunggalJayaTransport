@@ -60,6 +60,14 @@ class HomeController extends Controller
         $personalizedRecommendations = collect();
         if (auth()->check()) {
             $personalizedRecommendations = $this->getPersonalizedRecommendations();
+            
+            // If user has no booking history, provide new user recommendations
+            if ($personalizedRecommendations->isEmpty()) {
+                $personalizedRecommendations = $this->getRecommendationsForNewUsers();
+            }
+        } else {
+            // For logged-out users, provide general recommendations
+            $personalizedRecommendations = $this->getRecommendationsForNewUsers();
         }
         
         return view('frontend.home', compact(
@@ -353,6 +361,140 @@ class HomeController extends Controller
                     'schedule' => $schedule,
                     'score' => $score,
                     'type' => 'popular'
+                ]);
+            }
+        }
+        
+        return $recommendations;
+    }
+    
+    /**
+     * Get recommendations for users with no booking history
+     */
+    private function getRecommendationsForNewUsers()
+    {
+        $recommendations = collect();
+        
+        // 1. Get seasonally popular routes (if we can determine current season)
+        $seasonalRecommendations = $this->getSeasonalRecommendations();
+        $recommendations = $recommendations->merge($seasonalRecommendations);
+        
+        // 2. Add trending routes (recently increasing bookings)
+        if ($recommendations->count() < 3) {
+            $trendingRecommendations = $this->getTrendingRecommendations();
+            $recommendations = $recommendations->merge($trendingRecommendations);
+        }
+        
+        // 3. Get diverse popular routes (for variety)
+        if ($recommendations->count() < 3) {
+            $diverseRecommendations = $this->getDiversePopularRecommendations();
+            $recommendations = $recommendations->merge($diverseRecommendations);
+        }
+        
+        return $recommendations->sortByDesc('score')->take(3);
+    }
+
+    /**
+     * Get seasonal recommendations based on current time
+     */
+    private function getSeasonalRecommendations()
+    {
+        $recommendations = collect();
+        $currentMonth = now()->month;
+        
+        // Example: if certain routes are more popular in certain seasons
+        $seasonalSchedules = Booking::join('schedules', 'bookings.schedule_id', '=', 'schedules.id')
+            ->join('routes', 'schedules.route_id', '=', 'routes.id')
+            ->join('bookings AS b2', function($join) use ($currentMonth) {
+                $join->on('b2.schedule_id', '=', 'schedules.id')
+                     ->whereRaw('MONTH(b2.created_at) = ?', [$currentMonth]);
+            })
+            ->where('schedules.status', 'active')
+            ->selectRaw('schedules.id as schedule_id, count(*) as booking_count')
+            ->groupBy('schedules.id')
+            ->orderByDesc('booking_count')
+            ->limit(10)
+            ->get(['schedules.id']);
+        
+        foreach ($seasonalSchedules as $scheduleData) {
+            $schedule = \App\Models\Schedule::with(['route', 'bus'])->find($scheduleData->schedule_id);
+            if ($schedule && $schedule->route) {
+                $score = $this->calculateRecommendationScore($schedule->route, $schedule) + 40; // Seasonal bonus
+                
+                $recommendations->push([
+                    'route' => $schedule->route,
+                    'schedule' => $schedule,
+                    'score' => $score,
+                    'type' => 'seasonal'
+                ]);
+            }
+        }
+        
+        return $recommendations;
+    }
+
+    /**
+     * Get trending recommendations (routes with increasing bookings)
+     */
+    private function getTrendingRecommendations()
+    {
+        $recommendations = collect();
+        
+        // Get routes with significantly increasing booking counts compared to previous period
+        $trendingSchedules = Booking::join('schedules', 'bookings.schedule_id', '=', 'schedules.id')
+            ->join('routes', 'schedules.route_id', '=', 'routes.id')
+            ->where('bookings.created_at', '>', now()->subMonth())  // Bookings from last month
+            ->selectRaw('schedules.id as schedule_id, count(*) as recent_booking_count')
+            ->groupBy('schedules.id')
+            ->orderByDesc('recent_booking_count')
+            ->limit(10)
+            ->get(['schedules.id']);
+        
+        foreach ($trendingSchedules as $scheduleData) {
+            $schedule = \App\Models\Schedule::with(['route', 'bus'])->find($scheduleData->schedule_id);
+            if ($schedule && $schedule->route) {
+                $score = $this->calculateRecommendationScore($schedule->route, $schedule) + 30; // Trend bonus
+                
+                $recommendations->push([
+                    'route' => $schedule->route,
+                    'schedule' => $schedule,
+                    'score' => $score,
+                    'type' => 'trending'
+                ]);
+            }
+        }
+        
+        return $recommendations;
+    }
+
+    /**
+     * Get diverse popular recommendations to avoid showing the same routes repeatedly
+     */
+    private function getDiversePopularRecommendations()
+    {
+        $recommendations = collect();
+        
+        // Get popular routes but ensure diversity (not just the same top routes)
+        $popularSchedules = Booking::join('schedules', 'bookings.schedule_id', '=', 'schedules.id')
+            ->join('routes', 'schedules.route_id', '=', 'routes.id')
+            ->where('schedules.status', 'active')
+            ->selectRaw('routes.origin, schedules.id as schedule_id, count(*) as booking_count')
+            ->groupBy('routes.origin', 'schedules.id')  // Group by origin to ensure diversity
+            ->orderBy('routes.origin')
+            ->orderByDesc('booking_count')
+            ->limit(20)
+            ->get(['schedules.id']);
+        
+        foreach ($popularSchedules as $scheduleData) {
+            $schedule = \App\Models\Schedule::with(['route', 'bus'])->find($scheduleData->schedule_id);
+            if ($schedule && $schedule->route) {
+                $score = $this->calculateRecommendationScore($schedule->route, $schedule) + 20; // Diverse popularity bonus
+                
+                $recommendations->push([
+                    'route' => $schedule->route,
+                    'schedule' => $schedule,
+                    'score' => $score,
+                    'type' => 'diverse-popular'
                 ]);
             }
         }

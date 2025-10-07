@@ -258,6 +258,22 @@ use Illuminate\Support\Str;
                             @if($schedule)
                                 <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4"><i class="fas fa-tag mr-1 sm:mr-2"></i>Rp {{ number_format($schedule->price, 0, ',', '.') }}</p>
                             @endif
+                            <div class="mt-2">
+                                <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
+                                    @if(isset($item['type']) && $item['type'] === 'trending') bg-green-100 text-green-800
+                                    @elseif(isset($item['type']) && $item['type'] === 'seasonal') bg-blue-100 text-blue-800
+                                    @elseif(isset($item['type']) && $item['type'] === 'diverse-popular') bg-purple-100 text-purple-800
+                                    @elseif(isset($item['type']) && $item['type'] === 'popular') bg-yellow-100 text-yellow-800
+                                    @else bg-gray-100 text-gray-800
+                                    @endif">
+                                    @if(isset($item['type']) && $item['type'] === 'trending') Trending
+                                    @elseif(isset($item['type']) && $item['type'] === 'seasonal') Musim Ini
+                                    @elseif(isset($item['type']) && $item['type'] === 'diverse-popular') Populer
+                                    @elseif(isset($item['type']) && $item['type'] === 'popular') Populer
+                                    @else Rekomendasi
+                                    @endif
+                                </span>
+                            </div>
                             <a href="{{ route('frontend.booking.index', ['origin' => $route->origin, 'destination' => $route->destination]) }}" class="text-purple-600 hover:text-purple-800 font-medium flex items-center text-sm sm:text-base">
                                 Pesan Sekarang <i class="fas fa-chevron-right ml-1 sm:ml-2 text-xs sm:text-sm"></i>
                             </a>
