@@ -8,6 +8,7 @@ use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Route as BusRoute;
+use App\Services\TicketPdfService;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -505,54 +506,33 @@ class BookingController extends Controller
         return view('frontend.booking.success', compact('booking'));
     }
     
-    public function downloadTicket($id)
+    public function downloadTicket($id, TicketPdfService $ticketPdfService)
     {
         $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
-        
+
         // Check if the current user owns this booking or is authenticated
         if (auth()->check() && $booking->user_id !== auth()->id()) {
             abort(403, 'You do not have permission to access this booking.');
         }
-        
+
         // Ensure the booking has seat numbers
         if (empty($booking->seat_numbers)) {
             abort(404, 'Ticket not available. Please select seats first.');
         }
-        
+
         // Check if the schedule has already departed
         if ($booking->schedule->hasDeparted()) {
             abort(404, 'Ticket not available. The schedule has already departed.');
         }
-        
+
         // Check if the booking is valid
         if ($booking->booking_status !== 'confirmed' || $booking->payment_status !== 'paid') {
             abort(404, 'Ticket not available. Invalid booking status.');
         }
-        
-        // Define default settings for the ticket PDF
-        $settings = (object) [
-            'paper_size' => 'A4',
-            'font_settings' => [
-                'family' => 'Arial, sans-serif',
-                'size' => 12,
-                'headings' => 16
-            ],
-            'color_scheme' => [
-                'primary' => '#1e40af',
-                'secondary' => '#3b82f6',
-                'accent' => '#10b981',
-                'background' => '#ffffff'
-            ],
-            'enable_watermark' => true,
-            'watermark_text' => 'TUNGGAL JAYA',
-            'show_company_logo' => true,
-            'show_barcode' => true,
-            'show_qr_code' => true
-        ];
-        
-        // Generate PDF ticket using the original method (without TicketPdfService)
-        $pdf = Pdf::loadView('frontend.booking.ticket-pdf', compact('booking', 'settings'));
-        
+
+        // Generate PDF ticket using the service
+        $pdf = $ticketPdfService->generateTicketPdf($booking);
+
         return $pdf->download('ticket-' . $booking->booking_code . '.pdf');
     }
     

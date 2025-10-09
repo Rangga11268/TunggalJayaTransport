@@ -326,6 +326,8 @@ Tiket PDF harus:
 6. Konsisten dengan desain brand perusahaan
 7. Menggunakan format landscape yang mirip dengan tiket pesawat/kereta di Indonesia
 8. Menampilkan gambar dari `@public/img/heroImg.jpg` dan logo Tunggal Jaya secara menarik
+9. TAMPILKAN DI UKURAN KERTAS A4
+
 
 ## Technical Implementation
 
