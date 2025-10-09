@@ -1,56 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Ticket - {{ $booking->booking_code }}</title>
+    <title>E-Tiket Bus - {{ $booking->booking_code }}</title>
     <meta charset="utf-8">
     <style>
         @page {
-            size: {{ $settings->paper_size ?? 'A4' }} portrait;
-            margin: 0;
+            size: A4 portrait;
+            margin: 10mm;
         }
 
         body {
-            font-family: '{{ $settings->font_settings['family'] ?? 'Arial, sans-serif' }}';
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: white;
-            font-size: {{ $settings->font_settings['size'] ?? 12 }}px;
-            color: #1e293b;
+            color: #333;
+            font-size: 8px;
+            line-height: 1.1;
         }
 
         .ticket-container {
             width: 100%;
-            height: 297mm; /* A4 portrait height */
             margin: 0 auto;
-            padding: 0;
+            padding: 5mm;
             box-sizing: border-box;
-            position: relative;
-        }
-
-        .ticket {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, {{ $settings->color_scheme['primary'] ?? '#1e40af' }} 0%, {{ $settings->color_scheme['secondary'] ?? '#3b82f6' }} 100%);
-            border: 1px solid {{ $settings->color_scheme['secondary'] ?? '#3b82f6' }};
-            border-radius: 0;
-            padding: 12mm;
-            font-family: '{{ $settings->font_settings['family'] ?? 'Arial, sans-serif' }}';
-            position: relative;
-            box-sizing: border-box;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 3px;
+            height: 250mm; /* Fixed height to ensure it fits in margins */
             display: flex;
             flex-direction: column;
-            z-index: 1;
-            color: white;
-        }
-
-        /* Background image is handled via HTML element for DomPDF compatibility */
-
-        .ticket-content {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
         }
 
         /* Header Section */
@@ -58,8 +36,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 4mm;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+            padding-bottom: 3mm;
+            border-bottom: 1px solid #e5e7eb;
             margin-bottom: 4mm;
         }
 
@@ -68,345 +46,277 @@
             align-items: center;
         }
 
-        .logo-placeholder {
-            width: 25mm;
-            height: 12mm;
+        .logo {
+            width: 18mm;
+            height: auto;
+        }
+
+        .ticket-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #1e40af;
+            text-align: center;
+        }
+
+        /* Route Section */
+        .route-section {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin: 4mm 0;
+            padding: 3mm 0;
+            background-color: #f8fafc;
+            border-radius: 3px;
         }
 
-        .logo-placeholder img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .company-info {
-            margin-left: 10mm;
-            color: white;
-        }
-
-        .company-name {
-            font-size: {{ $settings->font_settings['headings'] ?? 16 }}px;
-            font-weight: bold;
-            margin: 0;
-            letter-spacing: 0.5px;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        .company-tagline {
-            font-size: 9px;
-            margin: 3px 0 0 0;
-            opacity: 0.9;
-        }
-
-        /* Main Content */
-        .ticket-body {
+        .route-item {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            color: white;
-        }
-
-        .route-section {
             text-align: center;
-            margin: 6mm 0;
-            padding: 4mm 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .route-text {
+        .route-name {
+            font-size: 12px;
             font-weight: bold;
-            font-size: 18px;
-            margin: 0;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            color: #1e40af;
+        }
+
+        .route-time {
+            font-size: 9px;
+            color: #4b5563;
+            margin-top: 1.5mm;
         }
 
         .route-arrow {
-            font-size: 20px;
-            margin: 4px 0;
+            font-size: 14px;
+            color: #9ca3af;
+            margin: 0 4mm;
         }
 
-        .date-time-info {
-            font-size: 12px;
-            margin: 4px 0;
-        }
-
-        .ticket-details-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-top: 8mm;
-        }
-
-        .detail-item {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 6px;
-            padding: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .detail-label {
-            display: block;
-            font-size: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-            margin-bottom: 3px;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-        }
-
-        .detail-value {
-            font-size: 12px;
-            font-weight: bold;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-        }
-
-        .detail-icon {
-            margin-right: 4px;
-            font-size: 12px;
-        }
-
-        .seat-info {
-            background: {{ $settings->color_scheme['accent'] ?? '#10b981' }};
-            color: white;
-        }
-
-        .price-info {
-            background: #dc2626;
-            color: white;
-        }
-
-        /* Footer with Barcode and QR */
-        .ticket-footer {
-            margin-top: 8mm;
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            padding-top: 8mm;
-        }
-
-        .barcode-qr-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6mm;
-            align-items: center;
-        }
-
-        .barcode-container {
-            flex: 1;
-            padding: 8px;
-            background: white;
-            border-radius: 4px;
-            margin-right: 8mm;
-        }
-
-        .qr-code-container {
-            width: 25mm;
-            height: 25mm;
-            padding: 4px;
-            background: white;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .qr-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .booking-code-large {
+        /* Date */
+        .date-section {
             text-align: center;
-            font-size: 18px;
+            font-size: 11px;
             font-weight: bold;
-            color: white;
-            margin: 4mm 0;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            color: #1e40af;
+            margin: 3.5mm 0;
         }
 
-        .instructions {
-            font-size: 8px;
-            color: rgba(255, 255, 255, 0.9);
+        /* Content area */
+        .ticket-content {
+            display: flex;
+            flex: 1;
+            gap: 4mm;
             margin-bottom: 4mm;
-            line-height: 1.4;
         }
 
-        .instructions p {
-            margin: 2px 0;
+        .main-column {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 4mm;
+        }
+
+        .side-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4mm;
+        }
+
+        /* Information Cards */
+        .info-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            padding: 2.5mm;
+            flex: 1; /* Allows cards to grow and fill available space */
+        }
+
+        .card-title {
+            font-size: 9px;
+            font-weight: bold;
+            color: #1e40af;
+            margin: 0 0 2mm 0;
+            padding-bottom: 1.5mm;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 1.8mm;
+            font-size: 8px;
+        }
+
+        .info-label {
+            flex: 1.2;
+            font-weight: bold;
+            color: #4b5563;
+        }
+
+        .info-value {
+            flex: 1.8;
+            color: #1f2937;
+        }
+
+        /* QR Code Section */
+        .qr-section {
+            text-align: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            padding: 3mm;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .qr-code {
+            width: 16mm;
+            height: 16mm;
+            margin: 0 auto;
+        }
+
+        .booking-code {
+            font-size: 8.5px;
+            font-weight: bold;
+            color: #1e40af;
+            margin-top: 2mm;
+        }
+
+        /* Footer */
+        .ticket-footer {
+            margin-top: auto; /* Pushes footer to the bottom when possible */
+            padding-top: 4mm;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            font-size: 6.5px;
+            color: #6b7280;
+        }
+
+        .terms {
+            margin-bottom: 2.5mm;
         }
 
         .contact-info {
-            text-align: center;
-            font-size: 7px;
-            color: rgba(255, 255, 255, 0.8);
-            padding-top: 4mm;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .contact-info p {
-            margin: 1px 0;
-        }
-
-        /* Icons */
-        .icon {
-            margin-right: 4px;
-            font-size: 12px;
-        }
-
-        /* Watermark */
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            opacity: 0.03;
-            font-size: 36px;
             font-weight: bold;
-            color: rgba(255, 255, 255, 0.7);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Print-specific styles */
-        @media print {
-            body {
-                background: white;
-            }
-
-            .ticket {
-                box-shadow: none;
-                border: 1px solid {{ $settings->color_scheme['secondary'] ?? '#3b82f6' }};
-            }
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .ticket-details-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            color: #1e40af;
         }
     </style>
 </head>
 <body>
     <div class="ticket-container">
-        <!-- Background for DomPDF -->
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background-image: url('{{ base_path('public/img/heroImg.jpg') }}');
-            background-size: cover; 
-            background-position: center; 
-            opacity: 0.05; 
-            z-index: -1;"></div>
-        
-        <div class="ticket">
-            @if($settings->enable_watermark && $settings->watermark_text)
-                <div class="watermark">{{ $settings->watermark_text }}</div>
-            @endif
+        <!-- Header -->
+        <div class="ticket-header">
+            <div class="logo-section">
+                <img src="{{ base_path('public/img/logoNoBg.png') }}" alt="Tunggal Jaya Logo" class="logo" style="max-width: 100%; height: auto;">
+            </div>
+            <div class="ticket-title">
+                <div>E-Tiket Bus</div>
+                <div style="font-size: 7px; color: #4b5563;">Boarding Pass</div>
+            </div>
+        </div>
 
-            <div class="ticket-content">
-                <!-- Ticket Header -->
-                <div class="ticket-header">
-                    <div class="logo-section">
-                        <div class="logo-placeholder">
-                            <img src="{{ base_path('public/img/logoNoBg.png') }}" alt="Tunggal Jaya Logo" style="max-height: 100%;">
-                        </div>
-                        <div class="company-info">
-                            <h1 class="company-name">TUNGGAL JAYA TRANSPORT</h1>
-                            <p class="company-tagline">Perjalanan Aman dan Nyaman</p>
-                        </div>
+        <!-- Route Information -->
+        <div class="route-section">
+            <div class="route-item">
+                <div class="route-name">{{ $booking->schedule->route->origin }}</div>
+                <div class="route-time">{{ $booking->schedule->getDepartureTimeWIB()->format('H:i') }} WIB</div>
+            </div>
+            <div class="route-arrow">→</div>
+            <div class="route-item">
+                <div class="route-name">{{ $booking->schedule->route->destination }}</div>
+                <div class="route-time">{{ $booking->schedule->getActualArrivalTime()->format('H:i') }} WIB</div>
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="date-section">
+            {{ $booking->schedule->getDepartureTimeWIB()->format('d F Y') }}
+        </div>
+
+        <!-- Main Content -->
+        <div class="ticket-content">
+            <!-- Main Column -->
+            <div class="main-column">
+                <!-- Journey Details -->
+                <div class="info-card">
+                    <div class="card-title">Detail Perjalanan</div>
+                    <div class="info-row">
+                        <div class="info-label">Kode Booking:</div>
+                        <div class="info-value">{{ $booking->booking_code }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Tanggal:</div>
+                        <div class="info-value">{{ $booking->schedule->getDepartureTimeWIB()->format('d F Y') }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Waktu Berangkat:</div>
+                        <div class="info-value">{{ $booking->schedule->getDepartureTimeWIB()->format('H:i') }} WIB</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">PO:</div>
+                        <div class="info-value">Tunggal Jaya</div>
                     </div>
                 </div>
 
-                <!-- Main Content -->
-                <div class="ticket-body">
-                    <!-- Route Information -->
-                    <div class="route-section">
-                        <div class="route-text">{{ $booking->schedule->route->origin }}</div>
-                        <div class="route-arrow">→</div>
-                        <div class="route-text">{{ $booking->schedule->route->destination }}</div>
-                        <div class="date-time-info">
-                            {{ $booking->schedule->getDepartureTimeWIB()->format('M j, Y') }} | {{ $booking->schedule->getDepartureTimeWIB()->format('H:i') }} (WIB)
-                        </div>
+                <!-- Passenger Details -->
+                <div class="info-card">
+                    <div class="card-title">Detail Penumpang</div>
+                    <div class="info-row">
+                        <div class="info-label">Nama:</div>
+                        <div class="info-value">{{ $booking->passenger_name }}</div>
                     </div>
+                    <div class="info-row">
+                        <div class="info-label">Jumlah:</div>
+                        <div class="info-value">{{ $booking->number_of_seats }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Kursi:</div>
+                        <div class="info-value">{{ $booking->seat_numbers }}</div>
+                    </div>
+                </div>
+            </div>
 
-                    <!-- Ticket Details Grid -->
-                    <div class="ticket-details-grid">
-                        <div class="detail-item">
-                            <span class="detail-label">Passenger</span>
-                            <div class="detail-value">{{ $booking->passenger_name }}</div>
-                        </div>
-
-                        <div class="detail-item">
-                            <span class="detail-label">Bus Type</span>
-                            <div class="detail-value">{{ $booking->schedule->bus->bus_type ?? 'Standard' }}</div>
-                        </div>
-
-                        <div class="detail-item">
-                            <span class="detail-label">Booking Code</span>
-                            <div class="detail-value">{{ $booking->booking_code }}</div>
-                        </div>
-
-                        <div class="detail-item">
-                            <span class="detail-label">Seat Numbers</span>
-                            <div class="detail-value seat-info">{{ $booking->seat_numbers }}</div>
-                        </div>
-
-                        <div class="detail-item">
-                            <span class="detail-label">Boarding Point</span>
-                            <div class="detail-value">{{ $booking->schedule->route->origin ?? 'Main Terminal' }}</div>
-                        </div>
-
-                        <div class="detail-item">
-                            <span class="detail-label">Price</span>
-                            <div class="detail-value price-info">Rp. {{ number_format($booking->total_price, 0, ',', '.') }}</div>
-                        </div>
+            <!-- Side Column -->
+            <div class="side-column">
+                <!-- Payment Details -->
+                <div class="info-card">
+                    <div class="card-title">Pembayaran</div>
+                    <div class="info-row">
+                        <div class="info-label">Harga:</div>
+                        <div class="info-value">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Status:</div>
+                        <div class="info-value" style="color: #10b981; font-weight: bold;">LUNAS</div>
                     </div>
                 </div>
 
-                <!-- Footer Section -->
-                <div class="ticket-footer">
-                    <div class="booking-code-large">{{ $booking->booking_code }}</div>
-                    
-                    <div class="barcode-qr-section">
-                        @if($settings->show_barcode)
-                        <div class="barcode-container">
-                            @php
-                                $generator = new Milon\Barcode\DNS1D();
-                                echo $generator->getBarcodeSVG($booking->booking_code, 'C128', 1.5, 40);
-                            @endphp
-                        </div>
-                        @endif
-
-                        @if($settings->show_qr_code)
-                        <div class="qr-code-container">
-                            <div class="qr-content">
-                                @php
-                                    $qr_generator = new Milon\Barcode\DNS2D();
-                                    echo $qr_generator->getBarcodeSVG($booking->booking_code, 'QRCODE', 4, 4);
-                                @endphp
-                            </div>
-                        </div>
-                        @endif
+                <!-- QR Code -->
+                <div class="qr-section">
+                    <div class="qr-code">
+                        @php
+                            $qr_generator = new Milon\Barcode\DNS2D();
+                            echo $qr_generator->getBarcodeSVG($booking->booking_code, 'QRCODE', 4, 4);
+                        @endphp
                     </div>
-
-                    <div class="instructions">
-                        <p>• Please arrive at least 30 minutes before departure</p>
-                        <p>• Bring this ticket and a valid ID during boarding</p>
-                        <p>• Keep this ticket safe until the end of your journey</p>
-                    </div>
-
-                    <div class="contact-info">
-                        <p>Customer Service: +62 123 456 789</p>
-                        <p>www.tunggaljayatransport.com</p>
-                    </div>
+                    <div class="booking-code">{{ $booking->booking_code }}</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="ticket-footer">
+            <div class="terms">
+                <p style="margin: 0.5mm 0;"><strong>Perhatian:</strong></p>
+                <p style="margin: 0.5mm 0;">• Tunjukkan tiket saat boarding</p>
+                <p style="margin: 0.5mm 0;">• Tiket tidak dapat dikembalikan</p>
+                <p style="margin: 0.5mm 0;">• Bawa identitas sesuai data</p>
+            </div>
+            <div class="contact-info">
+                <p style="margin: 0.5mm 0;">CS: +62 123 456 789</p>
+                <p style="margin: 0.5mm 0;">Email: info@tunggaljayatransport.com</p>
+                <p style="margin: 0.5mm 0;">www.tunggaljayatransport.com</p>
             </div>
         </div>
     </div>

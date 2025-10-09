@@ -24,10 +24,10 @@ class TicketPdfService
                 'accent' => '#10b981',
                 'background' => '#ffffff'
             ],
-            'enable_watermark' => true,
+            'enable_watermark' => false, // We're not using watermark in the new design
             'watermark_text' => 'TUNGGAL JAYA',
             'show_company_logo' => true,
-            'show_barcode' => true,
+            'show_barcode' => false, // We're using QR code in the new design
             'show_qr_code' => true
         ];
 
