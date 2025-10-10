@@ -537,4 +537,45 @@ Jika implementasi desain baru bermasalah, berikut adalah rencana rollback:
 -   Kembalikan file `ticket-pdf.blade.php` ke versi sebelumnya
 -   Hapus perubahan yang tidak diperlukan
 
+## Progress Update
+
+### Implementation Status
+
+Setelah completing the V1.1 update for the PDF ticket design, the following changes have been successfully implemented:
+
+#### 1. Backend Implementation
+- Created `TicketPdfService` class in `app/Services/TicketPdfService.php`
+- Updated `BookingController` to use dependency injection for the service
+- Maintained all security checks and validation in the downloadTicket method
+
+#### 2. Frontend Implementation 
+- Completely redesigned `ticket-pdf.blade.php` with modern layout
+- Implemented proper portrait orientation for A4 paper size
+- Added comprehensive information sections with proper organization
+- Integrated company logo and background image (`heroImg.jpg`)
+
+#### 3. Design Enhancements
+- Created a two-column layout with journey details on the left and payment/QR on the right
+- Added professional styling with blue color scheme that matches brand identity
+- Implemented proper information grouping with card-like sections
+- Added visual elements like gradients, subtle shadows, and decorative patterns
+- Added a background watermark using `heroImg.jpg` with low opacity
+- Enhanced the route section with prominent styling
+- Implemented a centered layout that properly fits on A4 paper
+- Added decorative elements like a bus icon and gradient borders
+
+#### 4. Information Organization
+- Created separate cards for Journey Details, Passenger Details, and Payment Information
+- Optimized font sizes and spacing for readability while maximizing information density
+- Ensured all essential information is clearly visible: booking code, route, date/time, passenger details, seat numbers, price, and QR code
+- Added proper terms and conditions in the footer
+- Implemented proper contact information
+
+#### 5. Technical Improvements
+- Fixed the "Array to string conversion" error in barcode generation
+- Resolved issues with image paths in DomPDF context
+- Ensured the design fits properly on a single page without overflow
+- Implemented responsive spacing that works well in PDF format
+- Used appropriate functions (`base_path()`) for image assets
+
 Desain tiket PDF yang ditingkatkan ini akan memberikan pengalaman yang lebih baik bagi pengguna, dengan tampilan yang lebih profesional dan informasi yang lebih mudah dibaca dan dipahami, serta konsisten antara tampilan frontend dan PDF.

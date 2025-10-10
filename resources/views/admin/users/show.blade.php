@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('View User') }}
+            {{ __('Lihat Pengguna') }}
         </h2>
     </x-slot>
 
@@ -17,7 +17,7 @@
                     </div>
                     
                     <div class="mb-6">
-                        <h3 class="text-lg font-medium mb-2">Roles</h3>
+                        <h3 class="text-lg font-medium mb-2">Peran</h3>
                         @if($user->roles->count() > 0)
                             <div class="flex flex-wrap gap-2">
                                 @foreach($user->roles as $role)
@@ -27,19 +27,19 @@
                                 @endforeach
                             </div>
                         @else
-                            <p class="text-gray-500 italic">No roles assigned.</p>
+                            <p class="text-gray-500 italic">Tidak ada peran yang ditetapkan.</p>
                         @endif
                     </div>
                     
                     <div class="mb-6">
-                        <h3 class="text-lg font-medium mb-2">Account Information</h3>
+                        <h3 class="text-lg font-medium mb-2">Informasi Akun</h3>
                         <dl class="grid grid-cols-1 gap-2">
                             <div class="flex">
-                                <dt class="font-medium text-gray-500 w-32">Member Since:</dt>
+                                <dt class="font-medium text-gray-500 w-32">Anggota Sejak:</dt>
                                 <dd class="text-gray-900">{{ $user->created_at->format('M d, Y') }}</dd>
                             </div>
                             <div class="flex">
-                                <dt class="font-medium text-gray-500 w-32">Last Updated:</dt>
+                                <dt class="font-medium text-gray-500 w-32">Terakhir Diperbarui:</dt>
                                 <dd class="text-gray-900">{{ $user->updated_at->format('M d, Y') }}</dd>
                             </div>
                         </dl>
@@ -47,7 +47,7 @@
                     
                     <div class="mt-8 flex items-center justify-between">
                         <a href="{{ route('admin.users.index') }}" class="text-gray-600 hover:text-gray-800">
-                            ← Back to Users
+                            ← Kembali ke Pengguna
                         </a>
                         <div>
                             <a href="{{ route('admin.users.edit', $user) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
@@ -58,7 +58,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="event.preventDefault(); handleDelete('delete-form', 'Hapus Pengguna?', 'Apakah Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.')">
-                                        Delete
+                                        Hapus
                                     </button>
                                 </form>
                             @endif
