@@ -3,85 +3,80 @@
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 page-spacing">
         <!-- Header -->
-        <div class="text-center mb-8">
+        <div class="text-center mb-10">
             <h1 class="text-4xl font-bold text-gray-800 mb-3">
                 {{ $route->name ?? $route->origin . ' - ' . $route->destination }}</h1>
-            <p class="text-lg text-gray-600">Informasi terperinci tentang rute ini dan jadwal yang tersedia</p>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Informasi terperinci tentang rute ini dan jadwal yang tersedia</p>
         </div>
 
         <!-- Route Information -->
-        <div class="mobile-info-card">
-            <div class="mobile-info-card-header">
-                <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Detail Rute</h2>
-                    <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                        <i class="fas fa-info-circle mr-1"></i>Info Rute
-                    </div>
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
+                <h2 class="text-2xl font-bold text-gray-800">Detail Rute</h2>
+                <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-info-circle mr-1"></i>Info Rute
                 </div>
             </div>
-            <div class="mobile-info-card-content">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-lg shadow-sm mobile-info-card">
-                        <h3
-                            class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">
-                            Gambaran Umum Rute</h3>
-                        <div class="space-y-4">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800 border-b border-gray-200 pb-2">
+                        Gambaran Umum Rute</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-map-marker-alt text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Asal</p>
+                                <p class="font-medium text-lg">{{ $route->origin }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-map-pin text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Tujuan</p>
+                                <p class="font-medium text-lg">{{ $route->destination }}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
                             <div class="flex items-center">
-                                <div class="bg-blue-100 p-3 rounded-full mr-4">
-                                    <i class="fas fa-map-marker-alt text-blue-600"></i>
+                                <div class="bg-blue-100 p-2 rounded-full mr-3">
+                                    <i class="fas fa-road text-blue-600"></i>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500">Asal</p>
-                                    <p class="font-medium text-lg">{{ $route->origin }}</p>
+                                    <p class="text-sm text-gray-500">Jarak</p>
+                                    <p class="font-medium">{{ $route->distance }} km</p>
                                 </div>
                             </div>
                             <div class="flex items-center">
-                                <div class="bg-blue-100 p-3 rounded-full mr-4">
-                                    <i class="fas fa-map-pin text-blue-600"></i>
+                                <div class="bg-blue-100 p-2 rounded-full mr-3">
+                                    <i class="fas fa-clock text-blue-600"></i>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500">Tujuan</p>
-                                    <p class="font-medium text-lg">{{ $route->destination }}</p>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="flex items-center">
-                                    <div class="bg-blue-100 p-2 rounded-full mr-3">
-                                        <i class="fas fa-road text-blue-600"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500">Jarak</p>
-                                        <p class="font-medium">{{ $route->distance }} km</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <div class="bg-blue-100 p-2 rounded-full mr-3">
-                                        <i class="fas fa-clock text-blue-600"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500">Durasi</p>
-                                        <p class="font-medium">{{ $route->formatted_duration }}</p>
-                                    </div>
+                                    <p class="text-sm text-gray-500">Durasi</p>
+                                    <p class="font-medium">{{ $route->formatted_duration }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm mobile-info-card">
-                        <h3
-                            class="text-lg font-medium mb-4 text-gray-800 border-b border-gray-200 pb-2 mobile-info-card-title">
-                            Deskripsi</h3>
-                        <div class="prose max-w-none">
-                            <p class="text-gray-700">
-                                {{ $route->description ?? 'Tidak ada deskripsi terperinci tersedia untuk rute ini. Bus kami beroperasi secara rutin di rute ini dengan kursi yang nyaman dan pengemudi profesional untuk memastikan perjalanan yang menyenangkan.' }}
-                            </p>
-                        </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800 border-b border-gray-200 pb-2">
+                        Deskripsi</h3>
+                    <div class="prose max-w-none">
+                        <p class="text-gray-700">
+                            {{ $route->description ?? 'Tidak ada deskripsi terperinci tersedia untuk rute ini. Bus kami beroperasi secara rutin di rute ini dengan kursi yang nyaman dan pengemudi profesional untuk memastikan perjalanan yang menyenangkan.' }}
+                        </p>
+                    </div>
 
-                        <div class="mt-6 pt-4 border-t border-gray-200">
-                            <div class="flex items-center text-sm text-gray-600">
-                                <i class="fas fa-sync-alt mr-2 text-blue-500"></i>
-                                <span>Layanan reguler dengan berbagai waktu keberangkatan setiap hari</span>
-                            </div>
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-sync-alt mr-2 text-blue-500"></i>
+                            <span>Layanan reguler dengan berbagai waktu keberangkatan setiap hari</span>
                         </div>
                     </div>
                 </div>
@@ -89,17 +84,15 @@
         </div>
 
         <!-- Route Map -->
-        <div class="mobile-route-map-container">
-            <div class="mobile-route-map-header">
-                <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Peta Rute</h2>
-                    <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                        <i class="fas fa-map-marked-alt mr-1"></i>Lihat Rute
-                    </div>
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
+                <h2 class="text-2xl font-bold text-gray-800">Peta Rute</h2>
+                <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-map-marked-alt mr-1"></i>Lihat Rute
                 </div>
             </div>
 
-            <div class="mobile-route-map-content">
+            <div>
                 @if ($route->origin_lat && $route->origin_lng && $route->destination_lat && $route->destination_lng)
                     <div id="route-map" style="height: 400px; width: 100%; border-radius: 0.5rem; z-index: 10;"></div>
                     <div class="mt-4 text-sm text-gray-600">
@@ -118,459 +111,360 @@
         </div>
 
         <!-- Schedule Legend -->
-        <div class="schedule-legend">
-            <div class="schedule-legend-item">
-                <div class="schedule-legend-color daily"></div>
-                <span class="schedule-legend-text">Jadwal Harian</span>
+        <div class="flex flex-wrap gap-4 mb-4 justify-center">
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-yellow-100 rounded-full mr-2"></div>
+                <span class="text-sm">Jadwal Harian</span>
             </div>
-            <div class="schedule-legend-item">
-                
-            </div>
-            <div class="schedule-legend-item">
-                <div class="schedule-legend-color departed"></div>
-                <span class="schedule-legend-text">Sudah Berangkat</span>
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-red-100 rounded-full mr-2"></div>
+                <span class="text-sm">Sudah Berangkat</span>
             </div>
         </div>
 
         <!-- Schedules -->
-        <div class="mobile-info-card">
-            <div class="mobile-info-card-header">
-                <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Jadwal Yang Tersedia</h2>
-                    <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                        <i class="fas fa-calendar-alt mr-1"></i>{{ $route->schedules->count() }} Jadwal
-                    </div>
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center mb-6 flex-col md:flex-row gap-4">
+                <h2 class="text-2xl font-bold text-gray-800">Jadwal Yang Tersedia</h2>
+                <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-calendar-alt mr-1"></i>{{ $route->schedules->count() }} Jadwal
                 </div>
             </div>
 
-            <div class="mobile-info-card-content">
-                @if ($route->schedules->count() > 0)
-                    <!-- Desktop table view -->
-                    <div class="hidden md:block">
-                        <div class="overflow-x-auto rounded-lg">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
-                                    <tr>
-                                        <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">
-                                            Jenis Jadwal</th>
-                                        <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">
-                                            Keberangkatan</th>
-                                        <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Kedatangan
-                                        </th>
-                                        <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Jenis
-                                            Bus</th>
-                                        <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">
-                                            Ketersediaan</th>
-                                        <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Harga
-                                        </th>
-                                        <th scope="col"
-                                            class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">Tindakan
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach ($route->schedules as $schedule)
-                                        <tr class="hover:bg-green-50 transition duration-150">
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div
-                                                        class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center {{ $schedule->is_daily ? 'bg-yellow-100' : 'bg-blue-100' }}">
-                                                        <i
-                                                            class="fas fa-{{ $schedule->is_daily ? 'sync-alt' : 'clock' }} text-{{ $schedule->is_daily ? 'yellow-600' : 'blue' }}-600"></i>
-                                                    </div>
-                                                    <div class="ml-3">
-                                                        <div class="text-sm font-medium text-gray-900">
-                                                            {{ $schedule->is_daily ? 'Harian Berulang' : 'Harian' }}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="bg-green-100 p-2 rounded-full mr-3">
-                                                        <i class="fas fa-sign-out-alt text-green-600"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="text-sm font-medium text-gray-900">
-                                                            {{ $schedule->getActualDepartureTime()->format('H:i') }}
-                                                        </div>
-                                                        <div class="text-sm text-gray-500">
-                                                            {{ $schedule->getActualDepartureTime()->format('l, F j') }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="bg-green-100 p-2 rounded-full mr-3">
-                                                        <i class="fas fa-sign-in-alt text-green-600"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="text-sm font-medium text-gray-900">
-                                                            {{ $schedule->getActualArrivalTime()->format('H:i') }}
-                                                        </div>
-                                                        <div class="text-sm text-gray-500">
-                                                            {{ $schedule->getActualArrivalTime()->format('l, F j') }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="bg-green-100 p-2 rounded-full mr-3">
-                                                        <i class="fas fa-bus text-green-600"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="text-sm font-medium text-gray-900">
-                                                            {{ $schedule->bus->name ?? ($schedule->bus->bus_type ?? 'Standar') }}
-                                                        </div>
-                                                        <div class="text-sm text-gray-500">
-                                                            {{ $schedule->bus->plate_number }}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                @if ($schedule->hasDeparted())
-                                                    <span
-                                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                        <i class="fas fa-times-circle mr-1"></i>Departed
-                                                    </span>
-                                                @else
-                                                    <div class="text-sm text-gray-900">
-                                                        @if(request()->get('date'))
-                                                            {{ $schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) }} /
-                                                        @else
-                                                            {{ $schedule->getAvailableSeatsCount() }} /
-                                                        @endif
-                                                        {{ $schedule->bus->capacity }} kursi</div>
-                                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                                        <div class="bg-green-600 h-2 rounded-full"
-                                                            @if(request()->get('date'))
-                                                                style="width: {{ ($schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) / max(1, $schedule->bus->capacity)) * 100 }}%"
-                                                            @else
-                                                                style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%"
-                                                            @endif
-                                                        >
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-lg font-bold text-gray-900">Rp.
-                                                    {{ number_format($schedule->price, 0, ',', '.') }}</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                @if ($schedule->hasDeparted())
-                                                    <span
-                                                        class="inline-flex items-center px-3 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
-                                                        Sudah Berangkat
-                                                    </span>
-                                                @elseif($schedule->getAvailableSeatsCount() > 0 && $schedule->isAvailableForBooking())
-                                                    <a href="{{ route('frontend.booking.show', ['id' => $schedule->id, 'date' => request()->get('date')]) }}"
-                                                        class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-700 border border-transparent rounded-md font-semibold text-white hover:from-green-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition duration-300 transform hover:scale-105">
-                                                        <i class="fas fa-ticket-alt mr-1"></i>Pesan Sekarang
-                                                    </a>
-                                                @elseif($schedule->getAvailableSeatsCount() == 0)
-                                                    <span
-                                                        class="inline-flex items-center px-3 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
-                                                        Penuh
-                                                    </span>
-                                                @else
-                                                    <span
-                                                        class="inline-flex items-center px-3 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed">
-                                                        Tidak Tersedia
-                                                    </span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Mobile card view -->
-                    <div class="md:hidden space-y-4">
-                        @foreach ($route->schedules as $schedule)
-                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                                <div
-                                    class="p-4 border-b border-gray-200 bg-gradient-to-r {{ $schedule->is_daily ? 'from-yellow-50 to-amber-50' : 'from-blue-50 to-indigo-50' }}">
-                                    <div class="flex justify-between items-center">
+            @if ($route->schedules->count() > 0)
+                <!-- Desktop table view -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden">
+                        <thead class="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
+                            <tr>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider min-w-[120px]">
+                                    Jenis Jadwal</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider min-w-[140px]">
+                                    Keberangkatan</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider min-w-[140px]">Kedatangan
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider min-w-[120px]">Jenis
+                                    Bus</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider min-w-[120px]">
+                                    Ketersediaan</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider min-w-[100px]">Harga
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider min-w-[120px]">Tindakan
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach ($route->schedules as $schedule)
+                                <tr class="hover:bg-green-50 transition duration-150">
+                                    <td class="px-4 py-3 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div
                                                 class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center {{ $schedule->is_daily ? 'bg-yellow-100' : 'bg-blue-100' }}">
                                                 <i
-                                                    class="fas fa-{{ $schedule->is_daily ? 'sync-alt' : 'clock' }} text-{{ $schedule->is_daily ? 'yellow-600' : 'blue' }}-600 text-sm"></i>
+                                                    class="fas fa-{{ $schedule->is_daily ? 'sync-alt' : 'clock' }} text-{{ $schedule->is_daily ? 'yellow-600' : 'blue' }}-600"></i>
                                             </div>
                                             <div class="ml-2">
                                                 <div class="text-sm font-medium text-gray-900">
                                                     {{ $schedule->is_daily ? 'Harian Berulang' : 'Harian' }}</div>
                                             </div>
                                         </div>
-                                        <div
-                                            class="text-xs font-medium {{ $schedule->hasDeparted() ? 'text-red-600' : 'text-gray-500' }}">
-                                            @if ($schedule->hasDeparted())
-                                                <span class="px-2 py-1 bg-red-100 rounded-full">
-                                                    <i class="fas fa-times-circle mr-1"></i>Departed
-                                                </span>
-                                            @else
-                                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                                                    Aktif
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="p-4">
-                                    <div class="grid grid-cols-2 gap-4 mb-4">
-                                        <div>
-                                            <div class="text-xs text-gray-500">Keberangkatan</div>
-                                            <div class="flex items-center mt-1">
-                                                <div class="bg-green-100 p-1 rounded-full mr-2">
-                                                    <i class="fas fa-sign-out-alt text-green-600 text-xs"></i>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="bg-green-100 p-1.5 rounded-full mr-2 flex-shrink-0">
+                                                <i class="fas fa-sign-out-alt text-green-600 text-xs"></i>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ $schedule->getActualDepartureTime()->format('H:i') }}
                                                 </div>
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-900">
-                                                            {{ $schedule->getDepartureTimeWIB()->format('H:i') }}
-                                                    </div>
-                                                    <div>
-                                                        {{ $schedule->getActualDepartureTime()->format('M j') }}
-                                                    </div>
+                                                <div class="text-xs text-gray-500">
+                                                    {{ $schedule->getActualDepartureTime()->format('l, F j') }}
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <div>
-                                            <div class="text-xs text-gray-500">Kedatangan</div>
-                                            <div class="flex items-center mt-1">
-                                                <div class="bg-green-100 p-1 rounded-full mr-2">
-                                                    <i class="fas fa-sign-in-alt text-green-600 text-xs"></i>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="bg-green-100 p-1.5 rounded-full mr-2 flex-shrink-0">
+                                                <i class="fas fa-sign-in-alt text-green-600 text-xs"></i>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ $schedule->getActualArrivalTime()->format('H:i') }}
                                                 </div>
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-900">
-                                                        {{ $schedule->getActualArrivalTime()->format('H:i') }}
-                                                    </div>
-                                                    <div class="text-xs text-gray-500">
-                                                        {{ $schedule->getActualArrivalTime()->format('M j') }}
-                                                    </div>
+                                                <div class="text-xs text-gray-500">
+                                                    {{ $schedule->getActualArrivalTime()->format('l, F j') }}
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <div class="grid grid-cols-2 gap-4 mb-4">
-                                        <div>
-                                            <div class="text-xs text-gray-500">Bus</div>
-                                            <div class="flex items-center mt-1">
-                                                <div class="bg-green-100 p-1 rounded-full mr-2">
-                                                    <i class="fas fa-bus text-green-600 text-xs"></i>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="bg-green-100 p-1.5 rounded-full mr-2 flex-shrink-0">
+                                                <i class="fas fa-bus text-green-600 text-xs"></i>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="text-sm font-medium text-gray-900 truncate">
+                                                    {{ $schedule->bus->name ?? ($schedule->bus->bus_type ?? 'Standar') }}
                                                 </div>
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-900 truncate">
-                                                        {{ $schedule->bus->name ?? ($schedule->bus->bus_type ?? 'Standar') }}
-                                                    </div>
-                                                    <div class="text-xs text-gray-500">{{ $schedule->bus->plate_number }}
-                                                    </div>
-                                                </div>
+                                                <div class="text-xs text-gray-500 truncate">
+                                                    {{ $schedule->bus->plate_number }}</div>
                                             </div>
                                         </div>
-
-                                        <div>
-                                            <div class="text-xs text-gray-500">Harga</div>
-                                            <div class="text-lg font-bold text-gray-900 mt-1">Rp.
-                                                {{ number_format($schedule->price, 0, ',', '.') }}</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <div class="text-xs text-gray-500 mb-1">Ketersediaan</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
                                         @if ($schedule->hasDeparted())
                                             <span
                                                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                                                 <i class="fas fa-times-circle mr-1"></i>Departed
                                             </span>
                                         @else
-                                            <div class="flex items-center">
-                                                <div class="text-sm text-gray-900 mr-2">
+                                            <div class="text-sm text-gray-900">
+                                                @if(request()->get('date'))
+                                                    {{ $schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) }} /
+                                                @else
+                                                    {{ $schedule->getAvailableSeatsCount() }} /
+                                                @endif
+                                                {{ $schedule->bus->capacity }} kursi</div>
+                                            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                                <div class="bg-green-600 h-2 rounded-full"
                                                     @if(request()->get('date'))
-                                                        {{ $schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) }} /
+                                                        style="width: {{ ($schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) / max(1, $schedule->bus->capacity)) * 100 }}%"
                                                     @else
-                                                        {{ $schedule->getAvailableSeatsCount() }} /
+                                                        style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%"
                                                     @endif
-                                                    {{ $schedule->bus->capacity }} kursi</div>
-                                                <div class="flex-1 ml-2">
-                                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                                        <div class="bg-green-600 h-2 rounded-full"
-                                                            @if(request()->get('date'))
-                                                                style="width: {{ ($schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) / max(1, $schedule->bus->capacity)) * 100 }}%"
-                                                            @else
-                                                                style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%"
-                                                            @endif
-                                                        >
-                                                        </div>
-                                                    </div>
+                                                >
                                                 </div>
                                             </div>
                                         @endif
-                                    </div>
-
-                                    <div class="pt-2">
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-base font-bold text-gray-900">Rp.
+                                            {{ number_format($schedule->price, 0, ',', '.') }}</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
                                         @if ($schedule->hasDeparted())
-                                            <button
-                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed text-sm">
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 bg-gray-300 border border-transparent rounded text-xs font-semibold text-gray-700 cursor-not-allowed">
                                                 Sudah Berangkat
-                                            </button>
+                                            </span>
                                         @elseif($schedule->getAvailableSeatsCount() > 0 && $schedule->isAvailableForBooking())
                                             <a href="{{ route('frontend.booking.show', ['id' => $schedule->id, 'date' => request()->get('date')]) }}"
-                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-700 border border-transparent rounded-md font-semibold text-white hover:from-green-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition duration-300 text-sm">
-                                                <i class="fas fa-ticket-alt mr-1"></i>Pesan Sekarang
+                                                class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-green-600 to-emerald-700 border border-transparent rounded text-xs font-semibold text-white hover:from-green-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition duration-300">
+                                                <i class="fas fa-ticket-alt mr-1 text-xs"></i>Pesan Sekarang
                                             </a>
                                         @elseif($schedule->getAvailableSeatsCount() == 0)
-                                            <button
-                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed text-sm">
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 bg-gray-300 border border-transparent rounded text-xs font-semibold text-gray-700 cursor-not-allowed">
                                                 Penuh
-                                            </button>
+                                            </span>
                                         @else
-                                            <button
-                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed text-sm">
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 bg-gray-300 border border-transparent rounded text-xs font-semibold text-gray-700 cursor-not-allowed">
                                                 Tidak Tersedia
-                                            </button>
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile card view -->
+                <div class="md:hidden space-y-4">
+                    @foreach ($route->schedules as $schedule)
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                            <div
+                                class="p-4 border-b border-gray-200 bg-gradient-to-r {{ $schedule->is_daily ? 'from-yellow-50 to-amber-50' : 'from-blue-50 to-indigo-50' }}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <div
+                                            class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center {{ $schedule->is_daily ? 'bg-yellow-100' : 'bg-blue-100' }}">
+                                            <i
+                                                class="fas fa-{{ $schedule->is_daily ? 'sync-alt' : 'clock' }} text-{{ $schedule->is_daily ? 'yellow-600' : 'blue' }}-600 text-sm"></i>
+                                        </div>
+                                        <div class="ml-2 min-w-0">
+                                            <div class="text-sm font-medium text-gray-900 truncate">
+                                                {{ $schedule->is_daily ? 'Harian Berulang' : 'Harian' }}</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="text-xs font-medium {{ $schedule->hasDeparted() ? 'text-red-600' : 'text-gray-500' }}">
+                                        @if ($schedule->hasDeparted())
+                                            <span class="px-2 py-1 bg-red-100 rounded-full text-xs">
+                                                <i class="fas fa-times-circle mr-1"></i>Departed
+                                            </span>
+                                        @else
+                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                                                Aktif
+                                            </span>
                                         @endif
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-12 bg-white rounded-xl shadow-sm">
-                        <div class="text-gray-400 text-5xl mb-4">
-                            <i class="fas fa-calendar-times"></i>
+
+                            <div class="p-4">
+                                <div class="space-y-3 mb-4">
+                                    <div>
+                                        <div class="text-xs text-gray-500">Keberangkatan</div>
+                                        <div class="flex items-center mt-1">
+                                            <div class="bg-green-100 p-1.5 rounded-full mr-2 flex-shrink-0">
+                                                <i class="fas fa-sign-out-alt text-green-600 text-xs"></i>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="text-sm font-medium text-gray-900 truncate">
+                                                    {{ $schedule->getDepartureTimeWIB()->format('H:i') }}
+                                                </div>
+                                                <div class="text-xs text-gray-500 truncate">
+                                                    {{ $schedule->getActualDepartureTime()->format('M j') }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-xs text-gray-500">Kedatangan</div>
+                                        <div class="flex items-center mt-1">
+                                            <div class="bg-green-100 p-1.5 rounded-full mr-2 flex-shrink-0">
+                                                <i class="fas fa-sign-in-alt text-green-600 text-xs"></i>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="text-sm font-medium text-gray-900 truncate">
+                                                    {{ $schedule->getActualArrivalTime()->format('H:i') }}
+                                                </div>
+                                                <div class="text-xs text-gray-500 truncate">
+                                                    {{ $schedule->getActualArrivalTime()->format('M j') }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3 mb-4">
+                                    <div>
+                                        <div class="text-xs text-gray-500">Bus</div>
+                                        <div class="flex items-center mt-1">
+                                            <div class="bg-green-100 p-1.5 rounded-full mr-2 flex-shrink-0">
+                                                <i class="fas fa-bus text-green-600 text-xs"></i>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="text-sm font-medium text-gray-900 truncate">
+                                                    {{ $schedule->bus->name ?? ($schedule->bus->bus_type ?? 'Standar') }}
+                                                </div>
+                                                <div class="text-xs text-gray-500 truncate">
+                                                    {{ $schedule->bus->plate_number }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-xs text-gray-500">Harga</div>
+                                        <div class="text-lg font-bold text-gray-900 mt-1">Rp.
+                                            {{ number_format($schedule->price, 0, ',', '.') }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="text-xs text-gray-500 mb-1">Ketersediaan</div>
+                                    @if ($schedule->hasDeparted())
+                                        <span
+                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                            <i class="fas fa-times-circle mr-1"></i>Departed
+                                        </span>
+                                    @else
+                                        <div class="flex items-center">
+                                            <div class="text-sm text-gray-900 mr-2 flex-shrink-0">
+                                                @if(request()->get('date'))
+                                                    {{ $schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) }} /
+                                                @else
+                                                    {{ $schedule->getAvailableSeatsCount() }} /
+                                                @endif
+                                                {{ $schedule->bus->capacity }} kursi</div>
+                                            <div class="flex-1">
+                                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                                    <div class="bg-green-600 h-2 rounded-full"
+                                                        @if(request()->get('date'))
+                                                            style="width: {{ ($schedule->getAvailableSeatsCount(\Carbon\Carbon::parse(request()->get('date'))) / max(1, $schedule->bus->capacity)) * 100 }}%"
+                                                        @else
+                                                            style="width: {{ ($schedule->getAvailableSeatsCount() / max(1, $schedule->bus->capacity)) * 100 }}%"
+                                                        @endif
+                                                    >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="pt-2">
+                                    @if ($schedule->hasDeparted())
+                                        <button
+                                            class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed text-sm">
+                                            Sudah Berangkat
+                                        </button>
+                                    @elseif($schedule->getAvailableSeatsCount() > 0 && $schedule->isAvailableForBooking())
+                                        <a href="{{ route('frontend.booking.show', ['id' => $schedule->id, 'date' => request()->get('date')]) }}"
+                                            class="w-full inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-700 border border-transparent rounded-md font-semibold text-white hover:from-green-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition duration-300 text-sm">
+                                            <i class="fas fa-ticket-alt mr-1"></i>Pesan Sekarang
+                                        </a>
+                                    @elseif($schedule->getAvailableSeatsCount() == 0)
+                                        <button
+                                            class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed text-sm">
+                                            Penuh
+                                        </button>
+                                    @else
+                                        <button
+                                            class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-700 cursor-not-allowed text-sm">
+                                            Tidak Tersedia
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-gray-600 text-lg">Tidak ada jadwal tersedia untuk rute ini saat ini.</p>
-                        <p class="text-gray-500 mt-2">Silakan periksa kembali nanti untuk pembaruan atau hubungi layanan pelanggan kami.
-                        </p>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-12 bg-white rounded-xl shadow-sm">
+                    <div class="text-gray-400 text-5xl mb-4">
+                        <i class="fas fa-calendar-times"></i>
                     </div>
-                @endif
-            </div>
+                    <p class="text-gray-600 text-lg">Tidak ada jadwal tersedia untuk rute ini saat ini.</p>
+                    <p class="text-gray-500 mt-2">Silakan periksa kembali nanti untuk pembaruan atau hubungi layanan pelanggan kami.
+                    </p>
+                </div>
+            @endif
         </div>
 
         <!-- Info about schedule reset -->
-        <div class="mobile-info-section">
-            <div class="mobile-info-section-content">
-                <div class="mobile-info-section-icon">
-                    <i class="fas fa-info-circle"></i>
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex items-start">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mr-4">
+                    <i class="fas fa-info-circle text-white"></i>
                 </div>
-                <div class="mobile-info-section-text">
-                    <div class="mobile-info-section-title">Informasi Jadwal</div>
-                    <div class="mobile-info-section-description">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Informasi Jadwal</h3>
+                    <p class="text-gray-600">
                         Jadwal harian diatur ulang secara otomatis setiap hari. Jadwal mingguan diulang pada hari yang ditentukan.
                         Setelah bus berangkat, tiket tidak dapat lagi dibeli untuk jadwal tersebut.
-                    </div>
+                    </p>
                 </div>
             </div>
         </div>
 
-        <style>
-            /* Mobile info section improvements - consistent styling for all devices */
-            div.mobile-info-section {
-                background: linear-gradient(to right, #eff6ff, #dbeafe);
-                border-radius: 0.75rem;
-                padding: 1.25rem;
-                margin-bottom: 1.25rem;
-                margin-top: 1.5rem;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            }
-
-            div.mobile-info-section div.mobile-info-section-content {
-                display: flex;
-                align-items: flex-start;
-            }
-
-            div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-icon {
-                flex-shrink: 0;
-                width: 2.25rem;
-                height: 2.25rem;
-                border-radius: 9999px;
-                background-color: #3b82f6;
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-right: 1.25rem;
-            }
-
-            div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text {
-                flex: 1;
-            }
-
-            div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-title {
-                font-size: 1.125rem;
-                font-weight: 600;
-                color: #1e40af;
-                margin-bottom: 0.5rem;
-            }
-
-            div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-description {
-                font-size: 0.95rem;
-                color: #374151;
-                line-height: 1.6;
-            }
-
-            /* Improvements for larger screens */
-            @media (min-width: 768px) {
-                div.mobile-info-section {
-                    padding: 1.5rem;
-                    margin-bottom: 1.5rem;
-                }
-
-                div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-icon {
-                    width: 2.5rem;
-                    height: 2.5rem;
-                    margin-right: 1.5rem;
-                }
-
-                div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-title {
-                    font-size: 1.25rem;
-                }
-
-                div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-description {
-                    font-size: 1rem;
-                }
-            }
-
-            /* Adjustments for smaller screens */
-            @media (max-width: 767px) {
-                div.mobile-info-section {
-                    padding: 1rem;
-                    margin-bottom: 1rem;
-                }
-
-                div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-icon {
-                    width: 2rem;
-                    height: 2rem;
-                    margin-right: 1rem;
-                }
-
-                div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-title {
-                    font-size: 1.125rem;
-                }
-
-                div.mobile-info-section div.mobile-info-section-content div.mobile-info-section-text div.mobile-info-section-description {
-                    font-size: 0.9rem;
-                }
-            }
-        </style>
-
         <!-- Back to Routes -->
-        <div class="mb-10">
+        <div class="mb-10 text-center">
             <a href="{{ route('frontend.routes.index') }}"
-                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold rounded-lg transition duration-300 shadow-lg transform hover:scale-105 mobile-action-button">
+                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold rounded-lg transition duration-300 shadow-lg transform hover:scale-105">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
