@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Reports') }}
+            {{ __('Laporan') }}
         </h2>
     </x-slot>
 
@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <h3 class="text-lg font-bold mb-6">Report Types</h3>
+                    <h3 class="text-lg font-bold mb-6">Jenis Laporan</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <a href="{{ route('admin.reports.sales') }}" class="block">
@@ -21,8 +21,8 @@
                                         </svg>
                                     </div>
                                     <div class="ml-4">
-                                        <h4 class="text-lg font-medium text-gray-900">Sales Reports</h4>
-                                        <p class="mt-1 text-sm text-gray-500">View revenue and booking statistics</p>
+                                        <h4 class="text-lg font-medium text-gray-900">Laporan Penjualan</h4>
+                                        <p class="mt-1 text-sm text-gray-500">Lihat statistik pendapatan dan pemesanan</p>
                                     </div>
                                 </div>
                             </div>
@@ -37,8 +37,8 @@
                                         </svg>
                                     </div>
                                     <div class="ml-4">
-                                        <h4 class="text-lg font-medium text-gray-900">Occupancy Reports</h4>
-                                        <p class="mt-1 text-sm text-gray-500">View bus occupancy rates</p>
+                                        <h4 class="text-lg font-medium text-gray-900">Laporan Okupansi</h4>
+                                        <p class="mt-1 text-sm text-gray-500">Lihat tingkat okupansi bus</p>
                                     </div>
                                 </div>
                             </div>
@@ -53,8 +53,8 @@
                                         </svg>
                                     </div>
                                     <div class="ml-4">
-                                        <h4 class="text-lg font-medium text-gray-900">Custom Reports</h4>
-                                        <p class="mt-1 text-sm text-gray-500">Create custom reports</p>
+                                        <h4 class="text-lg font-medium text-gray-900">Laporan Kustom</h4>
+                                        <p class="mt-1 text-sm text-gray-500">Buat laporan kustom</p>
                                     </div>
                                 </div>
                             </div>

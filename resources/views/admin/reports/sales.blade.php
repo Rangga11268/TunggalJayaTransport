@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Sales Reports') }}
+            {{ __('Laporan Penjualan') }}
         </h2>
     </x-slot>
 
@@ -10,35 +10,35 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold">Sales Overview</h3>
+                        <h3 class="text-lg font-bold">Ringkasan Penjualan</h3>
                         <a href="{{ route('admin.reports.index') }}" class="text-blue-500 hover:text-blue-700">
-                            ← Back to Reports
+                            ← Kembali ke Laporan
                         </a>
                     </div>
                     
                     <!-- Summary Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <div class="text-sm font-medium text-blue-800">Total Revenue</div>
+                            <div class="text-sm font-medium text-blue-800">Total Pendapatan</div>
                             <div class="mt-2 text-2xl font-bold text-blue-900">Rp. {{ number_format($salesData->sum('total'), 0, ',', '.') }}</div>
                         </div>
                         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                            <div class="text-sm font-medium text-green-800">Total Bookings</div>
+                            <div class="text-sm font-medium text-green-800">Total Pemesanan</div>
                             <div class="mt-2 text-2xl font-bold text-green-900">{{ $salesData->count() }}</div>
                         </div>
                         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                            <div class="text-sm font-medium text-yellow-800">Avg. Booking Value</div>
+                            <div class="text-sm font-medium text-yellow-800">Rata-rata Nilai Pemesanan</div>
                             <div class="mt-2 text-2xl font-bold text-yellow-900">Rp. {{ $salesData->count() > 0 ? number_format($salesData->sum('total') / $salesData->count(), 0, ',', '.') : 0 }}</div>
                         </div>
                         <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                            <div class="text-sm font-medium text-purple-800">This Month</div>
+                            <div class="text-sm font-medium text-purple-800">Bulan Ini</div>
                             <div class="mt-2 text-2xl font-bold text-purple-900">Rp. {{ number_format($salesData->filter(function($item) { return \Carbon\Carbon::parse($item->date)->isSameMonth(now()); })->sum('total'), 0, ',', '.') }}</div>
                         </div>
                     </div>
                     
                     <!-- Chart Container -->
                     <div class="mb-8">
-                        <h4 class="text-md font-medium mb-4">Revenue Trend (Last 30 Days)</h4>
+                        <h4 class="text-md font-medium mb-4">Tren Pendapatan (30 Hari Terakhir)</h4>
                         <div class="bg-white border border-gray-300 rounded-lg p-4 h-80">
                             <canvas id="salesChart" data-sales="{{ json_encode($chartData) }}"></canvas>
                         </div>
@@ -46,16 +46,16 @@
                     
                     <!-- Recent Sales Table -->
                     <div>
-                        <h4 class="text-md font-medium mb-4">Recent Sales</h4>
+                        <h4 class="text-md font-medium mb-4">Penjualan Terbaru</h4>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking Code</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode Pemesanan</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rute</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -70,7 +70,7 @@
                                     @empty
                                     <tr>
                                         <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
-                                            No recent sales data available
+                                            Tidak ada data penjualan terbaru
                                         </td>
                                     </tr>
                                     @endforelse

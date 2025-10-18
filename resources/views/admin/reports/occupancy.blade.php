@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Occupancy Reports') }}
+            {{ __('Laporan Okupansi') }}
         </h2>
     </x-slot>
 
@@ -10,16 +10,16 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold">Occupancy Overview</h3>
+                        <h3 class="text-lg font-bold">Ringkasan Okupansi</h3>
                         <a href="{{ route('admin.reports.index') }}" class="text-blue-500 hover:text-blue-700">
-                            ← Back to Reports
+                            ← Kembali ke Laporan
                         </a>
                     </div>
                     
                     <!-- Summary Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <div class="text-sm font-medium text-blue-800">Average Occupancy</div>
+                            <div class="text-sm font-medium text-blue-800">Rata-rata Okupansi</div>
                             <div class="mt-2 text-2xl font-bold text-blue-900">
                                 @php
                                     $averageOccupancy = count($occupancyData) > 0 ? array_sum(array_column($occupancyData, 'occupancy_rate')) / count($occupancyData) : 0;
@@ -28,22 +28,22 @@
                             </div>
                         </div>
                         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                            <div class="text-sm font-medium text-green-800">Highest Route</div>
+                            <div class="text-sm font-medium text-green-800">Rute Tertinggi</div>
                             <div class="mt-2 text-2xl font-bold text-green-900">
                                 @if(count($occupancyData) > 0)
                                     {{ $occupancyData[0]['route'] }}
                                 @else
-                                    N/A
+                                    Tidak Tersedia
                                 @endif
                             </div>
                         </div>
                         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                            <div class="text-sm font-medium text-yellow-800">Lowest Route</div>
+                            <div class="text-sm font-medium text-yellow-800">Rute Terendah</div>
                             <div class="mt-2 text-2xl font-bold text-yellow-900">
                                 @if(count($occupancyData) > 0)
                                     {{ end($occupancyData)['route'] }}
                                 @else
-                                    N/A
+                                    Tidak Tersedia
                                 @endif
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                     
                     <!-- Chart Container -->
                     <div class="mb-8">
-                        <h4 class="text-md font-medium mb-4">Top 10 Occupancy Rates by Bus</h4>
+                        <h4 class="text-md font-medium mb-4">10 Besar Tingkat Okupansi Berdasarkan Bus</h4>
                         <div class="bg-white border border-gray-300 rounded-lg p-4 h-80">
                             <canvas id="occupancyChart" data-occupancy="{{ json_encode($occupancyData) }}"></canvas>
                         </div>
@@ -59,17 +59,17 @@
                     
                     <!-- Occupancy by Bus Table -->
                     <div>
-                        <h4 class="text-md font-medium mb-4">Occupancy by Bus</h4>
+                        <h4 class="text-md font-medium mb-4">Okupansi Berdasarkan Bus</h4>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bus</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plate Number</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacity</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booked Seats</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Occupancy Rate</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Plat</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rute</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kapasitas</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kursi Dipesan</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tingkat Okupansi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -96,7 +96,7 @@
                                     @empty
                                     <tr>
                                         <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                                            No occupancy data available
+                                            Tidak ada data okupansi tersedia
                                         </td>
                                     </tr>
                                     @endforelse

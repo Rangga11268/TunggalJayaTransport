@@ -47,7 +47,9 @@ Catatan ini digunakan untuk melacak progres terjemahan dari bahasa Inggris ke ba
 -   [x] Halaman user management di admin panel (index, create, edit, show)
 -   [x] Halaman driver management di admin panel (index, create, edit, show)
 -   [x] Halaman conductor management di admin panel (index, create, edit, show)
--   [ ] Halaman di admin panel lain nya
+-   [x] Halaman facilities di admin panel (index, create, edit, show)
+-   [x] Halaman reports di admin panel (index, sales, occupancy, custom)
+-   [x] Halaman settings di admin panel (index)
 
 ## Catatan Penting
 
