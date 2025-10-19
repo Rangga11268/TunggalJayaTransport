@@ -16,6 +16,9 @@ return new class extends Migration
             $table->foreignId('bus_id')->constrained()->onDelete('cascade');
             $table->foreignId('conductor_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+            
+            // Add unique constraint to ensure a conductor is assigned to only one bus
+            $table->unique(['conductor_id'], 'unique_conductor_per_bus');
         });
     }
 

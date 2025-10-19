@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('schedules', function (Blueprint $table) {
+        Schema::create('bus_driver', function (Blueprint $table) {
             $table->id();
             $table->foreignId('bus_id')->constrained()->onDelete('cascade');
-            $table->foreignId('route_id')->constrained()->onDelete('cascade');
-            $table->time('departure_time');
-            $table->time('arrival_time');
-            $table->decimal('price', 10, 2);
-            $table->enum('status', ['active', 'cancelled', 'delayed'])->default('active');
+            $table->foreignId('driver_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+            
+            // Add unique constraint to ensure a driver is assigned to only one bus
+            $table->unique(['driver_id'], 'unique_driver_per_bus');
         });
     }
 
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('schedules');
+        Schema::dropIfExists('bus_driver');
     }
 };

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('bus_type');
             $table->integer('capacity');
             $table->text('description')->nullable();
+            $table->year('year')->nullable();
             $table->enum('status', ['active', 'maintenance', 'inactive'])->default('active');
             $table->timestamps();
         });

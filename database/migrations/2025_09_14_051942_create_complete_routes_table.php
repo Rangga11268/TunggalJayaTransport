@@ -19,6 +19,11 @@ return new class extends Migration
             $table->decimal('distance', 8, 2)->nullable();
             $table->integer('duration')->nullable(); // in minutes
             $table->text('description')->nullable();
+            $table->decimal('origin_lat', 10, 8)->nullable();
+            $table->decimal('origin_lng', 11, 8)->nullable();
+            $table->decimal('destination_lat', 10, 8)->nullable();
+            $table->decimal('destination_lng', 11, 8)->nullable();
+            $table->json('waypoints')->nullable();
             $table->timestamps();
         });
     }

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -13,6 +14,7 @@ return new class extends Migration
     {
         Schema::create('drivers', function (Blueprint $table) {
             $table->id();
+            $table->string('employee_id')->unique();
             $table->string('name');
             $table->string('license_number')->unique();
             $table->string('phone');
@@ -21,6 +23,15 @@ return new class extends Migration
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
+        
+        // Insert some default data if needed
+        // This is done in a separate step to avoid issues with unique constraints
+        DB::table('drivers')->where(function($query) {
+            $query->whereNull('employee_id')
+                  ->orWhere('employee_id', '=', '');
+        })->update([
+            'employee_id' => DB::raw("CONCAT('DRV', id)")
+        ]);
     }
 
     /**
