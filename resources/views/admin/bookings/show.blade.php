@@ -48,6 +48,10 @@
                             <h3 class="text-lg font-medium mb-4">Informasi Pemesanan</h3>
                             <dl class="grid grid-cols-1 gap-3">
                                 <div class="flex">
+                                    <dt class="font-medium text-gray-500 w-32">Tanggal Pemesanan:</dt>
+                                    <dd class="text-gray-900">{{ $booking->booking_date ? \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') : 'N/A' }}</dd>
+                                </div>
+                                <div class="flex">
                                     <dt class="font-medium text-gray-500 w-32">Total Harga:</dt>
                                     <dd class="text-gray-900">Rp. {{ number_format($booking->total_price, 0, ',', '.') }}</dd>
                                 </div>

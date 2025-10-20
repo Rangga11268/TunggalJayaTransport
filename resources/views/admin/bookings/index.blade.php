@@ -23,6 +23,8 @@
                                 <tr>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode Pemesanan</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penumpang</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Pemesanan</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Tanggal Keberangkatan</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rute</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Bus</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
@@ -47,17 +49,17 @@
                                             <div class="text-sm font-medium text-gray-900">{{ $booking->passenger_name }}</div>
                                             <div class="text-sm text-gray-500 truncate max-w-[150px] sm:max-w-xs">{{ $booking->passenger_email }}</div>
                                         </td>
+                                        <td class="px-4 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ $booking->booking_date ? \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') : 'N/A' }}
+                                        </td>
+                                        <td class="px-4 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                                            {{ $booking->schedule->getActualDepartureTime()->format('d M Y H:i') }}
+                                            @if($booking->schedule->hasDeparted())
+                                                <span class="text-red-600 font-semibold">(Berangkat)</span>
+                                            @endif
+                                        </td>
                                         <td class="px-4 py-3 sm:py-4">
                                             <div class="text-sm font-medium text-gray-900">{{ $booking->schedule->route->origin }} → {{ $booking->schedule->route->destination }}</div>
-                                            <div class="text-sm text-gray-500">
-                                                {{ $booking->schedule->getActualDepartureTime()->format('d M Y H:i') }}
-                                                @if($booking->schedule->hasDeparted())
-                                                    <span class="text-red-600 font-semibold">(Berangkat)</span>
-                                                @endif
-                                            </div>
-                                            @if($booking->schedule->hasDeparted() && $booking->payment_status == 'pending')
-                                                <div class="text-xs text-orange-600 font-semibold">Akan dibatalkan oleh sistem</div>
-                                            @endif
                                         </td>
                                         <td class="px-4 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                                             {{ $booking->schedule->bus->name }}
@@ -123,7 +125,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="px-4 py-4 text-center text-sm text-gray-500">
+                                        <td colspan="10" class="px-4 py-4 text-center text-sm text-gray-500">
                                             Tidak ada pemesanan ditemukan.
                                         </td>
                                     </tr>
