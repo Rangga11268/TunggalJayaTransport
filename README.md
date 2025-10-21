@@ -52,49 +52,77 @@ Dibangun dengan teknologi web modern, sistem kami menawarkan antarmuka yang rama
 ### Prasyarat
 
 - PHP 8.2 atau lebih tinggi
-- Composer
-- MySQL 8.0 atau lebih tinggi
-- Node.js & npm
+- Composer (versi 2.0+)
+- MySQL 8.0 atau MariaDB 10.5+
+- Node.js (versi 18+) & npm
 - Git
+- Web server (Apache/Nginx) - opsional untuk pengembangan
 
-### Setup Cepat
+### Setup Lengkap - Panduan untuk Teman
 
-1. **Klon repositori**
+Ikuti langkah-langkah berikut untuk mengatur proyek ini di lingkungan lokal Anda:
+
+#### 1. Clone repositori
 
 ```bash
 git clone https://github.com/yourusername/tunggal-jaya-transport.git
 cd tunggal-jaya-transport
 ```
 
-2. **Instal dependensi PHP**
+#### 2. Instal dependensi PHP
+
+Pastikan Composer terinstal di sistem Anda, lalu jalankan:
 
 ```bash
 composer install
 ```
 
-3. **Instal dependensi frontend**
+Jika Anda mendapatkan error karena versi dependensi, coba:
+```bash
+composer install --ignore-platform-reqs
+```
+
+#### 3. Instal dependensi frontend
+
+Pastikan Node.js dan npm terinstal, lalu jalankan:
 
 ```bash
 npm install
 npm run build
-# atau untuk pengembangan
+# atau untuk pengembangan (akan watch file Anda)
 npm run dev
 ```
 
-4. **Setup environment**
+#### 4. Setup environment
+
+Salin file `.env.example` ke `.env` dan generate kunci aplikasi:
 
 ```bash
-cp .env.example .env
+copy .env.example .env    # Pada Windows
+# atau
+cp .env.example .env      # Pada Linux/Mac
 ```
 
-5. **Generate kunci aplikasi**
+Setelah itu, generate kunci aplikasi:
 
 ```bash
 php artisan key:generate
 ```
 
-6. **Konfigurasi database di `.env`**
+#### 5. Konfigurasi database
 
+Anda memiliki dua opsi database:
+
+**Opsi A: Gunakan SQLite (termudah untuk pengembangan)**
+- Buka file `.env` dan pastikan konfigurasi berikut:
+```env
+DB_CONNECTION=sqlite
+```
+- Pastikan file `database/database.sqlite` ada (script composer biasanya membuatnya otomatis)
+
+**Opsi B: Gunakan MySQL**
+- Buat database kosong di MySQL
+- Edit file `.env` sesuaikan dengan konfigurasi database Anda:
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -104,25 +132,66 @@ DB_USERNAME=your_username
 DB_PASSWORD=your_password
 ```
 
-7. **Jalankan migrasi dan seeder**
+#### 6. Konfigurasi Midtrans (opsional untuk sekarang)
+
+Jika ingin menggunakan fitur pembayaran Midtrans, tambahkan kredensial ke file `.env`:
+
+```env
+MIDTRANS_SERVER_KEY=SB-Mid-server-xxxxxxxxxxxxxxxx
+MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxxxxxxxxxxxxx
+MIDTRANS_ENVIRONMENT=sandbox
+MIDTRANS_PAYMENT_URL=https://app.sandbox.midtrans.com/snap/v1/transactions
+MIDTRANS_API_URL=https://api.sandbox.midtrans.com/v2
+```
+
+> **Catatan**: Untuk awal, Anda bisa melewati konfigurasi ini dan menggunakannya nanti saat siap menggunakan fitur pembayaran.
+
+#### 7. Jalankan migrasi dan seeder
 
 ```bash
 php artisan migrate --seed
 ```
 
-8. **Setup link penyimpanan**
+Jika muncul error, coba jalankan perintah satu per satu:
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+#### 8. Setup link penyimpanan
 
 ```bash
 php artisan storage:link
 ```
 
-9. **Jalankan server pengembangan**
+#### 9. Generate passport keys jika diperlukan (jika menggunakan API)
+
+```bash
+php artisan passport:install --force
+```
+
+#### 10. Jalankan server pengembangan
 
 ```bash
 php artisan serve
 ```
 
 Aplikasi akan dapat diakses di `http://localhost:8000`
+
+### Konfigurasi Tambahan (Opsional)
+
+#### WebSockets untuk notifikasi real-time
+Jika ingin menggunakan fitur real-time, Anda bisa mengatur Laravel Echo Server:
+```bash
+npm install -g laravel-echo-server
+laravel-echo-server init
+```
+
+#### Queue Worker
+Untuk memproses tugas-tugas di latar belakang:
+```bash
+php artisan queue:work
+```
 
 ## 🔐 Integrasi Gateway Pembayaran Midtrans
 
@@ -298,6 +367,72 @@ MAIL_PASSWORD=your_mail_password
 - Generasi tiket PDF mungkin memiliki masalah tampilan di beberapa pembaca PDF
 - Masalah timeout sesekali dengan pemrosesan pembayaran selama lalu lintas tinggi
 - Beberapa masalah responsifitas mobile dengan formulir kompleks
+
+## ❗ Troubleshooting dan Error yang Sering Terjadi
+
+Berikut adalah solusi untuk beberapa error umum saat setup:
+
+### 1. Error saat composer install
+**Error**: `Your PHP version (8.1.x) is not compatible with your Laravel version`
+- **Solusi**: Pastikan Anda menggunakan PHP 8.2 atau lebih tinggi
+
+**Error**: `Failed to download [package-name]`
+- **Solusi**: Coba perbarui Composer: `composer self-update`
+- atau gunakan `composer install --ignore-platform-reqs`
+
+### 2. Error migrasi database
+**Error**: `PDOException: could not find driver (SQLITE)`
+- **Solusi**: Pastikan ekstensi SQLite diaktifkan di PHP Anda (cek php.ini)
+
+**Error**: `Access denied for user 'username'@'localhost'`
+- **Solusi**: Periksa kembali konfigurasi database di file `.env`
+
+### 3. Error saat artisan key:generate
+**Error**: `file_put_contents(.env): failed to open stream: Permission denied`
+- **Solusi**: Pastikan file `.env` dapat ditulis (chmod 644 di Linux/Mac)
+
+### 4. Error saat npm install
+**Error**: `node-sass` error
+- **Solusi**: Ganti dengan `dart-sass` atau gunakan `npm install --legacy-peer-deps`
+
+### 5. Tidak bisa mengakses halaman
+**Jika muncul error "404 Not Found" saat mengakses http://localhost:8000**:
+- Pastikan folder `public` digunakan sebagai root directory
+- Jalankan `php artisan serve` bukan server web lain
+
+**Jika muncul error "500 Internal Server Error"**:
+- Periksa file `storage/logs/laravel.log` untuk detail error
+- Pastikan folder `storage` dan `bootstrap/cache` dapat ditulis (chmod 755 atau 777)
+
+### 6. Error saat menjalankan migrasi
+**Jika muncul error "Base table or view not found: sessions table"**:
+- Jalankan: `php artisan migrate:fresh --seed`
+
+### 7. Error "Maximum execution time exceeded"
+- Tambahkan `set_time_limit(300);` di awal file artisan atau
+- Tambahkan `max_execution_time = 300` di file php.ini
+
+### 8. Jika muncul error "Call to undefined function imagecreate()"
+- Pastikan ekstensi GD diaktifkan di PHP
+- Di file `php.ini`, pastikan `extension=gd` tidak dikomentari
+
+### 9. Jika muncul error saat mengakses file upload
+- Pastikan folder `storage/app/public` dapat ditulis
+- Jalankan `php artisan storage:link` dan cek jika link sudah dibuat
+
+### 10. Jika npm run dev tidak bekerja
+- Coba `npm run build` sebagai alternatif
+- Atau coba versi yang kompatibel: `npx vite build`
+
+### 11. Jika login atau session tidak berfungsi
+- Pastikan `SESSION_DRIVER` di file `.env` diatur dengan benar (database/file)
+- Jalankan migrasi untuk tabel sessions: `php artisan migrate`
+
+### 12. Jika QR Code atau Barcode tidak muncul di tiket
+- Pastikan modul GD dan ImageMagick aktif di PHP
+- Periksa apakah folder penyimpanan sementara dapat ditulis
+
+Jika Anda mengalami error lain yang tidak tercantum di sini, periksa file log di `storage/logs/laravel.log` untuk detail error yang lebih lengkap.
 
 ## 📞 Dukungan
 
