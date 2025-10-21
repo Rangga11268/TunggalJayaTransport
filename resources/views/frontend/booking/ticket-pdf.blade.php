@@ -50,14 +50,14 @@
         }
 
         .company-logo {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             margin-right: 10px;
             vertical-align: middle;
         }
 
         .company-name {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: #0284c7;
             display: inline-block;
@@ -239,8 +239,8 @@
         }
 
         .qr-code-box {
-            width: 60px;
-            height: 60px;
+            width: 65px;
+            height: 65px;
             background: white;
             border: 1px solid #ddd;
             margin: 0 auto 4px;
@@ -248,8 +248,8 @@
         }
 
         .barcode-box {
-            width: 120px;
-            height: 40px;
+            width: 130px;
+            height: 42px;
             background: white;
             border: 1px solid #ddd;
             margin: 0 auto 4px;
