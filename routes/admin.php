@@ -10,7 +10,6 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ConductorController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -51,8 +50,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule
     // Category Management (only admins can manage categories)
     Route::resource('categories', CategoryController::class)->middleware('role:admin');
 
-    // Facility Management (only admins can manage facilities)
-    Route::resource('facilities', FacilityController::class)->middleware('role:admin');
+
 
     // User Management (only admins can manage users)
     Route::resource('users', UserController::class)->middleware('role:admin');

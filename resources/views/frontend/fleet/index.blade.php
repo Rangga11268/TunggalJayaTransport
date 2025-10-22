@@ -166,9 +166,9 @@
                 @forelse($facilities as $facility)
                     <div
                         class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition duration-300 text-center transform hover:-translate-y-1">
-                        @if ($facility->icon)
+                        @if (isset($facility['icon']) && $facility['icon'])
                             <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="{{ $facility->icon }} text-purple-600 text-2xl"></i>
+                                <i class="{{ $facility['icon'] }} text-purple-600 text-2xl"></i>
                             </div>
                         @else
                             <div
@@ -176,9 +176,9 @@
                                 <i class="fas fa-concierge-bell text-gray-500 text-2xl"></i>
                             </div>
                         @endif
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">{{ $facility->name }}</h3>
-                        @if ($facility->description)
-                            <p class="text-gray-600 text-sm">{{ $facility->description }}</p>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">{{ $facility['name'] }}</h3>
+                        @if (isset($facility['description']) && $facility['description'])
+                            <p class="text-gray-600 text-sm">{{ $facility['description'] }}</p>
                         @endif
                     </div>
                 @empty

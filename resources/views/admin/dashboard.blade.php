@@ -110,9 +110,7 @@
                         <a href="{{ route('admin.users.index') }}" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-6 rounded text-center">
                             Atur Pengguna
                         </a>
-                        <a href="{{ route('admin.facilities.index') }}" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 px-6 rounded text-center">
-                            Atur Fasilitas
-                        </a>
+
                         <a href="{{ route('admin.drivers.index') }}" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded text-center">
                             Atur Sopir
                         </a>

@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('facilities', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('icon')->nullable();
-            $table->text('description')->nullable();
-            $table->timestamps();
-        });
+        Schema::dropIfExists('bus_facility');
+        Schema::dropIfExists('facilities');
     }
 
     /**
@@ -25,6 +20,19 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('facilities');
+        Schema::create('facilities', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('icon')->nullable();
+            $table->text('description')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('bus_facility', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('bus_id')->constrained()->onDelete('cascade');
+            $table->foreignId('facility_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
     }
 };

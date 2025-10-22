@@ -265,7 +265,7 @@ class HomeController extends Controller
                 $bus->name = $bookingData->name;
                 $bus->bus_type = $bookingData->bus_type;
                 $bus->capacity = $bookingData->capacity;
-                $bus->facilities = $bookingData->facilities;
+
                 
                 $schedule = new \App\Models\Schedule();
                 $schedule->id = $bookingData->schedule_id;

@@ -16,7 +16,6 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             BusSeeder::class,
             RouteSeeder::class,
-            FacilitySeeder::class,
             DriverSeeder::class,
             RoleSeeder::class,
             UserRoleSeeder::class,

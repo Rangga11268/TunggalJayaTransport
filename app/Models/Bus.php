@@ -25,10 +25,7 @@ class Bus extends Model implements HasMedia
         return $this->hasMany(Schedule::class);
     }
 
-    public function facilities()
-    {
-        return $this->belongsToMany(Facility::class);
-    }
+
 
     public function drivers()
     {

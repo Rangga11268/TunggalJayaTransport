@@ -242,17 +242,7 @@
                     </div>
                 </div>
 
-                <!-- Facility Management -->
-                <a href="{{ route('admin.facilities.index') }}"
-                    class="flex items-center p-3 rounded-lg mb-1 transition-all duration-200 hover:bg-gray-700 {{ request()->routeIs('admin.facilities.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
-                    <i class="fas fa-concierge-bell text-lg w-6"></i>
-                    <span
-                        :class="{
-                            'ml-3 inline': sidebarOpen,
-                            'hidden': !sidebarOpen
-                        }"
-                        class="transition-opacity duration-300">Manajemen Fasilitas</span>
-                </a>
+
 
                 <!-- Reporting -->
                 <a href="{{ route('admin.reports.index') }}"
