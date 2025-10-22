@@ -1588,4 +1588,380 @@ Jika implementasi desain baru bermasalah, berikut adalah rencana rollback:
 -   Hapus perubahan yang tidak diperlukan
 
 
+# Qwen V1.5 Update: Analisis Masalah pada Fungsi Forgot Password di Tunggal Jaya Transport
+
+## Overview
+
+Dokumen ini merinci hasil analisis terhadap masalah yang terjadi pada fungsi forgot password (lupa sandi) di website Tunggal Jaya Transport. Ditemukan bahwa sistem reset password saat ini tidak berfungsi secara optimal karena beberapa konfigurasi penting yang belum diatur dengan benar.
+
+## Masalah yang Ditemukan
+
+### 1. Konfigurasi Email Pembawa Pesan Reset Password
+
+**Masalah:**
+- Mailer default diatur ke `log` alih-alih `smtp` di file konfigurasi
+- Password reset email hanya akan dicatat di log dan tidak dikirim ke pengguna
+
+**Dampak:**
+- Pengguna tidak menerima tautan reset password melalui email
+- Proses reset password menjadi tidak dapat digunakan secara fungsional
+
+**Lokasi File:**
+- `config/mail.php` - Default mailer diatur ke 'log'
+- `.env.example` - MAIL_MAILER=log
+
+### 2. Konfigurasi SMTP Tidak Lengkap
+
+**Masalah:**
+- SMTP credentials (MAIL_USERNAME dan MAIL_PASSWORD) diatur ke null
+- Host, port, dan pengaturan SMTP lainnya tidak disesuaikan dengan layanan email yang digunakan
+
+**Dampak:**
+- Jika pengaturan diubah dari 'log' ke 'smtp', sistem tetap tidak akan dapat mengirim email karena kredensial tidak lengkap
+
+**Lokasi File:**
+- `.env.example` - MAIL_USERNAME=null, MAIL_PASSWORD=null
+
+### 3. Pengaturan Alamat Pengirim Email
+
+**Masalah:**
+- Alamat pengirim email default menggunakan 'hello@example.com'
+- Nama pengirim email default menggunakan '${APP_NAME}' yang akan menjadi 'Laravel'
+
+**Dampak:**
+- Email yang dikirim akan terlihat tidak profesional 
+- Dapat dianggap sebagai spam oleh beberapa penyaring email
+
+**Lokasi File:**
+- `config/mail.php` - Bagian 'from' address dan name
+- `.env.example` - MAIL_FROM_ADDRESS dan MAIL_FROM_NAME
+
+## Dampak Keseluruhan
+
+Akibat dari masalah-masalah di atas:
+
+1. Pengguna yang lupa password tidak dapat menerima email reset password
+2. Proses verifikasi dan penggantian password tidak dapat berlangsung
+3. Pengalaman pengguna (UX) menjadi buruk karena fungsi penting tidak berfungsi
+4. Potensi kehilangan pengguna karena tidak dapat mengakses akun mereka
+5. Tim support harus menangani secara manual masalah reset password
+
+## Solusi yang Disarankan
+
+### 1. Konfigurasi Mailer yang Tepat
+
+- Ganti MAIL_MAILER dari 'log' ke 'smtp' di file .env
+- Atur parameter SMTP sesuai dengan layanan email yang digunakan (Gmail, SendGrid, SMTP server pribadi, dll)
+
+### 2. Penyesuaian Kredensial SMTP
+
+- Isi MAIL_USERNAME dan MAIL_PASSWORD dengan kredensial SMTP yang valid
+- Atur MAIL_HOST dan MAIL_PORT sesuai dengan layanan email yang digunakan
+- Jika menggunakan Gmail, aktifkan "Less Secure App Access" atau gunakan App Password
+
+### 3. Pengaturan Alamat Pengirim Email
+
+- Ganti MAIL_FROM_ADDRESS dengan alamat email resmi perusahaan
+- Ganti MAIL_FROM_NAME dengan nama resmi perusahaan (misal: "Tunggal Jaya Transport")
+
+### 4. Pengujian Fungsi Reset Password
+
+- Lakukan pengujian menyeluruh terhadap fungsi reset password
+- Pastikan email dapat dikirim dan tautan reset berfungsi dengan benar
+- Verifikasi bahwa token reset memiliki waktu kadaluarsa yang sesuai (default 60 menar di Laravel)
+
+## Implementation Plan
+
+### Phase 1: Perbaikan Konfigurasi Email (Hari 1)
+
+1. Setup SMTP credentials di file .env
+    - Atur MAIL_MAILER=smtp
+    - Atur MAIL_HOST sesuai layanan (contoh: smtp.gmail.com)
+    - Atur MAIL_PORT (biasanya 587 atau 465)
+    - Atur MAIL_USERNAME dengan email yang valid
+    - Atur MAIL_PASSWORD dengan password atau app password
+    - Atur MAIL_ENCRYPTION (biasanya 'tls')
+    - Atur MAIL_FROM_ADDRESS dan MAIL_FROM_NAME dengan informasi perusahaan
+
+2. Update file konfigurasi mail
+    - Pastikan pengaturan di config/mail.php sesuai dengan SMTP yang digunakan
+
+### Phase 2: Pengujian Fungsi Forgot Password (Hari 1-2)
+
+1. Testing fungsionalitas reset password
+    - Uji fitur "Forgot Password" dari halaman login
+    - Verifikasi bahwa email reset password berhasil dikirim
+    - Pastikan tautan reset password berfungsi dengan benar
+    - Uji proses pergantian password
+
+2. Validasi konfigurasi
+    - Pastikan token reset password memiliki waktu kadaluarsa yang sesuai
+    - Konfirmasi bahwa pengguna tidak dapat menggunakan token setelah kadaluarsa
+    - Verifikasi bahwa hanya pengguna dengan token valid yang dapat mereset password
+
+### Phase 3: Pengujian Keamanan (Hari 2)
+
+1. Pengujian keamanan dasar
+    - Uji throttling (pembatasan jumlah permintaan reset password)
+    - Pastikan hanya email yang terdaftar yang bisa meminta reset password
+    - Verifikasi bahwa token reset hanya bisa digunakan satu kali
+
+2. Pemeriksaan log
+    - Pastikan aktivitas reset password tercatat dalam log aplikasi
+    - Validasi penanganan error jika pengiriman email gagal
+
+## Integrasi dengan Fitur yang Ada
+
+Perbaikan ini akan memperkuat integrasi dengan:
+
+### A. Sistem Otentikasi
+- Meningkatkan keandalan proses reset password
+- Memperkuat pengalaman login pengguna secara keseluruhan
+
+### B. Sistem Notifikasi
+- Menambahkan kemampuan untuk mengirim email reset password
+- Meningkatkan sistem komunikasi dengan pengguna
+
+### C. Keamanan Aplikasi
+- Meningkatkan keamanan akun pengguna melalui proses verifikasi reset yang benar
+- Memastikan hanya pengguna yang sah yang dapat mereset password
+
+## Evaluasi dan Pengembangan Berkelanjutan
+
+1. Monitor tingkat keberhasilan pengiriman email reset password
+2. Kumpulkan feedback dari pengguna tentang proses reset password
+3. Evaluasi apakah metode pengiriman email yang digunakan cukup handal
+4. Pertimbangkan implementasi metode alternatif jika diperlukan (misalnya SMS OTP)
+
+## Penyesuaian untuk Lingkungan Produksi
+
+Saat menerapkan perubahan ini ke lingkungan produksi:
+
+1. Gunakan SMTP service yang handal dan memiliki reputasi baik
+2. Atur DNS records (SPF, DKIM) untuk meningkatkan tingkat pengiriman email
+3. Lakukan pengujian menyeluruh sebelum mengganti konfigurasi produksi
+4. Monitor log dan metrik pengiriman email setelah implementasi
+
+
+# Qwen V1.6 Update: Implementasi Role Management untuk Admin, Schedule Manager dan Owner di Tunggal Jaya Transport
+
+## Overview
+
+Dokumen ini merinci rencana implementasi untuk manajemen role pada sistem admin panel di Tunggal Jaya Transport. Tujuan utama adalah untuk memperjelas hak akses masing-masing role (admin, schedule manager, dan owner) serta memastikan hanya pengguna tertentu yang dapat mengedit user biasa.
+
+## Business Requirements
+
+Sistem role management harus memenuhi kebutuhan berikut:
+
+1. **Role Admin**: Harus memiliki akses penuh ke semua fitur admin panel termasuk manajemen admin dan schedule manager (CRUD pengguna dengan role admin dan schedule manager)
+2. **Role Schedule Manager**: Harus dapat mengelola jadwal, rute, dan bus tetapi TIDAK BOLEH mengedit atau menghapus user biasa
+3. **Role Owner**: Harus memiliki akses yang paling tinggi, termasuk semua akses dari admin dan schedule manager (jadwal, rute, bus, dan manajemen admin serta schedule manager)
+4. Manajemen jadwal harus melibatkan penjadwalan perjalanan bus, pengaturan rute, dan manajemen armada
+5. User biasa TIDAK BOLEH di-edit oleh schedule manager atau role lain kecuali admin dan owner
+6. Sistem harus menyediakan UI yang jelas untuk manajemen role dan pengguna
+
+## Technical Architecture
+
+### A. Backend Components
+
+1. **Role Management**: Memperluas `RoleSeeder` dan `RoleMiddleware` yang ada
+2. **Permission System**: Menyesuaikan hak akses untuk masing-masing role melalui `Permission` model
+3. **User Management**: Memperbarui `UserController` untuk membatasi akses berdasarkan role
+4. **Authorization Logic**: Menggunakan Gate dan policy Laravel untuk kontrol akses granular
+
+### B. Frontend Components
+
+1. **Admin Dashboard Navigation**: Menyesuaikan sidebar untuk menampilkan menu sesuai role
+2. **User Management UI**: Antarmuka untuk manajemen pengguna yang hanya dapat diakses oleh admin dan owner
+3. **Schedule Management UI**: Antarmuka untuk manajemen jadwal yang dapat diakses oleh schedule manager dan owner
+
+## Role Access Specifications
+
+### A. Role Admin (Sudah Ada)
+
+Akses penuh ke semua fitur:
+- CRUD bookings
+- CRUD schedules
+- CRUD routes
+- CRUD buses
+- CRUD user (manajemen pengguna)
+- CRUD news, categories
+- CRUD facilities
+- CRUD drivers, conductors
+- Reporting
+- Settings
+
+### B. Role Schedule Manager (Sudah Ada)
+
+Akses terbatas ke fitur manajemen transportasi:
+- CRUD schedules
+- CRUD routes
+- CRUD buses
+- View reports
+- **TIDAK BOLEH** mengakses manajemen pengguna
+
+### C. Role Owner (Baru)
+
+Akses paling tinggi (super admin), memiliki semua akses dari kedua role di atas:
+- CRUD bookings
+- CRUD schedules
+- CRUD routes
+- CRUD buses
+- CRUD user (manajemen admin dan schedule manager saja, bukan user biasa)
+- CRUD news, categories
+- CRUD facilities
+- CRUD drivers, conductors
+- Reporting
+- Settings
+- Memiliki semua akses yang dimiliki oleh admin dan schedule manager
+
+## Database Schema Changes
+
+### A. Tabel Roles (Pembaruan)
+
+- Tidak perlu membuat tabel baru karena menggunakan package Spatie Laravel-permission
+- Perlu menambahkan role `owner` baru dan menyesuaikan permissions
+
+### B. Tabel Permissions (Pembaruan)
+
+- Tidak perlu membuat tabel baru
+- Perlu menyesuaikan permissions untuk role `owner`
+
+## Core Implementation Components
+
+### A. Role Seeder Update
+
+#### 1. Penambahan Role Owner
+- Tambahkan role `owner` ke sistem
+- Tetapkan permissions yang sesuai untuk role owner (hak akses schedule + user management)
+
+#### 2. Penyesuaian Permissions
+- Gunakan permission `view_users`, `create_users`, `edit_users`, `delete_users` untuk mengatur akses ke manajemen pengguna, dengan keterbatasan hanya untuk role admin dan schedule manager
+- Pastikan role schedule_manager tidak memiliki permission untuk user management
+- Implementasi logika bahwa hanya owner dan admin yang bisa mengelola user dengan role admin dan schedule manager (bukan user biasa)
+
+### B. Middleware Update
+
+#### 1. Role Middleware
+- Gunakan middleware `role` yang sudah ada untuk mengontrol akses berdasarkan role
+- Pastikan route manajemen pengguna hanya dapat diakses oleh admin dan owner
+
+### C. Controller Update
+
+#### 1. UserController
+- Tambahkan pengecekan role sebelum melakukan operasi CRUD
+- User biasa hanya boleh di-edit oleh admin dan owner
+
+#### 2. ScheduleController
+- Pastikan schedule manager dan owner dapat mengakses route ini
+
+## Implementation Plan
+
+### Phase 1: Persiapan dan Definisi Role (Hari 1)
+
+1. Tambahkan role `owner` ke dalam `RoleSeeder`
+    - Buat definisi role dengan permissions yang tepat
+    - Role owner: akses ke schedule management dan user management (tapi bukan news, categories, facilities, drivers, conductors)
+2. Update permissions untuk role `owner`
+    - Berikan akses ke schedule, route, bus management
+    - Berikan akses ke user management
+    - Hindari akses ke content management dan setting
+3. Testing role definition di database
+
+### Phase 2: Update Middleware dan Authorization (Hari 2)
+
+1. Update route authorization
+    - Tambahkan middleware role ke route manajemen pengguna
+    - Pastikan hanya admin dan owner yang bisa mengakses user management
+2. Perbarui `UserController` untuk mengecek role
+    - Tambahkan authorization check sebelum operasi CRUD
+    - Hanya admin dan owner yang bisa mengedit user biasa
+3. Testing akses berdasarkan role
+
+### Phase 3: Implementasi UI/UX (Hari 3)
+
+1. Update sidebar navigation berdasarkan role
+    - Hanya admin dan owner yang melihat menu "Manajemen Pengguna"
+    - Schedule manager dan owner dapat mengakses "Manajemen Transportasi"
+2. Update tampilan dashboard untuk menyesuaikan dengan role
+3. Tambahkan informasi role pengguna saat ini di antarmuka
+
+### Phase 4: Penyesuaian Fitur dan Pengujian (Hari 4)
+
+1. Pengujian fungsionalitas berdasarkan role
+    - Testing akses admin: CRUD lengkap semua fitur
+    - Testing akses schedule manager: hanya bisa manajemen transportasi, tidak bisa user management
+    - Testing akses owner: bisa manajemen transportasi dan user, tapi tidak bisa content
+2. Validasi keamanan akses
+    - Pastikan tidak ada celah akses antar role
+    - Pastikan schedule manager tidak bisa mengedit user biasa
+    - Pastikan owner bisa mengelola semua fitur yang ditentukan
+3. Testing UI untuk masing-masing role
+
+### Phase 5: Perbaikan dan Deployment (Hari 5)
+
+1. Implementasi perbaikan berdasarkan hasil pengujian
+2. Dokumentasi implementasi
+3. Deployment ke staging
+4. Uji coba akhir sebelum deployment ke production
+
+## Teknologi yang Digunakan
+
+- **Backend**: Laravel 12 dengan PHP 8.2+
+- **Authorization**: Laravel Gates, Policies, dan Spatie Laravel-permission package
+- **Frontend**: Blade template untuk UI admin
+- **Database**: MySQL untuk menyimpan role dan permissions
+- **Middleware**: Custom role middleware yang sudah ada
+
+## Pertimbangan Keamanan
+
+1. Validasi role dan permission di setiap endpoint penting
+2. Pastikan tidak ada celah akses horizontal antar user
+3. Gunakan authorization check di level controller sebelum operasi CRUD
+4. Jangan hanya mengandalkan UI untuk menyembunyikan fitur, harus juga di level backend
+
+## Integrasi dengan Fitur yang Ada
+
+### A. Integrasi dengan Sistem Login dan Otentikasi
+- Pastikan role terdeteksi dengan benar setelah login
+- Tampilkan fitur yang sesuai dengan role pengguna saat ini
+
+### B. Integrasi dengan Middleware Otentikasi
+- Pastikan role middleware berjalan bersama auth middleware
+- Tambahkan error handling untuk unauthorized access
+
+### C. Integrasi dengan UI Admin
+- Hanya menu yang sesuai role yang akan ditampilkan
+- Dashboard menampilkan informasi yang relevan dengan role
+
+## Evaluasi dan Pengembangan Berkelanjutan
+
+1. Monitor penggunaan fitur berdasarkan role
+2. Kumpulkan feedback dari admin, schedule manager dan owner tentang fungsionalitas
+3. Evaluasi apakah ada role atau permission yang perlu ditambahkan/dihapus
+4. Lakukan audit keamanan secara berkala terhadap sistem role
+
+## Potensi Tantangan dan Solusi
+
+1. **Complex permission logic**: Gunakan Spatie Laravel-permission package untuk mempermudah manajemen
+2. **UI complexity**: Gunakan conditional rendering berdasarkan role pengguna
+3. **Maintainability**: Buat dokumentasi yang jelas tentang role dan permission
+4. **User confusion**: Sediakan informasi yang jelas tentang fitur yang tersedia untuk masing-masing role
+
+## Rollback Plan
+
+Jika implementasi role management bermasalah, berikut adalah rencana rollback:
+
+### A. Kembalikan RoleSeeder
+- Kembalikan ke versi sebelumnya tanpa role owner
+- Jalankan ulang seeder untuk reset role dan permission
+
+### B. Kembalikan Middleware dan Controller
+- Kembalikan `UserController` ke versi sebelumnya
+- Kembalikan route ke konfigurasi sebelumnya
+
+### C. Verifikasi Fungsionalitas
+- Pastikan semua role lama (admin dan schedule manager) tetap berfungsi
+- Pastikan tidak ada fitur yang rusak akibat rollback
+
 

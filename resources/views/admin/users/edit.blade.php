@@ -46,12 +46,14 @@
                             <label for="roles" class="block text-sm font-medium text-gray-700">Peran</label>
                             <div class="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
                                 @foreach($roles as $role)
+                                    @if(in_array($role->name, ['admin', 'schedule_manager']))
                                     <div class="flex items-center">
                                         <input type="checkbox" name="roles[]" id="role_{{ $role->id }}" value="{{ $role->id }}" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" {{ in_array($role->id, old('roles', $user->roles->pluck('id')->toArray())) ? 'checked' : '' }}>
                                         <label for="role_{{ $role->id }}" class="ml-2 block text-sm text-gray-900">
                                             {{ $role->name }}
                                         </label>
                                     </div>
+                                    @endif
                                 @endforeach
                             </div>
                             @error('roles')

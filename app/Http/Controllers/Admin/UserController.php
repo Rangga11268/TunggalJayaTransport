@@ -14,7 +14,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('roles')->latest()->paginate(10);
+        $users = User::whereHas('roles', function($query) {
+            $query->whereIn('name', ['admin', 'schedule_manager']);
+        })->with('roles')->latest()->paginate(10);
+        
         return view('admin.users.index', compact('users'));
     }
 
@@ -23,7 +26,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = Role::all();
+        $roles = Role::whereIn('name', ['admin', 'schedule_manager'])->get();
         return view('admin.users.create', compact('roles'));
     }
 
@@ -37,7 +40,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'roles' => 'array',
-            'roles.*' => 'exists:roles,id',
+            'roles.*' => 'exists:roles,id|in:' . Role::whereIn('name', ['admin', 'schedule_manager'])->pluck('id')->implode(','),
         ]);
 
         $user = User::create([
@@ -60,7 +63,10 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::with('roles')->findOrFail($id);
+        $user = User::whereHas('roles', function($query) {
+            $query->whereIn('name', ['admin', 'schedule_manager']);
+        })->with('roles')->findOrFail($id);
+        
         return view('admin.users.show', compact('user'));
     }
 
@@ -69,8 +75,11 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        $user = User::findOrFail($id);
-        $roles = Role::all();
+        $user = User::whereHas('roles', function($query) {
+            $query->whereIn('name', ['admin', 'schedule_manager']);
+        })->findOrFail($id);
+        
+        $roles = Role::whereIn('name', ['admin', 'schedule_manager'])->get();
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
@@ -79,14 +88,16 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::whereHas('roles', function($query) {
+            $query->whereIn('name', ['admin', 'schedule_manager']);
+        })->findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'array',
-            'roles.*' => 'exists:roles,id',
+            'roles.*' => 'exists:roles,id|in:' . Role::whereIn('name', ['admin', 'schedule_manager'])->pluck('id')->implode(','),
         ]);
 
         $user->name = $request->name;
@@ -114,7 +125,9 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::whereHas('roles', function($query) {
+            $query->whereIn('name', ['admin', 'schedule_manager']);
+        })->findOrFail($id);
         
         // Prevent deleting the current user
         if ($user->id == auth()->id()) {
