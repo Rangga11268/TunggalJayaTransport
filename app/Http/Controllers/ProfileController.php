@@ -16,9 +16,22 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        // Check if the user has admin or schedule_manager roles
+        $user = $request->user();
+        $isAdminOrScheduleManager = $user->hasRole('admin') || $user->hasRole('schedule_manager');
+        
+        if ($isAdminOrScheduleManager) {
+            // Admin and schedule manager use the existing profile view
+            return view('profile.edit', [
+                'user' => $request->user(),
+            ]);
+        } else {
+            // Regular users use the frontend profile view
+            // For debugging, let's return a simple response to see if we reach this point
+            return view('frontend.profile.edit', [
+                'user' => $request->user(),
+            ]);
+        }
     }
 
     /**

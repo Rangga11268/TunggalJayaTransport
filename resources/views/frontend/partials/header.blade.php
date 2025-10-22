@@ -64,6 +64,11 @@
                                 <x-dropdown-link :href="route('dashboard')" class="hover:bg-blue-50">
                                     {{ __('Admin Dashboard') }}
                                 </x-dropdown-link>
+                            @else
+                                <!-- Regular User Profile Link -->
+                                <x-dropdown-link :href="route('profile.edit')" class="hover:bg-blue-50">
+                                    {{ __('Profile') }}
+                                </x-dropdown-link>
                             @endif
                             
                             <!-- User Features -->

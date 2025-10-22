@@ -1743,162 +1743,138 @@ Saat menerapkan perubahan ini ke lingkungan produksi:
 4. Monitor log dan metrik pengiriman email setelah implementasi
 
 
-# Qwen V1.6 Update: Implementasi Role Management untuk Admin, Schedule Manager dan Owner di Tunggal Jaya Transport
+# Qwen V1.6 Update: Implementasi Fitur Profile Management untuk Pengguna Regular di Frontend Tunggal Jaya Transport
 
 ## Overview
 
-Dokumen ini merinci rencana implementasi untuk manajemen role pada sistem admin panel di Tunggal Jaya Transport. Tujuan utama adalah untuk memperjelas hak akses masing-masing role (admin, schedule manager, dan owner) serta memastikan hanya pengguna tertentu yang dapat mengedit user biasa.
+Dokumen ini merinci rencana implementasi untuk menambahkan fitur profile management khusus bagi pengguna regular (non-admin) di frontend Tunggal Jaya Transport. Saat ini sistem hanya memiliki fitur profile management di halaman admin, sedangkan pengguna regular di frontend tidak memiliki akses ke fitur profile management. Dengan fitur ini, pengguna biasa akan dapat mengakses dan mengelola profile mereka melalui dropdown menu di header frontend, serupa dengan menu profile yang tersedia di admin panel.
 
 ## Business Requirements
 
-Sistem role management harus memenuhi kebutuhan berikut:
+Fitur profile management untuk pengguna regular harus memenuhi kebutuhan berikut:
 
-1. **Role Admin**: Harus memiliki akses penuh ke semua fitur admin panel termasuk manajemen admin dan schedule manager (CRUD pengguna dengan role admin dan schedule manager)
-2. **Role Schedule Manager**: Harus dapat mengelola jadwal, rute, dan bus tetapi TIDAK BOLEH mengedit atau menghapus user biasa
-3. **Role Owner**: Harus memiliki akses yang paling tinggi, termasuk semua akses dari admin dan schedule manager (jadwal, rute, bus, dan manajemen admin serta schedule manager)
-4. Manajemen jadwal harus melibatkan penjadwalan perjalanan bus, pengaturan rute, dan manajemen armada
-5. User biasa TIDAK BOLEH di-edit oleh schedule manager atau role lain kecuali admin dan owner
-6. Sistem harus menyediakan UI yang jelas untuk manajemen role dan pengguna
+1. **Akses Profile**: Pengguna regular harus dapat mengakses halaman profile mereka dari dropdown menu di header frontend
+2. **Manajemen Informasi Pribadi**: Pengguna dapat mengedit nama dan email mereka
+3. **Manajemen Kata Sandi**: Pengguna dapat mengganti kata sandi mereka
+4. **Akses Terbatas**: Fitur profile ini hanya tersedia untuk pengguna regular, bukan untuk admin dan schedule manager (mereka tetap menggunakan profile management di admin panel)
+5. **UI Konsisten**: Tampilan profile management harus konsisten dengan desain frontend
+6. **Keamanan**: Harus mengikuti prinsip keamanan Laravel untuk validasi dan otorisasi
 
 ## Technical Architecture
 
 ### A. Backend Components
 
-1. **Role Management**: Memperluas `RoleSeeder` dan `RoleMiddleware` yang ada
-2. **Permission System**: Menyesuaikan hak akses untuk masing-masing role melalui `Permission` model
-3. **User Management**: Memperbarui `UserController` untuk membatasi akses berdasarkan role
-4. **Authorization Logic**: Menggunakan Gate dan policy Laravel untuk kontrol akses granular
+1. **Profile Controller**: Memperluas fungsi `ProfileController` yang sudah ada untuk memberikan akses ke pengguna regular
+2. **Authorization Logic**: Menggunakan middleware Laravel untuk memastikan hanya pengguna terotentikasi yang dapat mengakses fitur profile
+3. **Validation System**: Menggunakan `ProfileUpdateRequest` untuk validasi perubahan informasi profile
+4. **Route Management**: Menyesuaikan route untuk membedakan antara profile admin dan profile regular user
 
 ### B. Frontend Components
 
-1. **Admin Dashboard Navigation**: Menyesuaikan sidebar untuk menampilkan menu sesuai role
-2. **User Management UI**: Antarmuka untuk manajemen pengguna yang hanya dapat diakses oleh admin dan owner
-3. **Schedule Management UI**: Antarmuka untuk manajemen jadwal yang dapat diakses oleh schedule manager dan owner
+1. **Header Navigation**: Menambahkan link profile ke dropdown menu di header frontend untuk pengguna regular
+2. **Profile Management UI**: Membuat tampilan profile management yang responsif dan konsisten dengan desain frontend
+3. **User Experience**: Menyediakan pengalaman pengguna yang intuitif dan mudah digunakan
 
-## Role Access Specifications
+## Current System Analysis
 
-### A. Role Admin (Sudah Ada)
+### A. Existing Profile Functionality
 
-Akses penuh ke semua fitur:
-- CRUD bookings
-- CRUD schedules
-- CRUD routes
-- CRUD buses
-- CRUD user (manajemen pengguna)
-- CRUD news, categories
-- CRUD facilities
-- CRUD drivers, conductors
-- Reporting
-- Settings
+Saat ini sistem sudah memiliki:
+- ProfileController dengan fitur lengkap (update profile, update password, delete account)
+- ProfileUpdateRequest untuk validasi data
+- View profile yang terdiri dari beberapa partial: update-profile-information-form, update-password-form, delete-user-form
+- Route untuk profile management (profile.edit, profile.update, profile.destroy)
 
-### B. Role Schedule Manager (Sudah Ada)
+### B. Current Navigation Structure
 
-Akses terbatas ke fitur manajemen transportasi:
-- CRUD schedules
-- CRUD routes
-- CRUD buses
-- View reports
-- **TIDAK BOLEH** mengakses manajemen pengguna
+- Admin: Menggunakan profile link di dropdown menu admin panel
+- Regular users: Tidak memiliki akses ke menu profile di frontend, hanya memiliki link ke booking history dan logout
 
-### C. Role Owner (Baru)
+### C. Required Modifications
 
-Akses paling tinggi (super admin), memiliki semua akses dari kedua role di atas:
-- CRUD bookings
-- CRUD schedules
-- CRUD routes
-- CRUD buses
-- CRUD user (manajemen admin dan schedule manager saja, bukan user biasa)
-- CRUD news, categories
-- CRUD facilities
-- CRUD drivers, conductors
-- Reporting
-- Settings
-- Memiliki semua akses yang dimiliki oleh admin dan schedule manager
-
-## Database Schema Changes
-
-### A. Tabel Roles (Pembaruan)
-
-- Tidak perlu membuat tabel baru karena menggunakan package Spatie Laravel-permission
-- Perlu menambahkan role `owner` baru dan menyesuaikan permissions
-
-### B. Tabel Permissions (Pembaruan)
-
-- Tidak perlu membuat tabel baru
-- Perlu menyesuaikan permissions untuk role `owner`
+- Menyesuaikan dropdown menu di header frontend agar menampilkan link profile untuk pengguna regular
+- Memastikan tampilan profile management sesuai dengan desain frontend
+- Memastikan hanya pengguna regular (non-admin/non-schedule manager) yang diarahkan ke profile frontend
 
 ## Core Implementation Components
 
-### A. Role Seeder Update
+### A. Navigation Update
 
-#### 1. Penambahan Role Owner
-- Tambahkan role `owner` ke sistem
-- Tetapkan permissions yang sesuai untuk role owner (hak akses schedule + user management)
+#### 1. Header Dropdown Menu
+- Tambahkan link profile ke dropdown menu di `resources/views/frontend/partials/header.blade.php`
+- Gunakan logika kondisional untuk membedakan antara admin dan regular user
+- Hanya tampilkan link profile untuk regular user, bukan untuk admin/schedule manager
 
-#### 2. Penyesuaian Permissions
-- Gunakan permission `view_users`, `create_users`, `edit_users`, `delete_users` untuk mengatur akses ke manajemen pengguna, dengan keterbatasan hanya untuk role admin dan schedule manager
-- Pastikan role schedule_manager tidak memiliki permission untuk user management
-- Implementasi logika bahwa hanya owner dan admin yang bisa mengelola user dengan role admin dan schedule manager (bukan user biasa)
+#### 2. Profile Route Logic
+- Atur routing agar pengguna regular diarahkan ke view profile frontend
+- Biarkan admin/schedule manager menggunakan view profile dari admin panel
 
-### B. Middleware Update
+### B. View Customization
 
-#### 1. Role Middleware
-- Gunakan middleware `role` yang sudah ada untuk mengontrol akses berdasarkan role
-- Pastikan route manajemen pengguna hanya dapat diakses oleh admin dan owner
+#### 1. Profile View for Regular Users
+- Buat layout profile yang konsisten dengan desain frontend
+- Gunakan `frontend.layouts.app` sebagai layout utama
+- Adaptasi partial profile dari sistem admin ke sistem frontend
 
-### C. Controller Update
+#### 2. Styling Consistency
+- Gunakan Tailwind CSS sesuai dengan branding Tunggal Jaya Transport
+- Jaga konsistensi dengan desain frontend lainnya
 
-#### 1. UserController
-- Tambahkan pengecekan role sebelum melakukan operasi CRUD
-- User biasa hanya boleh di-edit oleh admin dan owner
+### C. Access Control
 
-#### 2. ScheduleController
-- Pastikan schedule manager dan owner dapat mengakses route ini
+#### 1. Middleware Implementation
+- Gunakan middleware auth untuk memastikan hanya pengguna terotentikasi yang bisa akses
+- Tambahkan pengecekan role untuk membedakan antara regular user dan admin/schedule manager
+
+#### 2. Conditional Logic
+- Implementasi logika untuk mengarahkan pengguna ke view yang sesuai berdasarkan role mereka
 
 ## Implementation Plan
 
-### Phase 1: Persiapan dan Definisi Role (Hari 1)
+### Phase 1: Persiapan dan Analisis (Hari 1)
 
-1. Tambahkan role `owner` ke dalam `RoleSeeder`
-    - Buat definisi role dengan permissions yang tepat
-    - Role owner: akses ke schedule management dan user management (tapi bukan news, categories, facilities, drivers, conductors)
-2. Update permissions untuk role `owner`
-    - Berikan akses ke schedule, route, bus management
-    - Berikan akses ke user management
-    - Hindari akses ke content management dan setting
-3. Testing role definition di database
+1. Analisis struktur profile management saat ini
+    - Tinjau `ProfileController.php` dan `ProfileUpdateRequest.php`
+    - Evaluasi view profile yang ada di `resources/views/profile/`
+    - Identifikasi perbedaan antara kebutuhan admin dan regular user
+2. Persiapkan struktur file dan folder baru
+    - Buat folder `resources/views/frontend/profile` jika belum ada
+    - Siapkan partial components untuk frontend
+3. Review desain frontend untuk konsistensi
 
-### Phase 2: Update Middleware dan Authorization (Hari 2)
+### Phase 2: Modifikasi Route dan Navigation (Hari 2)
 
-1. Update route authorization
-    - Tambahkan middleware role ke route manajemen pengguna
-    - Pastikan hanya admin dan owner yang bisa mengakses user management
-2. Perbarui `UserController` untuk mengecek role
-    - Tambahkan authorization check sebelum operasi CRUD
-    - Hanya admin dan owner yang bisa mengedit user biasa
-3. Testing akses berdasarkan role
+1. Update route untuk profile management
+    - Pastikan route profile.edit mengarahkan ke view yang sesuai per role
+2. Tambahkan link profile ke header frontend
+    - Modifikasi `resources/views/frontend/partials/header.blade.php`
+    - Tambahkan kondisi untuk menampilkan link profile hanya untuk regular user
+3. Testing navigasi awal
 
-### Phase 3: Implementasi UI/UX (Hari 3)
+### Phase 3: Pembuatan View Profile Frontend (Hari 3-4)
 
-1. Update sidebar navigation berdasarkan role
-    - Hanya admin dan owner yang melihat menu "Manajemen Pengguna"
-    - Schedule manager dan owner dapat mengakses "Manajemen Transportasi"
-2. Update tampilan dashboard untuk menyesuaikan dengan role
-3. Tambahkan informasi role pengguna saat ini di antarmuka
+1. Buat view profile frontend
+    - Gunakan layout `frontend.layouts.app`
+    - Implementasi komponen update profile information
+    - Implementasi komponen update password
+    - Tambahkan komponen delete account (jika relevan untuk regular user)
+2. Styling dan UI/UX
+    - Terapkan desain sesuai dengan frontend lainnya
+    - Gunakan Tailwind CSS sesuai dengan branding
+    - Pastikan tampilan responsif di berbagai perangkat
 
-### Phase 4: Penyesuaian Fitur dan Pengujian (Hari 4)
+### Phase 4: Testing dan Validasi (Hari 5)
 
-1. Pengujian fungsionalitas berdasarkan role
-    - Testing akses admin: CRUD lengkap semua fitur
-    - Testing akses schedule manager: hanya bisa manajemen transportasi, tidak bisa user management
-    - Testing akses owner: bisa manajemen transportasi dan user, tapi tidak bisa content
+1. Testing fungsionalitas berdasarkan role
+    - Testing akses regular user: dapat mengakses dan mengelola profile mereka
+    - Testing akses admin: tetap diarahkan ke profile admin panel
+    - Testing akses schedule manager: tetap diarahkan ke profile admin panel
 2. Validasi keamanan akses
-    - Pastikan tidak ada celah akses antar role
-    - Pastikan schedule manager tidak bisa mengedit user biasa
-    - Pastikan owner bisa mengelola semua fitur yang ditentukan
+    - Pastikan pengguna tidak terotentikasi tidak bisa mengakses fitur profile
+    - Pastikan hanya pengguna yang sesuai yang bisa mengedit data mereka sendiri
 3. Testing UI untuk masing-masing role
 
-### Phase 5: Perbaikan dan Deployment (Hari 5)
+### Phase 5: Penyempurnaan dan Deployment (Hari 6)
 
 1. Implementasi perbaikan berdasarkan hasil pengujian
 2. Dokumentasi implementasi
@@ -1908,60 +1884,62 @@ Akses paling tinggi (super admin), memiliki semua akses dari kedua role di atas:
 ## Teknologi yang Digunakan
 
 - **Backend**: Laravel 12 dengan PHP 8.2+
-- **Authorization**: Laravel Gates, Policies, dan Spatie Laravel-permission package
-- **Frontend**: Blade template untuk UI admin
-- **Database**: MySQL untuk menyimpan role dan permissions
-- **Middleware**: Custom role middleware yang sudah ada
+- **Authorization**: Laravel built-in authentication dan middleware
+- **Frontend**: Blade template, Tailwind CSS, Alpine.js untuk interaktivitas
+- **Database**: MySQL untuk menyimpan informasi pengguna
+- **Validation**: Laravel Form Request untuk validasi data
 
 ## Pertimbangan Keamanan
 
-1. Validasi role dan permission di setiap endpoint penting
-2. Pastikan tidak ada celah akses horizontal antar user
+1. Validasi role dan authentikasi di setiap endpoint profile
+2. Pastikan hanya pengguna yang terotentikasi yang bisa mengakses halaman profile
 3. Gunakan authorization check di level controller sebelum operasi CRUD
-4. Jangan hanya mengandalkan UI untuk menyembunyikan fitur, harus juga di level backend
+4. Validasi input pengguna untuk mencegah serangan XSS dan lainnya
+5. Pastikan hanya pengguna yang dapat mengedit profile mereka sendiri
 
 ## Integrasi dengan Fitur yang Ada
 
 ### A. Integrasi dengan Sistem Login dan Otentikasi
-- Pastikan role terdeteksi dengan benar setelah login
+- Pastikan profile hanya dapat diakses oleh pengguna yang sudah login
 - Tampilkan fitur yang sesuai dengan role pengguna saat ini
 
 ### B. Integrasi dengan Middleware Otentikasi
-- Pastikan role middleware berjalan bersama auth middleware
+- Pastikan auth middleware berjalan bersama role check
 - Tambahkan error handling untuk unauthorized access
 
-### C. Integrasi dengan UI Admin
-- Hanya menu yang sesuai role yang akan ditampilkan
-- Dashboard menampilkan informasi yang relevan dengan role
+### C. Integrasi dengan UI Frontend
+- Gunakan layout dan styling yang konsisten dengan halaman frontend lainnya
+- Tampilkan informasi profile yang relevan dengan pengalaman pengguna
 
 ## Evaluasi dan Pengembangan Berkelanjutan
 
-1. Monitor penggunaan fitur berdasarkan role
-2. Kumpulkan feedback dari admin, schedule manager dan owner tentang fungsionalitas
-3. Evaluasi apakah ada role atau permission yang perlu ditambahkan/dihapus
-4. Lakukan audit keamanan secara berkala terhadap sistem role
+1. Monitor penggunaan fitur profile oleh pengguna regular
+2. Kumpulkan feedback dari pengguna tentang pengalaman menggunakan fitur profile
+3. Evaluasi apakah ada fitur tambahan yang diperlukan (misal: upload foto profile)
+4. Lakukan perbaikan berdasarkan feedback dan kebutuhan pengguna
 
 ## Potensi Tantangan dan Solusi
 
-1. **Complex permission logic**: Gunakan Spatie Laravel-permission package untuk mempermudah manajemen
-2. **UI complexity**: Gunakan conditional rendering berdasarkan role pengguna
-3. **Maintainability**: Buat dokumentasi yang jelas tentang role dan permission
-4. **User confusion**: Sediakan informasi yang jelas tentang fitur yang tersedia untuk masing-masing role
+1. **Maintaining UI Consistency**: Gunakan komponen yang seragam dengan halaman frontend lainnya
+2. **Role-specific Logic**: Gunakan middleware dan conditional logic untuk membedakan akses antar role
+3. **Security Concerns**: Pastikan hanya pengguna yang dapat mengedit profile mereka sendiri
+4. **User Confusion**: Sediakan informasi yang jelas tentang fitur yang tersedia di profile
 
 ## Rollback Plan
 
-Jika implementasi role management bermasalah, berikut adalah rencana rollback:
+Jika implementasi profile management untuk regular user bermasalah, berikut adalah rencana rollback:
 
-### A. Kembalikan RoleSeeder
-- Kembalikan ke versi sebelumnya tanpa role owner
-- Jalankan ulang seeder untuk reset role dan permission
+### A. Kembalikan Header Navigation
+- Kembalikan perubahan pada `resources/views/frontend/partials/header.blade.php`
+- Hapus link profile yang ditambahkan untuk regular user
 
-### B. Kembalikan Middleware dan Controller
-- Kembalikan `UserController` ke versi sebelumnya
-- Kembalikan route ke konfigurasi sebelumnya
+### B. Kembalikan View dan Route
+- Hapus view profile untuk frontend jika diperlukan
+- Kembalikan route ke konfigurasi sebelumnya jika perubahan signifikan
+- Pastikan kembali routing untuk profile management tetap berfungsi untuk admin
 
 ### C. Verifikasi Fungsionalitas
-- Pastikan semua role lama (admin dan schedule manager) tetap berfungsi
+- Pastikan semua role (admin, schedule manager, user biasa) tetap bisa mengakses sistem
 - Pastikan tidak ada fitur yang rusak akibat rollback
 
 
