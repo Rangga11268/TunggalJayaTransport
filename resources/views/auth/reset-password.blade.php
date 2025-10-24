@@ -1,9 +1,17 @@
 <x-guest-layout>
+    <!-- Development Helper -->
+    @if(app()->environment('local', 'development'))
+    <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+        <p class="text-xs text-blue-800 font-medium">Development Mode:</p>
+        <p class="text-xs text-blue-600">You're in development mode and accessing this page directly with a reset token.</p>
+    </div>
+    @endif
+
     <form method="POST" action="{{ route('password.store') }}">
         @csrf
 
         <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+        <input type="hidden" name="token" value="{{ $request->route('token') ?? old('token') }}">
 
         <!-- Email Address -->
         <div>

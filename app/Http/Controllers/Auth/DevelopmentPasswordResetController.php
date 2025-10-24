@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
-class PasswordResetLinkController extends Controller
+class DevelopmentPasswordResetController extends Controller
 {
     /**
      * Display the password reset link request view.
@@ -21,42 +20,14 @@ class PasswordResetLinkController extends Controller
     }
 
     /**
-     * Handle an incoming password reset link request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Handle an incoming password reset link request for development.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $request->validate([
             'email' => ['required', 'email'],
         ]);
 
-        // Check if we're in development mode and mailer is set to log
-        $isDevelopment = app()->environment('local', 'development');
-        $usesLogMailer = config('mail.default') === 'log';
-        
-        if ($isDevelopment && $usesLogMailer) {
-            return $this->handleDevelopmentReset($request);
-        }
-
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
-    }
-    
-    /**
-     * Handle password reset for development environment.
-     */
-    private function handleDevelopmentReset(Request $request): RedirectResponse
-    {
         // Find the user
         $user = \App\Models\User::where('email', $request->email)->first();
         
@@ -85,5 +56,19 @@ class PasswordResetLinkController extends Controller
         session()->flash('dev_email', $user->email);
         
         return redirect()->back()->with('status', 'Password reset link generated successfully for development. Check the flashed message for the link.');
+    }
+
+    /**
+     * Display the password reset view for development.
+     */
+    public function showResetForm($token)
+    {
+        $email = request()->query('email');
+        
+        return view('auth.reset-password', [
+            'request' => request(),
+            'token' => $token,
+            'email' => $email
+        ]);
     }
 }
