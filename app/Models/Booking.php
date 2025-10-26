@@ -25,6 +25,7 @@ class Booking extends Model implements HasMedia
         'payment_status',
         'booking_status',
         'payment_started_at',
+        'midtrans_transaction_id',
     ];
 
     protected $casts = [
@@ -39,6 +40,16 @@ class Booking extends Model implements HasMedia
     public function schedule()
     {
         return $this->belongsTo(Schedule::class);
+    }
+    
+    public function paymentHistories()
+    {
+        return $this->hasMany(PaymentHistory::class);
+    }
+    
+    public function latestPaymentHistory()
+    {
+        return $this->hasOne(PaymentHistory::class)->latestOfMany();
     }
     
     public function getBookedSeatNumbersAttribute()

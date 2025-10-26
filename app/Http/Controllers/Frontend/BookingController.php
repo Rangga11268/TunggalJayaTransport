@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Route as BusRoute;
 use App\Services\TicketPdfService;
+use App\Services\PaymentService;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -411,7 +412,7 @@ class BookingController extends Controller
             // Validate the request
             $validatedData = $request->validate([
                 'booking_id' => 'required|exists:bookings,id',
-                'payment_method' => 'required|string|in:credit_card,bank_transfer,e_wallet'
+                'payment_method' => 'required|string|in:gopay,shopeepay,qris,dana,linkaja,credit_card,bank_transfer,echannel'
             ]);
             
             Log::info('Validation passed', ['validated_data' => $validatedData]);
@@ -438,14 +439,23 @@ class BookingController extends Controller
                 return response()->json(['success' => false, 'message' => 'Please select and save your seats before proceeding to payment.']);
             }
             
-            // For demo purposes, we'll just mark the payment as paid
-            $booking->payment_status = 'paid';
-            $booking->payment_started_at = null; // Clear payment timer
+            // Use PaymentService to process payment with Midtrans
+            $paymentMethod = $validatedData['payment_method'];
             
-            if ($booking->save()) {
-                return response()->json(['success' => true, 'message' => 'Payment processed successfully']);
+            $result = $this->paymentService->processPayment($booking->id, $paymentMethod);
+            
+            if ($result['status'] === 'success') {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Payment created successfully',
+                    'snap_token' => $result['snap_token'],
+                    'redirect_url' => $result['redirect_url']
+                ]);
             } else {
-                return response()->json(['success' => false, 'message' => 'Failed to process payment. Please try again.']);
+                return response()->json([
+                    'success' => false,
+                    'message' => $result['message'] ?? 'Failed to process payment with Midtrans'
+                ]);
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Payment validation error', [
@@ -506,6 +516,13 @@ class BookingController extends Controller
         return view('frontend.booking.success', compact('booking'));
     }
     
+    protected $paymentService;
+
+    public function __construct(PaymentService $paymentService)
+    {
+        $this->paymentService = $paymentService;
+    }
+
     public function downloadTicket($id, TicketPdfService $ticketPdfService)
     {
         $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);

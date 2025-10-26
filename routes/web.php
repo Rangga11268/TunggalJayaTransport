@@ -24,6 +24,12 @@ Route::prefix('')->name('frontend.')->group(function () {
         Route::get('/confirmation/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'confirmation'])->name('booking.confirmation');
         Route::get('/success/{id}', [App\Http\Controllers\Frontend\BookingController::class, 'success'])->name('booking.success');
         Route::get('/ticket/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'downloadTicket'])->name('booking.download-ticket');
+        
+        // Payment Routes
+        Route::prefix('payment')->name('payment.')->group(function () {
+            Route::post('/process', [App\Http\Controllers\PaymentController::class, 'process'])->name('process');
+            Route::get('/status/{orderId}', [App\Http\Controllers\PaymentController::class, 'status'])->name('status');
+        });
     });
 
     Route::get('/routes', [App\Http\Controllers\Frontend\RouteController::class, 'index'])->name('routes.index');
@@ -61,6 +67,9 @@ Route::middleware('auth')->group(function () {
     });
     
 });
+
+// Payment webhook route (must be accessible without auth)
+Route::post('/payment/webhook', [App\Http\Controllers\PaymentController::class, 'webhook'])->name('payment.webhook');
 
 // Admin Routes
 require __DIR__ . '/admin.php';

@@ -296,12 +296,12 @@
             <div class="border-2 border-gray-200 rounded-lg p-4 sm:p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="credit_card">
                 <div class="flex items-center">
                     <input type="radio" id="credit-card" name="payment" class="h-5 w-5 text-blue-600">
-                    <label for="credit-card" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">Kartu Kredit/Debit</label>
+                    <label for="credit-card" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">Kartu Kredit</label>
                 </div>
                 <div class="mt-4 flex space-x-2">
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
+                    <img src="{{ asset('img/payment-logos/visa.png') }}" alt="Visa" class="w-8 h-5 sm:w-10 sm:h-6 object-contain">
+                    <img src="{{ asset('img/payment-logos/mastercard.png') }}" alt="Mastercard" class="w-8 h-5 sm:w-10 sm:h-6 object-contain">
+                    <img src="{{ asset('img/payment-logos/jcb.png') }}" alt="JCB" class="w-8 h-5 sm:w-10 sm:h-6 object-contain">
                 </div>
             </div>
             <div class="border-2 border-gray-200 rounded-lg p-4 sm:p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="bank_transfer">
@@ -310,20 +310,49 @@
                     <label for="bank-transfer" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">Transfer Bank</label>
                 </div>
                 <div class="mt-4 flex space-x-2">
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-6"></div>
+                    <img src="{{ asset('img/payment-logos/bca.jpg') }}" alt="BCA" class="w-10 h-6 object-contain">
+                    <img src="{{ asset('img/payment-logos/bni.png') }}" alt="BNI" class="w-10 h-6 object-contain">
+                    <img src="{{ asset('img/payment-logos/mandiri.png') }}" alt="Mandiri" class="w-10 h-6 object-contain">
                 </div>
             </div>
-            <div class="border-2 border-gray-200 rounded-lg p-4 sm:p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md" data-method="e_wallet">
+            <div class="border-2 border-gray-200 rounded-lg p-4 sm:p-5 cursor-pointer hover:border-blue-500 payment-method transition duration-200 hover:shadow-md relative" data-method="e_wallet">
                 <div class="flex items-center">
                     <input type="radio" id="e-wallet" name="payment" class="h-5 w-5 text-blue-600">
                     <label for="e-wallet" class="ml-3 block text-base sm:text-lg font-medium text-gray-700">E-Wallet</label>
                 </div>
                 <div class="mt-4 flex space-x-2">
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-5 sm:w-10 sm:h-6"></div>
+                    <img src="{{ asset('img/payment-logos/gopay.png') }}" alt="GoPay" class="w-8 h-5 sm:w-10 sm:h-6 object-contain">
+                    <img src="{{ asset('img/payment-logos/Shopeepay.jpg') }}" alt="ShopeePay" class="w-8 h-5 sm:w-10 sm:h-6 object-contain">
+                    <img src="{{ asset('img/payment-logos/dana.png') }}" alt="DANA" class="w-8 h-5 sm:w-10 sm:h-6 object-contain">
+                </div>
+                
+                <!-- Dropdown E-Wallet Options -->
+                <div id="ewallet-dropdown" class="absolute left-0 mt-2 w-full bg-white rounded-lg shadow-xl z-10 hidden border border-gray-200">
+                    <div class="p-2">
+                        <div class="ewallet-option payment-method p-3 rounded-lg cursor-pointer hover:bg-blue-50 flex items-center" data-ewallet-method="gopay">
+                            <input type="radio" id="gopay-option" name="ewallet-option" class="h-4 w-4 text-blue-600" value="gopay">
+                            <img src="{{ asset('img/payment-logos/gopay.png') }}" alt="GoPay" class="w-8 h-6 mr-2">
+                            <label for="gopay-option" class="block text-sm font-medium text-gray-700">GoPay</label>
+                        </div>
+                        <div class="ewallet-option payment-method p-3 rounded-lg cursor-pointer hover:bg-blue-50 flex items-center mt-1" data-ewallet-method="shopeepay">
+                            <input type="radio" id="shopeepay-option" name="ewallet-option" class="h-4 w-4 text-blue-600" value="shopeepay">
+                            <img src="{{ asset('img/payment-logos/Shopeepay.jpg') }}" alt="ShopeePay" class="w-8 h-6 mr-2">
+                            <label for="shopeepay-option" class="block text-sm font-medium text-gray-700">ShopeePay</label>
+                        </div>
+                        <div class="ewallet-option payment-method p-3 rounded-lg flex items-center mt-1 disabled-payment opacity-50" title="QRIS payment is not currently available. Please contact Darell Rangga to discuss payment procedure.">
+                            <img src="{{ asset('img/payment-logos/qris.png') }}" alt="QRIS" class="w-8 h-6 mr-2">
+                            <label class="block text-sm font-medium text-gray-500">QRIS (Not Available)</label>
+                        </div>
+                        <div class="ewallet-option payment-method p-3 rounded-lg cursor-pointer hover:bg-blue-50 flex items-center mt-1" data-ewallet-method="dana">
+                            <input type="radio" id="dana-option" name="ewallet-option" class="h-4 w-4 text-blue-600" value="dana">
+                            <img src="{{ asset('img/payment-logos/dana.png') }}" alt="DANA" class="w-8 h-6 mr-2">
+                            <label for="dana-option" class="block text-sm font-medium text-gray-700">DANA</label>
+                        </div>
+                        <div class="ewallet-option payment-method p-3 rounded-lg flex items-center mt-1 disabled-payment opacity-50" title="LinkAja payment is not currently available. Please contact Darell Rangga to discuss payment procedure.">
+                            <img src="{{ asset('img/payment-logos/Logo LinkAja.png') }}" alt="LinkAja" class="w-8 h-6 mr-2">
+                            <label class="block text-sm font-medium text-gray-500">LinkAja (Not Available)</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -549,6 +578,16 @@
         </div>
     </div>
     
+<style>
+    .ewallet-option {
+        border: 2px solid transparent;
+    }
+    
+    .ewallet-option.border-blue-500 {
+        border-color: #3b82f6;
+    }
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Seat selection functionality
@@ -945,13 +984,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Payment method selection
-    const paymentMethods = document.querySelectorAll('.payment-method');
+    const paymentMethods = document.querySelectorAll('.payment-method:not(.ewallet-option)');
     let selectedPaymentMethod = 'credit_card';
+    let ewalletDropdown = document.getElementById('ewallet-dropdown');
+    let ewalletMain = document.querySelector('[data-method="e_wallet"]');
     
+    // Handle main payment method selection
     paymentMethods.forEach(method => {
         method.addEventListener('click', function() {
             // Remove active class from all methods
             paymentMethods.forEach(m => m.classList.remove('border-blue-500'));
+            
+            // Close e-wallet dropdown if open
+            if (ewalletDropdown) {
+                ewalletDropdown.classList.add('hidden');
+            }
             
             // Add active class to clicked method
             this.classList.add('border-blue-500');
@@ -960,6 +1007,58 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedPaymentMethod = this.getAttribute('data-method');
         });
     });
+    
+    // Handle e-wallet dropdown
+    if (ewalletMain) {
+        ewalletMain.addEventListener('click', function(e) {
+            // Don't close dropdown if clicking on option inside
+            if (e.target.closest('.ewallet-option')) {
+                return;
+            }
+            
+            // Toggle dropdown visibility
+            if (ewalletDropdown) {
+                ewalletDropdown.classList.toggle('hidden');
+            }
+        });
+        
+        // Handle e-wallet option selection
+        const ewalletOptions = document.querySelectorAll('.ewallet-option');
+        ewalletOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent triggering main div click
+                
+                // Update selected payment method
+                selectedPaymentMethod = this.getAttribute('data-ewallet-method');
+                
+                // Update radio selection visuals
+                document.querySelectorAll('.ewallet-option').forEach(opt => {
+                    opt.classList.remove('border-blue-500');
+                });
+                this.classList.add('border-blue-500');
+                
+                // Select the radio button
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                    // Also update the main e-wallet radio button to reflect selection
+                    const mainEwalletRadio = document.querySelector('#e-wallet input[type="radio"]');
+                    if (mainEwalletRadio) {
+                        mainEwalletRadio.checked = true;
+                    }
+                }
+                
+                // Close dropdown after selection
+                if (ewalletDropdown) {
+                    ewalletDropdown.classList.add('hidden');
+                }
+                
+                // Update main selection visual
+                paymentMethods.forEach(m => m.classList.remove('border-blue-500'));
+                ewalletMain.classList.add('border-blue-500');
+            });
+        });
+    }
     
     // Payment button functionality
     const payButton = document.getElementById('pay-button');
@@ -1005,8 +1104,70 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
-                // Redirect to success page
-                window.location.href = '{{ route("frontend.booking.success", ["id" => $booking->id]) }}';
+                // If snap token is returned, use Midtrans Snap to process payment
+                if (data.snap_token) {
+                    // Load Midtrans Snap script dynamically
+                    const script = document.createElement('script');
+                    script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
+                    script.setAttribute('data-client-key', '{{ config("midtrans.client_key") }}');
+                    script.onload = function() {
+                        // Call Midtrans Snap to show payment page
+                        window.snap.pay(data.snap_token, {
+                            onSuccess: function(result) {
+                                // Payment successful
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Payment Successful!',
+                                    text: 'Your payment has been processed successfully.',
+                                    confirmButtonColor: '#3b82f6'
+                                }).then(() => {
+                                    // Redirect to success page
+                                    window.location.href = data.redirect_url || '{{ route("frontend.booking.success", ["id" => $booking->id]) }}';
+                                });
+                            },
+                            onPending: function(result) {
+                                // Payment pending
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Payment Pending',
+                                    text: 'Please complete your payment.',
+                                    confirmButtonColor: '#3b82f6'
+                                });
+                                // Reset button
+                                payButton.disabled = false;
+                                payButton.innerHTML = originalText;
+                            },
+                            onError: function(result) {
+                                // Payment error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Payment Failed',
+                                    text: 'There was an error processing your payment.',
+                                    confirmButtonColor: '#3b82f6'
+                                });
+                                // Reset button
+                                payButton.disabled = false;
+                                payButton.innerHTML = originalText;
+                            },
+                            onClose: function() {
+                                // Payment window closed by user
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Payment Cancelled',
+                                    text: 'You have cancelled the payment. You can try again later.',
+                                    confirmButtonColor: '#3b82f6'
+                                });
+                                // Reset button
+                                payButton.disabled = false;
+                                payButton.innerHTML = originalText;
+                            }
+                        });
+                    };
+                    document.body.appendChild(script);
+                } else {
+                    // Redirect to success page (for demo purposes)
+                    window.location.href = '{{ route("frontend.booking.success", ["id" => $booking->id]) }}';
+                }
             } else {
                 Swal.fire({
                     icon: 'error',

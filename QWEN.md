@@ -580,624 +580,254 @@ Setelah completing the V1.1 update for the PDF ticket design, the following chan
 
 Desain tiket PDF yang ditingkatkan ini akan memberikan pengalaman yang lebih baik bagi pengguna, dengan tampilan yang lebih profesional dan informasi yang lebih mudah dibaca dan dipahami, serta konsisten antara tampilan frontend dan PDF.
 
+
 # Qwen V1.2 Update: Midtrans Payment Gateway Integration for Tunggal Jaya Transport
 
 ## Overview
 
-Dokumen ini merinci rencana implementasi untuk integrasi gateway pembayaran Midtrans pada website Tunggal Jaya Transport. Integrasi ini akan memungkinkan pengguna untuk melakukan pembayaran tiket secara aman dan mudah melalui berbagai metode pembayaran yang didukung Midtrans seperti kartu kredit, debit, e-wallet, dan transfer bank.
+Dokumen ini merinci rencana implementasi untuk integrasi gateway pembayaran Midtrans pada website Tunggal Jaya Transport. Integrasi ini akan memungkinkan pengguna untuk melakukan pembayaran tiket bus secara aman dan efisien melalui berbagai metode pembayaran yang disediakan oleh Midtrans.
 
 ## Business Requirements
 
-Integrasi Midtrans harus:
+Integrasi Midtrans harus memenuhi kebutuhan berikut:
 
-1. Mendukung berbagai metode pembayaran termasuk kartu kredit/debit, e-wallet (OVO, DANA, ShopeePay), dan transfer bank
-2. Menyediakan pengalaman pembayaran yang aman dan nyaman bagi pengguna
-3. Menyediakan integrasi dengan sistem booking yang sudah ada
-4. Menyediakan notifikasi status pembayaran secara real-time
-5. Menyimpan informasi pembayaran dengan aman sesuai standar PCI DSS
-6. Menyediakan fitur retensi pelanggan melalui notifikasi pembayaran yang profesional
-7. Menyediakan kemampuan untuk menangani pembatalan pembayaran dan refund
-8. Menyediakan laporan pembayaran untuk keperluan administrasi dan akunting
+1. **Metode Pembayaran**: Dukungan untuk berbagai metode pembayaran (kartu kredit, transfer bank, e-wallet)
+2. **Keamanan Pembayaran**: Proses pembayaran yang aman dan terenkripsi
+3. **Pengalaman Pengguna**: Proses pembayaran yang mulus dan tidak memerlukan registrasi akun pembayaran terpisah
+4. **Notifikasi Pembayaran**: Sistem konfirmasi pembayaran otomatis
+5. **Manajemen Status Pembayaran**: Pelacakan status pembayaran secara real-time
+6. **Integrasi dengan Booking System**: Sinkronisasi status pembayaran dengan sistem booking
+7. **Webhook Handler**: Menangani notifikasi pembayaran dari Midtrans
+8. **Manajemen Error**: Penanganan error dan skenario pembayaran yang gagal
 
 ## Technical Architecture
 
 ### A. Backend Components
 
-1. **Midtrans Controller**: `PaymentController` untuk menangani permintaan pembayaran dan notifikasi webhook
-2. **Payment Service**: `MidtransService` untuk logika bisnis pembayaran dan interaksi API Midtrans
-3. **Database Models**: Update tabel booking untuk menyimpan informasi pembayaran dan status transaksi
-4. **Webhook Handler**: Untuk menerima dan memproses notifikasi status pembayaran dari Midtrans
-5. **Event Listeners**: Untuk menangani perubahan status pembayaran dan memicu aksi yang sesuai
+1. **Midtrans Service**: Kelas khusus untuk menangani komunikasi dengan Midtrans API
+2. **Payment Controller**: Kelas baru untuk menangani endpoint pembayaran
+3. **Webhook Handler**: Endpoint untuk menerima notifikasi pembayaran dari Midtrans
+4. **Payment History Model**: Model baru untuk menyimpan riwayat pembayaran
+5. **Configuration**: File konfigurasi khusus Midtrans untuk menyimpan kredensial
 
 ### B. Frontend Components
 
-1. **Payment Form**: Integrasi Snap API Midtrans untuk form pembayaran yang responsive
-2. **Payment Status**: Tampilan status pembayaran real-time setelah transaksi
-3. **Payment Method Selection**: UI untuk memilih metode pembayaran yang tersedia
-4. **Loading Indicators**: Umpan balik visual selama proses pembayaran
+1. **Checkout Page**: Integrasi dengan halaman konfirmasi booking
+2. **Payment Modal/Redirect**: Tampilan modal Midtrans atau redirect ke halaman pembayaran
+3. **Payment Status Display**: Tampilan status pembayaran di halaman booking
 
-## Database Schema Changes
+## Database Schema
 
-### A. Tabel Booking (diperbarui)
-
-Tambahkan kolom ke tabel booking:
-- `payment_status` (string) - 'pending', 'settlement', 'capture', 'cancel', 'expire', 'failure'
-- `transaction_id` (string) - ID transaksi dari Midtrans
-- `transaction_time` (timestamp) - waktu transaksi di Midtrans
-- `payment_type` (string) - jenis pembayaran yang digunakan
-- `payment_code` (string, nullable) - kode pembayaran untuk transfer bank
-- `payment_amount` (decimal) - jumlah pembayaran yang diproses
-- `payment_method_details` (json, nullable) - detail tambahan berdasarkan metode pembayaran
-- `payment_expiry_time` (timestamp, nullable) - waktu kadaluarsa pembayaran (untuk pembayaran non-kartu)
-
-### B. Tabel Riwayat Pembayaran (`payment_histories`)
+### A. Tabel Riwayat Pembayaran (`payment_histories`)
 
 - `id` (bigint, primary key)
-- `booking_id` (foreign key) - referensi ke tabel booking
+- `booking_id` (foreign key) - Relasi ke tabel bookings
 - `transaction_id` (string) - ID transaksi dari Midtrans
-- `transaction_status` (string) - status terbaru dari Midtrans
-- `payment_type` (string) - jenis pembayaran
-- `fraud_status` (string) - status fraud dari Midtrans
-- `amount` (decimal) - jumlah transaksi
+- `payment_method` (string) - Metode pembayaran yang digunakan
+- `gross_amount` (decimal) - Jumlah pembayaran
+- `transaction_status` (string) - Status transaksi (pending, success, failed, expired)
+- `fraud_status` (string) - Status fraud (accept, deny, challenge)
+- `payment_url` (text, nullable) - URL pembayaran jika menggunakan redirect
+- `metadata` (json, nullable) - Metadata tambahan dari Midtrans
 - `created_at`, `updated_at` (timestamp)
 
-## Core Integration Components
+### B. Modifikasi Tabel Booking
 
-### A. Midtrans Service Layer
+- Tambahkan kolom `midtrans_transaction_id` (string, nullable) - Kolom baru untuk menyimpan ID transaksi Midtrans
+- Gunakan kolom `payment_status` yang sudah ada (enum: 'pending', 'paid', 'failed', 'refunded')
 
-#### 1. Pembuatan Transaksi
+## Core Implementation Components
 
-- Generate payload pembayaran dengan data booking
-- Hubungkan dengan API Midtrans (Snap atau Core API)
-- Tangani response dan simpan informasi ke database
-- Kembalikan token dan redirect URL ke frontend
+### A. Konfigurasi Midtrans
 
-#### 2. Manajemen Webhook
+#### 1. File Environment (.env)
+- `MIDTRANS_SERVER_KEY` - Mid-server-q1kUecRxL9JDtnYIbxzPOHhZ
+- `MIDTRANS_CLIENT_KEY` - Mid-client-aAUNIuf1fCSll2qz
+- `MIDTRANS_ENVIRONMENT` - sandbox
+- `MIDTRANS_PAYMENT_URL` - URL untuk endpoint pembayaran
+- `MIDTRANS_API_URL` - URL untuk endpoint API Midtrans
 
-- Terima notifikasi status pembayaran dari Midtrans
-- Validasi signature webhook dari Midtrans
-- Update status booking sesuai status pembayaran
-- Trigger notifikasi dan email ke pengguna
+#### 2. File Konfigurasi
+- `config/midtrans.php` - File konfigurasi dengan parameter-parameter Midtrans
 
-#### 3. Manajemen Refund
+### B. Service Layer
 
-- Proses refund melalui API Midtrans
-- Update status booking dan buat entri dalam payment_histories
-- Kirim notifikasi kepada pengguna
+#### 1. MidtransService
+- `createTransaction($orderData)` - Membuat transaksi baru di Midtrans
+- `getTransactionStatus($orderId)` - Mendapatkan status transaksi dari Midtrans
+- `handleWebhook($payload)` - Menangani payload webhook dari Midtrans
+- `validateNotification($notification)` - Memvalidasi notifikasi pembayaran
 
-### B. Flow Pembayaran
+#### 2. PaymentService  
+- `processPayment($bookingId, $paymentMethod)` - Memproses pembayaran untuk booking tertentu
+- `updateBookingPaymentStatus($bookingId, $status)` - Memperbarui status pembayaran booking
 
-1. **Inisiasi Pembayaran**
-   - Pengguna klik bayar setelah membuat booking
-   - Sistem membuat order ke Midtrans
-   - Midtrans mengembalikan token dan redirect URL
+### C. API Endpoints
 
-2. **Proses Pembayaran**
-   - Pengguna diarahkan ke halaman pembayaran Midtrans
-   - Pengguna memilih metode pembayaran dan menyelesaikan pembayaran
+#### 1. Payment Processing
+- `POST /api/payment/process` - Endpoint untuk memproses pembayaran dengan Midtrans
+- `POST /api/payment/webhook` - Endpoint untuk menerima webhook dari Midtrans
+- `GET /api/payment/status/{orderId}` - Endpoint untuk mengecek status pembayaran
 
-3. **Notifikasi Pembayaran**
-   - Midtrans mengirim notifikasi ke webhook endpoint
-   - Sistem memvalidasi dan memperbarui status booking
-   - Sistem mengirim notifikasi dan email ke pengguna
+#### 2. Response Format
+- Format JSON konsisten untuk semua endpoint pembayaran
+- Kode status HTTP yang sesuai untuk berbagai skenario pembayaran
+- Pesan error yang informatif untuk debugging
 
-4. **Selesai Pembayaran**
-   - Status booking diperbarui sebagai 'paid'
-   - Pengguna dapat mengunduh tiket
+### D. Frontend Integration
 
-### C. Fungsi Utama
+#### 1. Payment Selection
+- Menampilkan pilihan metode pembayaran Midtrans
+- Mengintegrasikan dengan tombol pembayaran yang ada
 
-#### 1. Pembayaran Pesanan
-
-- Fungsi untuk membuat pembayaran untuk pesanan booking
-- Integrasi dengan Snap API untuk form pembayaran
-- Penanganan berbagai metode pembayaran
-
-#### 2. Notifikasi Pembayaran
-
-- Endpoint untuk menerima notifikasi pembayaran dari Midtrans
-- Proses status pembayaran dan update database
-- Logging kejadian pembayaran
-
-#### 3. Status Pembayaran
-
-- Fungsi untuk mengecek status pembayaran
-- Sinkronisasi status pembayaran secara manual jika diperlukan
-- Tampilan status pembayaran di halaman booking
-
-#### 4. Pembatalan Pembayaran
-
-- Fungsi untuk menangani pembatalan pembayaran
-- Proses refund jika pembayaran sudah diselesaikan
-- Update status booking
+#### 2. Payment Flow
+- Redirect ke halaman pembayaran Midtrans atau menampilkan modal
+- Penanganan redirect setelah pembayaran selesai
+- Tampilan status pembayaran
 
 ## Implementation Plan
 
-### Phase 1: Persiapan dan Konfigurasi (Hari 1-2)
+### Phase 1: Persiapan dan Instalasi (Hari 1)
 
-1. Instalasi dan konfigurasi SDK Midtrans
-    - Instal package midtrans/midtrans-php melalui Composer
-    - Konfigurasi environment (server key dan client key sandbox)
-    - Setup konfigurasi Midtrans di config/services.php
-2. Perbarui struktur database
-    - Buat migration untuk menambahkan kolom pembayaran ke tabel booking
-    - Buat migration untuk tabel payment_histories
-    - Buat model PaymentHistory dan update model Booking
-3. Setup environment Midtrans sandbox
-    - Registrasi akun sandbox Midtrans
-    - Konfigurasi webhook endpoint
+1. Instalasi package Midtrans
+    - Tambahkan `"midtrans/midtrans-php": "^2.5"` ke `composer.json`
+    - Jalankan `composer install`
+2. Setup konfigurasi Midtrans
+    - Tambahkan environment variables ke `.env.example` dan `.env`
+    - Buat file konfigurasi `config/midtrans.php`
+3. Buat model PaymentHistory
+    - Definisikan struktur tabel payment_histories
+    - Buat migration file
+    - Buat model class
 
-### Phase 2: Pembuatan Service Layer (Hari 3-4)
+### Phase 2: Pembuatan Service dan Model (Hari 2-3)
 
-1. Buat kelas `MidtransService`
-    - Implementasi fungsi pembuatan transaksi
-    - Implementasi fungsi notifikasi webhook
-    - Implementasi fungsi cek status pembayaran
-    - Implementasi fungsi refund
-2. Tambahkan validasi dan error handling
+1. Implementasi MidtransService
+    - Buat class `MidtransService` di `app/Services/`
+    - Implementasi semua metode yang diperlukan
+2. Implementasi PaymentService
+    - Buat class `PaymentService` di `app/Services/`
+    - Implementasi logika bisnis pembayaran
+3. Update model Booking
+    - Tambahkan relasi dengan payment_histories
+    - Tambahkan metode terkait pembayaran
+
+### Phase 3: Pembuatan Controller dan Endpoint (Hari 4-5)
+
+1. Buat PaymentController
+    - Implementasi endpoint pembayaran
+    - Implementasi webhook handler
+    - Tambahkan validasi input
+2. Integrasi dengan BookingController
+    - Ganti logika pembayaran placeholder dengan integrasi Midtrans
+    - Pastikan penanganan error yang baik
+3. Tambahkan route pembayaran
+    - Buat route untuk endpoint pembayaran
+    - Pastikan middleware otentikasi diterapkan
+
+### Phase 4: Frontend Integration dan Testing (Hari 6-7)
+
+1. Integrasi frontend
+    - Modifikasi halaman konfirmasi booking untuk integrasi pembayaran
+    - Tambahkan JavaScript untuk menangani pembayaran Midtrans
+    - Pastikan tampilan responsif untuk semua ukuran layar
+2. Testing pembayaran
+    - Testing pembayaran sukses
+    - Testing pembayaran gagal
+    - Testing pembayaran dibatalkan
+    - Testing webhook notification
+3. Testing UI
+    - Pastikan tampilan tombol pembayaran konsisten
+    - Pastikan status pembayaran ditampilkan dengan benar
+    - Testing di berbagai perangkat dan browser
+
+### Phase 5: Validasi dan Penyelesaian (Hari 8)
+
+1. Validasi keamanan
+    - Validasi webhook dengan server key
     - Validasi data pembayaran
-    - Penanganan error API Midtrans
-    - Logging aktivitas pembayaran
-
-### Phase 3: Pengembangan Controller dan API (Hari 5-6)
-
-1. Buat `PaymentController`
-    - Method `processPayment` untuk membuat transaksi
-    - Method `handleWebhook` untuk menerima notifikasi Midtrans
-    - Method `checkPaymentStatus` untuk mengecek status pembayaran
-2. Implementasi keamanan endpoint
-    - Validasi signature webhook
-    - Proteksi CSRF dan lainnya
-3. Buat validasi dan rate limiting
-
-### Phase 4: Integrasi Frontend (Hari 7-8)
-
-1. Tambahkan Snap API integration
-    - Tambahkan script Midtrans ke halaman pembayaran
-    - Implementasi Snap redirect setelah pembuatan transaksi
-    - Buat loading states dan penanganan error
-2. Implementasi UI status pembayaran
-    - Tampilan status pembayaran real-time
-    - Notifikasi pengguna tentang status pembayaran
-3. Tambahkan fitur cek status manual
-
-### Phase 5: Testing dan Validasi (Hari 9-10)
-
-1. Uji coba pembayaran dengan berbagai metode
-    - Kartu kredit
-    - E-wallet
-    - Transfer bank
-    - Pembayaran yang gagal dan dibatalkan
-2. Validasi notifikasi webhook berfungsi dengan benar
-3. Uji skenario edge case (timeout, pembatalan, refund)
-4. Lakukan pengujian keamanan dasar
-
-### Phase 6: Fitur Tambahan dan Penyempurnaan (Hari 11-12)
-
-1. Implementasi fitur refund (jika diperlukan)
-2. Tambahkan laporan pembayaran di admin panel
-3. Integrasikan dengan sistem notifikasi
-4. Perbaiki UI/UX berdasarkan feedback
+    - Pastikan tidak ada celah keamanan dalam penanganan pembayaran
+2. Penanganan edge cases
+    - Penanganan pembayaran duplikat
+    - Penanganan pembayaran yang kadaluarsa
+    - Penanganan kesalahan jaringan
+3. Dokumentasi
+    - Update dokumentasi API
+    - Update README dengan konfigurasi Midtrans
+    - Buat dokumentasi untuk developer
 
 ## Teknologi yang Digunakan
 
 - **Backend**: Laravel 12 dengan PHP 8.2+
-- **Payment Gateway**: Midtrans Snap API dan Core API
-- **Frontend**: JavaScript untuk integrasi Snap dan status pembayaran
-- **Database**: MySQL untuk menyimpan informasi pembayaran
-- **Package**: midtrans/midtrans-php official SDK
-
-## Setup Midtrans Sandbox
-
-### A. Registrasi Akun Sandbox
-
-1. Kunjungi halaman registrasi Midtrans: https://dashboard.sandbox.midtrans.com/register
-2. Buat akun dengan email dan password
-3. Verifikasi email yang terdaftar
-4. Login ke dashboard sandbox
-
-### B. Konfigurasi Environment
-
-1. Dapatkan Server Key dan Client Key dari dashboard sandbox
-2. Tambahkan ke file `.env`:
-   ```
-   MIDTRANS_SERVER_KEY=SB-Mid-server-xxxxxxxxxxxxxxxx
-   MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxxxxxxxxxxxxx
-   MIDTRANS_ENVIRONMENT=sandbox
-   MIDTRANS_PAYMENT_URL=https://app.sandbox.midtrans.com/snap/v1/transactions
-   MIDTRANS_API_URL=https://api.sandbox.midtrans.com/v2
-   ```
-
-3. Buat file konfigurasi `config/midtrans.php`:
-   ```php
-   <?php
-   return [
-       'server_key' => env('MIDTRANS_SERVER_KEY'),
-       'client_key' => env('MIDTRANS_CLIENT_KEY'),
-       'environment' => env('MIDTRANS_ENVIRONMENT', 'sandbox'),
-       'payment_url' => env('MIDTRANS_PAYMENT_URL'),
-       'api_url' => env('MIDTRANS_API_URL'),
-   ];
-   ```
-
-### C. Instalasi Package
-
-1. Install package Midtrans PHP SDK:
-   ```
-   composer require midtrans/midtrans-php
-   ```
-
-2. (Opsional) Install Laravel package wrapper jika tersedia:
-   ```
-   composer require laravolt/midtrans
-   ```
+- **Midtrans SDK**: midtrans-php untuk komunikasi dengan API Midtrans
+- **Frontend**: JavaScript vanilla atau Alpine.js untuk integrasi frontend
+- **Database**: MySQL untuk menyimpan riwayat pembayaran
+- **Environment**: .env untuk menyimpan kredensial Midtrans
 
 ## Pertimbangan Keamanan
 
-1. Validasi signature webhook Midtrans untuk memastikan keaslian notifikasi
-2. Jangan pernah menyimpan data kartu kredit di sistem lokal
-3. Pastikan koneksi API menggunakan HTTPS
-4. Proteksi endpoint webhook dengan validasi tambahan
-5. Enkripsi informasi sensitif pengguna dalam database jika diperlukan
-
-## Integration Logic and Best Practices
-
-### A. Best Practices Umum
-
-1. **Jangan menyimpan data sensitif**
-   - Jangan menyimpan data kartu kredit atau informasi pembayaran sensitif lainnya
-   - Midtrans menangani penyimpanan data sensitif secara aman
-
-2. **Gunakan environment yang tepat**
-   - Gunakan sandbox untuk pengembangan dan testing
-   - Gunakan production hanya untuk lingkungan produksi
-
-3. **Implementasi logging**
-   - Catat semua transaksi dan notifikasi untuk audit trail
-   - Gunakan logging yang cukup detail untuk debugging
-
-4. **Validasi webhook**
-   - Selalu validasi signature webhook untuk mencegah spoofing
-   - Verifikasi bahwa notifikasi benar-benar berasal dari Midtrans
-
-5. **Handle semua kemungkinan status pembayaran**
-   - Penanganan untuk status settlement, pending, cancel, expire, failure
-   - Update status booking sesuai dengan status pembayaran
-
-### B. Integration Logic
-
-#### 1. Flow Pembuatan Transaksi
-
-```php
-// Dalam MidtransService
-public function createTransaction($bookingId) 
-{
-    // Ambil data booking berdasarkan ID
-    $booking = Booking::findOrFail($bookingId);
-    
-    // Siapkan parameter transaksi
-    $params = [
-        'transaction_details' => [
-            'order_id' => $booking->booking_code,
-            'gross_amount' => $booking->total_price,
-        ],
-        'customer_details' => [
-            'first_name' => $booking->passenger_name,
-            'email' => $booking->email,
-            'phone' => $booking->phone,
-        ],
-        // Tambahkan item details jika diperlukan
-        'item_details' => [
-            [
-                'id' => 'bus-ticket-' . $booking->id,
-                'price' => $booking->total_price,
-                'quantity' => 1,
-                'name' => 'Bus Ticket - ' . $booking->route->name,
-            ]
-        ]
-    ];
-
-    try {
-        // Buat transaksi di Midtrans
-        $snapToken = \Midtrans\Snap::getSnapToken($params);
-        
-        // Simpan informasi transaksi ke database
-        $booking->update([
-            'payment_status' => 'pending',
-            'transaction_id' => $booking->booking_code, // Midtrans akan memberikan ID sebenarnya setelah pembuatan
-        ]);
-
-        return $snapToken;
-    } catch (\Exception $e) {
-        \Log::error('Midtrans transaction creation failed: ' . $e->getMessage());
-        throw $e;
-    }
-}
-```
-
-#### 2. Flow Webhook Handler
-
-```php
-// Dalam PaymentController
-public function handleWebhook(Request $request)
-{
-    // Validasi signature
-    $notification = $request->json()->all();
-    
-    $validator = new \Midtrans\Notification();
-    $notification = $validator->validate();
-    
-    $order_id = $notification->order_id;
-    $transaction = $notification->transaction_status;
-    $fraud = $notification->fraud_status;
-    
-    // Dapatkan booking berdasarkan order_id
-    $booking = Booking::where('booking_code', $order_id)->first();
-    
-    if (!$booking) {
-        return response('Booking not found', 404);
-    }
-    
-    // Proses berdasarkan status transaksi
-    switch ($transaction) {
-        case 'capture':
-            if ($fraud === 'challenge') {
-                $booking->payment_status = 'challenge';
-            } else if ($fraud === 'accept') {
-                $booking->payment_status = 'settlement';
-            }
-            break;
-        case 'settlement':
-            $booking->payment_status = 'settlement';
-            break;
-        case 'pending':
-            $booking->payment_status = 'pending';
-            break;
-        case 'deny':
-            $booking->payment_status = 'deny';
-            break;
-        case 'expire':
-            $booking->payment_status = 'expire';
-            break;
-        case 'cancel':
-            $booking->payment_status = 'cancel';
-            break;
-    }
-    
-    // Simpan perubahan status
-    $booking->save();
-    
-    // Simpan ke payment history
-    PaymentHistory::create([
-        'booking_id' => $booking->id,
-        'transaction_id' => $notification->transaction_id,
-        'transaction_status' => $transaction,
-        'payment_type' => $notification->payment_type,
-        'fraud_status' => $fraud,
-        'amount' => $notification->gross_amount,
-    ]);
-    
-    return response('Notification handled', 200);
-}
-```
-
-#### 3. Flow Cek Status Pembayaran
-
-```php
-// Dalam MidtransService
-public function checkTransactionStatus($orderId)
-{
-    try {
-        $status = \Midtrans\Transaction::status($orderId);
-        return $status;
-    } catch (\Exception $e) {
-        \Log::error('Failed to check transaction status: ' . $e->getMessage());
-        return null;
-    }
-}
-```
-
-## Pertimbangan Kinerja
-
-1. Implementasi queue untuk pemrosesan webhook agar tidak memblokir respon
-2. Gunakan caching untuk informasi pembayaran yang sering diakses
-3. Implementasi logging yang efisien untuk mencegah overhead
-4. Gunakan timeout yang sesuai untuk API calls
+1. Jangan pernah menyimpan kredensial Midtrans di codebase
+2. Validasi webhook dari Midtrans dengan server key
+3. Gunakan HTTPS untuk endpoint pembayaran dan webhook
+4. Validasi data booking sebelum membuat transaksi
+5. Jangan pernah mengandalkan status pembayaran dari client-side
+6. Gunakan CSRF protection untuk semua endpoint pembayaran
 
 ## Integrasi dengan Fitur yang Ada
 
 ### A. Integrasi dengan Sistem Booking
+- Pastikan booking sudah memiliki seat_numbers sebelum pembayaran
+- Update status booking berdasarkan status pembayaran dari Midtrans
+- Sinkronisasi waktu kadaluarsa pembayaran dengan logika booking
 
-- Update workflow booking untuk menyertakan status pembayaran
-- Pastikan tiket hanya dibuat setelah pembayaran berhasil
-- Integrasi dengan notifikasi booking yang sudah ada
-- Hubungkan dengan fitur download tiket PDF
+### B. Integrasi dengan Sistem Notifikasi
+- Kirim notifikasi email/SMS saat pembayaran sukses
+- Kirim notifikasi jika pembayaran gagal atau kadaluarsa
+- Update status booking yang terkait
 
-### B. Integrasi dengan Notifikasi
-
-- Kirim notifikasi email ke pengguna saat pembayaran berhasil/gagal
-- Update notifikasi push jika sistem mendukung
-- Integrasi dengan sistem SMS jika diperlukan
-
-### C. Integrasi dengan Admin Panel
-
-- Tambahkan dashboard pembayaran untuk admin
-- Tambahkan fitur cek status pembayaran manual
-- Tambahkan fitur refund dari admin panel
+### C. Integrasi dengan Sistem Tiket
+- Hanya izinkan download tiket untuk booking dengan payment_status = 'paid'
+- Pastikan tiket tidak dapat diakses sebelum pembayaran selesai
 
 ## Evaluasi dan Pengembangan Berkelanjutan
 
-1. Kumpulkan data tentang metode pembayaran yang paling sering digunakan
-2. Analisis tingkat keberhasilan pembayaran dan kendala yang dihadapi pengguna
-3. Evaluasi tingkat kepuasan pengguna terhadap proses pembayaran
-4. Monitor error dan latency pembayaran
-5. Lakukan perbaikan dan peningkatan berdasarkan data dan feedback
+1. Monitoring status pembayaran
+2. Analisis tingkat keberhasilan pembayaran
+3. Pengumpulan feedback dari pengguna tentang proses pembayaran
+4. Pengembangan fitur pembayaran ulang untuk pembayaran yang gagal
+5. Peningkatan UX berdasarkan data penggunaan
 
 ## Potensi Tantangan dan Solusi
 
-1. **Koneksi API tidak stabil**: Implementasi retry mechanism dan queue untuk pemrosesan webhook
-2. **Perbedaan zona waktu**: Gunakan UTC untuk semua timestamp dan konversi ke lokal time saat tampilan
-3. **Kegagalan webhook**: Implementasi fitur sync manual status pembayaran
-4. **Pembayaran timeout**: Gunakan cron job untuk mengecek status pembayaran yang belum final
+1. **Testing Pembayaran**: Gunakan environment sandbox Midtrans untuk testing
+2. **Webhook Handling**: Implementasi retry mechanism untuk webhook yang gagal
+3. **Status Pembayaran**: Gunakan cron job untuk sinkronisasi status pembayaran secara berkala
+4. **Kesalahan Jaringan**: Implementasi mekanisme fallback dan retry
+5. **Keamanan**: Validasi semua input dan response dari Midtrans
 
 ## Rollback Plan
 
-Jika implementasi pembayaran Midtrans bermasalah, berikut adalah rencana rollback:
+Jika implementasi integrasi pembayaran bermasalah, berikut adalah rencana rollback:
 
-### A. Mengembalikan Migrasi Database
+### A. Kembalikan File yang Diubah
 
-- Kembalikan perubahan migrasi database:
-  - Migration: `create_payment_histories_table`, `update_bookings_table_for_payments`
-    - Untuk menghapus: `php artisan migrate:rollback --step=2`
-    - Atau secara manual drop tabel: `payment_histories`
-    - Kembalikan struktur tabel `bookings` ke versi sebelumnya (hapus kolom terkait pembayaran)
-- Backup struktur database sebelum implementasi agar bisa dikembalikan ke kondisi semula jika diperlukan
-- **PENTING**: Setelah rollback, jika ingin mengembalikan migrasi ke kondisi semula, jalankan:
-  - `php artisan migrate` untuk menjalankan migrasi baru kembali
-  - Pastikan migrasi yang dijalankan kembali sesuai dengan versi terbaru sebelum rollback
+- Controller: `BookingController.php` - kembalikan ke implementasi payment placeholder asli
+- Route: kembalikan perubahan pada file route
+- View: kembalikan perubahan pada halaman konfirmasi booking
+- Service: hapus `MidtransService.php` dan `PaymentService.php` jika tidak diperlukan untuk fungsi lain
+- Model: hapus model `PaymentHistory` dan migration terkait
 
-### B. Menghapus File yang Dibuat
+### B. Kembalikan Database
 
-- `app/Services/MidtransService.php` - Service untuk logika pembayaran
-- `app/Http/Controllers/PaymentController.php` - Controller untuk pembayaran
-- `app/Models/PaymentHistory.php` - Model untuk histori pembayaran
-- `resources/views/payment/` - Folder view terkait pembayaran (jika ada)
-- `routes/web.php` - Hapus route pembayaran dari file ini
+- Migration: rollback migrasi terkait tabel payment_histories
+- Data: jika diperlukan, kembalikan data sebelum integrasi
 
-### C. Menghapus Konfigurasi dan Integrasi
+### C. Kembalikan Konfigurasi
 
-- Dalam `config/midtrans.php`: hapus file konfigurasi Midtrans
-- Dalam `config/services.php`: hapus konfigurasi Midtrans jika ditambahkan di sana
-- Dalam `.env`: hapus variabel lingkungan untuk Midtrans (MIDTRANS_SERVER_KEY, MIDTRANS_CLIENT_KEY, dll)
-- Dalam `composer.json` dan `composer.lock`: hapus dependency midtrans-php dan jalankan `composer install` untuk sinkronisasi
+- Hapus file konfigurasi Midtrans
+- Hapus environment variables terkait Midtrans
 
-### D. Membersihkan Referensi Kode
-
-- Dalam controller booking: hapus panggilan ke service pembayaran
-- Dalam view booking: hapus elemen pembayaran
-- Dalam model booking: hapus relasi dan kolom terkait pembayaran
-- Dalam model booking: kembalikan struktur model ke kondisi sebelum penambahan fitur pembayaran
-
-### E. Verifikasi Rollback
-
-Setelah melaksanakan rollback, pastikan:
-
-1. Tidak ada error saat menjalankan `php artisan migrate:status`
-2. Aplikasi tetap berjalan normal tanpa fitur pembayaran Midtrans
-3. Tidak ada file sisa yang terkait dengan Midtrans
-4. Tidak ada route, konfigurasi atau dependency yang mengarah ke fitur yang sudah dihapus
-5. Database tidak memiliki tabel atau kolom yang ditambahkan oleh migrasi pembayaran
-
-### F. Prosedur untuk Mengembalikan ke Kondisi Sebelum Rollback
-
-Jika Anda ingin mengembalikan fitur pembayaran Midtrans setelah melakukan rollback, ikuti langkah-langkah berikut:
-
-1. **Mengembalikan Migrasi Database**:
-   - Pastikan file-file migrasi masih ada di folder `database/migrations/`
-   - Jalankan `php artisan migrate` untuk menjalankan kembali migrasi yang sebelumnya di-rollback
-   - Periksa status migrasi dengan `php artisan migrate:status` untuk memastikan semua migrasi sudah berjalan
-
-2. **Mengembalikan File-file Inti**:
-   - Pastikan file-file berikut sudah dikembalikan:
-     - `app/Services/MidtransService.php`
-     - `app/Http/Controllers/PaymentController.php`
-     - `app/Models/PaymentHistory.php`
-   - Tambahkan kembali route pembayaran di `routes/web.php`
-
-3. **Mengembalikan Konfigurasi**:
-   - Kembalikan file konfigurasi `config/midtrans.php`
-   - Tambahkan kembali variabel lingkungan ke file `.env`
-   - Tambahkan kembali dependency Midtrans ke `composer.json` jika perlu, lalu jalankan `composer install`
-
-4. **Mengembalikan Integrasi**:
-   - Tambahkan kembali kode-kode integrasi ke model Booking dan controller terkait
-   - Pastikan semua koneksi dan penanganan pembayaran berfungsi kembali
-
-### G. Daftar Lengkap Migrasi yang Telah Dijalankan (Referensi untuk Rollback)
-
-Berikut adalah daftar lengkap migrasi yang telah dijalankan dalam sistem Tunggal Jaya Transport sebelum implementasi Midtrans, berdasarkan database saat ini:
-
-**Batch 1:**
-1. `0001_01_01_000000_create_users_table` (ID: 1)
-2. `0001_01_01_000001_create_cache_table` (ID: 2)
-3. `0001_01_01_000002_create_jobs_table` (ID: 3)
-4. `2025_01_01_000000_create_otp_codes_table` (ID: 4)
-5. `2025_01_01_000001_add_phone_verification_to_users_table` (ID: 5)
-6. `2025_09_14_051831_create_permission_tables` (ID: 6)
-7. `2025_09_14_051835_create_media_table` (ID: 7)
-8. `2025_09_14_051847_create_personal_access_tokens_table` (ID: 8)
-9. `2025_09_14_051939_create_buses_table` (ID: 9)
-10. `2025_09_14_051942_create_routes_table` (ID: 10)
-11. `2025_09_14_051948_create_schedules_table` (ID: 11)
-12. `2025_09_14_051954_create_bookings_table` (ID: 12)
-13. `2025_09_14_052004_create_categories_table` (ID: 13)
-14. `2025_09_14_052005_create_news_articles_table` (ID: 14)
-15. `2025_09_14_052011_create_facilities_table` (ID: 15)
-16. `2025_09_14_052015_create_drivers_table` (ID: 16)
-17. `2025_09_14_052358_create_bus_facility_table` (ID: 17)
-18. `2025_09_14_052414_create_bus_driver_table` (ID: 18)
-19. `2025_09_15_130908_create_conductors_table` (ID: 19)
-20. `2025_09_15_130957_create_bus_conductor_table` (ID: 20)
-21. `2025_09_15_132741_add_employee_id_to_drivers_table` (ID: 21)
-22. `2025_09_15_142009_create_media_collections_for_drivers_and_conductors` (ID: 22)
-
-**Batch 2:**
-23. `2025_10_03_153719_fix_year_column_in_buses_table` (ID: 23)
-
-**Batch 3:**
-24. `2025_09_16_094335_make_user_id_nullable_in_bookings_table` (ID: 24)
-
-**Batch 4:**
-25. `2025_09_16_094642_ensure_seat_numbers_is_nullable_in_bookings_table` (ID: 25)
-
-**Batch 5:**
-26. `2025_09_16_095137_add_number_of_seats_to_bookings_table` (ID: 26)
-
-**Batch 6:**
-27. `2025_09_19_113037_fix_bookings_table_structure` (ID: 27)
-
-**Batch 7:**
-28. `2025_09_26_120000_add_booking_date_to_bookings_table` (ID: 28)
-
-**Batch 8:**
-29. `2025_09_16_093356_add_seat_number_to_bookings_table` (ID: 29)
-30. `2025_09_16_094550_rename_seat_number_to_seat_numbers_in_bookings_table` (ID: 30)
-31. `2025_09_16_094808_remove_duplicate_seat_number_column_in_bookings_table` (ID: 31)
-32. `2025_09_28_184944_add_year_and_fuel_type_to_buses_table` (ID: 32)
-33. `2025_10_03_153354_fix_buses_table_add_year_column` (ID: 33)
-
-**Batch 9:**
-34. `2025_09_17_084044_add_unique_constraint_to_bus_driver_pivot_table` (ID: 34)
-
-**Batch 10:**
-35. `2025_09_17_084047_add_unique_constraint_to_bus_conductor_pivot_table` (ID: 35)
-
-**Batch 11:**
-36. `2025_09_17_084715_ensure_unique_constraints_for_drivers` (ID: 36)
-
-**Batch 12:**
-37. `2025_09_18_132224_add_coordinates_to_routes_table` (ID: 37)
-
-**Batch 13:**
-38. `2025_09_19_120433_fix_schedule_time_fields_to_datetime` (ID: 38)
-
-**Batch 14:**
-39. `2025_09_18_125822_add_weekly_schedule_fields_to_schedules_table` (ID: 39)
-
-**Batch 15:**
-40. `2025_09_19_221142_add_is_daily_to_schedules_table` (ID: 40)
-
-**Batch 16:**
-41. `2025_09_29_000000_remove_weekly_schedule_fields_from_schedules_table` (ID: 41)
-
-**Batch 17:**
-42. `2025_09_24_153723_drop_weekly_schedule_templates_table` (ID: 42)
-
-**Catatan Penting**: Saat melakukan rollback fitur Midtrans, hanya migrasi terkait Midtrans yang akan di-rollback (yaitu migrasi yang akan dibuat untuk `payment_histories` dan perubahan pada `bookings`). Migrasi-migrasi di atas adalah migrasi inti aplikasi yang tidak boleh di-rollback kecuali secara keseluruhan sistem perlu dikembalikan ke versi awal. Informasi batch di atas menunjukkan urutan eksekusi migrasi, dengan Batch 17 sebagai migrasi terakhir yang dijalankan.
-
-
-
-
+---
 
 # Qwen V1.3 Update: Migration Optimization and Database Structure Consolidation
 

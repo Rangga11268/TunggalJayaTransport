@@ -24,12 +24,14 @@ return new class extends Migration
             $table->integer('number_of_seats')->default(1);
             $table->decimal('total_price', 10, 2);
             $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
+            $table->string('midtrans_transaction_id')->nullable();
             $table->enum('booking_status', ['pending', 'confirmed', 'cancelled', 'completed'])->default('pending');
             $table->timestamp('payment_started_at')->nullable();
             $table->timestamps();
             
             // Create an index for better performance when querying by schedule and date
             $table->index(['schedule_id', 'booking_date'], 'idx_schedule_booking_date');
+            $table->index('midtrans_transaction_id');
         });
     }
 
