@@ -28,6 +28,22 @@ class MidtransService
     public function createTransaction($orderData)
     {
         try {
+            // Add callbacks configuration if not already present
+            if (!isset($orderData['callbacks'])) {
+                $bookingId = $orderData['booking_id'] ?? '';
+                $callbackUrl = route('frontend.booking.success', ['id' => $bookingId]);
+                
+                // Log the callback URL for debugging
+                \Log::info('Midtrans callback URL generated', [
+                    'booking_id' => $bookingId,
+                    'callback_url' => $callbackUrl
+                ]);
+                
+                $orderData['callbacks'] = [
+                    'finish' => $callbackUrl,
+                ];
+            }
+            
             // Create snap token
             $snapToken = Snap::createTransaction($orderData)->token;
             

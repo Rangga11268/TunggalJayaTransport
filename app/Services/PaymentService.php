@@ -54,6 +54,7 @@ class PaymentService
                 ]
             ],
             'enabled_payments' => [$paymentMethod],
+            'booking_id' => $booking->id, // Add booking_id for callback URL
         ];
 
         // For QRIS, we need to specify additional parameters

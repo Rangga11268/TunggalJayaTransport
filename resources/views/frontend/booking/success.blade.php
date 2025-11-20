@@ -196,8 +196,15 @@
             <div
                 class="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="text-center sm:text-left">
-                    <p class="text-gray-600 text-sm sm:text-base">Status Pembayaran: <span
-                            class="font-bold text-green-600">Selesai</span></p>
+                    <p class="text-gray-600 text-sm sm:text-base">Status Pembayaran: 
+                        @if($booking->payment_status === 'paid')
+                            <span class="font-bold text-green-600">Selesai</span>
+                        @elseif($booking->payment_status === 'pending')
+                            <span class="font-bold text-yellow-600">Menunggu Konfirmasi</span>
+                        @else
+                            <span class="font-bold text-gray-600">{{ ucfirst($booking->payment_status) }}</span>
+                        @endif
+                    </p>
                     <p class="text-xs sm:text-sm text-gray-500 mt-1">+ Biaya Layanan: Rp. 5.000</p>
                 </div>
                 <div class="text-center sm:text-right">

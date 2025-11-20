@@ -1122,7 +1122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     confirmButtonColor: '#3b82f6'
                                 }).then(() => {
                                     // Redirect to success page
-                                    window.location.href = data.redirect_url || '{{ route("frontend.booking.success", ["id" => $booking->id]) }}';
+                                    window.location.href = '{{ route("frontend.booking.success", ["id" => $booking->id]) }}';
                                 });
                             },
                             onPending: function(result) {

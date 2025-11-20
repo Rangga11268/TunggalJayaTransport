@@ -485,25 +485,17 @@ class BookingController extends Controller
         }
         
         // Ensure the booking is valid for success page
-        if ($booking->booking_status !== 'confirmed') {
+        // Allow both 'confirmed' and 'pending' booking status
+        // 'pending' is set by PaymentService when payment is initiated
+        if (!in_array($booking->booking_status, ['confirmed', 'pending'])) {
             abort(404, 'Invalid booking');
         }
         
-        // Check if the schedule has already departed
-        if ($booking->schedule->hasDeparted()) {
-            return redirect()->route('frontend.booking.index')
-                ->withErrors(['schedule' => 'The schedule for this booking has already departed.'])
-                ->withInput();
-        }
-        
-        // For demo purposes, we ensure the booking is marked as completed
-        if ($booking->payment_status !== 'paid') {
-            // In a real scenario, you might want to verify with payment gateway
-            // For demo, we'll just mark it as completed if it's confirmed and has seat numbers
-            if ($booking->booking_status === 'confirmed' && !empty($booking->seat_numbers)) {
-                $booking->payment_status = 'paid';
-                $booking->save();
-            }
+        // Allow access for both 'paid' and 'pending' payment statuses
+        // The webhook will update the status to 'paid' once payment is confirmed
+        if (!in_array($booking->payment_status, ['paid', 'pending'])) {
+            return redirect()->route('frontend.booking.confirmation', ['booking' => $booking->id])
+                ->withErrors(['payment' => 'Payment has not been initiated yet.']);
         }
         
         // Check if the schedule has already departed
@@ -543,7 +535,12 @@ class BookingController extends Controller
         }
 
         // Check if the booking is valid
-        if ($booking->booking_status !== 'confirmed' || $booking->payment_status !== 'paid') {
+        // Allow both 'confirmed' and 'pending' status as payment might still be processing
+        $validBookingStatuses = ['confirmed', 'pending'];
+        $validPaymentStatuses = ['paid', 'pending'];
+        
+        if (!in_array($booking->booking_status, $validBookingStatuses) || 
+            !in_array($booking->payment_status, $validPaymentStatuses)) {
             abort(404, 'Ticket not available. Invalid booking status.');
         }
 
