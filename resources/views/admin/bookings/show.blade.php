@@ -14,13 +14,13 @@
                         <div class="mt-2 text-sm text-gray-500 flex items-center">
                             <span>Kode Pemesanan: {{ $booking->booking_code }}</span>
                             @if($booking->schedule->hasDeparted())
-                                <span class="ml-3 bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">
-                                    JADWAL BERANGKAT
-                                </span>
+                            <span class="ml-3 bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                JADWAL BERANGKAT
+                            </span>
                             @endif
                         </div>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <h3 class="text-lg font-medium mb-4">Informasi Penumpang</h3>
@@ -43,7 +43,7 @@
                                 </div>
                             </dl>
                         </div>
-                        
+
                         <div>
                             <h3 class="text-lg font-medium mb-4">Informasi Pemesanan</h3>
                             <dl class="grid grid-cols-1 gap-3">
@@ -59,21 +59,21 @@
                                     <dt class="font-medium text-gray-500 w-32">Status Pembayaran:</dt>
                                     <dd class="text-gray-900">
                                         @if($booking->payment_status === 'pending')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                Tertunda
-                                            </span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            Tertunda
+                                        </span>
                                         @elseif($booking->payment_status === 'paid')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                Dibayar
-                                            </span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Dibayar
+                                        </span>
                                         @elseif($booking->payment_status === 'failed')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                Gagal
-                                            </span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                            Gagal
+                                        </span>
                                         @else
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                Dikembalikan
-                                            </span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            Dikembalikan
+                                        </span>
                                         @endif
                                     </dd>
                                 </div>
@@ -81,28 +81,28 @@
                                     <dt class="font-medium text-gray-500 w-32">Status Pemesanan:</dt>
                                     <dd class="text-gray-900">
                                         @if($booking->booking_status === 'pending')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                Tertunda
-                                            </span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            Tertunda
+                                        </span>
                                         @elseif($booking->booking_status === 'confirmed')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                Dikonfirmasi
-                                            </span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Dikonfirmasi
+                                        </span>
                                         @elseif($booking->booking_status === 'cancelled')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                Dibatalkan
-                                            </span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                            Dibatalkan
+                                        </span>
                                         @else
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                                Selesai
-                                            </span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            Selesai
+                                        </span>
                                         @endif
                                     </dd>
                                 </div>
                             </dl>
                         </div>
                     </div>
-                    
+
                     <div class="mt-8">
                         <h3 class="text-lg font-medium mb-4">Informasi Jadwal</h3>
                         <dl class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -127,9 +127,9 @@
                                 <dd class="text-gray-900">
                                     {{ $booking->schedule->getActualDepartureTime()->format('d M Y H:i') }}
                                     @if($booking->schedule->hasDeparted())
-                                        <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded">
-                                            BERANGKAT
-                                        </span>
+                                    <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded">
+                                        BERANGKAT
+                                    </span>
                                     @endif
                                 </dd>
                             </div>
@@ -138,17 +138,17 @@
                                 <dd class="text-gray-900">{{ $booking->schedule->getActualArrivalTime()->format('d M Y H:i') }}</dd>
                             </div>
                             @if($booking->schedule->hasDeparted())
-                                <div class="flex md:col-span-2">
-                                    <dt class="font-medium text-gray-500 w-32">Status:</dt>
-                                    <dd class="text-red-600 font-semibold">
-                                        <i class="fas fa-exclamation-triangle mr-1"></i>
-                                        Jadwal ini sudah berangkat. Pemesanan tidak lagi valid.
-                                    </dd>
-                                </div>
+                            <div class="flex md:col-span-2">
+                                <dt class="font-medium text-gray-500 w-32">Status:</dt>
+                                <dd class="text-red-600 font-semibold">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    Jadwal ini sudah berangkat. Pemesanan tidak lagi valid.
+                                </dd>
+                            </div>
                             @endif
                         </dl>
                     </div>
-                    
+
                     <div class="mt-8 flex items-center justify-between pt-6 border-t border-gray-200">
                         <a href="{{ route('admin.bookings.index') }}" class="text-gray-600 hover:text-gray-800 touch-friendly">
                             ← Kembali ke Pemesanan

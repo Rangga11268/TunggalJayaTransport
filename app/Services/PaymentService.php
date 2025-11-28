@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentService
 {
-    protected $midtransService;
+    public $midtransService;
 
     public function __construct(MidtransService $midtransService)
     {
@@ -111,7 +111,7 @@ class PaymentService
     public function updateBookingPaymentStatus($bookingId, $status)
     {
         $booking = Booking::find($bookingId);
-        
+
         if (!$booking) {
             return false;
         }

@@ -6,6 +6,7 @@ use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Transaction;
 use App\Models\PaymentHistory;
+use Illuminate\Support\Facades\Log;
 
 class MidtransService
 {
@@ -32,21 +33,21 @@ class MidtransService
             if (!isset($orderData['callbacks'])) {
                 $bookingId = $orderData['booking_id'] ?? '';
                 $callbackUrl = route('frontend.booking.success', ['id' => $bookingId]);
-                
+
                 // Log the callback URL for debugging
                 \Log::info('Midtrans callback URL generated', [
                     'booking_id' => $bookingId,
                     'callback_url' => $callbackUrl
                 ]);
-                
+
                 $orderData['callbacks'] = [
                     'finish' => $callbackUrl,
                 ];
             }
-            
+
             // Create snap token
             $snapToken = Snap::createTransaction($orderData)->token;
-            
+
             return [
                 'status' => 'success',
                 'snap_token' => $snapToken,
@@ -66,15 +67,62 @@ class MidtransService
      * @param string $orderId
      * @return array
      */
+
     public function getTransactionStatus($orderId)
     {
         try {
             $status = Transaction::status($orderId);
+
+            // Log the raw status for debugging
+            Log::info('Midtrans Transaction Status Raw:', ['order_id' => $orderId, 'status' => (array)$status]);
+
+            // Safely get properties whether it's an object or array
+            $transactionStatus = is_object($status) ? $status->transaction_status : $status['transaction_status'];
+            $fraudStatus = is_object($status) ? ($status->fraud_status ?? 'accept') : ($status['fraud_status'] ?? 'accept');
+            $paymentType = is_object($status) ? ($status->payment_type ?? 'unknown') : ($status['payment_type'] ?? 'unknown');
+            $grossAmount = is_object($status) ? ($status->gross_amount ?? 0) : ($status['gross_amount'] ?? 0);
+
+            // Find the payment history record
+            $paymentHistory = PaymentHistory::where('transaction_id', $orderId)->first();
+
+            if ($paymentHistory) {
+                // Update payment history
+                $paymentHistory->update([
+                    'transaction_status' => $transactionStatus,
+                    'fraud_status' => $fraudStatus,
+                    'payment_method' => $paymentType,
+                    'gross_amount' => $grossAmount
+                ]);
+
+                // Update booking status based on payment result
+                $booking = $paymentHistory->booking;
+                if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
+                    // Payment successful
+                    $booking->update([
+                        'payment_status' => 'paid',
+                        'midtrans_transaction_id' => $orderId
+                    ]);
+                } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire') {
+                    // Payment failed/expired
+                    $booking->update([
+                        'payment_status' => 'failed',
+                        'midtrans_transaction_id' => $orderId
+                    ]);
+                } elseif ($transactionStatus === 'pending') {
+                    // Waiting for payment
+                    $booking->update([
+                        'payment_status' => 'pending',
+                        'midtrans_transaction_id' => $orderId
+                    ]);
+                }
+            }
+
             return [
                 'status' => 'success',
                 'data' => $status
             ];
         } catch (\Exception $e) {
+            Log::error('Midtrans Get Status Error: ' . $e->getMessage());
             return [
                 'status' => 'error',
                 'message' => $e->getMessage()
@@ -98,7 +146,7 @@ class MidtransService
 
         // Find the payment history record
         $paymentHistory = PaymentHistory::where('transaction_id', $orderId)->first();
-        
+
         if (!$paymentHistory) {
             return [
                 'status' => 'error',
@@ -153,7 +201,7 @@ class MidtransService
         try {
             $orderId = $notification['order_id'];
             $result = Transaction::status($orderId);
-            
+
             // Verify the status matches
             if ($result->transaction_status === $notification['transaction_status']) {
                 return true;
@@ -161,7 +209,7 @@ class MidtransService
         } catch (\Exception $e) {
             \Log::error('Midtrans validation error: ' . $e->getMessage());
         }
-        
+
         return false;
     }
 }
