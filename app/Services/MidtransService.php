@@ -31,7 +31,7 @@ class MidtransService
         try {
             // Add callbacks configuration if not already present
             if (!isset($orderData['callbacks'])) {
-                $bookingId = $orderData['booking_id'] ?? '';
+                $bookingId = $orderData['booking_id'] ?? $orderData['custom_field1'] ?? '';
                 $callbackUrl = route('frontend.booking.success', ['id' => $bookingId]);
 
                 // Log the callback URL for debugging

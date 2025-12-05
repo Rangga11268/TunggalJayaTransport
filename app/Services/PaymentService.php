@@ -38,7 +38,7 @@ class PaymentService
         $orderData = [
             'transaction_details' => [
                 'order_id' => $booking->booking_code . '_' . time(),
-                'gross_amount' => $booking->total_price,
+                'gross_amount' => (int) $booking->total_price,
             ],
             'customer_details' => [
                 'first_name' => $booking->passenger_name,
@@ -48,18 +48,24 @@ class PaymentService
             'item_details' => [
                 [
                     'id' => $booking->id,
-                    'price' => $booking->total_price,
+                    'price' => (int) $booking->total_price,
                     'quantity' => 1,
                     'name' => 'Bus Ticket - ' . $booking->schedule->route->name,
                 ]
             ],
-            'enabled_payments' => [$paymentMethod],
-            'booking_id' => $booking->id, // Add booking_id for callback URL
+            'custom_field1' => $booking->id,
         ];
 
-        // For QRIS, we need to specify additional parameters
-        if ($paymentMethod === 'qris') {
-            $orderData['enabled_payments'] = ['qris'];
+        // Handle enabled payments
+        if ($paymentMethod && $paymentMethod !== 'all') {
+            if ($paymentMethod === 'e_wallet') {
+                // If generic e_wallet, allow common ones or don't restrict
+                $orderData['enabled_payments'] = ['gopay', 'shopeepay', 'qris'];
+            } elseif ($paymentMethod === 'bank_transfer') {
+                $orderData['enabled_payments'] = ['bca_va', 'bni_va', 'bri_va', 'permata_va'];
+            } else {
+                $orderData['enabled_payments'] = [$paymentMethod];
+            }
         }
 
         // Create transaction in Midtrans

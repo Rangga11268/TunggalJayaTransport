@@ -580,7 +580,9 @@ class BookingController extends Controller
                 ->withInput();
         }
 
-        return view('frontend.booking.success', compact('booking'));
+        return \Inertia\Inertia::render('Frontend/Booking/Success', [
+        'booking' => $booking
+    ]);
     }
 
     protected $paymentService;
