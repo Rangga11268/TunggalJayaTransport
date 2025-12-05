@@ -32,7 +32,7 @@ class RouteController extends Controller
         $route->available_schedules = $availableSchedules->values();
         
         return \Inertia\Inertia::render('Frontend/Routes/Show', [
-            'route' => $route
+            'routeModel' => $route
         ]);
     }
 }

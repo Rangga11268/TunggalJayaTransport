@@ -5,7 +5,7 @@ import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 defineOptions({ layout: FrontendLayout });
 
 const props = defineProps({
-    route: Object,
+    routeModel: Object,
 });
 
 const formatPrice = (price) => {
@@ -36,7 +36,7 @@ const formatTime = (timeString) => {
 </script>
 
 <template>
-    <Head :title="`${route.origin} - ${route.destination}`" />
+    <Head :title="`${routeModel.origin} - ${routeModel.destination}`" />
 
     <!-- Hero Header -->
     <div class="relative bg-primary-950 py-24 overflow-hidden">
@@ -71,22 +71,22 @@ const formatTime = (timeString) => {
                     <h1
                         class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-2 font-serif"
                     >
-                        {{ route.origin }}
+                        {{ routeModel.origin }}
                         <span class="text-gray-400 mx-2 text-2xl md:text-4xl"
                             ><i class="fas fa-long-arrow-alt-right"></i
                         ></span>
-                        {{ route.destination }}
+                        {{ routeModel.destination }}
                     </h1>
                     <div class="flex items-center space-x-6 text-gray-300 mt-4">
                         <div class="flex items-center space-x-2">
                             <i class="fas fa-clock text-gold-400"></i>
                             <span>{{
-                                route.formatted_duration || "6 Jam"
+                                routeModel.formatted_duration || "6 Jam"
                             }}</span>
                         </div>
                         <div class="flex items-center space-x-2">
                             <i class="fas fa-road text-gold-400"></i>
-                            <span>{{ route.distance }} km</span>
+                            <span>{{ routeModel.distance }} km</span>
                         </div>
                     </div>
                 </div>
@@ -121,11 +121,11 @@ const formatTime = (timeString) => {
                             class="text-gray-600 dark:text-gray-400 leading-relaxed"
                         >
                             {{
-                                route.description ||
+                                routeModel.description ||
                                 "Nikmati perjalanan yang nyaman dan aman dari " +
-                                    route.origin +
+                                    routeModel.origin +
                                     " menuju " +
-                                    route.destination +
+                                    routeModel.destination +
                                     " bersama Tunggal Jaya Transport. Rute ini menawarkan pemandangan indah dan fasilitas lengap di setiap armada kami."
                             }}
                         </p>
@@ -180,8 +180,8 @@ const formatTime = (timeString) => {
                             </h3>
                             <span class="text-sm text-gray-500"
                                 >{{
-                                    route.available_schedules
-                                        ? route.available_schedules.length
+                                    routeModel.available_schedules
+                                        ? routeModel.available_schedules.length
                                         : 0
                                 }}
                                 jadwal ditemukan</span
@@ -190,13 +190,13 @@ const formatTime = (timeString) => {
 
                         <div
                             v-if="
-                                route.available_schedules &&
-                                route.available_schedules.length > 0
+                                routeModel.available_schedules &&
+                                routeModel.available_schedules.length > 0
                             "
                             class="space-y-4"
                         >
                             <div
-                                v-for="schedule in route.available_schedules"
+                                v-for="schedule in routeModel.available_schedules"
                                 :key="schedule.id"
                                 class="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all group"
                             >
