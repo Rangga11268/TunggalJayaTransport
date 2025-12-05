@@ -1,11 +1,30 @@
-import './bootstrap';
+import "./bootstrap";
+import "../css/app.css";
 
-import Alpine from 'alpinejs';
-import Collapse from '@alpinejs/collapse';
+import { createApp, h } from "vue";
+import { createInertiaApp, Link, Head } from "@inertiajs/vue3";
+import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
+import { ZiggyVue } from "ziggy-js";
 
-window.Alpine = Alpine;
+const appName = import.meta.env.VITE_APP_NAME || "Tunggal Jaya Transport";
 
-// Register the collapse plugin
-Alpine.plugin(Collapse);
-
-Alpine.start();
+createInertiaApp({
+    title: (title) => `${title} - ${appName}`,
+    resolve: (name) =>
+        resolvePageComponent(
+            `./Pages/${name}.vue`,
+            import.meta.glob("./Pages/**/*.vue")
+        ),
+    setup({ el, App, props, plugin }) {
+        return createApp({ render: () => h(App, props) })
+            .use(plugin)
+            .use(ZiggyVue)
+            .component("Link", Link)
+            .component("Head", Head)
+            .mount(el);
+    },
+    progress: {
+        color: "#4F46E5",
+        showSpinner: true,
+    },
+});

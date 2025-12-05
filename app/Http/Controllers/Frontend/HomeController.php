@@ -8,6 +8,7 @@ use App\Models\Route as BusRoute;
 use App\Models\NewsArticle;
 use App\Models\Booking;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class HomeController extends Controller
 {
@@ -70,19 +71,19 @@ class HomeController extends Controller
             $personalizedRecommendations = $this->getRecommendationsForNewUsers();
         }
         
-        return view('frontend.home', compact(
-            'featuredRoutes',
-            'latestNews',
-            'fleetCount',
-            'fleet',
-            'routeCount',
-            'customerCount',
-            'origins',
-            'destinations',
-            'favoriteRoutes',
-            'recommendedRoutes',
-            'personalizedRecommendations'
-        ));
+        return Inertia::render('Frontend/Home', [
+            'featuredRoutes' => $featuredRoutes,
+            'latestNews' => $latestNews,
+            'fleetCount' => $fleetCount,
+            'fleet' => $fleet,
+            'routeCount' => $routeCount,
+            'customerCount' => $customerCount,
+            'origins' => $origins,
+            'destinations' => $destinations,
+            'favoriteRoutes' => $favoriteRoutes,
+            'recommendedRoutes' => $recommendedRoutes,
+            'personalizedRecommendations' => $personalizedRecommendations,
+        ]);
     }
     
     private function getRecommendedRoutes()
