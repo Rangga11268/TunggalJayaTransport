@@ -29,9 +29,20 @@ const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("id-ID", options);
 };
 
-const formatTime = (timeString) => {
-    if (!timeString) return "";
-    return timeString.substring(0, 5);
+const formatTime = (dateString) => {
+    if (!dateString) return "";
+    // If it's already a time string like "14:00", return it
+    if (dateString.length === 5 && dateString.includes(":")) return dateString;
+
+    // Otherwise parse it as date
+    const date = new Date(dateString);
+    return date
+        .toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+        })
+        .replace(".", ":");
 };
 </script>
 

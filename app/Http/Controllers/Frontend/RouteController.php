@@ -25,7 +25,13 @@ class RouteController extends Controller
         
         // Filter schedules to only show available ones
         $availableSchedules = $route->schedules->filter(function ($schedule) {
-            return $schedule->isAvailableForBooking();
+        return $schedule->isAvailableForBooking();
+        })->map(function ($schedule) {
+            // Overwrite departure_time and arrival_time with actual dates for display
+            // This ensures the frontend shows the correct date (e.g., Today/Tomorrow) instead of the base date (2000-01-01)
+            $schedule->departure_time = $schedule->getActualDepartureTime();
+            $schedule->arrival_time = $schedule->getActualArrivalTime();
+            return $schedule;
         });
         
         // Re-index the collection to array for JSON response

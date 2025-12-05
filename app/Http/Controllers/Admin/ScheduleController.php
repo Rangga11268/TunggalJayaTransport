@@ -79,8 +79,8 @@ class ScheduleController extends Controller
             // For daily recurring schedules, we store only the time part
             $data['is_daily'] = true;
             
-            // Using a base date that won't interfere with calculations
-            $baseDate = '2000-01-01';
+            // Using today as base date to show current relevant time
+            $baseDate = date('Y-m-d');
             // Store times in WIB directly without converting to UTC
             $data['departure_time'] = $baseDate . ' ' . $request->departure_time . ':00';
             $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';
@@ -165,8 +165,8 @@ class ScheduleController extends Controller
             // For daily recurring schedules, we store only the time part
             $data['is_daily'] = true;
             
-            // Using a base date that won't interfere with calculations
-            $baseDate = '2000-01-01';
+            // Using today as base date to show current relevant time
+            $baseDate = date('Y-m-d');
             // Store times in WIB directly without converting to UTC
             $data['departure_time'] = $baseDate . ' ' . $request->departure_time . ':00';
             $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';

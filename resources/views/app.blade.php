@@ -22,6 +22,10 @@
     @routes
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @inertiaHead
+    <!-- Midtrans Snap -->
+    <script type="text/javascript"
+        src="https://app.{{ config('midtrans.environment') === 'sandbox' ? 'sandbox.midtrans.com' : 'midtrans.com' }}/snap/snap.js"
+        data-client-key="{{ config('midtrans.client_key') }}"></script>
 </head>
 <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900">
     @inertia

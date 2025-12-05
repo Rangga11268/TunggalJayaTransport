@@ -29,6 +29,7 @@ class Booking extends Model implements HasMedia
     ];
 
     protected $casts = [
+        'booking_date' => 'date',
         'payment_started_at' => 'datetime',
     ];
 

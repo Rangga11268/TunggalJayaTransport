@@ -82,9 +82,45 @@ class BookingController extends Controller
                         });
                 }
             }
+        } else {
+            // Default: Fetch all available schedules if no specific search
+            $validPair = true;
+            $schedules = Schedule::with('route', 'bus')
+                ->available()
+                ->orderBy('departure_time')
+                ->get()
+                ->filter(function ($schedule) {
+                    return $schedule->isAvailableForBooking();
+                });
         }
 
-        return view('frontend.booking.index', compact('schedules', 'origins', 'destinations', 'validPair', 'origin', 'destination'));
+        // Transform schedules for frontend
+        $schedules = $schedules->map(function ($schedule) use ($date) {
+            $checkDate = $date ? Carbon::parse($date) : null;
+            return [
+                'id' => $schedule->id,
+                'price' => $schedule->price,
+                'departure_time' => $schedule->getActualDepartureTime($checkDate)->format('H:i'),
+                'arrival_time' => $schedule->getActualArrivalTime($checkDate)->format('H:i'),
+                'duration' => $schedule->route->formatted_duration,
+                'available_seats' => $schedule->getAvailableSeatsCount($checkDate),
+                'bus' => [
+                    'name' => $schedule->bus->name,
+                    'bus_type' => $schedule->bus->bus_type,
+                    'plate_number' => $schedule->bus->plate_number,
+                    'capacity' => $schedule->bus->capacity,
+                ],
+                'route' => $schedule->route,
+            ];
+        });
+
+        return \Inertia\Inertia::render('Frontend/Booking/Index', [
+            'schedules' => $schedules,
+            'origins' => $origins,
+            'destinations' => $destinations,
+            'validPair' => $validPair,
+            'filters' => $request->only(['origin', 'destination', 'date']),
+        ]);
     }
 
     public function schedules(Request $request)
@@ -215,8 +251,16 @@ class BookingController extends Controller
                 ->withInput();
         }
 
+        // Overwrite departure_time and arrival_time with actual dates for display
+        // This ensures the frontend shows the correct date (e.g., Today/Tomorrow) instead of the base date (2000-01-01)
+        $schedule->departure_time = $schedule->getActualDepartureTime($checkDate);
+        $schedule->arrival_time = $schedule->getActualArrivalTime($checkDate);
+
         // Pass the date parameter to the view
-        return view('frontend.booking.show', compact('schedule', 'selectedDate'));
+        return \Inertia\Inertia::render('Frontend/Booking/Show', [
+            'schedule' => $schedule,
+            'selectedDate' => $selectedDate,
+        ]);
     }
 
     public function store(Request $request)
@@ -288,7 +332,10 @@ class BookingController extends Controller
 
         // Convert bookingDate to string for database storage if it's a Carbon instance
         if ($bookingDate instanceof Carbon) {
-            $bookingDate = $bookingDate->toDateString();
+            $bookingDate = $bookingDate->format('Y-m-d');
+        } else {
+             // Ensure it's a valid date string even if it came as string
+             $bookingDate = Carbon::parse($bookingDate)->format('Y-m-d');
         }
 
         // Create booking
@@ -338,7 +385,10 @@ class BookingController extends Controller
         // Get occupied seats for this schedule on the specific booking date
         $occupiedSeats = $booking->schedule->getBookedSeatNumbers($booking->booking_date);
 
-        return view('frontend.booking.confirmation', compact('booking', 'occupiedSeats'));
+        return \Inertia\Inertia::render('Frontend/Booking/SeatSelection', [
+            'booking' => $booking,
+            'occupiedSeats' => $occupiedSeats,
+        ]);
     }
 
     public function selectSeats(Request $request)
