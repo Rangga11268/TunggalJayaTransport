@@ -1,10 +1,26 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
+import { ref, watch } from "vue";
 import Swal from "sweetalert2";
 
 const props = defineProps({
     categories: Object,
+    filters: Object,
+});
+
+const search = ref(props.filters?.search || "");
+let timeout = null;
+
+watch(search, (value) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        router.get(
+            route("admin.categories.index"),
+            { search: value },
+            { preserveState: true, replace: true }
+        );
+    }, 500);
 });
 
 const deleteCategory = (id) => {
@@ -20,14 +36,7 @@ const deleteCategory = (id) => {
     }).then((result) => {
         if (result.isConfirmed) {
             router.delete(route("admin.categories.destroy", id), {
-                onSuccess: () => {
-                    // Success alert handled by flash message in layout usually,
-                    // but we can add specific one if needed.
-                },
-                onError: (errors) => {
-                    // Check if there's a specific error message from controller redirect
-                    // The AdminLayout handles flash.error, but sometimes we want immediate feedback
-                },
+                onSuccess: () => {},
             });
         }
     });
@@ -38,7 +47,9 @@ const deleteCategory = (id) => {
     <Head title="Manajemen Kategori" />
 
     <AdminLayout title="Manajemen Kategori">
-        <div class="flex items-center justify-between mb-8">
+        <div
+            class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
+        >
             <div>
                 <h2
                     class="text-2xl font-bold text-gray-900 dark:text-white font-serif"
@@ -49,13 +60,30 @@ const deleteCategory = (id) => {
                     Kelompokkan artikel berita agar mudah ditemukan.
                 </p>
             </div>
-            <Link
-                :href="route('admin.categories.create')"
-                class="px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 flex items-center gap-2"
-            >
-                <i class="fas fa-plus"></i>
-                <span>Tambah Kategori</span>
-            </Link>
+
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <input
+                        type="text"
+                        v-model="search"
+                        placeholder="Cari kategori..."
+                        class="pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-brand-red/50 outline-none transition-all w-full md:w-64"
+                    />
+                    <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400"
+                    >
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <Link
+                    :href="route('admin.categories.create')"
+                    class="px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 flex items-center gap-2 whitespace-nowrap"
+                >
+                    <i class="fas fa-plus"></i>
+                    <span class="hidden md:inline">Tambah Kategori</span>
+                </Link>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -99,9 +127,7 @@ const deleteCategory = (id) => {
                                     <span
                                         class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                                     >
-                                        {{
-                                            category.articles_count || 0
-                                        }}
+                                        {{ category.articles_count || 0 }}
                                         Artikel
                                     </span>
                                 </td>

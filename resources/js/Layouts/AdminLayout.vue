@@ -13,12 +13,12 @@ const user = computed(() => page.props.auth.user);
 // Sidebar State
 const sidebarOpen = ref(window.innerWidth >= 1024);
 const isMobile = ref(window.innerWidth < 1024);
+const searchQuery = ref("");
 
 // Dropdown States
 const contentOpen = ref(false);
 const transportOpen = ref(false);
 const usersOpen = ref(false);
-const systemOpen = ref(false);
 const userDropdownOpen = ref(false);
 
 // Initialize dropdowns based on current route
@@ -62,16 +62,50 @@ const checkActiveRoutes = () => {
     ) {
         usersOpen.value = true;
     }
-    if (
-        route().current("admin.settings.*") ||
-        route().current("admin.reports.*")
-    ) {
-        // reports in separate link but maybe grouped later
-    }
 };
 
 const logout = () => {
     router.post(route("logout"));
+};
+
+// Flash Message State
+const showSuccess = ref(false);
+const showError = ref(false);
+const flashSuccess = computed(() => page.props.flash.success);
+const flashError = computed(() => page.props.flash.error);
+
+import { watch as vueWatch } from "vue"; // Rename to avoid conflict if any, or just use watch
+
+vueWatch(
+    flashSuccess,
+    (newValue) => {
+        if (newValue) {
+            showSuccess.value = true;
+            // Auto dismiss after 5 seconds
+            setTimeout(() => {
+                showSuccess.value = false;
+            }, 5000);
+        }
+    },
+    { immediate: true }
+);
+
+vueWatch(
+    flashError,
+    (newValue) => {
+        if (newValue) {
+            showError.value = true;
+        }
+    },
+    { immediate: true }
+);
+
+const closeSuccess = () => {
+    showSuccess.value = false;
+};
+
+const closeError = () => {
+    showError.value = false;
 };
 </script>
 
@@ -82,7 +116,7 @@ const logout = () => {
         <!-- Sidebar -->
         <aside
             :class="[
-                'bg-slate-900 text-white transition-all duration-300 z-40 flex flex-col shadow-2xl border-r border-slate-800',
+                'bg-[#050505] text-white transition-all duration-300 z-40 flex flex-col shadow-2xl border-r border-white/5',
                 isMobile
                     ? sidebarOpen
                         ? 'fixed inset-y-0 left-0 w-72'
@@ -92,33 +126,48 @@ const logout = () => {
                     : 'w-20 relative',
             ]"
         >
+            <!-- Background Gradient Texture -->
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-[#111] via-[#050505] to-[#0a0a0a] pointer-events-none"
+            ></div>
+            <!-- Subtle Red Glow at bottom -->
+            <div
+                class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-brand-red/10 to-transparent pointer-events-none opacity-50"
+            ></div>
+
             <!-- Logo Section -->
             <div
-                class="h-20 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-950/50 backdrop-blur-sm"
+                class="h-24 flex items-center justify-between px-6 border-b border-white/5 bg-[#050505]/95 backdrop-blur-md relative z-10"
             >
                 <div v-show="!isMobile && !sidebarOpen" class="mx-auto">
                     <img
                         src="/img/logoNoBg.png"
                         alt="Logo"
-                        class="h-10 w-auto drop-shadow-lg"
+                        class="h-10 w-auto drop-shadow-[0_0_15px_rgba(220,38,38,0.5)] transition-transform hover:scale-110 duration-300"
                     />
                 </div>
                 <div
                     v-show="sidebarOpen"
                     class="flex items-center gap-3 transition-opacity duration-300 overflow-hidden whitespace-nowrap"
                 >
-                    <img
-                        src="/img/logoNoBg.png"
-                        alt="Logo"
-                        class="h-10 w-auto drop-shadow-md"
-                    />
+                    <div class="relative group">
+                        <div
+                            class="absolute -inset-2 bg-brand-red/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition duration-500"
+                        ></div>
+                        <img
+                            src="/img/logoNoBg.png"
+                            alt="Logo"
+                            class="relative h-11 w-auto drop-shadow-md"
+                        />
+                    </div>
+
                     <div class="flex flex-col">
                         <span
-                            class="font-bold text-lg tracking-wide leading-tight font-serif text-white"
+                            class="font-bold text-xl tracking-tight leading-none font-serif text-white group-hover:text-red-500 transition-colors duration-300"
                             >Tunggal Jaya</span
                         >
                         <span
-                            class="text-[10px] text-gray-400 font-medium tracking-widest uppercase"
+                            class="text-[10px] text-gray-500 font-bold tracking-[0.2em] uppercase mt-1"
                             >Admin Panel</span
                         >
                     </div>
@@ -126,28 +175,58 @@ const logout = () => {
                 <button
                     v-if="isMobile"
                     @click="sidebarOpen = false"
-                    class="text-gray-400 hover:text-white focus:outline-none transition-colors"
+                    class="text-gray-400 hover:text-white focus:outline-none transition-colors p-2 hover:bg-white/5 rounded-lg"
                 >
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
 
+            <!-- Search (Sidebar) -->
+            <div class="px-4 py-4 relative z-10" v-show="sidebarOpen">
+                <div class="relative group">
+                    <input
+                        type="text"
+                        v-model="searchQuery"
+                        placeholder="Cari menu..."
+                        class="w-full bg-[#1a1a1a] text-gray-300 text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-red/50 border border-white/5 focus:border-brand-red/30 transition-all placeholder-gray-600"
+                    />
+                    <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-600 group-focus-within:text-brand-red transition-colors"
+                    >
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+            </div>
+
             <!-- Navigation -->
             <nav
-                class="flex-1 overflow-y-auto py-6 px-4 space-y-2 custom-scrollbar"
+                class="flex-1 overflow-y-auto px-4 space-y-1 custom-scrollbar pb-6 relative z-10"
             >
                 <!-- Dashboard -->
                 <Link
                     :href="route('admin.dashboard')"
                     :class="[
-                        'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden',
+                        'flex items-center px-4 py-3.5 rounded-xl transition-all duration-300 group relative mb-2',
                         route().current('admin.dashboard')
-                            ? 'bg-gradient-to-r from-brand-red to-red-700 text-white shadow-lg shadow-brand-red/20 translate-x-1'
-                            : 'text-slate-400 hover:bg-slate-800 hover:text-white',
+                            ? 'bg-gradient-to-r from-brand-red to-red-800 text-white shadow-lg shadow-brand-red/25'
+                            : 'text-gray-500 hover:bg-white/5 hover:text-white',
                     ]"
                 >
+                    <div
+                        class="absolute left-0 w-1 h-8 bg-white rounded-r-full opacity-0 transition-all duration-300"
+                        :class="
+                            route().current('admin.dashboard')
+                                ? 'opacity-30'
+                                : ''
+                        "
+                    ></div>
                     <i
-                        class="fas fa-chart-pie text-lg w-6 text-center z-10"
+                        class="fas fa-chart-pie text-lg w-6 text-center z-10 transition-transform group-hover:scale-110 duration-300"
+                        :class="
+                            route().current('admin.dashboard')
+                                ? 'text-white'
+                                : 'text-gray-500 group-hover:text-white'
+                        "
                     ></i>
                     <span
                         :class="[
@@ -158,17 +237,29 @@ const logout = () => {
                         ]"
                         >Dasbor</span
                     >
+
+                    <!-- Tooltip for collapsed -->
+                    <div
+                        v-show="!sidebarOpen && !isMobile"
+                        class="absolute left-full top-1/2 -translate-y-1/2 ml-2 bg-[#1a1a1a] text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-xl border border-white/10"
+                    >
+                        Dasbor
+                    </div>
                 </Link>
 
+                <!-- Section: Management -->
                 <div class="pt-4 pb-2" v-show="sidebarOpen || isMobile">
                     <p
-                        class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest"
+                        class="px-4 text-[10px] font-extrabold text-gray-600 uppercase tracking-widest flex items-center gap-2"
                     >
+                        <span
+                            class="w-1.5 h-1.5 rounded-full bg-brand-red/50"
+                        ></span>
                         Manajemen
                     </p>
                 </div>
                 <div
-                    class="my-2 border-t border-slate-800"
+                    class="my-2 border-t border-white/5"
                     v-show="!sidebarOpen && !isMobile"
                 ></div>
 
@@ -177,15 +268,20 @@ const logout = () => {
                     <button
                         @click="contentOpen = !contentOpen"
                         :class="[
-                            'w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors group',
+                            'w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group',
                             contentOpen
-                                ? 'bg-slate-800/50 text-white'
-                                : 'text-slate-400 hover:bg-slate-800 hover:text-white',
+                                ? 'bg-white/5 text-white'
+                                : 'text-gray-500 hover:bg-white/5 hover:text-white',
                         ]"
                     >
                         <div class="flex items-center">
                             <i
-                                class="fas fa-layer-group text-lg w-6 text-center"
+                                class="fas fa-layer-group text-lg w-6 text-center transition-transform group-hover:scale-110 duration-300"
+                                :class="
+                                    contentOpen
+                                        ? 'text-brand-red'
+                                        : 'text-gray-500 group-hover:text-white'
+                                "
                             ></i>
                             <span
                                 :class="[
@@ -197,7 +293,7 @@ const logout = () => {
                         </div>
                         <i
                             :class="[
-                                'fas text-xs transition-transform duration-300 text-slate-500 group-hover:text-slate-300',
+                                'fas text-xs transition-transform duration-300 text-gray-600 group-hover:text-gray-400',
                                 contentOpen ? 'rotate-180' : '',
                                 !sidebarOpen && !isMobile ? 'hidden' : '',
                             ]"
@@ -209,19 +305,56 @@ const logout = () => {
                             (contentOpen && sidebarOpen) ||
                             (contentOpen && isMobile)
                         "
-                        class="mt-1 space-y-1 pl-12 pr-2 overflow-hidden transition-all duration-300"
+                        class="mt-1 space-y-1 pl-4 pr-2"
                     >
-                        <Link
-                            :href="route('admin.news.index')"
-                            :class="[
-                                'flex items-center px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-2',
-                                route().current('admin.news.*')
-                                    ? 'border-brand-red text-white bg-slate-800'
-                                    : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50',
-                            ]"
+                        <div
+                            class="border-l border-white/10 pl-8 space-y-1 py-1"
                         >
-                            Berita & Artikel
-                        </Link>
+                            <Link
+                                :href="route('admin.news.index')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current('admin.news.*')
+                                        ? 'text-white font-bold'
+                                        : 'text-gray-500 hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current('admin.news.*')
+                                                ? 'bg-brand-red'
+                                                : 'bg-gray-700'
+                                        "
+                                    ></span>
+                                    Berita & Artikel
+                                </span>
+                            </Link>
+                            <Link
+                                :href="route('admin.categories.index')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current('admin.categories.*')
+                                        ? 'text-white font-bold'
+                                        : 'text-gray-500 hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current(
+                                                'admin.categories.*'
+                                            )
+                                                ? 'bg-brand-red'
+                                                : 'bg-gray-700'
+                                        "
+                                    ></span>
+                                    Kategori
+                                </span>
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
@@ -230,15 +363,20 @@ const logout = () => {
                     <button
                         @click="transportOpen = !transportOpen"
                         :class="[
-                            'w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors group',
+                            'w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group',
                             transportOpen
-                                ? 'bg-slate-800/50 text-white'
-                                : 'text-slate-400 hover:bg-slate-800 hover:text-white',
+                                ? 'bg-white/5 text-white'
+                                : 'text-gray-500 hover:bg-white/5 hover:text-white',
                         ]"
                     >
                         <div class="flex items-center">
                             <i
-                                class="fas fa-bus-alt text-lg w-6 text-center"
+                                class="fas fa-bus-alt text-lg w-6 text-center transition-transform group-hover:scale-110 duration-300"
+                                :class="
+                                    transportOpen
+                                        ? 'text-amber-500'
+                                        : 'text-gray-500 group-hover:text-white'
+                                "
                             ></i>
                             <span
                                 :class="[
@@ -250,7 +388,7 @@ const logout = () => {
                         </div>
                         <i
                             :class="[
-                                'fas text-xs transition-transform duration-300 text-slate-500 group-hover:text-slate-300',
+                                'fas text-xs transition-transform duration-300 text-gray-600 group-hover:text-gray-400',
                                 transportOpen ? 'rotate-180' : '',
                                 !sidebarOpen && !isMobile ? 'hidden' : '',
                             ]"
@@ -262,52 +400,100 @@ const logout = () => {
                             (transportOpen && sidebarOpen) ||
                             (transportOpen && isMobile)
                         "
-                        class="mt-1 space-y-1 pl-12 pr-2"
+                        class="mt-1 space-y-1 pl-4 pr-2"
                     >
-                        <Link
-                            :href="route('admin.buses.index')"
-                            :class="[
-                                'flex items-center px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-2',
-                                route().current('admin.buses.*')
-                                    ? 'border-brand-red text-white bg-slate-800'
-                                    : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50',
-                            ]"
+                        <div
+                            class="border-l border-white/10 pl-8 space-y-1 py-1"
                         >
-                            Armada Bus
-                        </Link>
-                        <Link
-                            :href="route('admin.routes.index')"
-                            :class="[
-                                'flex items-center px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-2',
-                                route().current('admin.routes.*')
-                                    ? 'border-brand-red text-white bg-slate-800'
-                                    : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50',
-                            ]"
-                        >
-                            Rute Perjalanan
-                        </Link>
-                        <Link
-                            :href="route('admin.schedules.index')"
-                            :class="[
-                                'flex items-center px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-2',
-                                route().current('admin.schedules.*')
-                                    ? 'border-brand-red text-white bg-slate-800'
-                                    : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50',
-                            ]"
-                        >
-                            Jadwal Keberangkatan
-                        </Link>
-                        <Link
-                            :href="route('admin.schedule-management.index')"
-                            :class="[
-                                'flex items-center px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-2',
-                                route().current('admin.schedule-management.*')
-                                    ? 'border-brand-red text-white bg-slate-800'
-                                    : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50',
-                            ]"
-                        >
-                            Papan Jadwal
-                        </Link>
+                            <Link
+                                :href="route('admin.buses.index')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current('admin.buses.*')
+                                        ? 'text-white font-bold'
+                                        : 'text-gray-500 hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current('admin.buses.*')
+                                                ? 'bg-brand-red'
+                                                : 'bg-gray-700'
+                                        "
+                                    ></span>
+                                    Armada Bus
+                                </span>
+                            </Link>
+                            <Link
+                                :href="route('admin.routes.index')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current('admin.routes.*')
+                                        ? 'text-white font-bold'
+                                        : 'text-gray-500 hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current('admin.routes.*')
+                                                ? 'bg-brand-red'
+                                                : 'bg-gray-700'
+                                        "
+                                    ></span>
+                                    Rute Perjalanan
+                                </span>
+                            </Link>
+                            <Link
+                                :href="route('admin.schedules.index')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current('admin.schedules.*')
+                                        ? 'text-white font-bold'
+                                        : 'text-gray-500 hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current('admin.schedules.*')
+                                                ? 'bg-brand-red'
+                                                : 'bg-gray-700'
+                                        "
+                                    ></span>
+                                    Jadwal
+                                </span>
+                            </Link>
+                            <Link
+                                :href="route('admin.schedule-management.index')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current(
+                                        'admin.schedule-management.*'
+                                    )
+                                        ? 'text-white font-bold'
+                                        : 'text-gray-500 hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current(
+                                                'admin.schedule-management.*'
+                                            )
+                                                ? 'bg-brand-red'
+                                                : 'bg-gray-700'
+                                        "
+                                    ></span>
+                                    Papan Jadwal
+                                </span>
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
@@ -315,14 +501,19 @@ const logout = () => {
                 <Link
                     :href="route('admin.bookings.index')"
                     :class="[
-                        'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden',
+                        'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative my-1',
                         route().current('admin.bookings.*')
-                            ? 'bg-gradient-to-r from-brand-red to-red-700 text-white shadow-lg shadow-brand-red/20 translate-x-1'
-                            : 'text-slate-400 hover:bg-slate-800 hover:text-white',
+                            ? 'bg-gradient-to-r from-brand-red to-red-800 text-white shadow-lg shadow-brand-red/25'
+                            : 'text-gray-500 hover:bg-white/5 hover:text-white',
                     ]"
                 >
                     <i
-                        class="fas fa-ticket-alt text-lg w-6 text-center z-10"
+                        class="fas fa-ticket-alt text-lg w-6 text-center z-10 transition-transform group-hover:scale-110 duration-300"
+                        :class="
+                            route().current('admin.bookings.*')
+                                ? 'text-white'
+                                : 'text-gray-500 group-hover:text-white'
+                        "
                     ></i>
                     <span
                         :class="[
@@ -333,17 +524,27 @@ const logout = () => {
                         ]"
                         >Pemesanan</span
                     >
+                    <!-- Notification Badge -->
+                    <span
+                        v-if="sidebarOpen"
+                        class="ml-auto bg-brand-red text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-lg shadow-brand-red/40"
+                        >Baru</span
+                    >
                 </Link>
 
+                <!-- Section: Users & System -->
                 <div class="pt-4 pb-2" v-show="sidebarOpen || isMobile">
                     <p
-                        class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest"
+                        class="px-4 text-[10px] font-extrabold text-gray-600 uppercase tracking-widest flex items-center gap-2"
                     >
+                        <span
+                            class="w-1.5 h-1.5 rounded-full bg-brand-red/50"
+                        ></span>
                         Pengguna & Sistem
                     </p>
                 </div>
                 <div
-                    class="my-2 border-t border-slate-800"
+                    class="my-2 border-t border-white/5"
                     v-show="!sidebarOpen && !isMobile"
                 ></div>
 
@@ -352,14 +553,21 @@ const logout = () => {
                     <button
                         @click="usersOpen = !usersOpen"
                         :class="[
-                            'w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors group',
+                            'w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group',
                             usersOpen
-                                ? 'bg-slate-800/50 text-white'
-                                : 'text-slate-400 hover:bg-slate-800 hover:text-white',
+                                ? 'bg-white/5 text-white'
+                                : 'text-gray-500 hover:bg-white/5 hover:text-white',
                         ]"
                     >
                         <div class="flex items-center">
-                            <i class="fas fa-users text-lg w-6 text-center"></i>
+                            <i
+                                class="fas fa-users text-lg w-6 text-center transition-transform group-hover:scale-110 duration-300"
+                                :class="
+                                    usersOpen
+                                        ? 'text-purple-400'
+                                        : 'text-gray-500 group-hover:text-white'
+                                "
+                            ></i>
                             <span
                                 :class="[
                                     'ml-3 font-medium whitespace-nowrap',
@@ -370,7 +578,7 @@ const logout = () => {
                         </div>
                         <i
                             :class="[
-                                'fas text-xs transition-transform duration-300 text-slate-500 group-hover:text-slate-300',
+                                'fas text-xs transition-transform duration-300 text-gray-600 group-hover:text-gray-400',
                                 usersOpen ? 'rotate-180' : '',
                                 !sidebarOpen && !isMobile ? 'hidden' : '',
                             ]"
@@ -382,41 +590,77 @@ const logout = () => {
                             (usersOpen && sidebarOpen) ||
                             (usersOpen && isMobile)
                         "
-                        class="mt-1 space-y-1 pl-12 pr-2"
+                        class="mt-1 space-y-1 pl-4 pr-2"
                     >
-                        <Link
-                            :href="route('admin.users.index')"
-                            :class="[
-                                'flex items-center px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-2',
-                                route().current('admin.users.*')
-                                    ? 'border-brand-red text-white bg-slate-800'
-                                    : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50',
-                            ]"
+                        <div
+                            class="border-l border-white/10 pl-8 space-y-1 py-1"
                         >
-                            Pelanggan
-                        </Link>
-                        <Link
-                            :href="route('admin.drivers.index')"
-                            :class="[
-                                'flex items-center px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-2',
-                                route().current('admin.drivers.*')
-                                    ? 'border-brand-red text-white bg-slate-800'
-                                    : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50',
-                            ]"
-                        >
-                            Sopir
-                        </Link>
-                        <Link
-                            :href="route('admin.conductors.index')"
-                            :class="[
-                                'flex items-center px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-2',
-                                route().current('admin.conductors.*')
-                                    ? 'border-brand-red text-white bg-slate-800'
-                                    : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50',
-                            ]"
-                        >
-                            Kondektur
-                        </Link>
+                            <Link
+                                :href="route('admin.users.index')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current('admin.users.*')
+                                        ? 'text-white font-bold'
+                                        : 'text-gray-500 hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current('admin.users.*')
+                                                ? 'bg-brand-red'
+                                                : 'bg-gray-700'
+                                        "
+                                    ></span>
+                                    Pelanggan
+                                </span>
+                            </Link>
+                            <Link
+                                :href="route('admin.drivers.index')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current('admin.drivers.*')
+                                        ? 'text-white font-bold'
+                                        : 'text-gray-500 hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current('admin.drivers.*')
+                                                ? 'bg-brand-red'
+                                                : 'bg-gray-700'
+                                        "
+                                    ></span>
+                                    Sopir
+                                </span>
+                            </Link>
+                            <Link
+                                :href="route('admin.conductors.index')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current('admin.conductors.*')
+                                        ? 'text-white font-bold'
+                                        : 'text-gray-500 hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current(
+                                                'admin.conductors.*'
+                                            )
+                                                ? 'bg-brand-red'
+                                                : 'bg-gray-700'
+                                        "
+                                    ></span>
+                                    Kondektur
+                                </span>
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
@@ -424,14 +668,19 @@ const logout = () => {
                 <Link
                     :href="route('admin.reports.index')"
                     :class="[
-                        'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden',
+                        'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative my-1',
                         route().current('admin.reports.*')
-                            ? 'bg-gradient-to-r from-brand-red to-red-700 text-white shadow-lg shadow-brand-red/20 translate-x-1'
-                            : 'text-slate-400 hover:bg-slate-800 hover:text-white',
+                            ? 'bg-gradient-to-r from-brand-red to-red-800 text-white shadow-lg shadow-brand-red/25'
+                            : 'text-gray-500 hover:bg-white/5 hover:text-white',
                     ]"
                 >
                     <i
-                        class="fas fa-chart-line text-lg w-6 text-center z-10"
+                        class="fas fa-chart-line text-lg w-6 text-center z-10 transition-transform group-hover:scale-110 duration-300"
+                        :class="
+                            route().current('admin.reports.*')
+                                ? 'text-white'
+                                : 'text-gray-500 group-hover:text-white'
+                        "
                     ></i>
                     <span
                         :class="[
@@ -448,13 +697,20 @@ const logout = () => {
                 <Link
                     :href="route('admin.settings.index')"
                     :class="[
-                        'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden',
+                        'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative my-1',
                         route().current('admin.settings.*')
-                            ? 'bg-gradient-to-r from-brand-red to-red-700 text-white shadow-lg shadow-brand-red/20 translate-x-1'
-                            : 'text-slate-400 hover:bg-slate-800 hover:text-white',
+                            ? 'bg-gradient-to-r from-brand-red to-red-800 text-white shadow-lg shadow-brand-red/25'
+                            : 'text-gray-500 hover:bg-white/5 hover:text-white',
                     ]"
                 >
-                    <i class="fas fa-cog text-lg w-6 text-center z-10"></i>
+                    <i
+                        class="fas fa-cog text-lg w-6 text-center z-10 transition-transform group-hover:scale-110 duration-300"
+                        :class="
+                            route().current('admin.settings.*')
+                                ? 'text-white'
+                                : 'text-gray-500 group-hover:text-white'
+                        "
+                    ></i>
                     <span
                         :class="[
                             'ml-3 font-medium whitespace-nowrap transition-all duration-300 z-10',
@@ -467,27 +723,39 @@ const logout = () => {
                 </Link>
             </nav>
 
-            <!-- User Profile (Bottom) -->
+            <!-- User Profile (Bottom) with advanced blur -->
             <div
-                class="p-4 border-t border-slate-800 mt-auto"
+                class="p-4 border-t border-white/5 mt-auto relative z-20"
                 v-if="sidebarOpen"
             >
                 <div
-                    class="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50"
+                    class="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors cursor-pointer group"
                 >
-                    <div
-                        class="h-10 w-10 rounded-full bg-gradient-to-br from-brand-red to-red-600 flex items-center justify-center text-white font-bold shadow-md"
-                    >
-                        {{ user.name.charAt(0).toUpperCase() }}
+                    <div class="relative">
+                        <div
+                            class="h-10 w-10 rounded-full bg-gradient-to-br from-brand-red to-red-800 flex items-center justify-center text-white font-bold shadow-lg shadow-brand-red/20 ring-2 ring-[#0f172a] group-hover:ring-brand-red transition-all"
+                        >
+                            {{ user.name.charAt(0).toUpperCase() }}
+                        </div>
+                        <div
+                            class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-[#050505]"
+                        ></div>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-white truncate">
+                        <p
+                            class="text-sm font-bold text-white truncate group-hover:text-brand-red transition-colors"
+                        >
                             {{ user.name }}
                         </p>
-                        <p class="text-[10px] text-slate-400 truncate">
-                            {{ user.email }}
+                        <p class="text-[10px] text-gray-400 truncate">
+                            Administrator
                         </p>
                     </div>
+                    <button
+                        class="text-gray-500 hover:text-white transition-colors"
+                    >
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
                 </div>
             </div>
         </aside>
@@ -495,7 +763,7 @@ const logout = () => {
         <!-- Mobile Overlay -->
         <div
             v-if="isMobile && sidebarOpen"
-            class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 transition-opacity"
+            class="fixed inset-0 bg-[#000]/80 backdrop-blur-md z-30 transition-opacity"
             @click="sidebarOpen = false"
         ></div>
 
@@ -503,12 +771,12 @@ const logout = () => {
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
             <!-- Topbar (Glassmorphism) -->
             <header
-                class="sticky top-0 z-20 h-20 px-6 flex items-center justify-between bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800/50"
+                class="sticky top-0 z-20 h-20 px-6 flex items-center justify-between bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800/50 transition-all duration-300"
             >
                 <div class="flex items-center gap-4">
                     <button
                         @click="sidebarOpen = !sidebarOpen"
-                        class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 focus:outline-none transition-colors"
+                        class="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 focus:outline-none transition-colors"
                     >
                         <i
                             :class="
@@ -526,8 +794,10 @@ const logout = () => {
                         <p
                             class="text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide"
                         >
-                            Selamat datang kembali,
-                            {{ user.name.split(" ")[0] }}!
+                            <span
+                                class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"
+                            ></span>
+                            Sistem Siap
                         </p>
                     </div>
                 </div>
@@ -536,18 +806,20 @@ const logout = () => {
                 <div class="flex items-center gap-4">
                     <!-- Notifications -->
                     <button
-                        class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
+                        class="relative p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors group"
                     >
-                        <i class="far fa-bell text-xl"></i>
+                        <i
+                            class="far fa-bell text-xl group-hover:animate-swing"
+                        ></i>
                         <span
-                            class="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900"
+                            class="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-950 animate-bounce"
                         ></span>
                     </button>
 
                     <!-- View Website -->
                     <Link
                         :href="route('frontend.home')"
-                        class="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 text-sm font-semibold hover:bg-brand-red hover:text-white hover:shadow-lg hover:shadow-brand-red/20 transition-all duration-300"
+                        class="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 text-sm font-semibold hover:bg-brand-red hover:text-white hover:shadow-lg hover:shadow-brand-red/30 transition-all duration-300"
                     >
                         <i class="fas fa-globe"></i>
                         <span>Lihat Website</span>
@@ -560,12 +832,12 @@ const logout = () => {
                             class="flex items-center gap-2 focus:outline-none"
                         >
                             <div
-                                class="h-10 w-10 rounded-full bg-gradient-to-br from-brand-red to-red-600 p-[2px] cursor-pointer hover:scale-105 transition-transform"
+                                class="h-11 w-11 rounded-full bg-gradient-to-br from-brand-red to-red-600 p-[2px] cursor-pointer hover:scale-105 transition-transform shadow-md"
                             >
                                 <div
                                     class="h-full w-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center"
                                 >
-                                    <span class="font-bold text-brand-red">{{
+                                    <span class="font-bold text-brand-red/80">{{
                                         user.name.charAt(0).toUpperCase()
                                     }}</span>
                                 </div>
@@ -575,10 +847,13 @@ const logout = () => {
                         <!-- Dropdown Content -->
                         <div
                             v-if="userDropdownOpen"
-                            class="absolute right-0 mt-3 w-56 bg-white dark:bg-gray-900 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-black/50 border border-gray-100 dark:border-gray-800 py-2 z-50 transform origin-top-right transition-all animate-fade-in-up"
+                            class="absolute right-0 mt-4 w-60 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-black/50 border border-gray-100 dark:border-gray-800 py-3 z-50 transform origin-top-right transition-all animate-fade-in-up"
                         >
                             <div
-                                class="px-4 py-3 border-b border-gray-100 dark:border-gray-800"
+                                class="absolute -top-2 right-4 w-4 h-4 bg-white dark:bg-gray-900 rotate-45 border-l border-t border-gray-100 dark:border-gray-800"
+                            ></div>
+                            <div
+                                class="px-5 py-3 border-b border-gray-100 dark:border-gray-800 relative z-10"
                             >
                                 <p
                                     class="text-sm font-bold text-gray-900 dark:text-white"
@@ -592,37 +867,38 @@ const logout = () => {
                                 </p>
                             </div>
 
-                            <div class="p-2">
+                            <div class="p-2 relative z-10">
                                 <Link
                                     :href="route('profile.edit')"
-                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                                 >
                                     <i
-                                        class="fas fa-user-circle text-gray-400"
+                                        class="fas fa-user-circle text-gray-400 w-5"
                                     ></i>
                                     Profil Saya
                                 </Link>
                                 <Link
                                     :href="route('frontend.home')"
-                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                                 >
                                     <i
-                                        class="fas fa-external-link-alt text-gray-400"
+                                        class="fas fa-external-link-alt text-gray-400 w-5"
                                     ></i>
                                     Ke Website
                                 </Link>
                             </div>
 
                             <div
-                                class="border-t border-gray-100 dark:border-gray-800 my-1"
+                                class="border-t border-gray-100 dark:border-gray-800 my-1 relative z-10"
                             ></div>
 
-                            <div class="p-2">
+                            <div class="p-2 relative z-10">
                                 <button
                                     @click="logout"
-                                    class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                    class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium"
                                 >
-                                    <i class="fas fa-sign-out-alt"></i> Keluar
+                                    <i class="fas fa-sign-out-alt w-5"></i>
+                                    Keluar
                                 </button>
                             </div>
                         </div>
@@ -651,7 +927,7 @@ const logout = () => {
                     leave-to-class="transform -translate-y-4 opacity-0 scale-95"
                 >
                     <div
-                        v-if="$page.props.flash.success"
+                        v-if="showSuccess"
                         key="success"
                         class="mb-8 flex items-center w-full max-w-3xl mx-auto p-4 rounded-2xl bg-white dark:bg-gray-900 border border-green-100 dark:border-green-900/50 shadow-lg shadow-green-500/10"
                     >
@@ -667,18 +943,19 @@ const logout = () => {
                                 Berhasil
                             </h3>
                             <p class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ $page.props.flash.success }}
+                                {{ flashSuccess }}
                             </p>
                         </div>
                         <button
-                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                            @click="closeSuccess"
+                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         >
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
 
                     <div
-                        v-if="$page.props.flash.error"
+                        v-if="showError"
                         key="error"
                         class="mb-8 flex items-center w-full max-w-3xl mx-auto p-4 rounded-2xl bg-white dark:bg-gray-900 border border-red-100 dark:border-red-900/50 shadow-lg shadow-red-500/10"
                     >
@@ -694,11 +971,12 @@ const logout = () => {
                                 Gagal
                             </h3>
                             <p class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ $page.props.flash.error }}
+                                {{ flashError }}
                             </p>
                         </div>
                         <button
-                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                            @click="closeError"
+                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         >
                             <i class="fas fa-times"></i>
                         </button>
@@ -714,16 +992,38 @@ const logout = () => {
 <style scoped>
 /* Custom Scrollbar for sidebar */
 .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
+    border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes swing {
+    20% {
+        transform: rotate(15deg);
+    }
+    40% {
+        transform: rotate(-10deg);
+    }
+    60% {
+        transform: rotate(5deg);
+    }
+    80% {
+        transform: rotate(-5deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.animate-swing {
+    animation: swing 1s ease-in-out;
 }
 </style>

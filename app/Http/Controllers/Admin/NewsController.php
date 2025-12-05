@@ -12,10 +12,21 @@ class NewsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $articles = NewsArticle::with('category')->latest()->paginate(10);
-        return Inertia::render('Admin/News/Index', compact('articles'));
+        $articles = NewsArticle::with('category')
+            ->when($request->search, function ($query, $search) {
+                $query->where('title', 'like', "%{$search}%")
+                      ->orWhere('content', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Admin/News/Index', [
+            'articles' => $articles,
+            'filters' => $request->only(['search'])
+        ]);
     }
 
     /**
