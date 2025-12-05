@@ -41,11 +41,11 @@ Route::prefix('')->name('frontend.')->group(function () {
     Route::get('/news/{slug}', [App\Http\Controllers\Frontend\NewsController::class, 'show'])->name('news.show');
 
     Route::get('/about', function () {
-        return view('frontend.about.index');
+        return \Inertia\Inertia::render('Frontend/About');
     })->name('about');
 
     Route::get('/contact', function () {
-        return view('frontend.contact.index');
+        return \Inertia\Inertia::render('Frontend/Contact');
     })->name('contact');
 
     Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'store'])->name('contact.store');

@@ -24,7 +24,11 @@ class NewsController extends Controller
         
         $categories = Category::all();
             
-        return view('frontend.news.index', compact('articles', 'categories'));
+        return \Inertia\Inertia::render('Frontend/News/Index', [
+            'articles' => $articles,
+            'categories' => $categories,
+            'currentCategory' => $categoryId
+        ]);
     }
     
     public function show($slug)
@@ -59,6 +63,9 @@ class NewsController extends Controller
             $relatedArticles = $relatedArticles->concat($additionalArticles);
         }
             
-        return view('frontend.news.show', compact('article', 'relatedArticles'));
+        return \Inertia\Inertia::render('Frontend/News/Show', [
+            'article' => $article,
+            'relatedArticles' => $relatedArticles
+        ]);
     }
 }

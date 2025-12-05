@@ -355,12 +355,15 @@ const isActive = (routeName) => {
 
         <!-- Footer -->
         <footer
-            class="bg-primary-950 text-white relative overflow-hidden border-t border-white/10"
+            class="bg-gray-900 text-white relative overflow-hidden border-t border-white/10"
         >
             <!-- Background Pattern -->
-            <div class="absolute inset-0 opacity-5 pointer-events-none">
+            <div class="absolute inset-0 opacity-10 pointer-events-none">
                 <div
-                    class="absolute top-0 left-0 w-full h-full bg-[url('/img/pattern.png')] bg-repeat"
+                    class="absolute -top-24 -left-24 w-96 h-96 bg-brand-red/20 rounded-full blur-[100px]"
+                ></div>
+                <div
+                    class="absolute bottom-0 right-0 w-80 h-80 bg-blue-600/20 rounded-full blur-[100px]"
                 ></div>
             </div>
 
@@ -368,10 +371,10 @@ const isActive = (routeName) => {
                 class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10"
             >
                 <div
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
                 >
                     <!-- Company Info -->
-                    <div class="col-span-1 md:col-span-2">
+                    <div>
                         <Link
                             :href="route('frontend.home')"
                             class="flex items-center space-x-3 mb-6"
@@ -387,43 +390,43 @@ const isActive = (routeName) => {
                             </span>
                         </Link>
                         <p
-                            class="text-gray-400 mb-8 max-w-md leading-relaxed font-light"
+                            class="text-gray-400 mb-8 leading-relaxed font-light text-sm"
                         >
                             Partner perjalanan terpercaya Anda dengan armada bus
                             modern dan pelayanan premium. Kenyamanan dan
-                            keselamatan adalah prioritas utama kami.
+                            keselamatan adalah prioritas utama kami sejak 1973.
                         </p>
-                        <div class="flex space-x-4">
+                        <div class="flex space-x-3">
                             <a
                                 href="#"
-                                class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:scale-110 transition-all duration-300 group"
+                                class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:scale-110 transition-all duration-300 group"
                             >
                                 <i
-                                    class="fab fa-facebook-f group-hover:text-white text-gray-400 transition-colors"
+                                    class="fab fa-facebook-f group-hover:text-white text-gray-400 transition-colors text-sm"
                                 ></i>
                             </a>
                             <a
                                 href="#"
-                                class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-sky-500 hover:border-sky-400 hover:scale-110 transition-all duration-300 group"
+                                class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-sky-500 hover:border-sky-400 hover:scale-110 transition-all duration-300 group"
                             >
                                 <i
-                                    class="fab fa-twitter group-hover:text-white text-gray-400 transition-colors"
+                                    class="fab fa-twitter group-hover:text-white text-gray-400 transition-colors text-sm"
                                 ></i>
                             </a>
                             <a
                                 href="#"
-                                class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-pink-600 hover:border-pink-500 hover:scale-110 transition-all duration-300 group"
+                                class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-pink-600 hover:border-pink-500 hover:scale-110 transition-all duration-300 group"
                             >
                                 <i
-                                    class="fab fa-instagram group-hover:text-white text-gray-400 transition-colors"
+                                    class="fab fa-instagram group-hover:text-white text-gray-400 transition-colors text-sm"
                                 ></i>
                             </a>
                             <a
                                 href="#"
-                                class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-green-500 hover:border-green-400 hover:scale-110 transition-all duration-300 group"
+                                class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-blue-700 hover:border-blue-600 hover:scale-110 transition-all duration-300 group"
                             >
                                 <i
-                                    class="fab fa-whatsapp group-hover:text-white text-gray-400 transition-colors"
+                                    class="fab fa-linkedin-in group-hover:text-white text-gray-400 transition-colors text-sm"
                                 ></i>
                             </a>
                         </div>
@@ -432,30 +435,90 @@ const isActive = (routeName) => {
                     <!-- Quick Links -->
                     <div>
                         <h3
-                            class="text-lg font-bold mb-6 text-white border-b-2 border-brand-red inline-block pb-2 font-serif"
+                            class="text-lg font-bold mb-6 text-white border-b-2 border-brand-red inline-block pb-2"
                         >
                             Link Cepat
                         </h3>
-                        <ul class="space-y-3">
+                        <ul class="space-y-3 text-sm">
                             <li
-                                v-for="item in [
-                                    'Pesan Tiket',
-                                    'Rute Perjalanan',
-                                    'Info Armada',
-                                    'Berita Terkini',
-                                    'Tentang Kami',
+                                v-for="(item, index) in [
+                                    {
+                                        name: 'Tentang Kami',
+                                        route: 'frontend.about',
+                                    },
+                                    {
+                                        name: 'Rute Perjalanan',
+                                        route: 'frontend.routes.index',
+                                    },
+                                    {
+                                        name: 'Info Armada',
+                                        route: 'frontend.fleet.index',
+                                    },
+                                    {
+                                        name: 'Berita & Update',
+                                        route: 'frontend.news.index',
+                                    },
+                                    {
+                                        name: 'Hubungi Kami',
+                                        route: 'frontend.contact',
+                                    },
                                 ]"
-                                :key="item"
+                                :key="index"
                             >
-                                <a
-                                    href="#"
+                                <Link
+                                    :href="route(item.route)"
                                     class="text-gray-400 hover:text-brand-red transition-colors flex items-center group"
                                 >
                                     <i
-                                        class="fas fa-chevron-right text-xs mr-2 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 text-brand-red"
+                                        class="fas fa-chevron-right text-[10px] mr-2 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 text-brand-red"
                                     ></i>
-                                    {{ item }}
-                                </a>
+                                    {{ item.name }}
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Services (From Blade) -->
+                    <div>
+                        <h3
+                            class="text-lg font-bold mb-6 text-white border-b-2 border-brand-red inline-block pb-2"
+                        >
+                            Layanan
+                        </h3>
+                        <ul class="space-y-3 text-sm">
+                            <li
+                                class="flex items-center text-gray-400 hover:text-white transition-colors"
+                            >
+                                <i class="fas fa-bus mr-3 text-brand-red"></i>
+                                Transportasi Kota
+                            </li>
+                            <li
+                                class="flex items-center text-gray-400 hover:text-white transition-colors"
+                            >
+                                <i class="fas fa-route mr-3 text-brand-red"></i>
+                                Perjalanan Antar Kota
+                            </li>
+                            <li
+                                class="flex items-center text-gray-400 hover:text-white transition-colors"
+                            >
+                                <i class="fas fa-plane mr-3 text-brand-red"></i>
+                                Antar Jemput Bandara
+                            </li>
+                            <li
+                                class="flex items-center text-gray-400 hover:text-white transition-colors"
+                            >
+                                <i
+                                    class="fas fa-map-marked-alt mr-3 text-brand-red"
+                                ></i>
+                                Paket Wisata
+                            </li>
+                            <li
+                                class="flex items-center text-gray-400 hover:text-white transition-colors"
+                            >
+                                <i
+                                    class="fas fa-building mr-3 text-brand-red"
+                                ></i>
+                                Perjalanan Bisnis
                             </li>
                         </ul>
                     </div>
@@ -463,50 +526,58 @@ const isActive = (routeName) => {
                     <!-- Contact -->
                     <div>
                         <h3
-                            class="text-lg font-bold mb-6 text-white border-b-2 border-brand-red inline-block pb-2 font-serif"
+                            class="text-lg font-bold mb-6 text-white border-b-2 border-brand-red inline-block pb-2"
                         >
                             Hubungi Kami
                         </h3>
-                        <ul class="space-y-4 text-gray-400">
+                        <ul class="space-y-4 text-gray-400 text-sm">
                             <li class="flex items-start space-x-3 group">
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-red group-hover:border-brand-red transition-colors"
-                                >
+                                <div class="mt-1 flex-shrink-0">
                                     <i
-                                        class="fas fa-phone text-brand-red group-hover:text-white transition-colors text-sm"
+                                        class="fas fa-map-marker-alt text-brand-red group-hover:text-white transition-colors"
                                     ></i>
                                 </div>
                                 <span
-                                    class="group-hover:text-gray-300 transition-colors"
-                                    >+62 812-3456-7890</span
+                                    class="group-hover:text-gray-300 transition-colors leading-relaxed"
                                 >
+                                    Jl. Transportation No. 123, Jakarta 12345
+                                </span>
                             </li>
-                            <li class="flex items-start space-x-3 group">
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-red group-hover:border-brand-red transition-colors"
-                                >
+                            <li class="flex items-center space-x-3 group">
+                                <div class="flex-shrink-0">
                                     <i
-                                        class="fas fa-envelope text-brand-red group-hover:text-white transition-colors text-sm"
+                                        class="fas fa-phone-alt text-brand-red group-hover:text-white transition-colors"
                                     ></i>
                                 </div>
                                 <span
                                     class="group-hover:text-gray-300 transition-colors"
-                                    >info@tunggaljaya.com</span
                                 >
+                                    +62 21 1234 5678
+                                </span>
                             </li>
-                            <li class="flex items-start space-x-3 group">
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-red group-hover:border-brand-red transition-colors"
-                                >
+                            <li class="flex items-center space-x-3 group">
+                                <div class="flex-shrink-0">
                                     <i
-                                        class="fas fa-map-marker-alt text-brand-red group-hover:text-white transition-colors text-sm"
+                                        class="fas fa-envelope text-brand-red group-hover:text-white transition-colors"
                                     ></i>
                                 </div>
                                 <span
                                     class="group-hover:text-gray-300 transition-colors"
-                                    >Jl. Raya Utama No. 123, Surabaya, Jawa
-                                    Timur</span
                                 >
+                                    info@tunggaljayatransport.com
+                                </span>
+                            </li>
+                            <li class="flex items-center space-x-3 group">
+                                <div class="flex-shrink-0">
+                                    <i
+                                        class="fas fa-clock text-brand-red group-hover:text-white transition-colors"
+                                    ></i>
+                                </div>
+                                <span
+                                    class="group-hover:text-gray-300 transition-colors"
+                                >
+                                    Senin - Jumat, 08:00 - 20:00
+                                </span>
                             </li>
                         </ul>
                     </div>
@@ -516,8 +587,11 @@ const isActive = (routeName) => {
                     class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm"
                 >
                     <p>
-                        &copy; {{ new Date().getFullYear() }} Tunggal Jaya
-                        Transport. All rights reserved.
+                        &copy; {{ new Date().getFullYear() }}
+                        <span
+                            class="text-white hover:text-brand-red cursor-pointer transition-colors"
+                            >Tunggal Jaya Transport</span
+                        >. All rights reserved.
                     </p>
                     <div class="flex space-x-6 mt-4 md:mt-0">
                         <a

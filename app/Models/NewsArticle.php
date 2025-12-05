@@ -26,6 +26,13 @@ class NewsArticle extends Model implements HasMedia
         'published_at' => 'datetime',
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->getFirstMediaUrl('cover') ?: $this->getFirstMediaUrl('default') ?: 'https://placehold.co/800x600?text=No+Image'; 
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
