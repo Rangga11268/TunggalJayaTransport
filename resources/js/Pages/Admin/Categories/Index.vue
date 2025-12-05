@@ -1,0 +1,224 @@
+<script setup>
+import AdminLayout from "@/Layouts/AdminLayout.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import Swal from "sweetalert2";
+
+const props = defineProps({
+    categories: Object,
+});
+
+const deleteCategory = (id) => {
+    Swal.fire({
+        title: "Apakah Anda yakin?",
+        text: "Kategori yang dihapus tidak dapat dikembalikan!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Ya, hapus!",
+        cancelButtonText: "Batal",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(route("admin.categories.destroy", id), {
+                onSuccess: () => {
+                    // Success alert handled by flash message in layout usually,
+                    // but we can add specific one if needed.
+                },
+                onError: (errors) => {
+                    // Check if there's a specific error message from controller redirect
+                    // The AdminLayout handles flash.error, but sometimes we want immediate feedback
+                },
+            });
+        }
+    });
+};
+</script>
+
+<template>
+    <Head title="Manajemen Kategori" />
+
+    <AdminLayout title="Manajemen Kategori">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2
+                    class="text-2xl font-bold text-gray-900 dark:text-white font-serif"
+                >
+                    Kategori Berita
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Kelompokkan artikel berita agar mudah ditemukan.
+                </p>
+            </div>
+            <Link
+                :href="route('admin.categories.create')"
+                class="px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 flex items-center gap-2"
+            >
+                <i class="fas fa-plus"></i>
+                <span>Tambah Kategori</span>
+            </Link>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Categories List -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 overflow-hidden"
+            >
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead
+                            class="bg-gray-50/50 dark:bg-gray-900/20 text-gray-500 dark:text-gray-400 text-xs uppercase font-bold tracking-wider"
+                        >
+                            <tr>
+                                <th class="px-6 py-4">Nama Kategori</th>
+                                <th class="px-6 py-4">Jumlah Artikel</th>
+                                <th class="px-6 py-4 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody
+                            class="divide-y divide-gray-100 dark:divide-gray-700/50"
+                        >
+                            <tr
+                                v-for="category in categories.data"
+                                :key="category.id"
+                                class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
+                            >
+                                <td class="px-6 py-4">
+                                    <p
+                                        class="font-bold text-gray-900 dark:text-white text-sm"
+                                    >
+                                        {{ category.name }}
+                                    </p>
+                                    <p
+                                        class="text-xs text-gray-500 line-clamp-1 mt-0.5"
+                                        v-if="category.parent"
+                                    >
+                                        Sub: {{ category.parent.name }}
+                                    </p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span
+                                        class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                                    >
+                                        {{
+                                            category.articles_count || 0
+                                        }}
+                                        Artikel
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div
+                                        class="flex items-center justify-end gap-2"
+                                    >
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'admin.categories.edit',
+                                                    category.id
+                                                )
+                                            "
+                                            class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors tooltip"
+                                            title="Edit"
+                                        >
+                                            <i class="fas fa-edit"></i>
+                                        </Link>
+                                        <button
+                                            @click="deleteCategory(category.id)"
+                                            class="p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors tooltip"
+                                            title="Hapus"
+                                        >
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="categories.data.length === 0">
+                                <td
+                                    colspan="3"
+                                    class="px-6 py-12 text-center text-gray-400"
+                                >
+                                    <div class="flex flex-col items-center">
+                                        <i
+                                            class="fas fa-tags text-4xl mb-3 opacity-30"
+                                        ></i>
+                                        <p>Belum ada kategori.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div
+                    class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between"
+                    v-if="categories.links.length > 3"
+                >
+                    <div class="text-xs text-gray-500">
+                        Total {{ categories.total }}
+                    </div>
+                    <div class="flex gap-1">
+                        <Link
+                            v-for="(link, k) in categories.links"
+                            :key="k"
+                            :href="link.url"
+                            v-html="link.label"
+                            :class="[
+                                'px-3 py-1 rounded-lg text-xs font-bold transition-all',
+                                link.active
+                                    ? 'bg-brand-red text-white shadow-md shadow-brand-red/20'
+                                    : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700',
+                                !link.url
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : '',
+                            ]"
+                            preserve-scroll
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Card (Optional side content) -->
+            <div class="hidden lg:block">
+                <div
+                    class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden"
+                >
+                    <div
+                        class="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 bg-white/5 rounded-full blur-3xl"
+                    ></div>
+                    <div
+                        class="absolute bottom-0 left-0 -mb-10 -ml-10 h-64 w-64 bg-brand-red/20 rounded-full blur-3xl"
+                    ></div>
+
+                    <h3 class="text-xl font-bold font-serif mb-4 relative z-10">
+                        Tips Kategori
+                    </h3>
+                    <ul class="space-y-4 relative z-10 text-sm text-gray-300">
+                        <li class="flex items-start gap-3">
+                            <i
+                                class="fas fa-check-circle text-green-400 mt-1"
+                            ></i>
+                            <p>Gunakan nama kategori yang singkat dan jelas.</p>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i
+                                class="fas fa-check-circle text-green-400 mt-1"
+                            ></i>
+                            <p>
+                                Kategori membantu pengguna memfilter berita yang
+                                relevan.
+                            </p>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i
+                                class="fas fa-exclamation-circle text-amber-400 mt-1"
+                            ></i>
+                            <p>
+                                Kategori yang memiliki artikel tidak dapat
+                                dihapus secara langsung.
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </AdminLayout>
+</template>

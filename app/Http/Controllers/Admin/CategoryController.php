@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
@@ -13,8 +14,16 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::with('parent')->latest()->paginate(10);
-        return view('admin.categories.index', compact('categories'));
+        $categories = Category::withCount('articles')->latest()->paginate(10);
+        return Inertia::render('Admin/Categories/Index', compact('categories'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return Inertia::render('Admin/Categories/Create');
     }
 
     /**
@@ -35,7 +44,16 @@ class CategoryController extends Controller
         $category->parent_id = $request->parent_id;
         $category->save();
 
-        return response()->json(['success' => true, 'message' => 'Kategori berhasil dibuat.']);
+        return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil dibuat.');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $category = Category::findOrFail($id);
+        return Inertia::render('Admin/Categories/Edit', compact('category'));
     }
 
     /**
@@ -52,12 +70,14 @@ class CategoryController extends Controller
         ]);
 
         $category->name = $request->name;
-        $category->slug = \Str::slug($request->name);
+        if ($category->name !== $request->name) {
+             $category->slug = \Str::slug($request->name);
+        }
         $category->description = $request->description;
         $category->parent_id = $request->parent_id;
         $category->save();
 
-        return response()->json(['success' => true, 'message' => 'Kategori berhasil diperbarui.']);
+         return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil diperbarui.');
     }
 
     /**
@@ -69,16 +89,16 @@ class CategoryController extends Controller
         
         // Check if category has articles
         if ($category->articles()->count() > 0) {
-            return response()->json(['error' => 'Tidak dapat menghapus kategori karena masih memiliki artikel.'], 400);
+             return redirect()->back()->with('error', 'Tidak dapat menghapus kategori karena masih memiliki artikel.');
         }
         
         // Check if category has children
         if ($category->children()->count() > 0) {
-            return response()->json(['error' => 'Tidak dapat menghapus kategori karena masih memiliki subkategori.'], 400);
+             return redirect()->back()->with('error', 'Tidak dapat menghapus kategori karena masih memiliki subkategori.');
         }
         
         $category->delete();
 
-        return response()->json(['success' => true, 'message' => 'Kategori berhasil dihapus.']);
+        return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil dihapus.');
     }
 }

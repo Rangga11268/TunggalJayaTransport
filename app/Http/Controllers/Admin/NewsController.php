@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NewsArticle;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class NewsController extends Controller
 {
@@ -13,8 +14,8 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $articles = NewsArticle::latest()->paginate(10);
-        return view('admin.news.index', compact('articles'));
+        $articles = NewsArticle::with('category')->latest()->paginate(10);
+        return Inertia::render('Admin/News/Index', compact('articles'));
     }
 
     /**
@@ -23,7 +24,7 @@ class NewsController extends Controller
     public function create()
     {
         $categories = \App\Models\Category::all();
-        return view('admin.news.create', compact('categories'));
+        return Inertia::render('Admin/News/Create', compact('categories'));
     }
 
     /**
@@ -54,7 +55,7 @@ class NewsController extends Controller
             $article->addMediaFromRequest('featured_image')->toMediaCollection('featured_images');
         }
 
-        return redirect()->route('admin.news.index')->with('create_success', 'Artikel berita berhasil dibuat.');
+        return redirect()->route('admin.news.index')->with('success', 'Artikel berita berhasil dibuat.');
     }
 
     /**
@@ -62,8 +63,17 @@ class NewsController extends Controller
      */
     public function show(string $id)
     {
-        $article = NewsArticle::findOrFail($id);
-        return view('admin.news.show', compact('article'));
+        // Typically admin doesn't need a separate show page if not implemented in Vue yet, 
+        // but we can reuse Edit or just redirect. Let's redirect to edit for now or leave as is if we want a preview.
+        // For simplicity in this migration, I'll redirect to Edit or render a Show page if we build it.
+        // Given the plan, I'll skip Show for now or make it render the frontend show? 
+        // Let's just return the Edit view for now as 'Show' is often redundant in Admin unless it's a preview.
+         $article = NewsArticle::with('category')->findOrFail($id);
+         return Inertia::render('Admin/News/Edit', [
+            'article' => $article,
+            'categories' => \App\Models\Category::all(),
+            'readonly' => true // Optional flag if we want to reuse Edit component
+         ]);
     }
 
     /**
@@ -71,9 +81,12 @@ class NewsController extends Controller
      */
     public function edit(string $id)
     {
-        $article = NewsArticle::findOrFail($id);
+        $article = NewsArticle::with('media')->findOrFail($id);
+        // Append image_url manually or rely on accessor if appended
+        $article->append('image_url'); 
+        
         $categories = \App\Models\Category::all();
-        return view('admin.news.edit', compact('article', 'categories'));
+        return Inertia::render('Admin/News/Edit', compact('article', 'categories'));
     }
 
     /**
@@ -91,7 +104,9 @@ class NewsController extends Controller
 
         $article = NewsArticle::findOrFail($id);
         $article->title = $request->title;
-        $article->slug = $this->createUniqueSlug($request->title, $article->id);
+        if ($article->title !== $request->title) {
+             $article->slug = $this->createUniqueSlug($request->title, $article->id);
+        }
         $article->content = $request->content;
         $article->excerpt = $request->excerpt;
         $article->category_id = $request->category_id;
@@ -101,12 +116,13 @@ class NewsController extends Controller
         // Handle image upload
         if ($request->hasFile('featured_image')) {
             // Delete existing featured image if it exists
-            $article->clearMediaCollection('featured_images');
+             $article->clearMediaCollection('featured_images');
+             $article->clearMediaCollection('cover'); // Clear old collection too just in case
             // Add new featured image
             $article->addMediaFromRequest('featured_image')->toMediaCollection('featured_images');
         }
 
-        return redirect()->route('admin.news.index')->with('update_success', 'Artikel berita berhasil diperbarui.');
+        return redirect()->route('admin.news.index')->with('success', 'Artikel berita berhasil diperbarui.');
     }
 
     /**
@@ -117,7 +133,7 @@ class NewsController extends Controller
         $article = NewsArticle::findOrFail($id);
         $article->delete();
 
-        return redirect()->route('admin.news.index')->with('delete_success', 'Artikel berita berhasil dihapus.');
+        return redirect()->route('admin.news.index')->with('success', 'Artikel berita berhasil dihapus.');
     }
 
     /**
