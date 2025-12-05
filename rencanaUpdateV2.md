@@ -51,6 +51,7 @@ Transition the Tunggal Jaya Transport frontend from Laravel Blade to a modern Si
     -   [x] `Booking/Show.vue`: Passenger Information.
     -   [x] `Booking/SeatSelection.vue`: Interactive seat map & Payment.
 -   [ ] **Static Pages**:
+    -    [ ] **Static Pages**:
     -   [ ] `About.vue`: Company profile and history.
     -   [ ] `Contact.vue`: Contact form and map.
 -   [x] **Auth Pages**: Login, Register, Forgot Password (customized for Inertia).

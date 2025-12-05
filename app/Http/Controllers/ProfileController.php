@@ -14,7 +14,7 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit(Request $request)
     {
         // Check if the user has admin or schedule_manager roles
         $user = $request->user();
@@ -27,9 +27,9 @@ class ProfileController extends Controller
             ]);
         } else {
             // Regular users use the frontend profile view
-            // For debugging, let's return a simple response to see if we reach this point
-            return view('frontend.profile.edit', [
-                'user' => $request->user(),
+            return \Inertia\Inertia::render('Frontend/Profile/Edit', [
+                'mustVerifyEmail' => $request->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail,
+                'status' => session('status'),
             ]);
         }
     }

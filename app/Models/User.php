@@ -69,4 +69,12 @@ class User extends Authenticatable
     {
         return $this->hasVerifiedEmail() && $this->hasPhoneVerified() && $this->is_verified;
     }
+
+    /**
+     * Get the user's role name.
+     */
+    public function getRoleAttribute()
+    {
+        return $this->getRoleNames()->first();
+    }
 }

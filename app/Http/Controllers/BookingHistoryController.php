@@ -25,7 +25,9 @@ class BookingHistoryController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10); // Paginate results for better UI
 
-        return view('booking-history.index', compact('bookings'));
+        return \Inertia\Inertia::render('Frontend/BookingHistory/Index', [
+            'bookings' => $bookings
+        ]);
     }
 
     /**
@@ -44,6 +46,8 @@ class BookingHistoryController extends Controller
             ->with(['schedule.route', 'schedule.bus'])
             ->findOrFail($id);
 
-        return view('booking-history.show', compact('booking'));
+        return \Inertia\Inertia::render('Frontend/BookingHistory/Show', [
+            'booking' => $booking
+        ]);
     }
 }
