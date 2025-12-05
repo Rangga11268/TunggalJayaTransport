@@ -30,7 +30,10 @@ class NewsArticle extends Model implements HasMedia
 
     public function getImageUrlAttribute()
     {
-        return $this->getFirstMediaUrl('cover') ?: $this->getFirstMediaUrl('default') ?: 'https://placehold.co/800x600?text=No+Image'; 
+        return $this->getFirstMediaUrl('cover') 
+            ?: $this->getFirstMediaUrl('featured_images') 
+            ?: $this->getFirstMediaUrl('default') 
+            ?: 'https://placehold.co/800x600?text=No+Image'; 
     }
 
     public function category()
