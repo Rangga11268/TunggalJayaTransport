@@ -44,7 +44,8 @@ Transition the Tunggal Jaya Transport frontend from Laravel Blade to a modern Si
 
 ### Remaining Pages (To Do)
 
--   [ ] **Fleet Page** (`Fleet/Index.vue`): Filterable list of all buses.
+-   [x] **Fleet Page** (`Fleet/Index.vue`): Filterable list of all buses.
+-   [x] **Routes Page** (`Routes/Index.vue` & `Show.vue`): List and Detail views for routes.
 -   [ ] **Booking Flow**:
     -   [ ] `Booking/Search.vue`: Search results page.
     -   [ ] `Booking/SeatSelection.vue`: Interactive seat map.

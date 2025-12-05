@@ -1,13 +1,13 @@
 {
-  "_FrontendLayout-CINFPXj5.js": {
-    "file": "assets/FrontendLayout-CINFPXj5.js",
+  "_FrontendLayout-ANpLohrV.js": {
+    "file": "assets/FrontendLayout-ANpLohrV.js",
     "name": "FrontendLayout",
     "imports": [
       "resources/js/app.js"
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-DTIEGeei.css",
+    "file": "assets/app-BeK5aeTq.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "names": [
@@ -15,42 +15,70 @@
     ]
   },
   "resources/js/Pages/Frontend/Fleet/Index.vue": {
-    "file": "assets/Index-DSkV2Bol.js",
+    "file": "assets/Index-DRIOjY-P.js",
     "name": "Index",
     "src": "resources/js/Pages/Frontend/Fleet/Index.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_FrontendLayout-CINFPXj5.js"
+      "_FrontendLayout-ANpLohrV.js"
     ],
     "css": [
-      "assets/app-DTIEGeei.css"
+      "assets/app-BeK5aeTq.css"
     ]
   },
   "resources/js/Pages/Frontend/Home.vue": {
-    "file": "assets/Home-xc5QwGza.js",
+    "file": "assets/Home-CFK9uWMe.js",
     "name": "Home",
     "src": "resources/js/Pages/Frontend/Home.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_FrontendLayout-CINFPXj5.js"
+      "_FrontendLayout-ANpLohrV.js"
     ],
     "css": [
-      "assets/app-DTIEGeei.css"
+      "assets/app-BeK5aeTq.css"
+    ]
+  },
+  "resources/js/Pages/Frontend/Routes/Index.vue": {
+    "file": "assets/Index-DEGaAZ-3.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Frontend/Routes/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_FrontendLayout-ANpLohrV.js"
+    ],
+    "css": [
+      "assets/app-BeK5aeTq.css"
+    ]
+  },
+  "resources/js/Pages/Frontend/Routes/Show.vue": {
+    "file": "assets/Show-B4LNsIFv.js",
+    "name": "Show",
+    "src": "resources/js/Pages/Frontend/Routes/Show.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_FrontendLayout-ANpLohrV.js"
+    ],
+    "css": [
+      "assets/app-BeK5aeTq.css"
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BKc4VauM.js",
+    "file": "assets/app-Db0gf32a.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "dynamicImports": [
       "resources/js/Pages/Frontend/Fleet/Index.vue",
-      "resources/js/Pages/Frontend/Home.vue"
+      "resources/js/Pages/Frontend/Home.vue",
+      "resources/js/Pages/Frontend/Routes/Index.vue",
+      "resources/js/Pages/Frontend/Routes/Show.vue"
     ],
     "css": [
-      "assets/app-DTIEGeei.css"
+      "assets/app-BeK5aeTq.css"
     ]
   }
 }

@@ -10,25 +10,29 @@ class RouteController extends Controller
 {
     public function index()
     {
-        $routes = BusRoute::all();
+        $routes = BusRoute::withCount('schedules')->get()->append('formatted_duration');
         
-        return view('frontend.routes.index', compact('routes'));
+        return \Inertia\Inertia::render('Frontend/Routes/Index', [
+            'routes' => $routes
+        ]);
     }
     
     public function show($id)
     {
-        $route = BusRoute::with(['schedules.bus' => function($query) {
-            $query->orderBy('plate_number');
-        }])->findOrFail($id);
+        $route = BusRoute::with(['schedules.bus.media' => function($query) {
+             // Eager load bus media for the schedule list
+        }])->findOrFail($id)->append('formatted_duration');
         
         // Filter schedules to only show available ones
         $availableSchedules = $route->schedules->filter(function ($schedule) {
             return $schedule->isAvailableForBooking();
         });
         
-        // Add the filtered schedules to the route object
-        $route->availableSchedules = $availableSchedules;
+        // Re-index the collection to array for JSON response
+        $route->available_schedules = $availableSchedules->values();
         
-        return view('frontend.routes.show', compact('route'));
+        return \Inertia\Inertia::render('Frontend/Routes/Show', [
+            'route' => $route
+        ]);
     }
 }
