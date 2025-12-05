@@ -81,14 +81,23 @@ const isActive = (routeName) => {
                         :href="route('frontend.home')"
                         class="flex items-center space-x-3 group"
                     >
-                        <div class="relative">
+                        <div
+                            class="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center"
+                        >
+                            <!-- Saturn Rings -->
                             <div
-                                class="absolute inset-0 bg-brand-red blur-xl opacity-20 group-hover:opacity-50 transition-all duration-500 scale-75 group-hover:scale-110"
+                                class="logo-ring absolute w-[160%] h-[160%] animate-ring-spin"
                             ></div>
+                            <div
+                                class="logo-ring absolute w-[140%] h-[140%] animate-ring-spin"
+                                style="animation-duration: 15s"
+                            ></div>
+
+                            <!-- Logo Image -->
                             <img
                                 src="/img/logoNoBg.png"
                                 alt="Logo"
-                                class="h-10 w-10 md:h-12 md:w-12 relative z-10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md"
+                                class="h-10 w-10 md:h-12 md:w-12 relative z-10 transition-transform duration-500 group-hover:scale-110 drop-shadow-lg"
                             />
                         </div>
                         <span
