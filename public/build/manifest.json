@@ -1,34 +1,56 @@
 {
+  "_FrontendLayout-CINFPXj5.js": {
+    "file": "assets/FrontendLayout-CINFPXj5.js",
+    "name": "FrontendLayout",
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
   "resources/css/app.css": {
-    "file": "assets/app-DtKBz8VJ.css",
+    "file": "assets/app-DTIEGeei.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "names": [
       "app.css"
     ]
   },
+  "resources/js/Pages/Frontend/Fleet/Index.vue": {
+    "file": "assets/Index-DSkV2Bol.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Frontend/Fleet/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_FrontendLayout-CINFPXj5.js"
+    ],
+    "css": [
+      "assets/app-DTIEGeei.css"
+    ]
+  },
   "resources/js/Pages/Frontend/Home.vue": {
-    "file": "assets/Home-DtExqRax.js",
+    "file": "assets/Home-xc5QwGza.js",
     "name": "Home",
     "src": "resources/js/Pages/Frontend/Home.vue",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/app.js"
+      "resources/js/app.js",
+      "_FrontendLayout-CINFPXj5.js"
     ],
     "css": [
-      "assets/app-DtKBz8VJ.css"
+      "assets/app-DTIEGeei.css"
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-c6HHUnnm.js",
+    "file": "assets/app-BKc4VauM.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "dynamicImports": [
+      "resources/js/Pages/Frontend/Fleet/Index.vue",
       "resources/js/Pages/Frontend/Home.vue"
     ],
     "css": [
-      "assets/app-DtKBz8VJ.css"
+      "assets/app-DTIEGeei.css"
     ]
   }
 }

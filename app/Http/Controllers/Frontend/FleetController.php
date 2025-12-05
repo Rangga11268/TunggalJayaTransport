@@ -11,8 +11,8 @@ class FleetController extends Controller
 {
     public function index()
     {
-        $buses = Bus::all();
-        $drivers = Driver::where('status', 'active')->get();
+        $buses = Bus::with('media')->get();
+        // $drivers = Driver::where('status', 'active')->get(); // Not typically shown on public fleet list unless requested
         
         // Hardcoded facilities
         $facilities = collect([
@@ -58,6 +58,9 @@ class FleetController extends Controller
             ]
         ]);
         
-        return view('frontend.fleet.index', compact('buses', 'facilities', 'drivers'));
+        return \Inertia\Inertia::render('Frontend/Fleet/Index', [
+            'buses' => $buses,
+            'facilities' => $facilities
+        ]);
     }
 }
