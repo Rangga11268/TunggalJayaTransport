@@ -54,32 +54,28 @@ const features = [
         title: "Kursi Premium",
         description:
             "Desain kursi ergonomis dengan leg room luas untuk kenyamanan maksimal",
-        gradient: "from-blue-500 to-indigo-600",
-        bgGradient: "from-blue-50 to-indigo-50",
+        gradient: "bg-gradient-to-br from-primary-500 to-primary-700",
     },
     {
         icon: "fas fa-tv",
         title: "Hiburan Modern",
         description:
             "TV LCD layar lebar & sistem audio surround untuk perjalanan menyenangkan",
-        gradient: "from-purple-500 to-pink-600",
-        bgGradient: "from-purple-50 to-pink-50",
+        gradient: "bg-gradient-to-br from-secondary-500 to-secondary-700",
     },
     {
         icon: "fas fa-wifi",
         title: "WiFi Gratis",
         description:
             "Internet berkecepatan tinggi gratis untuk tetap produktif",
-        gradient: "from-cyan-500 to-blue-600",
-        bgGradient: "from-cyan-50 to-blue-50",
+        gradient: "bg-gradient-to-br from-gold-500 to-gold-700",
     },
     {
         icon: "fas fa-snowflake",
         title: "AC Premium",
         description:
             "Sistem pendingin udara canggih dengan kontrol suhu optimal",
-        gradient: "from-emerald-500 to-teal-600",
-        bgGradient: "from-emerald-50 to-teal-50",
+        gradient: "bg-gradient-to-br from-emerald-500 to-teal-600",
     },
 ];
 
@@ -197,25 +193,27 @@ const formatNumber = (num) => {
     <Head title="Beranda" />
 
     <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center overflow-hidden">
+    <section
+        class="relative min-h-screen flex items-center overflow-hidden bg-primary-950"
+    >
         <!-- Animated Background -->
-        <div class="absolute inset-0 gradient-hero">
+        <div class="absolute inset-0">
             <!-- Animated blobs -->
             <div
-                class="blob w-96 h-96 bg-blue-500/30 top-20 -left-20"
+                class="blob w-[600px] h-[600px] bg-primary-600/20 top-[-10%] left-[-10%]"
                 style="animation-delay: 0s"
             ></div>
             <div
-                class="blob w-80 h-80 bg-purple-500/20 bottom-20 right-10"
+                class="blob w-[500px] h-[500px] bg-secondary-600/20 bottom-[-10%] right-[-5%]"
                 style="animation-delay: 2s"
             ></div>
             <div
-                class="blob w-64 h-64 bg-cyan-500/20 top-1/2 left-1/3"
+                class="blob w-[400px] h-[400px] bg-gold-500/10 top-[40%] left-[60%]"
                 style="animation-delay: 4s"
             ></div>
 
             <!-- Pattern overlay -->
-            <div class="absolute inset-0 hero-pattern"></div>
+            <div class="absolute inset-0 hero-pattern opacity-20"></div>
 
             <!-- Background image with overlay -->
             <img
@@ -224,138 +222,101 @@ const formatNumber = (num) => {
                 class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay"
             />
 
-            <!-- Gradient overlay -->
+            <!-- Gradient overlay for better text readability -->
             <div
-                class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0c1445]/50 to-[#0c1445]"
+                class="absolute inset-0 bg-gradient-to-b from-transparent via-primary-950/60 to-primary-950"
             ></div>
         </div>
 
         <!-- Content -->
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-            <div class="max-w-3xl">
+            <div class="max-w-4xl mx-auto text-center">
                 <!-- Badge -->
                 <div
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6 animate-fade-in-down"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 mb-8 animate-fade-in-down mx-auto"
                 >
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
+                        ></span>
+                        <span
+                            class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"
+                        ></span>
+                    </span>
                     <span
-                        class="w-2 h-2 rounded-full bg-green-400 animate-pulse"
-                    ></span>
-                    <span class="text-sm font-medium text-white/90"
+                        class="text-sm font-medium text-white/90 tracking-wide"
                         >Layanan 24/7 Tersedia</span
                     >
                 </div>
 
                 <!-- Title -->
                 <h1
-                    class="hero-title text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight animate-fade-in-down stagger-1"
+                    class="hero-title text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-8 leading-tight animate-fade-in-down stagger-1 tracking-tight font-serif"
                 >
-                    Perjalanan
-                    <span class="text-gradient-gold">Premium</span> dengan
-                    Kenyamanan <span class="text-gradient-ocean">Maksimal</span>
+                    Elegansi dalam
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 to-gold-500"
+                        >Setiap Perjalanan</span
+                    >
                 </h1>
 
                 <!-- Subtitle -->
                 <p
-                    class="text-lg md:text-xl text-blue-100/90 mb-10 max-w-2xl leading-relaxed animate-fade-in-up stagger-2"
+                    class="text-lg md:text-xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in-up stagger-2 font-light"
                 >
-                    Rasakan pengalaman perjalanan bus terbaik dengan armada
-                    modern, sopir profesional, dan pelayanan bintang 5.
+                    Nikmati pengalaman perjalanan bus terbaik dengan armada
+                    modern, fasilitas lengkap, dan pelayanan profesional dari
+                    Tunggal Jaya.
                 </p>
 
                 <!-- CTA Buttons -->
-                <div class="flex flex-wrap gap-4 animate-fade-in-up stagger-3">
+                <div
+                    class="flex flex-wrap justify-center gap-5 animate-fade-in-up stagger-3"
+                >
                     <Link
                         :href="route('frontend.booking.index')"
-                        class="btn-premium animate-pulse-glow"
+                        class="btn-premium group px-8 py-4 text-lg"
                     >
-                        <span class="flex items-center gap-2">
-                            <i class="fas fa-ticket-alt"></i>
-                            Pesan Tiket Sekarang
+                        <span class="flex items-center gap-3">
+                            <i
+                                class="fas fa-ticket-alt group-hover:rotate-12 transition-transform"
+                            ></i>
+                            Pesan Tiket
                         </span>
                     </Link>
                     <Link
                         :href="route('frontend.fleet.index')"
-                        class="btn-secondary-premium"
+                        class="btn-secondary-premium group px-8 py-4 text-lg"
                     >
-                        <i class="fas fa-bus mr-2"></i>
-                        Jelajahi Armada
+                        <i
+                            class="fas fa-bus mr-2 group-hover:-translate-x-1 transition-transform"
+                        ></i>
+                        Lihat Armada
                     </Link>
                 </div>
-
-                <!-- Trust badges -->
-                <div
-                    class="flex flex-wrap items-center gap-6 mt-12 animate-fade-in-up stagger-4"
-                >
-                    <div class="flex items-center gap-2 text-white/80">
-                        <i class="fas fa-shield-alt text-green-400"></i>
-                        <span class="text-sm">Aman & Terpercaya</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-white/80">
-                        <i class="fas fa-clock text-blue-400"></i>
-                        <span class="text-sm">Tepat Waktu</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-white/80">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <span class="text-sm">Rating 4.9/5</span>
-                    </div>
-                </div>
             </div>
-        </div>
-
-        <!-- Scroll indicator -->
-        <div
-            class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce-soft"
-        >
-            <div
-                class="w-8 h-14 rounded-full border-2 border-white/40 flex items-start justify-center p-2"
-            >
-                <div class="w-1.5 h-3 bg-white/60 rounded-full"></div>
-            </div>
-            <span class="block text-center text-xs text-white/50 mt-2"
-                >Scroll</span
-            >
         </div>
     </section>
 
     <!-- Booking Form Section -->
     <section
-        class="relative z-20 -mt-28 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8"
+        class="relative z-20 -mt-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-24"
     >
         <div
-            class="glass-white rounded-3xl shadow-2xl p-8 md:p-10 border border-white/50"
+            class="glass-white dark:glass-dark rounded-3xl p-8 md:p-10 shadow-2xl border-t border-white/50"
         >
-            <!-- Form Header -->
-            <div class="text-center mb-8">
-                <div
-                    class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-4"
-                >
-                    <i class="fas fa-search text-white text-xl"></i>
-                </div>
-                <h2
-                    class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white"
-                >
-                    Cari Jadwal Perjalanan
-                </h2>
-                <p class="text-gray-500 dark:text-gray-400 mt-2">
-                    Temukan tiket bus untuk tujuan Anda
-                </p>
-            </div>
-
             <form
                 :action="route('frontend.booking.index')"
                 method="GET"
                 class="space-y-6"
             >
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                     <!-- Origin -->
-                    <div class="md:col-span-3 origin-input relative">
+                    <div class="md:col-span-3 origin-input relative group">
                         <label
-                            class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2"
                         >
-                            <i
-                                class="fas fa-map-marker-alt text-indigo-500 mr-2"
-                            ></i
-                            >Kota Asal
+                            Kota Asal
                         </label>
                         <div class="relative">
                             <input
@@ -365,11 +326,11 @@ const formatNumber = (num) => {
                                 name="origin"
                                 type="text"
                                 placeholder="Pilih kota asal..."
-                                class="input-premium"
+                                class="input-premium pl-12 border-gray-200 focus:border-primary-500 focus:ring-primary-500"
                                 autocomplete="off"
                             />
                             <i
-                                class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                                class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-primary-500 text-lg"
                             ></i>
                         </div>
                         <!-- Dropdown -->
@@ -391,10 +352,10 @@ const formatNumber = (num) => {
                                     v-for="item in filteredOrigins"
                                     :key="item"
                                     @click="selectOrigin(item)"
-                                    class="px-4 py-3 cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-gray-700 dark:text-gray-200 flex items-center gap-3 transition-colors"
+                                    class="px-4 py-3 cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/30 text-gray-700 dark:text-gray-200 flex items-center gap-3 transition-colors"
                                 >
                                     <i
-                                        class="fas fa-location-dot text-indigo-500"
+                                        class="fas fa-location-dot text-primary-500"
                                     ></i>
                                     {{ item }}
                                 </div>
@@ -404,26 +365,23 @@ const formatNumber = (num) => {
 
                     <!-- Swap Button -->
                     <div
-                        class="hidden md:flex md:col-span-1 items-end justify-center pb-3"
+                        class="hidden md:flex md:col-span-1 items-end justify-center pb-1"
                     >
                         <button
                             type="button"
                             @click="swapLocations"
-                            class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+                            class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-primary-100 hover:text-primary-600 dark:hover:bg-primary-900/30 dark:hover:text-primary-400 transition-colors flex items-center justify-center transform hover:rotate-180 duration-300"
                         >
                             <i class="fas fa-exchange-alt"></i>
                         </button>
                     </div>
 
                     <!-- Destination -->
-                    <div class="md:col-span-3 destination-input relative">
+                    <div class="md:col-span-3 destination-input relative group">
                         <label
-                            class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2"
                         >
-                            <i
-                                class="fas fa-flag-checkered text-purple-500 mr-2"
-                            ></i
-                            >Kota Tujuan
+                            Kota Tujuan
                         </label>
                         <div class="relative">
                             <input
@@ -433,11 +391,11 @@ const formatNumber = (num) => {
                                 name="destination"
                                 type="text"
                                 placeholder="Pilih kota tujuan..."
-                                class="input-premium"
+                                class="input-premium pl-12 border-gray-200 focus:border-secondary-500 focus:ring-secondary-500"
                                 autocomplete="off"
                             />
                             <i
-                                class="fas fa-flag-checkered absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                                class="fas fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-secondary-500 text-lg"
                             ></i>
                         </div>
                         <!-- Dropdown -->
@@ -460,10 +418,10 @@ const formatNumber = (num) => {
                                     v-for="item in filteredDestinations"
                                     :key="item"
                                     @click="selectDestination(item)"
-                                    class="px-4 py-3 cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 text-gray-700 dark:text-gray-200 flex items-center gap-3 transition-colors"
+                                    class="px-4 py-3 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900/30 text-gray-700 dark:text-gray-200 flex items-center gap-3 transition-colors"
                                 >
                                     <i
-                                        class="fas fa-location-dot text-purple-500"
+                                        class="fas fa-location-dot text-secondary-500"
                                     ></i>
                                     {{ item }}
                                 </div>
@@ -474,10 +432,9 @@ const formatNumber = (num) => {
                     <!-- Date -->
                     <div class="md:col-span-2">
                         <label
-                            class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2"
                         >
-                            <i class="fas fa-calendar text-cyan-500 mr-2"></i
-                            >Tanggal Berangkat
+                            Tanggal
                         </label>
                         <div class="relative">
                             <input
@@ -485,10 +442,10 @@ const formatNumber = (num) => {
                                 name="date"
                                 type="date"
                                 :min="today"
-                                class="input-premium"
+                                class="input-premium pl-12 border-gray-200 focus:border-primary-500 focus:ring-primary-500"
                             />
                             <i
-                                class="fas fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                                class="fas fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-primary-500 text-lg"
                             ></i>
                         </div>
                     </div>
@@ -496,16 +453,15 @@ const formatNumber = (num) => {
                     <!-- Bus Type -->
                     <div class="md:col-span-2">
                         <label
-                            class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2"
                         >
-                            <i class="fas fa-bus text-emerald-500 mr-2"></i>Tipe
-                            Bus
+                            Kelas
                         </label>
                         <div class="relative">
                             <select
                                 v-model="busType"
                                 name="bus_type"
-                                class="input-premium appearance-none cursor-pointer"
+                                class="input-premium pl-12 appearance-none cursor-pointer border-gray-200 focus:border-gold-500 focus:ring-gold-500"
                             >
                                 <option
                                     v-for="type in busTypes"
@@ -516,10 +472,10 @@ const formatNumber = (num) => {
                                 </option>
                             </select>
                             <i
-                                class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                                class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"
                             ></i>
                             <i
-                                class="fas fa-bus absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                                class="fas fa-crown absolute left-4 top-1/2 -translate-y-1/2 text-gold-500 text-lg"
                             ></i>
                         </div>
                     </div>
@@ -528,14 +484,9 @@ const formatNumber = (num) => {
                     <div class="md:col-span-1 flex items-end">
                         <button
                             type="submit"
-                            class="w-full h-[52px] btn-premium rounded-xl"
+                            class="w-full h-[50px] btn-premium rounded-xl shadow-lg hover:shadow-primary-500/30 flex items-center justify-center"
                         >
-                            <span
-                                class="flex items-center justify-center gap-2"
-                            >
-                                <i class="fas fa-search"></i>
-                                <span class="hidden lg:inline">Cari</span>
-                            </span>
+                            <i class="fas fa-search text-xl"></i>
                         </button>
                     </div>
                 </div>
@@ -544,54 +495,57 @@ const formatNumber = (num) => {
     </section>
 
     <!-- Features Section -->
-    <section
-        class="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800"
-    >
+    <section class="py-24 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <span
-                    class="inline-block px-4 py-2 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-sm font-semibold mb-4"
+                    class="inline-block px-4 py-2 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-sm font-bold mb-4 tracking-wide"
                 >
                     FASILITAS UNGGULAN
                 </span>
                 <h2
-                    class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-800 dark:text-white mb-4"
+                    class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-800 dark:text-white mb-6 font-serif"
                 >
                     Kenapa Memilih
-                    <span class="text-gradient">Tunggal Jaya?</span>
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-secondary-600"
+                        >Tunggal Jaya?</span
+                    >
                 </h2>
                 <p
-                    class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg"
+                    class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed"
                 >
                     Kami berkomitmen memberikan layanan transportasi terbaik
-                    dengan berbagai fasilitas premium.
+                    dengan berbagai fasilitas premium untuk kenyamanan Anda.
                 </p>
             </div>
 
-            <div
-                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8"
-            >
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div
                     v-for="(feature, index) in features"
                     :key="index"
-                    class="card-premium p-8 text-center group"
+                    class="card-premium p-8 text-center group hover:bg-white dark:hover:bg-gray-800 relative overflow-hidden"
                     :style="{ animationDelay: `${index * 0.1}s` }"
                 >
+                    <!-- Background blob on hover -->
                     <div
-                        class="feature-icon-box mx-auto mb-6 bg-gradient-to-br shadow-lg"
+                        class="absolute -top-10 -right-10 w-32 h-32 bg-primary-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"
+                    ></div>
+
+                    <div
+                        class="feature-icon-box mx-auto mb-6 shadow-lg text-white relative z-10"
                         :class="feature.gradient"
                     >
-                        <i
-                            :class="feature.icon"
-                            class="text-white text-2xl"
-                        ></i>
+                        <i :class="feature.icon" class="text-2xl"></i>
                     </div>
                     <h3
-                        class="text-xl font-bold text-gray-800 dark:text-white mb-3"
+                        class="text-xl font-bold text-gray-800 dark:text-white mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors relative z-10 font-serif"
                     >
                         {{ feature.title }}
                     </h3>
-                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <p
+                        class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm relative z-10"
+                    >
                         {{ feature.description }}
                     </p>
                 </div>
@@ -600,80 +554,76 @@ const formatNumber = (num) => {
     </section>
 
     <!-- Popular Routes Section -->
-    <section class="py-24 bg-white dark:bg-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="py-24 bg-white dark:bg-gray-950 relative">
+        <!-- Decorative elements -->
+        <div
+            class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-gray-50 to-transparent dark:from-gray-900 pointer-events-none"
+        ></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div
-                class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12"
+                class="flex flex-col md:flex-row justify-between items-end gap-6 mb-16"
             >
                 <div>
                     <span
-                        class="inline-block px-4 py-2 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-sm font-semibold mb-4"
+                        class="inline-block px-4 py-2 rounded-full bg-secondary-100 dark:bg-secondary-900/30 text-secondary-600 dark:text-secondary-400 text-sm font-bold mb-4 tracking-wide"
                     >
-                        RUTE UNGGULAN
+                        RUTE TERPOPULER
                     </span>
                     <h2
-                        class="text-3xl md:text-4xl font-extrabold text-gray-800 dark:text-white"
+                        class="text-3xl md:text-4xl font-extrabold text-gray-800 dark:text-white font-serif"
                     >
-                        Rute Populer
+                        Jelajahi Destinasi Favorit
                     </h2>
-                    <p class="text-gray-600 dark:text-gray-400 mt-2">
-                        Destinasi favorit pilihan pelanggan kami
-                    </p>
                 </div>
                 <Link
                     :href="route('frontend.routes.index')"
-                    class="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:gap-4 transition-all"
+                    class="group inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-bold hover:text-primary-700 transition-colors"
                 >
-                    Lihat Semua Rute <i class="fas fa-arrow-right"></i>
+                    Lihat Semua Rute
+                    <i
+                        class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"
+                    ></i>
                 </Link>
             </div>
 
-            <div
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
-            >
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div
                     v-for="busRoute in featuredRoutes"
                     :key="busRoute.id"
-                    class="group relative bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-3xl p-1 card-hover"
+                    class="card-premium group hover:border-primary-500/30"
                 >
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-[1.4rem] p-6 h-full"
-                    >
-                        <div class="flex items-center justify-between mb-6">
+                    <div class="p-8">
+                        <div class="flex items-center justify-between mb-8">
                             <div class="flex-1">
                                 <p
-                                    class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1"
+                                    class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1"
                                 >
                                     Dari
                                 </p>
                                 <p
-                                    class="font-bold text-gray-800 dark:text-white text-lg"
+                                    class="font-bold text-gray-800 dark:text-white text-xl font-serif"
                                 >
                                     {{ busRoute.origin }}
                                 </p>
                             </div>
-                            <div
-                                class="flex-shrink-0 w-16 flex items-center justify-center"
-                            >
-                                <div class="relative">
-                                    <div
-                                        class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"
-                                    >
-                                        <i class="fas fa-bus text-white"></i>
-                                    </div>
-                                    <i
-                                        class="fas fa-arrow-right absolute -right-4 top-1/2 -translate-y-1/2 text-indigo-500"
-                                    ></i>
+
+                            <div class="px-4">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300"
+                                >
+                                    <i class="fas fa-arrow-right"></i>
                                 </div>
                             </div>
+
                             <div class="flex-1 text-right">
                                 <p
-                                    class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1"
+                                    class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1"
                                 >
                                     Ke
                                 </p>
                                 <p
-                                    class="font-bold text-gray-800 dark:text-white text-lg"
+                                    class="font-bold text-gray-800 dark:text-white text-xl font-serif"
                                 >
                                     {{ busRoute.destination }}
                                 </p>
@@ -681,22 +631,22 @@ const formatNumber = (num) => {
                         </div>
 
                         <div
-                            class="flex items-center justify-center gap-6 py-4 border-y border-gray-100 dark:border-gray-700 mb-6"
+                            class="flex items-center gap-6 py-4 border-t border-gray-100 dark:border-gray-700 mb-6"
                         >
                             <div
                                 v-if="busRoute.distance"
-                                class="flex items-center gap-2 text-gray-600 dark:text-gray-400"
+                                class="flex items-center gap-2 text-gray-500 dark:text-gray-400"
                             >
-                                <i class="fas fa-road text-indigo-500"></i>
+                                <i class="fas fa-road text-primary-500"></i>
                                 <span class="text-sm font-medium"
                                     >{{ busRoute.distance }} km</span
                                 >
                             </div>
                             <div
                                 v-if="busRoute.duration"
-                                class="flex items-center gap-2 text-gray-600 dark:text-gray-400"
+                                class="flex items-center gap-2 text-gray-500 dark:text-gray-400"
                             >
-                                <i class="fas fa-clock text-purple-500"></i>
+                                <i class="fas fa-clock text-secondary-500"></i>
                                 <span class="text-sm font-medium"
                                     >{{
                                         Math.round(busRoute.duration / 60)
@@ -713,9 +663,9 @@ const formatNumber = (num) => {
                                     destination: busRoute.destination,
                                 })
                             "
-                            class="block w-full text-center py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30"
+                            class="block w-full text-center py-4 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold hover:bg-primary-600 dark:hover:bg-primary-500 dark:hover:text-white transition-all duration-300 shadow-lg hover:shadow-primary-500/30"
                         >
-                            <i class="fas fa-ticket-alt mr-2"></i>Pesan Tiket
+                            Pesan Sekarang
                         </Link>
                     </div>
                 </div>
@@ -724,83 +674,58 @@ const formatNumber = (num) => {
     </section>
 
     <!-- Stats Section -->
-    <section id="stats-section" class="py-24 relative overflow-hidden">
+    <section
+        id="stats-section"
+        class="py-32 relative overflow-hidden bg-primary-950"
+    >
         <!-- Background -->
-        <div class="absolute inset-0 gradient-hero">
-            <div class="absolute inset-0 hero-pattern opacity-30"></div>
+        <div class="absolute inset-0">
+            <div class="absolute inset-0 hero-pattern opacity-10"></div>
             <div
-                class="blob w-96 h-96 bg-cyan-500/20 -top-20 -right-20"
-                style="animation-delay: 0s"
+                class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
             ></div>
             <div
-                class="blob w-80 h-80 bg-purple-500/20 bottom-10 left-20"
-                style="animation-delay: 3s"
+                class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
             ></div>
         </div>
 
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <span
-                    class="inline-block px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm text-white text-sm font-semibold mb-4"
-                >
-                    PENCAPAIAN KAMI
-                </span>
-                <h2
-                    class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4"
-                >
-                    Dipercaya oleh Ribuan Pelanggan
-                </h2>
-                <p class="text-blue-200/80 max-w-2xl mx-auto text-lg">
-                    Statistik yang membuktikan komitmen kami dalam memberikan
-                    layanan terbaik
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div
-                    class="text-center p-10 rounded-3xl glass border border-white/20 group hover:bg-white/20 transition-all duration-300"
-                >
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+                <div class="group">
                     <div
-                        class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/30 group-hover:scale-110 transition-transform"
+                        class="stats-number mb-2 group-hover:scale-110 transition-transform duration-500"
                     >
-                        <i class="fas fa-bus text-white text-3xl"></i>
-                    </div>
-                    <div class="stats-number mb-2">
                         {{ displayFleetCount }}+
                     </div>
-                    <p class="text-lg text-blue-200 font-medium">
-                        Armada Bus Modern
+                    <p
+                        class="text-lg text-slate-400 font-medium tracking-wide uppercase"
+                    >
+                        Armada Bus
                     </p>
                 </div>
 
-                <div
-                    class="text-center p-10 rounded-3xl glass border border-white/20 group hover:bg-white/20 transition-all duration-300"
-                >
+                <div class="group">
                     <div
-                        class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform"
+                        class="stats-number mb-2 group-hover:scale-110 transition-transform duration-500"
                     >
-                        <i class="fas fa-route text-white text-3xl"></i>
-                    </div>
-                    <div class="stats-number mb-2">
                         {{ displayRouteCount }}+
                     </div>
-                    <p class="text-lg text-blue-200 font-medium">
-                        Rute Tersedia
+                    <p
+                        class="text-lg text-slate-400 font-medium tracking-wide uppercase"
+                    >
+                        Rute Perjalanan
                     </p>
                 </div>
 
-                <div
-                    class="text-center p-10 rounded-3xl glass border border-white/20 group hover:bg-white/20 transition-all duration-300"
-                >
+                <div class="group">
                     <div
-                        class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform"
+                        class="stats-number mb-2 group-hover:scale-110 transition-transform duration-500"
                     >
-                        <i class="fas fa-users text-white text-3xl"></i>
-                    </div>
-                    <div class="stats-number mb-2">
                         {{ formatNumber(displayCustomerCount) }}+
                     </div>
-                    <p class="text-lg text-blue-200 font-medium">
+                    <p
+                        class="text-lg text-slate-400 font-medium tracking-wide uppercase"
+                    >
                         Pelanggan Puas
                     </p>
                 </div>
@@ -813,20 +738,24 @@ const formatNumber = (num) => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <span
-                    class="inline-block px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-sm font-semibold mb-4"
+                    class="inline-block px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-sm font-bold mb-4 tracking-wide"
                 >
                     ARMADA KAMI
                 </span>
                 <h2
-                    class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-800 dark:text-white mb-4"
+                    class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-800 dark:text-white mb-6 font-serif"
                 >
-                    Bus Armada <span class="text-gradient">Premium</span>
+                    Kenyamanan
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500"
+                        >Kelas Atas</span
+                    >
                 </h2>
                 <p
                     class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg"
                 >
-                    Dipelihara dengan standar tertinggi untuk kenyamanan
-                    perjalanan Anda
+                    Armada bus terbaru dengan standar keamanan dan kenyamanan
+                    tertinggi.
                 </p>
             </div>
 
@@ -837,73 +766,94 @@ const formatNumber = (num) => {
                     class="card-premium overflow-hidden group"
                 >
                     <div
-                        class="h-52 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center relative overflow-hidden"
+                        class="h-64 bg-gray-200 dark:bg-gray-800 relative overflow-hidden"
                     >
                         <img
                             v-if="bus.media && bus.media.length"
                             :src="bus.media[0].original_url"
                             :alt="bus.name"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         />
                         <div
                             v-else
-                            class="flex flex-col items-center text-indigo-400"
+                            class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100 dark:bg-gray-800"
                         >
-                            <i class="fas fa-bus text-6xl mb-2"></i>
-                            <span class="text-sm opacity-60"
-                                >Gambar tidak tersedia</span
+                            <i class="fas fa-bus text-5xl mb-4"></i>
+                            <span class="text-sm font-medium"
+                                >No Image Available</span
                             >
                         </div>
 
-                        <!-- Overlay badge -->
-                        <div class="absolute top-4 left-4">
+                        <!-- Overlay gradient -->
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"
+                        ></div>
+
+                        <!-- Type Badge -->
+                        <div class="absolute bottom-4 left-4">
                             <span
-                                class="px-3 py-1.5 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-sm font-semibold text-indigo-600 dark:text-indigo-400"
+                                class="px-3 py-1 rounded-lg bg-white/20 backdrop-blur-md text-white text-sm font-bold border border-white/20"
                             >
                                 {{ bus.bus_type }}
                             </span>
                         </div>
                     </div>
+
                     <div class="p-6">
                         <h3
-                            class="text-xl font-bold text-gray-800 dark:text-white mb-3"
+                            class="text-xl font-bold text-gray-800 dark:text-white mb-4 font-serif"
                         >
                             {{ bus.name }}
                         </h3>
-                        <div class="flex flex-wrap gap-2 mb-4">
+
+                        <div class="flex flex-wrap gap-3 mb-6">
                             <span
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-medium"
+                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-medium"
                             >
                                 <img
                                     src="/img/car-seat.png"
                                     alt="seat"
-                                    class="w-4 h-4"
+                                    class="w-4 h-4 opacity-70"
                                 />
-                                {{ bus.capacity }} kursi
+                                {{ bus.capacity }} Kursi
                             </span>
                             <span
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm font-medium"
+                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-medium"
                             >
-                                <i class="fas fa-id-card"></i>
+                                <i class="fas fa-id-card text-gray-400"></i>
                                 {{ bus.plate_number }}
                             </span>
                         </div>
+
                         <div
-                            class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
+                            class="pt-6 border-t border-gray-100 dark:border-gray-700"
                         >
-                            <i class="fas fa-check-circle text-green-500"></i>
-                            <span>AC | WiFi | USB Charging</span>
+                            <div
+                                class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400"
+                            >
+                                <span class="flex items-center gap-1.5">
+                                    <i
+                                        class="fas fa-snowflake text-sky-400"
+                                    ></i>
+                                    AC
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fas fa-wifi text-primary-400"></i>
+                                    WiFi
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fas fa-bolt text-gold-400"></i>
+                                    USB
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="text-center mt-12">
+            <div class="text-center mt-16">
                 <Link :href="route('frontend.fleet.index')" class="btn-premium">
-                    <span class="flex items-center gap-2">
-                        <i class="fas fa-bus"></i>
-                        Lihat Semua Armada
-                    </span>
+                    Lihat Seluruh Armada
                 </Link>
             </div>
         </div>
@@ -912,32 +862,32 @@ const formatNumber = (num) => {
     <!-- Latest News -->
     <section
         v-if="latestNews && latestNews.length"
-        class="py-24 bg-white dark:bg-gray-800"
+        class="py-24 bg-white dark:bg-gray-950"
     >
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div
-                class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12"
+                class="flex flex-col md:flex-row justify-between items-end gap-6 mb-16"
             >
                 <div>
                     <span
-                        class="inline-block px-4 py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-sm font-semibold mb-4"
+                        class="inline-block px-4 py-2 rounded-full bg-gold-100 dark:bg-gold-900/30 text-gold-600 dark:text-gold-400 text-sm font-bold mb-4 tracking-wide"
                     >
-                        BERITA & UPDATE
+                        BERITA TERKINI
                     </span>
                     <h2
-                        class="text-3xl md:text-4xl font-extrabold text-gray-800 dark:text-white"
+                        class="text-3xl md:text-4xl font-extrabold text-gray-800 dark:text-white font-serif"
                     >
-                        Berita Terbaru
+                        Info & Promo Terbaru
                     </h2>
-                    <p class="text-gray-600 dark:text-gray-400 mt-2">
-                        Informasi dan promo terkini
-                    </p>
                 </div>
                 <Link
                     :href="route('frontend.news.index')"
-                    class="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:gap-4 transition-all"
+                    class="group inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-bold hover:text-primary-700 transition-colors"
                 >
-                    Semua Berita <i class="fas fa-arrow-right"></i>
+                    Lihat Semua Berita
+                    <i
+                        class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"
+                    ></i>
                 </Link>
             </div>
 
@@ -948,43 +898,57 @@ const formatNumber = (num) => {
                     class="card-premium overflow-hidden group"
                 >
                     <div
-                        class="h-52 bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center relative overflow-hidden"
+                        class="h-56 bg-gray-200 dark:bg-gray-800 relative overflow-hidden"
                     >
                         <img
                             v-if="news.media && news.media.length"
                             :src="news.media[0].original_url"
                             :alt="news.title"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         />
-                        <i
+                        <div
                             v-else
-                            class="fas fa-newspaper text-white/80 text-5xl"
-                        ></i>
-                    </div>
-                    <div class="p-6">
-                        <p
-                            class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3"
+                            class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gold-400 to-primary-500"
                         >
-                            <i class="far fa-calendar-alt"></i>
-                            {{
-                                new Date(news.created_at).toLocaleDateString(
-                                    "id-ID",
-                                    {
+                            <i
+                                class="fas fa-newspaper text-white/50 text-5xl"
+                            ></i>
+                        </div>
+
+                        <!-- Date Badge -->
+                        <div class="absolute top-4 left-4">
+                            <span
+                                class="px-3 py-1 rounded-lg bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold shadow-sm"
+                            >
+                                {{
+                                    new Date(
+                                        news.created_at
+                                    ).toLocaleDateString("id-ID", {
                                         day: "numeric",
-                                        month: "long",
-                                        year: "numeric",
-                                    }
-                                )
-                            }}
-                        </p>
+                                        month: "short",
+                                    })
+                                }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
                         <h3
-                            class="text-lg font-bold text-gray-800 dark:text-white mb-3 line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"
+                            class="text-lg font-bold text-gray-800 dark:text-white mb-3 line-clamp-2 group-hover:text-primary-600 transition-colors font-serif"
                         >
                             {{ news.title }}
                         </h3>
+                        <p
+                            class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-4"
+                        >
+                            {{
+                                news.content ||
+                                "Klik untuk membaca selengkapnya..."
+                            }}
+                        </p>
                         <Link
                             :href="route('frontend.news.show', news.slug)"
-                            class="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:gap-4 transition-all text-sm"
+                            class="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-bold text-sm hover:gap-3 transition-all"
                         >
                             Baca Selengkapnya
                             <i class="fas fa-arrow-right text-xs"></i>
@@ -994,60 +958,4 @@ const formatNumber = (num) => {
             </div>
         </div>
     </section>
-
-    <!-- CTA Section -->
-    <section class="py-24 relative overflow-hidden">
-        <div
-            class="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600"
-        >
-            <div class="absolute inset-0 hero-pattern opacity-20"></div>
-            <div class="blob w-96 h-96 bg-white/10 -top-20 -left-20"></div>
-            <div
-                class="blob w-80 h-80 bg-white/10 bottom-10 right-20"
-                style="animation-delay: 2s"
-            ></div>
-        </div>
-
-        <div
-            class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
-        >
-            <div
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8"
-            >
-                <i class="fas fa-gift text-yellow-300"></i>
-                <span class="text-white text-sm font-medium"
-                    >Promo Spesial - Diskon hingga 30%!</span
-                >
-            </div>
-
-            <h2
-                class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight"
-            >
-                Siap untuk Perjalanan
-                <span class="text-gradient-gold">Tak Terlupakan?</span>
-            </h2>
-            <p class="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-                Pesan tiket bus sekarang dan nikmati perjalanan nyaman dengan
-                harga terbaik bersama Tunggal Jaya Transport.
-            </p>
-
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <Link
-                    :href="route('frontend.booking.index')"
-                    class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-indigo-600 font-bold rounded-full hover:bg-gray-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
-                >
-                    <i class="fas fa-ticket-alt"></i>
-                    Pesan Tiket Sekarang
-                </Link>
-                <Link
-                    :href="route('frontend.contact')"
-                    class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent border-2 border-white/40 text-white font-bold rounded-full hover:bg-white hover:text-indigo-600 transition-all hover:-translate-y-1"
-                >
-                    <i class="fas fa-phone"></i>
-                    Hubungi Kami
-                </Link>
-            </div>
-        </div>
-    </section>
 </template>
-
