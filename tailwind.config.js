@@ -57,6 +57,10 @@ export default {
                     900: "#78350f",
                     950: "#451a03",
                 },
+                brand: {
+                    red: "#DC2626", // Red-600
+                    dark: "#991B1B", // Red-800
+                },
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

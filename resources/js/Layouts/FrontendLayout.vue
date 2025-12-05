@@ -52,17 +52,20 @@ const isActive = (routeName) => {
         <!-- Flash Messages -->
         <FlashMessages />
 
-        <!-- Header -->
+        <!-- Header (Floating Pill) -->
         <header
-            class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-            :class="
-                isScrolled
-                    ? 'glass-white dark:glass-dark shadow-lg py-2'
-                    : 'bg-transparent py-4'
-            "
+            class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out px-4 sm:px-6 lg:px-8"
+            :class="isScrolled ? 'pt-4' : 'pt-6'"
         >
-            <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
+            <nav
+                class="max-w-7xl mx-auto rounded-full transition-all duration-500"
+                :class="
+                    isScrolled
+                        ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg border border-white/20 dark:border-gray-700 py-3 px-6'
+                        : 'bg-transparent py-4 px-0'
+                "
+            >
+                <div class="flex items-center justify-between">
                     <!-- Logo -->
                     <Link
                         :href="route('frontend.home')"
@@ -70,7 +73,7 @@ const isActive = (routeName) => {
                     >
                         <div class="relative">
                             <div
-                                class="absolute inset-0 bg-blue-500 blur-lg opacity-20 group-hover:opacity-40 transition-opacity"
+                                class="absolute inset-0 bg-brand-red blur-lg opacity-20 group-hover:opacity-40 transition-opacity"
                             ></div>
                             <img
                                 src="/img/logoNoBg.png"
@@ -79,10 +82,10 @@ const isActive = (routeName) => {
                             />
                         </div>
                         <span
-                            class="text-xl md:text-2xl font-extrabold tracking-tight"
+                            class="text-xl md:text-2xl font-extrabold tracking-tight font-serif"
                         >
-                            <span class="text-gradient-ocean">Tunggal</span>
-                            <span class="text-gradient-gold">Jaya</span>
+                            <span class="text-brand-red">Tunggal</span>
+                            <span class="text-brand-dark">Jaya</span>
                         </span>
                     </Link>
 
@@ -92,17 +95,17 @@ const isActive = (routeName) => {
                             v-for="link in navLinks"
                             :key="link.href"
                             :href="route(link.href)"
-                            class="px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 relative group overflow-hidden"
+                            class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 relative group overflow-hidden"
                             :class="
                                 isActive(link.href)
-                                    ? 'text-white bg-gradient-to-r from-primary-600 to-primary-700 shadow-lg shadow-primary-500/30'
-                                    : 'text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400'
+                                    ? 'text-white bg-brand-red shadow-lg shadow-brand-red/30'
+                                    : 'text-gray-700 dark:text-gray-200 hover:text-brand-red dark:hover:text-brand-red'
                             "
                         >
                             <span class="relative z-10">{{ link.name }}</span>
                             <div
                                 v-if="!isActive(link.href)"
-                                class="absolute inset-0 bg-blue-50 dark:bg-blue-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                class="absolute inset-0 bg-brand-red/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                             ></div>
                         </Link>
                     </div>
@@ -127,13 +130,13 @@ const isActive = (routeName) => {
                         <template v-if="!page.props.auth.user">
                             <Link
                                 :href="route('login')"
-                                class="hidden sm:inline-flex px-5 py-2 text-sm font-bold text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                class="hidden sm:inline-flex px-5 py-2 text-sm font-bold text-gray-700 dark:text-gray-200 hover:text-brand-red dark:hover:text-brand-red transition-colors"
                             >
                                 Masuk
                             </Link>
                             <Link
                                 :href="route('register')"
-                                class="hidden sm:inline-flex px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-full hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 hover:-translate-y-0.5"
+                                class="hidden sm:inline-flex px-6 py-2.5 bg-brand-red text-white text-sm font-bold rounded-full hover:shadow-lg hover:shadow-brand-red/30 transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
                             >
                                 Daftar
                             </Link>
@@ -141,10 +144,10 @@ const isActive = (routeName) => {
                         <template v-else>
                             <div class="relative group">
                                 <button
-                                    class="flex items-center space-x-2 p-1.5 pr-4 rounded-full border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-colors bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm"
+                                    class="flex items-center space-x-2 p-1.5 pr-4 rounded-full border border-gray-200 dark:border-gray-700 hover:border-brand-red dark:hover:border-brand-red transition-colors bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm"
                                 >
                                     <div
-                                        class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold shadow-md"
+                                        class="w-8 h-8 rounded-full bg-brand-red flex items-center justify-center text-white text-sm font-bold shadow-md"
                                     >
                                         {{
                                             page.props.auth.user.name
@@ -186,7 +189,7 @@ const isActive = (routeName) => {
 
                                     <Link
                                         :href="route('profile.edit')"
-                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-brand-red dark:hover:text-brand-red transition-colors"
                                     >
                                         <i
                                             class="fas fa-user w-6 text-center mr-2 text-gray-400"
@@ -195,7 +198,7 @@ const isActive = (routeName) => {
                                     </Link>
                                     <Link
                                         :href="route('booking-history.index')"
-                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-brand-red dark:hover:text-brand-red transition-colors"
                                     >
                                         <i
                                             class="fas fa-history w-6 text-center mr-2 text-gray-400"
@@ -269,7 +272,7 @@ const isActive = (routeName) => {
                 >
                     <div
                         v-if="mobileMenuOpen"
-                        class="lg:hidden absolute left-4 right-4 top-20 glass-white dark:glass-dark rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
+                        class="lg:hidden absolute left-0 right-0 top-full mt-4 mx-4 glass-white dark:glass-dark rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
                     >
                         <div class="p-4 space-y-2">
                             <Link
@@ -280,7 +283,7 @@ const isActive = (routeName) => {
                                 class="block px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200"
                                 :class="
                                     isActive(link.href)
-                                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                                        ? 'bg-brand-red text-white shadow-lg'
                                         : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
                                 "
                             >
@@ -306,7 +309,7 @@ const isActive = (routeName) => {
                                 </Link>
                                 <Link
                                     :href="route('register')"
-                                    class="block px-4 py-3 mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl text-center shadow-lg"
+                                    class="block px-4 py-3 mt-2 bg-brand-red text-white text-sm font-bold rounded-xl text-center shadow-lg"
                                 >
                                     Daftar Sekarang
                                 </Link>
@@ -318,7 +321,7 @@ const isActive = (routeName) => {
         </header>
 
         <!-- Main Content -->
-        <main class="flex-grow pt-20">
+        <main class="flex-grow pt-24">
             <slot />
         </main>
 
@@ -351,8 +354,8 @@ const isActive = (routeName) => {
                                 class="h-12 w-12 brightness-200"
                             />
                             <span class="text-2xl font-bold font-serif">
-                                <span class="text-gradient-ocean">Tunggal</span>
-                                <span class="text-gradient-gold">Jaya</span>
+                                <span class="text-brand-red">Tunggal</span>
+                                <span class="text-brand-dark">Jaya</span>
                             </span>
                         </Link>
                         <p
@@ -365,7 +368,7 @@ const isActive = (routeName) => {
                         <div class="flex space-x-4">
                             <a
                                 href="#"
-                                class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary-600 hover:border-primary-500 hover:scale-110 transition-all duration-300 group"
+                                class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:scale-110 transition-all duration-300 group"
                             >
                                 <i
                                     class="fab fa-facebook-f group-hover:text-white text-gray-400 transition-colors"
@@ -401,7 +404,7 @@ const isActive = (routeName) => {
                     <!-- Quick Links -->
                     <div>
                         <h3
-                            class="text-lg font-bold mb-6 text-white border-b-2 border-gold-500 inline-block pb-2 font-serif"
+                            class="text-lg font-bold mb-6 text-white border-b-2 border-brand-red inline-block pb-2 font-serif"
                         >
                             Link Cepat
                         </h3>
@@ -418,10 +421,10 @@ const isActive = (routeName) => {
                             >
                                 <a
                                     href="#"
-                                    class="text-gray-400 hover:text-gold-400 transition-colors flex items-center group"
+                                    class="text-gray-400 hover:text-brand-red transition-colors flex items-center group"
                                 >
                                     <i
-                                        class="fas fa-chevron-right text-xs mr-2 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 text-gold-500"
+                                        class="fas fa-chevron-right text-xs mr-2 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 text-brand-red"
                                     ></i>
                                     {{ item }}
                                 </a>
@@ -432,17 +435,17 @@ const isActive = (routeName) => {
                     <!-- Contact -->
                     <div>
                         <h3
-                            class="text-lg font-bold mb-6 text-white border-b-2 border-gold-500 inline-block pb-2 font-serif"
+                            class="text-lg font-bold mb-6 text-white border-b-2 border-brand-red inline-block pb-2 font-serif"
                         >
                             Hubungi Kami
                         </h3>
                         <ul class="space-y-4 text-gray-400">
                             <li class="flex items-start space-x-3 group">
                                 <div
-                                    class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-600 group-hover:border-primary-500 transition-colors"
+                                    class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-red group-hover:border-brand-red transition-colors"
                                 >
                                     <i
-                                        class="fas fa-phone text-primary-400 group-hover:text-white transition-colors text-sm"
+                                        class="fas fa-phone text-brand-red group-hover:text-white transition-colors text-sm"
                                     ></i>
                                 </div>
                                 <span
@@ -452,10 +455,10 @@ const isActive = (routeName) => {
                             </li>
                             <li class="flex items-start space-x-3 group">
                                 <div
-                                    class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-600 group-hover:border-primary-500 transition-colors"
+                                    class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-red group-hover:border-brand-red transition-colors"
                                 >
                                     <i
-                                        class="fas fa-envelope text-primary-400 group-hover:text-white transition-colors text-sm"
+                                        class="fas fa-envelope text-brand-red group-hover:text-white transition-colors text-sm"
                                     ></i>
                                 </div>
                                 <span
@@ -465,10 +468,10 @@ const isActive = (routeName) => {
                             </li>
                             <li class="flex items-start space-x-3 group">
                                 <div
-                                    class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-600 group-hover:border-primary-500 transition-colors"
+                                    class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-red group-hover:border-brand-red transition-colors"
                                 >
                                     <i
-                                        class="fas fa-map-marker-alt text-primary-400 group-hover:text-white transition-colors text-sm"
+                                        class="fas fa-map-marker-alt text-brand-red group-hover:text-white transition-colors text-sm"
                                     ></i>
                                 </div>
                                 <span
@@ -491,17 +494,17 @@ const isActive = (routeName) => {
                     <div class="flex space-x-6 mt-4 md:mt-0">
                         <a
                             href="#"
-                            class="hover:text-gold-400 transition-colors"
+                            class="hover:text-brand-red transition-colors"
                             >Privacy Policy</a
                         >
                         <a
                             href="#"
-                            class="hover:text-gold-400 transition-colors"
+                            class="hover:text-brand-red transition-colors"
                             >Terms of Service</a
                         >
                         <a
                             href="#"
-                            class="hover:text-gold-400 transition-colors"
+                            class="hover:text-brand-red transition-colors"
                             >Cookie Policy</a
                         >
                     </div>
