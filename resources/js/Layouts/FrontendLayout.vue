@@ -55,17 +55,27 @@ const isActive = (routeName) => {
         <!-- Header (Floating Pill) -->
         <header
             class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out px-4 sm:px-6 lg:px-8"
-            :class="isScrolled ? 'pt-4' : 'pt-6'"
+            :class="isScrolled ? 'pt-4' : 'pt-2'"
         >
             <nav
-                class="max-w-7xl mx-auto rounded-full transition-all duration-500"
+                class="max-w-7xl mx-auto rounded-full transition-all duration-500 relative group/nav"
                 :class="
                     isScrolled
-                        ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg border border-white/20 dark:border-gray-700 py-3 px-6'
+                        ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl shadow-xl shadow-brand-red/5 py-2.5 px-6'
                         : 'bg-transparent py-4 px-0'
                 "
             >
-                <div class="flex items-center justify-between">
+                <!-- Gradient Border Effect -->
+                <div
+                    class="absolute inset-0 rounded-full p-[1px] bg-gradient-to-r from-white/20 via-white/50 to-white/20 dark:from-gray-700/30 dark:via-gray-600/50 dark:to-gray-700/30 -z-10 opacity-0 transition-opacity duration-500"
+                    :class="{ 'opacity-100': isScrolled }"
+                >
+                    <div
+                        class="w-full h-full bg-white/90 dark:bg-gray-900/90 rounded-full"
+                    ></div>
+                </div>
+
+                <div class="flex items-center justify-between relative z-10">
                     <!-- Logo -->
                     <Link
                         :href="route('frontend.home')"
@@ -73,16 +83,16 @@ const isActive = (routeName) => {
                     >
                         <div class="relative">
                             <div
-                                class="absolute inset-0 bg-brand-red blur-lg opacity-20 group-hover:opacity-40 transition-opacity"
+                                class="absolute inset-0 bg-brand-red blur-xl opacity-20 group-hover:opacity-50 transition-all duration-500 scale-75 group-hover:scale-110"
                             ></div>
                             <img
                                 src="/img/logoNoBg.png"
                                 alt="Logo"
-                                class="h-10 w-10 md:h-12 md:w-12 relative z-10 transition-transform group-hover:scale-110 drop-shadow-md"
+                                class="h-10 w-10 md:h-12 md:w-12 relative z-10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md"
                             />
                         </div>
                         <span
-                            class="text-xl md:text-2xl font-extrabold tracking-tight font-serif"
+                            class="text-xl md:text-2xl font-extrabold tracking-tight font-serif transition-all duration-300 group-hover:tracking-normal"
                         >
                             <span class="text-brand-red">Tunggal</span>
                             <span class="text-brand-dark">Jaya</span>
@@ -95,17 +105,18 @@ const isActive = (routeName) => {
                             v-for="link in navLinks"
                             :key="link.href"
                             :href="route(link.href)"
-                            class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 relative group overflow-hidden"
+                            class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 relative group overflow-hidden"
                             :class="
                                 isActive(link.href)
-                                    ? 'text-white bg-brand-red shadow-lg shadow-brand-red/30'
-                                    : 'text-gray-700 dark:text-gray-200 hover:text-brand-red dark:hover:text-brand-red'
+                                    ? 'text-brand-red bg-brand-red/10 ring-1 ring-brand-red/20'
+                                    : 'text-gray-600 dark:text-gray-300 hover:text-brand-red dark:hover:text-brand-red hover:bg-brand-red/5'
                             "
                         >
                             <span class="relative z-10">{{ link.name }}</span>
+                            <!-- Active Glow -->
                             <div
-                                v-if="!isActive(link.href)"
-                                class="absolute inset-0 bg-brand-red/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                v-if="isActive(link.href)"
+                                class="absolute inset-0 bg-brand-red/5 blur-md"
                             ></div>
                         </Link>
                     </div>
@@ -115,7 +126,7 @@ const isActive = (routeName) => {
                         <!-- Dark Mode Toggle -->
                         <button
                             @click="toggleDarkMode"
-                            class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none"
+                            class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 focus:outline-none hover:rotate-12"
                         >
                             <i
                                 :class="
@@ -136,7 +147,7 @@ const isActive = (routeName) => {
                             </Link>
                             <Link
                                 :href="route('register')"
-                                class="hidden sm:inline-flex px-6 py-2.5 bg-brand-red text-white text-sm font-bold rounded-full hover:shadow-lg hover:shadow-brand-red/30 transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
+                                class="hidden sm:inline-flex px-6 py-2.5 bg-gradient-to-r from-brand-red to-red-700 text-white text-sm font-bold rounded-full shadow-lg shadow-brand-red/30 hover:shadow-brand-red/50 transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
                             >
                                 Daftar
                             </Link>
@@ -144,10 +155,10 @@ const isActive = (routeName) => {
                         <template v-else>
                             <div class="relative group">
                                 <button
-                                    class="flex items-center space-x-2 p-1.5 pr-4 rounded-full border border-gray-200 dark:border-gray-700 hover:border-brand-red dark:hover:border-brand-red transition-colors bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm"
+                                    class="flex items-center space-x-2 p-1.5 pr-4 rounded-full border border-gray-200 dark:border-gray-700 hover:border-brand-red dark:hover:border-brand-red transition-all duration-300 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm group-hover:shadow-lg group-hover:shadow-brand-red/10"
                                 >
                                     <div
-                                        class="w-8 h-8 rounded-full bg-brand-red flex items-center justify-center text-white text-sm font-bold shadow-md"
+                                        class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-red to-red-700 flex items-center justify-center text-white text-sm font-bold shadow-md"
                                     >
                                         {{
                                             page.props.auth.user.name
@@ -165,20 +176,20 @@ const isActive = (routeName) => {
                                         }}
                                     </span>
                                     <i
-                                        class="fas fa-chevron-down text-xs text-gray-400"
+                                        class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-300 group-hover:rotate-180"
                                     ></i>
                                 </button>
                                 <!-- Dropdown -->
                                 <div
-                                    class="absolute right-0 mt-2 w-56 py-2 bg-white dark:bg-gray-800 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100 dark:border-gray-700 transform origin-top-right scale-95 group-hover:scale-100 z-50"
+                                    class="absolute right-0 mt-4 w-60 py-2 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl shadow-brand-red/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100 dark:border-gray-700 transform origin-top-right scale-95 group-hover:scale-100 z-50"
                                 >
                                     <div
-                                        class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 mb-2"
+                                        class="px-4 py-4 border-b border-gray-100 dark:border-gray-700 mb-2 bg-gray-50/50 dark:bg-gray-800/50"
                                     >
                                         <p
-                                            class="text-xs text-gray-500 dark:text-gray-400"
+                                            class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold mb-1"
                                         >
-                                            Login sebagai
+                                            Akun
                                         </p>
                                         <p
                                             class="text-sm font-bold text-gray-800 dark:text-white truncate"
@@ -189,20 +200,24 @@ const isActive = (routeName) => {
 
                                     <Link
                                         :href="route('profile.edit')"
-                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-brand-red dark:hover:text-brand-red transition-colors"
+                                        class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-brand-red dark:hover:text-brand-red transition-colors"
                                     >
-                                        <i
-                                            class="fas fa-user w-6 text-center mr-2 text-gray-400"
-                                        ></i>
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center mr-3 text-brand-red"
+                                        >
+                                            <i class="fas fa-user"></i>
+                                        </div>
                                         Profil Saya
                                     </Link>
                                     <Link
                                         :href="route('booking-history.index')"
-                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-brand-red dark:hover:text-brand-red transition-colors"
+                                        class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-brand-red dark:hover:text-brand-red transition-colors"
                                     >
-                                        <i
-                                            class="fas fa-history w-6 text-center mr-2 text-gray-400"
-                                        ></i>
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center mr-3 text-brand-red"
+                                        >
+                                            <i class="fas fa-history"></i>
+                                        </div>
                                         Riwayat Booking
                                     </Link>
 
@@ -217,11 +232,13 @@ const isActive = (routeName) => {
                                         ></div>
                                         <Link
                                             :href="route('admin.dashboard')"
-                                            class="flex items-center px-4 py-2.5 text-sm text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+                                            class="flex items-center px-4 py-3 text-sm text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
                                         >
-                                            <i
-                                                class="fas fa-cog w-6 text-center mr-2"
-                                            ></i>
+                                            <div
+                                                class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mr-3 text-indigo-600"
+                                            >
+                                                <i class="fas fa-cog"></i>
+                                            </div>
                                             Admin Panel
                                         </Link>
                                     </template>
@@ -233,11 +250,13 @@ const isActive = (routeName) => {
                                         :href="route('logout')"
                                         method="post"
                                         as="button"
-                                        class="w-full text-left flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                        class="w-full text-left flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                     >
-                                        <i
-                                            class="fas fa-sign-out-alt w-6 text-center mr-2"
-                                        ></i>
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center mr-3 text-red-600"
+                                        >
+                                            <i class="fas fa-sign-out-alt"></i>
+                                        </div>
                                         Keluar
                                     </Link>
                                 </div>
@@ -272,7 +291,7 @@ const isActive = (routeName) => {
                 >
                     <div
                         v-if="mobileMenuOpen"
-                        class="lg:hidden absolute left-0 right-0 top-full mt-4 mx-4 glass-white dark:glass-dark rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
+                        class="lg:hidden absolute left-0 right-0 top-full mt-4 mx-4 glass-white dark:glass-dark rounded-2xl shadow-2xl shadow-brand-red/10 border border-white/20 overflow-hidden"
                     >
                         <div class="p-4 space-y-2">
                             <Link
@@ -280,11 +299,11 @@ const isActive = (routeName) => {
                                 :key="link.href"
                                 :href="route(link.href)"
                                 @click="mobileMenuOpen = false"
-                                class="block px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200"
+                                class="block px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200"
                                 :class="
                                     isActive(link.href)
-                                        ? 'bg-brand-red text-white shadow-lg'
-                                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                        ? 'bg-brand-red text-white shadow-lg shadow-brand-red/30'
+                                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-red'
                                 "
                             >
                                 <div class="flex items-center justify-between">
@@ -309,7 +328,7 @@ const isActive = (routeName) => {
                                 </Link>
                                 <Link
                                     :href="route('register')"
-                                    class="block px-4 py-3 mt-2 bg-brand-red text-white text-sm font-bold rounded-xl text-center shadow-lg"
+                                    class="block px-4 py-3 mt-2 bg-gradient-to-r from-brand-red to-red-700 text-white text-sm font-bold rounded-xl text-center shadow-lg shadow-brand-red/30"
                                 >
                                     Daftar Sekarang
                                 </Link>
