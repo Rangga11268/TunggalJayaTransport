@@ -30,7 +30,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('admin.dashboard', compact('totalBookings', 'totalRevenue', 'totalSchedules', 'totalUsers', 'recentBookings', 'upcomingSchedules'));
+        return \Inertia\Inertia::render('Admin/Dashboard', compact('totalBookings', 'totalRevenue', 'totalSchedules', 'totalUsers', 'recentBookings', 'upcomingSchedules'));
     }
     
     // Test method to verify role-based access control
