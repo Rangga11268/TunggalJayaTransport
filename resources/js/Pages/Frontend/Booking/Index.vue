@@ -19,10 +19,19 @@ const form = useForm({
     origin: props.filters.origin || "",
     destination: props.filters.destination || "",
     date: props.filters.date || "",
+    class: props.filters.class ? props.filters.class.split(",") : [],
+    time: props.filters.time ? props.filters.time.split(",") : [],
 });
 
 const search = () => {
-    form.get(route("frontend.booking.index"), {
+    // Convert arrays to comma-separated strings for URL params
+    const params = {
+        ...form,
+        class: form.class.length ? form.class.join(",") : null,
+        time: form.time.length ? form.time.join(",") : null,
+    };
+
+    router.get(route("frontend.booking.index"), params, {
         preserveState: true,
         preserveScroll: true,
         only: ["schedules", "validPair", "filters"],
@@ -57,7 +66,7 @@ const swapLocations = () => {
 
 // Auto-search when filters change
 watch(
-    () => [form.origin, form.destination, form.date],
+    () => [form.origin, form.destination, form.date, form.class, form.time],
     () => {
         search();
     },
@@ -268,6 +277,8 @@ watch(
                                         <div class="relative flex items-center">
                                             <input
                                                 type="checkbox"
+                                                v-model="form.class"
+                                                value="Executive"
                                                 class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-brand-red checked:bg-brand-red hover:border-brand-red"
                                             />
                                             <i
@@ -285,6 +296,8 @@ watch(
                                         <div class="relative flex items-center">
                                             <input
                                                 type="checkbox"
+                                                v-model="form.class"
+                                                value="Suites Class"
                                                 class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-brand-red checked:bg-brand-red hover:border-brand-red"
                                             />
                                             <i
@@ -294,6 +307,25 @@ watch(
                                         <span
                                             class="text-sm font-medium text-gray-600 dark:text-gray-300 group-hover:text-brand-red transition-colors"
                                             >Suites Class</span
+                                        >
+                                    </label>
+                                    <label
+                                        class="flex items-center space-x-3 cursor-pointer group"
+                                    >
+                                        <div class="relative flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                v-model="form.class"
+                                                value="Economy"
+                                                class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-brand-red checked:bg-brand-red hover:border-brand-red"
+                                            />
+                                            <i
+                                                class="fas fa-check absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"
+                                            ></i>
+                                        </div>
+                                        <span
+                                            class="text-sm font-medium text-gray-600 dark:text-gray-300 group-hover:text-brand-red transition-colors"
+                                            >Economy</span
                                         >
                                     </label>
                                 </div>
@@ -313,6 +345,8 @@ watch(
                                         <div class="relative flex items-center">
                                             <input
                                                 type="checkbox"
+                                                v-model="form.time"
+                                                value="morning"
                                                 class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-brand-red checked:bg-brand-red hover:border-brand-red"
                                             />
                                             <i
@@ -330,6 +364,8 @@ watch(
                                         <div class="relative flex items-center">
                                             <input
                                                 type="checkbox"
+                                                v-model="form.time"
+                                                value="afternoon"
                                                 class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-brand-red checked:bg-brand-red hover:border-brand-red"
                                             />
                                             <i
@@ -347,6 +383,8 @@ watch(
                                         <div class="relative flex items-center">
                                             <input
                                                 type="checkbox"
+                                                v-model="form.time"
+                                                value="evening"
                                                 class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-brand-red checked:bg-brand-red hover:border-brand-red"
                                             />
                                             <i

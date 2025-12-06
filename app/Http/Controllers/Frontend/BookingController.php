@@ -25,6 +25,8 @@ class BookingController extends Controller
         $origin = $request->get('origin');
         $destination = $request->get('destination');
         $date = $request->get('date');
+        $classes = $request->get('class') ? explode(',', $request->get('class')) : [];
+        $times = $request->get('time') ? explode(',', $request->get('time')) : [];
 
         $schedules = collect();
         $validPair = false;
@@ -43,55 +45,96 @@ class BookingController extends Controller
                 $validPair = true;
                 // Get schedules for these routes that are available for booking
                 $routeIds = $validRoutes->pluck('id');
+                $searchDate = $date ? Carbon::parse($date) : null;
 
-                // For date-specific searches, we need to handle weekly schedules specially
-                if ($date) {
-                    $searchDate = Carbon::parse($date);
-
-                    // Get all active schedules for these routes
-                    $allSchedules = Schedule::whereIn('route_id', $routeIds)
+                // Build query
+                $query = Schedule::whereIn('route_id', $routeIds)
                         ->with('route', 'bus')
-                        ->available()
-                        ->get();
+                        ->available();
 
-                    // Filter schedules based on the search date
-                    $schedules = $allSchedules->filter(function ($schedule) use ($searchDate) {
-                        // For daily schedules, check if the date matches
+                $allSchedules = $query->get();
+
+                // Filter schedules
+                $schedules = $allSchedules->filter(function ($schedule) use ($searchDate, $classes, $times) {
+                    // 1. Availability Check
+                    $isAvailable = false;
+                    if ($searchDate) {
                         if (!$schedule->is_daily) {
-                            return $schedule->departure_time->toDateString() === $searchDate->toDateString()
+                            $isAvailable = $schedule->departure_time->toDateString() === $searchDate->toDateString()
                                 && $schedule->isAvailableForBooking($searchDate);
+                        } else {
+                            $isAvailable = $schedule->isAvailableForBooking($searchDate);
+                        }
+                    } else {
+                        // If no date selected, just check generic availability
+                         $isAvailable = $schedule->isAvailableForBooking();
+                    }
+
+                    if (!$isAvailable) return false;
+
+                    // 2. Class Filter
+                    if (!empty($classes)) {
+                        if (!in_array($schedule->bus->bus_type, $classes)) {
+                            return false;
+                        }
+                    }
+
+                    // 3. Time Filter
+                    if (!empty($times)) {
+                        $departureTime = $schedule->getActualDepartureTime($searchDate);
+                        $hour = $departureTime->hour;
+                        $timeMatch = false;
+
+                        foreach ($times as $time) {
+                            if ($time === 'morning' && $hour >= 0 && $hour < 12) $timeMatch = true;
+                            if ($time === 'afternoon' && $hour >= 12 && $hour < 18) $timeMatch = true;
+                            if ($time === 'evening' && $hour >= 18 && $hour <= 23) $timeMatch = true;
                         }
 
-                        // For daily recurring schedules, they are available every day
-                        if ($schedule->is_daily) {
-                            // Daily recurring schedules are always available regardless of the search date
-                            return $schedule->isAvailableForBooking($searchDate);
-                        }
+                        if (!$timeMatch) return false;
+                    }
 
-                        return false;
-                    });
-                } else {
-                    // For non-date-specific searches, get all available schedules
-                    $schedules = Schedule::whereIn('route_id', $routeIds)
-                        ->with('route', 'bus')
-                        ->available()
-                        ->get()
-                        ->filter(function ($schedule) {
-                            // All schedules must pass the isAvailableForBooking check
-                            return $schedule->isAvailableForBooking();
-                        });
-                }
+                    return true;
+                });
             }
         } else {
             // Default: Fetch all available schedules if no specific search
             $validPair = true;
-            $schedules = Schedule::with('route', 'bus')
+            // For default view, we still want to apply filters if they exist (though usually filters are used with search)
+             $query = Schedule::with('route', 'bus')
                 ->available()
-                ->orderBy('departure_time')
-                ->get()
-                ->filter(function ($schedule) {
-                    return $schedule->isAvailableForBooking();
-                });
+                ->orderBy('departure_time');
+            
+            $allSchedules = $query->get();
+
+            $schedules = $allSchedules->filter(function ($schedule) use ($classes, $times) {
+                if (!$schedule->isAvailableForBooking()) return false;
+
+                // Class Filter
+                if (!empty($classes)) {
+                    if (!in_array($schedule->bus->bus_type, $classes)) {
+                        return false;
+                    }
+                }
+
+                // Time Filter
+                if (!empty($times)) {
+                     // Without a date, we check the base departure time
+                    $departureTime = $schedule->getActualDepartureTime(); // Defaults to today/tomorrow logic
+                    $hour = $departureTime->hour;
+                    $timeMatch = false;
+
+                   foreach ($times as $time) {
+                        if ($time === 'morning' && $hour >= 0 && $hour < 12) $timeMatch = true;
+                        if ($time === 'afternoon' && $hour >= 12 && $hour < 18) $timeMatch = true;
+                        if ($time === 'evening' && $hour >= 18 && $hour <= 23) $timeMatch = true;
+                    }
+
+                    if (!$timeMatch) return false;
+                }
+
+                return true;
+            });
         }
 
         // Transform schedules for frontend
@@ -115,11 +158,11 @@ class BookingController extends Controller
         });
 
         return \Inertia\Inertia::render('Frontend/Booking/Index', [
-            'schedules' => $schedules,
+            'schedules' => $schedules->values(), // Re-index array keys
             'origins' => $origins,
             'destinations' => $destinations,
             'validPair' => $validPair,
-            'filters' => $request->only(['origin', 'destination', 'date']),
+            'filters' => $request->only(['origin', 'destination', 'date', 'class', 'time']),
         ]);
     }
 
@@ -132,6 +175,7 @@ class BookingController extends Controller
         $origin = $request->get('origin');
         $destination = $request->get('destination');
         $date = $request->get('date');
+
 
         // Validate request parameters
         $request->validate([

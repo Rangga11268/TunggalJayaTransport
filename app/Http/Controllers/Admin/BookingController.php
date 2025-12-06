@@ -18,9 +18,11 @@ class BookingController extends Controller
     {
         $bookings = Booking::with(['user', 'schedule.route', 'schedule.bus'])
             ->when($request->search, function ($query, $search) {
-                $query->where('booking_code', 'like', "%{$search}%")
+                $query->where(function ($q) use ($search) {
+                    $q->where('booking_code', 'like', "%{$search}%")
                       ->orWhere('passenger_name', 'like', "%{$search}%")
                       ->orWhere('passenger_email', 'like', "%{$search}%");
+                });
             })
             ->when($request->status, function ($query, $status) {
                 if ($status !== 'all') {

@@ -25,7 +25,34 @@ const userDropdownOpen = ref(false);
 onMounted(() => {
     checkActiveRoutes();
     window.addEventListener("resize", handleResize);
+
+    // Initialize Dark Mode
+    if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+        isDark.value = true;
+        document.documentElement.classList.add("dark");
+    } else {
+        isDark.value = false;
+        document.documentElement.classList.remove("dark");
+    }
 });
+
+// Dark Mode State
+const isDark = ref(false);
+
+const toggleDarkMode = () => {
+    isDark.value = !isDark.value;
+    if (isDark.value) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+    } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+    }
+};
 
 onUnmounted(() => {
     window.removeEventListener("resize", handleResize);
@@ -115,7 +142,7 @@ const closeError = () => {
         <!-- Sidebar -->
         <aside
             :class="[
-                'bg-[#050505] text-white transition-all duration-300 z-40 flex flex-col shadow-2xl border-r border-white/5',
+                'bg-slate-50 dark:bg-[#050505] text-gray-800 dark:text-white transition-all duration-300 z-40 flex flex-col shadow-2xl border-r border-slate-200 dark:border-white/5',
                 isMobile
                     ? sidebarOpen
                         ? 'fixed inset-y-0 left-0 w-72'
@@ -125,18 +152,18 @@ const closeError = () => {
                     : 'w-20 relative',
             ]"
         >
-            <!-- Background Gradient Texture -->
+            <!-- Background Gradient Texture (Dark Mode Only) -->
             <div
-                class="absolute inset-0 bg-gradient-to-br from-[#111] via-[#050505] to-[#0a0a0a] pointer-events-none"
+                class="absolute inset-0 bg-gradient-to-br from-[#111] via-[#050505] to-[#0a0a0a] pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-300"
             ></div>
             <!-- Subtle Red Glow at bottom -->
             <div
-                class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-brand-red/10 to-transparent pointer-events-none opacity-50"
+                class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-brand-red/5 dark:from-brand-red/10 to-transparent pointer-events-none opacity-50"
             ></div>
 
             <!-- Logo Section -->
             <div
-                class="h-24 flex items-center justify-between px-6 border-b border-white/5 bg-[#050505]/95 backdrop-blur-md relative z-10"
+                class="h-24 flex items-center justify-between px-6 border-b border-slate-200 dark:border-white/5 bg-slate-50/95 dark:bg-[#050505]/95 backdrop-blur-md relative z-10 transition-colors duration-300"
             >
                 <div v-show="!isMobile && !sidebarOpen" class="mx-auto">
                     <img
@@ -162,7 +189,7 @@ const closeError = () => {
 
                     <div class="flex flex-col">
                         <span
-                            class="font-bold text-xl tracking-tight leading-none font-serif text-white group-hover:text-red-500 transition-colors duration-300"
+                            class="font-bold text-xl tracking-tight leading-none font-serif text-gray-900 dark:text-white group-hover:text-red-500 transition-colors duration-300"
                             >Tunggal Jaya</span
                         >
                         <span
@@ -174,7 +201,7 @@ const closeError = () => {
                 <button
                     v-if="isMobile"
                     @click="sidebarOpen = false"
-                    class="text-gray-400 hover:text-white focus:outline-none transition-colors p-2 hover:bg-white/5 rounded-lg"
+                    class="text-gray-400 hover:text-gray-600 dark:hover:text-white focus:outline-none transition-colors p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg"
                 >
                     <i class="fas fa-times text-xl"></i>
                 </button>
@@ -187,10 +214,10 @@ const closeError = () => {
                         type="text"
                         v-model="searchQuery"
                         placeholder="Cari menu..."
-                        class="w-full bg-[#1a1a1a] text-gray-300 text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-red/50 border border-white/5 focus:border-brand-red/30 transition-all placeholder-gray-600"
+                        class="w-full bg-white dark:bg-[#1a1a1a] text-gray-800 dark:text-gray-300 text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-red/50 border border-slate-200 dark:border-white/5 focus:border-brand-red/30 transition-all placeholder-gray-500 dark:placeholder-gray-600 shadow-sm dark:shadow-none"
                     />
                     <div
-                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-600 group-focus-within:text-brand-red transition-colors"
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 dark:text-gray-600 group-focus-within:text-brand-red transition-colors"
                     >
                         <i class="fas fa-search"></i>
                     </div>
@@ -208,14 +235,14 @@ const closeError = () => {
                         'flex items-center px-4 py-3.5 rounded-xl transition-all duration-300 group relative mb-2',
                         route().current('admin.dashboard')
                             ? 'bg-gradient-to-r from-brand-red to-red-800 text-white shadow-lg shadow-brand-red/25'
-                            : 'text-gray-500 hover:bg-white/5 hover:text-white',
+                            : 'text-gray-600 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-brand-red dark:hover:text-white',
                     ]"
                 >
                     <div
-                        class="absolute left-0 w-1 h-8 bg-white rounded-r-full opacity-0 transition-all duration-300"
+                        class="absolute left-0 w-1 h-8 bg-brand-red dark:bg-white rounded-r-full opacity-0 transition-all duration-300"
                         :class="
                             route().current('admin.dashboard')
-                                ? 'opacity-30'
+                                ? 'opacity-100'
                                 : ''
                         "
                     ></div>
@@ -224,7 +251,7 @@ const closeError = () => {
                         :class="
                             route().current('admin.dashboard')
                                 ? 'text-white'
-                                : 'text-gray-500 group-hover:text-white'
+                                : 'text-gray-400 dark:text-gray-500 group-hover:text-brand-red dark:group-hover:text-white'
                         "
                     ></i>
                     <span
@@ -240,7 +267,7 @@ const closeError = () => {
                     <!-- Tooltip for collapsed -->
                     <div
                         v-show="!sidebarOpen && !isMobile"
-                        class="absolute left-full top-1/2 -translate-y-1/2 ml-2 bg-[#1a1a1a] text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-xl border border-white/10"
+                        class="absolute left-full top-1/2 -translate-y-1/2 ml-2 bg-white dark:bg-[#1a1a1a] text-gray-800 dark:text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-xl border border-gray-200 dark:border-white/10"
                     >
                         Dasbor
                     </div>
@@ -249,7 +276,7 @@ const closeError = () => {
                 <!-- Section: Management -->
                 <div class="pt-4 pb-2" v-show="sidebarOpen || isMobile">
                     <p
-                        class="px-4 text-[10px] font-extrabold text-gray-600 uppercase tracking-widest flex items-center gap-2"
+                        class="px-4 text-[10px] font-extrabold text-gray-400 dark:text-gray-600 uppercase tracking-widest flex items-center gap-2"
                     >
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-brand-red/50"
@@ -258,7 +285,7 @@ const closeError = () => {
                     </p>
                 </div>
                 <div
-                    class="my-2 border-t border-white/5"
+                    class="my-2 border-t border-slate-200 dark:border-white/5"
                     v-show="!sidebarOpen && !isMobile"
                 ></div>
 
@@ -269,8 +296,8 @@ const closeError = () => {
                         :class="[
                             'w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group',
                             contentOpen
-                                ? 'bg-white/5 text-white'
-                                : 'text-gray-500 hover:bg-white/5 hover:text-white',
+                                ? 'bg-white dark:bg-white/5 text-gray-900 dark:text-white shadow-sm dark:shadow-none'
+                                : 'text-gray-600 dark:text-gray-500 hover:bg-white dark:hover:bg-white/5 hover:text-brand-red dark:hover:text-white hover:shadow-sm dark:hover:shadow-none',
                         ]"
                     >
                         <div class="flex items-center">
@@ -279,7 +306,7 @@ const closeError = () => {
                                 :class="
                                     contentOpen
                                         ? 'text-brand-red'
-                                        : 'text-gray-500 group-hover:text-white'
+                                        : 'text-gray-400 dark:text-gray-500 group-hover:text-brand-red dark:group-hover:text-white'
                                 "
                             ></i>
                             <span
@@ -292,7 +319,7 @@ const closeError = () => {
                         </div>
                         <i
                             :class="[
-                                'fas text-xs transition-transform duration-300 text-gray-600 group-hover:text-gray-400',
+                                'fas text-xs transition-transform duration-300 text-gray-400 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-400',
                                 contentOpen ? 'rotate-180' : '',
                                 !sidebarOpen && !isMobile ? 'hidden' : '',
                             ]"
@@ -307,15 +334,15 @@ const closeError = () => {
                         class="mt-1 space-y-1 pl-4 pr-2"
                     >
                         <div
-                            class="border-l border-white/10 pl-8 space-y-1 py-1"
+                            class="border-l border-slate-200 dark:border-white/10 pl-8 space-y-1 py-1"
                         >
                             <Link
                                 :href="route('admin.news.index')"
                                 :class="[
                                     'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
                                     route().current('admin.news.*')
-                                        ? 'text-white font-bold'
-                                        : 'text-gray-500 hover:text-white',
+                                        ? 'text-brand-red dark:text-white font-bold'
+                                        : 'text-gray-500 dark:text-gray-500 hover:text-brand-red dark:hover:text-white',
                                 ]"
                             >
                                 <span class="flex items-center gap-2">
@@ -324,7 +351,7 @@ const closeError = () => {
                                         :class="
                                             route().current('admin.news.*')
                                                 ? 'bg-brand-red'
-                                                : 'bg-gray-700'
+                                                : 'bg-slate-300 dark:bg-gray-700'
                                         "
                                     ></span>
                                     Berita & Artikel
@@ -335,8 +362,8 @@ const closeError = () => {
                                 :class="[
                                     'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
                                     route().current('admin.categories.*')
-                                        ? 'text-white font-bold'
-                                        : 'text-gray-500 hover:text-white',
+                                        ? 'text-brand-red dark:text-white font-bold'
+                                        : 'text-gray-500 dark:text-gray-500 hover:text-brand-red dark:hover:text-white',
                                 ]"
                             >
                                 <span class="flex items-center gap-2">
@@ -347,7 +374,7 @@ const closeError = () => {
                                                 'admin.categories.*'
                                             )
                                                 ? 'bg-brand-red'
-                                                : 'bg-gray-700'
+                                                : 'bg-slate-300 dark:bg-gray-700'
                                         "
                                     ></span>
                                     Kategori
@@ -364,8 +391,8 @@ const closeError = () => {
                         :class="[
                             'w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group',
                             transportOpen
-                                ? 'bg-white/5 text-white'
-                                : 'text-gray-500 hover:bg-white/5 hover:text-white',
+                                ? 'bg-white dark:bg-white/5 text-gray-900 dark:text-white shadow-sm dark:shadow-none'
+                                : 'text-gray-600 dark:text-gray-500 hover:bg-white dark:hover:bg-white/5 hover:text-brand-red dark:hover:text-white hover:shadow-sm dark:hover:shadow-none',
                         ]"
                     >
                         <div class="flex items-center">
@@ -374,7 +401,7 @@ const closeError = () => {
                                 :class="
                                     transportOpen
                                         ? 'text-amber-500'
-                                        : 'text-gray-500 group-hover:text-white'
+                                        : 'text-gray-400 dark:text-gray-500 group-hover:text-brand-red dark:group-hover:text-white'
                                 "
                             ></i>
                             <span
@@ -387,7 +414,7 @@ const closeError = () => {
                         </div>
                         <i
                             :class="[
-                                'fas text-xs transition-transform duration-300 text-gray-600 group-hover:text-gray-400',
+                                'fas text-xs transition-transform duration-300 text-gray-400 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-400',
                                 transportOpen ? 'rotate-180' : '',
                                 !sidebarOpen && !isMobile ? 'hidden' : '',
                             ]"
@@ -402,15 +429,15 @@ const closeError = () => {
                         class="mt-1 space-y-1 pl-4 pr-2"
                     >
                         <div
-                            class="border-l border-white/10 pl-8 space-y-1 py-1"
+                            class="border-l border-slate-200 dark:border-white/10 pl-8 space-y-1 py-1"
                         >
                             <Link
                                 :href="route('admin.buses.index')"
                                 :class="[
                                     'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
                                     route().current('admin.buses.*')
-                                        ? 'text-white font-bold'
-                                        : 'text-gray-500 hover:text-white',
+                                        ? 'text-brand-red dark:text-white font-bold'
+                                        : 'text-gray-500 dark:text-gray-500 hover:text-brand-red dark:hover:text-white',
                                 ]"
                             >
                                 <span class="flex items-center gap-2">
@@ -419,7 +446,7 @@ const closeError = () => {
                                         :class="
                                             route().current('admin.buses.*')
                                                 ? 'bg-brand-red'
-                                                : 'bg-gray-700'
+                                                : 'bg-slate-300 dark:bg-gray-700'
                                         "
                                     ></span>
                                     Armada Bus
@@ -430,8 +457,8 @@ const closeError = () => {
                                 :class="[
                                     'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
                                     route().current('admin.routes.*')
-                                        ? 'text-white font-bold'
-                                        : 'text-gray-500 hover:text-white',
+                                        ? 'text-brand-red dark:text-white font-bold'
+                                        : 'text-gray-500 dark:text-gray-500 hover:text-brand-red dark:hover:text-white',
                                 ]"
                             >
                                 <span class="flex items-center gap-2">
@@ -440,7 +467,7 @@ const closeError = () => {
                                         :class="
                                             route().current('admin.routes.*')
                                                 ? 'bg-brand-red'
-                                                : 'bg-gray-700'
+                                                : 'bg-slate-300 dark:bg-gray-700'
                                         "
                                     ></span>
                                     Rute Perjalanan
@@ -451,8 +478,8 @@ const closeError = () => {
                                 :class="[
                                     'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
                                     route().current('admin.schedules.*')
-                                        ? 'text-white font-bold'
-                                        : 'text-gray-500 hover:text-white',
+                                        ? 'text-brand-red dark:text-white font-bold'
+                                        : 'text-gray-500 dark:text-gray-500 hover:text-brand-red dark:hover:text-white',
                                 ]"
                             >
                                 <span class="flex items-center gap-2">
@@ -461,7 +488,7 @@ const closeError = () => {
                                         :class="
                                             route().current('admin.schedules.*')
                                                 ? 'bg-brand-red'
-                                                : 'bg-gray-700'
+                                                : 'bg-slate-300 dark:bg-gray-700'
                                         "
                                     ></span>
                                     Jadwal
@@ -478,7 +505,7 @@ const closeError = () => {
                         'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative my-1',
                         route().current('admin.bookings.*')
                             ? 'bg-gradient-to-r from-brand-red to-red-800 text-white shadow-lg shadow-brand-red/25'
-                            : 'text-gray-500 hover:bg-white/5 hover:text-white',
+                            : 'text-gray-600 dark:text-gray-500 hover:bg-white dark:hover:bg-white/5 hover:text-brand-red dark:hover:text-white hover:shadow-sm dark:hover:shadow-none',
                     ]"
                 >
                     <i
@@ -486,7 +513,7 @@ const closeError = () => {
                         :class="
                             route().current('admin.bookings.*')
                                 ? 'text-white'
-                                : 'text-gray-500 group-hover:text-white'
+                                : 'text-gray-400 dark:text-gray-500 group-hover:text-brand-red dark:group-hover:text-white'
                         "
                     ></i>
                     <span
@@ -509,7 +536,7 @@ const closeError = () => {
                 <!-- Section: Users & System -->
                 <div class="pt-4 pb-2" v-show="sidebarOpen || isMobile">
                     <p
-                        class="px-4 text-[10px] font-extrabold text-gray-600 uppercase tracking-widest flex items-center gap-2"
+                        class="px-4 text-[10px] font-extrabold text-gray-400 dark:text-gray-600 uppercase tracking-widest flex items-center gap-2"
                     >
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-brand-red/50"
@@ -518,7 +545,7 @@ const closeError = () => {
                     </p>
                 </div>
                 <div
-                    class="my-2 border-t border-white/5"
+                    class="my-2 border-t border-slate-200 dark:border-white/5"
                     v-show="!sidebarOpen && !isMobile"
                 ></div>
 
@@ -529,8 +556,8 @@ const closeError = () => {
                         :class="[
                             'w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group',
                             usersOpen
-                                ? 'bg-white/5 text-white'
-                                : 'text-gray-500 hover:bg-white/5 hover:text-white',
+                                ? 'bg-white dark:bg-white/5 text-gray-900 dark:text-white shadow-sm dark:shadow-none'
+                                : 'text-gray-600 dark:text-gray-500 hover:bg-white dark:hover:bg-white/5 hover:text-brand-red dark:hover:text-white hover:shadow-sm dark:hover:shadow-none',
                         ]"
                     >
                         <div class="flex items-center">
@@ -539,7 +566,7 @@ const closeError = () => {
                                 :class="
                                     usersOpen
                                         ? 'text-purple-400'
-                                        : 'text-gray-500 group-hover:text-white'
+                                        : 'text-gray-400 dark:text-gray-500 group-hover:text-brand-red dark:group-hover:text-white'
                                 "
                             ></i>
                             <span
@@ -552,7 +579,7 @@ const closeError = () => {
                         </div>
                         <i
                             :class="[
-                                'fas text-xs transition-transform duration-300 text-gray-600 group-hover:text-gray-400',
+                                'fas text-xs transition-transform duration-300 text-gray-400 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-400',
                                 usersOpen ? 'rotate-180' : '',
                                 !sidebarOpen && !isMobile ? 'hidden' : '',
                             ]"
@@ -567,15 +594,15 @@ const closeError = () => {
                         class="mt-1 space-y-1 pl-4 pr-2"
                     >
                         <div
-                            class="border-l border-white/10 pl-8 space-y-1 py-1"
+                            class="border-l border-slate-200 dark:border-white/10 pl-8 space-y-1 py-1"
                         >
                             <Link
                                 :href="route('admin.users.index')"
                                 :class="[
                                     'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
                                     route().current('admin.users.*')
-                                        ? 'text-white font-bold'
-                                        : 'text-gray-500 hover:text-white',
+                                        ? 'text-brand-red dark:text-white font-bold'
+                                        : 'text-gray-500 dark:text-gray-500 hover:text-brand-red dark:hover:text-white',
                                 ]"
                             >
                                 <span class="flex items-center gap-2">
@@ -584,7 +611,7 @@ const closeError = () => {
                                         :class="
                                             route().current('admin.users.*')
                                                 ? 'bg-brand-red'
-                                                : 'bg-gray-700'
+                                                : 'bg-slate-300 dark:bg-gray-700'
                                         "
                                     ></span>
                                     Admin & Staff
@@ -595,8 +622,8 @@ const closeError = () => {
                                 :class="[
                                     'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
                                     route().current('admin.drivers.*')
-                                        ? 'text-white font-bold'
-                                        : 'text-gray-500 hover:text-white',
+                                        ? 'text-brand-red dark:text-white font-bold'
+                                        : 'text-gray-500 dark:text-gray-500 hover:text-brand-red dark:hover:text-white',
                                 ]"
                             >
                                 <span class="flex items-center gap-2">
@@ -605,7 +632,7 @@ const closeError = () => {
                                         :class="
                                             route().current('admin.drivers.*')
                                                 ? 'bg-brand-red'
-                                                : 'bg-gray-700'
+                                                : 'bg-slate-300 dark:bg-gray-700'
                                         "
                                     ></span>
                                     Sopir
@@ -616,8 +643,8 @@ const closeError = () => {
                                 :class="[
                                     'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
                                     route().current('admin.conductors.*')
-                                        ? 'text-white font-bold'
-                                        : 'text-gray-500 hover:text-white',
+                                        ? 'text-brand-red dark:text-white font-bold'
+                                        : 'text-gray-500 dark:text-gray-500 hover:text-brand-red dark:hover:text-white',
                                 ]"
                             >
                                 <span class="flex items-center gap-2">
@@ -628,7 +655,7 @@ const closeError = () => {
                                                 'admin.conductors.*'
                                             )
                                                 ? 'bg-brand-red'
-                                                : 'bg-gray-700'
+                                                : 'bg-slate-300 dark:bg-gray-700'
                                         "
                                     ></span>
                                     Kondektur
@@ -645,7 +672,7 @@ const closeError = () => {
                         'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative my-1',
                         route().current('admin.reports.*')
                             ? 'bg-gradient-to-r from-brand-red to-red-800 text-white shadow-lg shadow-brand-red/25'
-                            : 'text-gray-500 hover:bg-white/5 hover:text-white',
+                            : 'text-gray-600 dark:text-gray-500 hover:bg-white dark:hover:bg-white/5 hover:text-brand-red dark:hover:text-white hover:shadow-sm dark:hover:shadow-none',
                     ]"
                 >
                     <i
@@ -653,7 +680,7 @@ const closeError = () => {
                         :class="
                             route().current('admin.reports.*')
                                 ? 'text-white'
-                                : 'text-gray-500 group-hover:text-white'
+                                : 'text-gray-400 dark:text-gray-500 group-hover:text-brand-red dark:group-hover:text-white'
                         "
                     ></i>
                     <span
@@ -674,7 +701,7 @@ const closeError = () => {
                         'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative my-1',
                         route().current('admin.settings.*')
                             ? 'bg-gradient-to-r from-brand-red to-red-800 text-white shadow-lg shadow-brand-red/25'
-                            : 'text-gray-500 hover:bg-white/5 hover:text-white',
+                            : 'text-gray-600 dark:text-gray-500 hover:bg-white dark:hover:bg-white/5 hover:text-brand-red dark:hover:text-white hover:shadow-sm dark:hover:shadow-none',
                     ]"
                 >
                     <i
@@ -682,7 +709,7 @@ const closeError = () => {
                         :class="
                             route().current('admin.settings.*')
                                 ? 'text-white'
-                                : 'text-gray-500 group-hover:text-white'
+                                : 'text-gray-400 dark:text-gray-500 group-hover:text-brand-red dark:group-hover:text-white'
                         "
                     ></i>
                     <span
@@ -699,11 +726,11 @@ const closeError = () => {
 
             <!-- User Profile (Bottom) with advanced blur -->
             <div
-                class="p-4 border-t border-white/5 mt-auto relative z-20"
+                class="p-4 border-t border-slate-200 dark:border-white/5 mt-auto relative z-20"
                 v-if="sidebarOpen"
             >
                 <div
-                    class="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors cursor-pointer group"
+                    class="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer group shadow-sm dark:shadow-none"
                 >
                     <div class="relative">
                         <div
@@ -717,16 +744,18 @@ const closeError = () => {
                     </div>
                     <div class="flex-1 min-w-0">
                         <p
-                            class="text-sm font-bold text-white truncate group-hover:text-brand-red transition-colors"
+                            class="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-brand-red transition-colors"
                         >
                             {{ user.name }}
                         </p>
-                        <p class="text-[10px] text-gray-400 truncate">
+                        <p
+                            class="text-[10px] text-gray-500 dark:text-gray-400 truncate"
+                        >
                             Administrator
                         </p>
                     </div>
                     <button
-                        class="text-gray-500 hover:text-white transition-colors"
+                        class="text-gray-500 hover:text-brand-red dark:hover:text-white transition-colors"
                     >
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
@@ -778,6 +807,21 @@ const closeError = () => {
 
                 <!-- Right Actions -->
                 <div class="flex items-center gap-4">
+                    <!-- Dark Mode Toggle -->
+                    <button
+                        @click="toggleDarkMode"
+                        class="p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
+                    >
+                        <i
+                            :class="
+                                isDark
+                                    ? 'fas fa-sun text-amber-500'
+                                    : 'fas fa-moon'
+                            "
+                            class="text-xl"
+                        ></i>
+                    </button>
+
                     <!-- Notifications -->
                     <button
                         class="relative p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors group"
