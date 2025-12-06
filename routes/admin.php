@@ -67,6 +67,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule
     Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('reports.occupancy')->middleware('role:admin,schedule_manager');
     Route::get('/reports/custom', [ReportController::class, 'custom'])->name('reports.custom')->middleware('role:admin,schedule_manager');
     Route::post('/reports/custom', [ReportController::class, 'generateCustom'])->name('reports.custom.generate')->middleware('role:admin,schedule_manager');
+    Route::get('/reports/custom/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.custom.export.pdf')->middleware('role:admin,schedule_manager');
+    Route::get('/reports/custom/export/excel', [ReportController::class, 'exportExcel'])->name('reports.custom.export.excel')->middleware('role:admin,schedule_manager');
 
     // Settings (only admins can manage settings)
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index')->middleware('role:admin');

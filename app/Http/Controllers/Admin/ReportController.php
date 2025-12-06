@@ -6,19 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Route as TransportRoute;
 use App\Models\Bus;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CustomReportExport;
 
 class ReportController extends Controller
 {
     public function index()
     {
-        return view('admin.reports.index');
+        return Inertia::render('Admin/Reports/Index');
     }
     
     public function sales()
     {
         // Get sales data for the last 30 days
-        $salesData = \App\Models\Booking::selectRaw('DATE(created_at) as date, SUM(total_price) as total')
+        $salesData = Booking::selectRaw('DATE(created_at) as date, SUM(total_price) as total')
             ->where('payment_status', 'paid')
             ->where('created_at', '>=', now()->subDays(30))
             ->groupBy('date')
@@ -28,28 +34,47 @@ class ReportController extends Controller
         // Format the data for the chart
         $chartData = $salesData->map(function($item) {
             return [
-                'date' => \Carbon\Carbon::parse($item->date)->format('M j'),
+                'date' => Carbon::parse($item->date)->format('M j'),
                 'total' => (float) $item->total
             ];
         });
             
         // Get recent bookings for the table
-        $recentBookings = \App\Models\Booking::with(['schedule.route', 'user'])
+        $recentBookings = Booking::with(['schedule.route', 'user', 'schedule.bus'])
             ->where('payment_status', 'paid')
             ->orderBy('created_at', 'desc')
             ->limit(10)
-            ->get();
+            ->get()
+            ->map(function ($booking) {
+                return [
+                    'id' => $booking->id,
+                    'booking_code' => $booking->booking_code,
+                    'user_name' => $booking->user ? $booking->user->name : 'Guest',
+                    'route' => $booking->schedule->route ? $booking->schedule->route->origin . ' - ' . $booking->schedule->route->destination : '-',
+                    'total_price' => $booking->total_price,
+                    'created_at' => $booking->created_at->format('d M Y H:i'),
+                ];
+            });
             
-        return view('admin.reports.sales', compact('salesData', 'chartData', 'recentBookings'));
+        return Inertia::render('Admin/Reports/Sales', [
+            'salesData' => $salesData, 
+            'chartData' => $chartData, 
+            'recentBookings' => $recentBookings
+        ]);
     }
     
     public function occupancy()
     {
         // Get occupancy data by fetching schedules with their bookings
-        $schedules = \App\Models\Schedule::with(['bus', 'route', 'bookings' => function($query) {
+        $schedules = Schedule::with(['bus', 'route', 'bookings' => function($query) {
             $query->where('booking_status', 'confirmed')
                   ->where('payment_status', 'paid');
-        }])->get();
+        }])
+        ->whereHas('bus') // Ensure bus exists
+        ->whereHas('route') // Ensure route exists
+        ->latest()
+        ->take(50) // Limit to recent 50 schedules for performance
+        ->get();
         
         // Calculate occupancy for each schedule
         $occupancyData = [];
@@ -59,6 +84,8 @@ class ReportController extends Controller
             $occupancyRate = $totalCapacity > 0 ? ($bookedSeats / $totalCapacity) * 100 : 0;
             
             $occupancyData[] = [
+                'id' => $schedule->id,
+                'date' => Carbon::parse($schedule->departure_time)->format('d M Y H:i'),
                 'bus_name' => $schedule->bus->name,
                 'plate_number' => $schedule->bus->plate_number,
                 'route' => $schedule->route->origin . ' - ' . $schedule->route->destination,
@@ -73,21 +100,98 @@ class ReportController extends Controller
             return $b['occupancy_rate'] <=> $a['occupancy_rate'];
         });
         
-        return view('admin.reports.occupancy', compact('occupancyData'));
+        return Inertia::render('Admin/Reports/Occupancy', [
+            'occupancyData' => $occupancyData
+        ]);
     }
     
     public function custom()
     {
         // Get data for the form
-        $routes = TransportRoute::all();
-        $buses = Bus::all();
+        $routes = TransportRoute::all()->map(function($route) {
+            return [
+                'id' => $route->id,
+                'name' => $route->origin . ' - ' . $route->destination
+            ];
+        });
+
+        $buses = Bus::all()->map(function($bus) {
+            return [
+                'id' => $bus->id,
+                'name' => $bus->name . ' (' . $bus->plate_number . ')'
+            ];
+        });
         
-        return view('admin.reports.custom', compact('routes', 'buses'));
+        return Inertia::render('Admin/Reports/Custom', [
+            'routes' => $routes, 
+            'buses' => $buses
+        ]);
     }
     
     public function generateCustom(Request $request)
     {
         // Validate the request
+        $this->validateReportRequest($request);
+        
+        $data = $this->getReportData($request);
+        
+        // Get data for the form (dropdowns)
+        $routes = TransportRoute::all()->map(function($route) {
+            return [
+                'id' => $route->id,
+                'name' => $route->origin . ' - ' . $route->destination
+            ];
+        });
+        
+        $buses = Bus::all()->map(function($bus) {
+            return [
+                'id' => $bus->id,
+                'name' => $bus->name . ' (' . $bus->plate_number . ')'
+            ];
+        });
+
+        return Inertia::render('Admin/Reports/Custom', [
+            'routes' => $routes, 
+            'buses' => $buses, 
+            'filters' => $request->all(),
+            'selectedRoute' => $data['selectedRoute'],
+            'selectedBus' => $data['selectedBus'], 
+            'reportData' => $data['reportData']
+        ]);
+    }
+    
+    public function exportPdf(Request $request)
+    {
+        $this->validateReportRequest($request);
+        $data = $this->getReportData($request);
+        
+        $pdf = Pdf::loadView('admin.reports.pdf', [
+            'filters' => $request->all(),
+            'selectedRoute' => $data['selectedRoute'],
+            'selectedBus' => $data['selectedBus'], 
+            'reportData' => $data['reportData'],
+            'reportType' => $request->report_type
+        ]);
+        
+        return $pdf->download('laporan_' . $request->report_type . '_' . now()->format('YmdHis') . '.pdf');
+    }
+    
+    public function exportExcel(Request $request)
+    {
+        $this->validateReportRequest($request);
+        $data = $this->getReportData($request);
+        
+        return Excel::download(new CustomReportExport(
+            $request->report_type,
+            $data['reportData'],
+            $request->all(),
+            $data['selectedRoute'],
+            $data['selectedBus']
+        ), 'laporan_' . $request->report_type . '_' . now()->format('YmdHis') . '.xlsx');
+    }
+    
+    private function validateReportRequest(Request $request)
+    {
         $request->validate([
             'report_type' => 'required|in:bookings,revenue,passengers',
             'start_date' => 'required|date',
@@ -95,20 +199,21 @@ class ReportController extends Controller
             'route_id' => 'nullable|exists:routes,id',
             'bus_id' => 'nullable|exists:buses,id',
         ]);
-        
-        // Get data for the form
-        $routes = TransportRoute::all();
-        $buses = Bus::all();
-        
-        // Get the form data
+    }
+    
+    private function getReportData(Request $request)
+    {
         $reportType = $request->input('report_type');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         $routeId = $request->input('route_id');
         $busId = $request->input('bus_id');
         
-        // Initialize the query
-        $query = Booking::whereBetween('created_at', [$startDate, $endDate]);
+        // Use Carbon to ensuring proper date comparison including time if needed, or set start/end of day
+        $start = Carbon::parse($startDate)->startOfDay();
+        $end = Carbon::parse($endDate)->endOfDay();
+
+        $query = Booking::whereBetween('created_at', [$start, $end]);
         
         // Apply filters if provided
         if ($routeId) {
@@ -124,9 +229,12 @@ class ReportController extends Controller
         }
         
         // Get the selected route and bus if provided
-        $selectedRoute = $routeId ? TransportRoute::find($routeId) : null;
-        $selectedBus = $busId ? Bus::find($busId) : null;
+        $selectedRouteObj = $routeId ? TransportRoute::find($routeId) : null;
+        $selectedBusObj = $busId ? Bus::find($busId) : null;
         
+        $selectedRoute = $selectedRouteObj ? ($selectedRouteObj->origin . ' - ' . $selectedRouteObj->destination) : null;
+        $selectedBus = $selectedBusObj ? ($selectedBusObj->name . ' (' . $selectedBusObj->plate_number . ')') : null;
+
         // Generate report data based on type
         $reportData = [];
         
@@ -152,7 +260,8 @@ class ReportController extends Controller
                 
             case 'revenue':
                 // Get daily revenue data
-                $dailyRevenue = $query->where('payment_status', 'paid')
+                $dailyRevenueQuery = clone $query; 
+                $dailyRevenue = $dailyRevenueQuery->where('payment_status', 'paid')
                     ->selectRaw('DATE(created_at) as date, SUM(total_price) as revenue')
                     ->groupBy('date')
                     ->orderBy('date')
@@ -210,18 +319,10 @@ class ReportController extends Controller
                 break;
         }
         
-        // Return the view with all data
-        return view('admin.reports.custom', compact(
-            'routes', 
-            'buses', 
-            'reportType', 
-            'startDate', 
-            'endDate', 
-            'routeId', 
-            'busId', 
-            'selectedRoute', 
-            'selectedBus', 
-            'reportData'
-        ));
+        return [
+            'reportData' => $reportData,
+            'selectedRoute' => $selectedRoute,
+            'selectedBus' => $selectedBus
+        ];
     }
 }

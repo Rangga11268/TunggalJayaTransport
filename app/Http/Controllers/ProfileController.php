@@ -21,9 +21,10 @@ class ProfileController extends Controller
         $isAdminOrScheduleManager = $user->hasRole('admin') || $user->hasRole('schedule_manager');
         
         if ($isAdminOrScheduleManager) {
-            // Admin and schedule manager use the existing profile view
-            return view('profile.edit', [
-                'user' => $request->user(),
+            // Admin and schedule manager use the new Inertia profile view
+            return \Inertia\Inertia::render('Admin/Profile/Edit', [
+                'mustVerifyEmail' => $request->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail,
+                'status' => session('status'),
             ]);
         } else {
             // Regular users use the frontend profile view
