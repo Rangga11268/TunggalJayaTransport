@@ -192,118 +192,62 @@ const formatNumber = (num) => {
 <template>
     <Head title="Beranda" />
 
-    <!-- Hero Section -->
-    <section
-        class="relative min-h-screen flex items-center overflow-hidden bg-primary-950"
+    <!-- Clean Title Section (Home Variant with Hero Image) -->
+    <div
+        class="relative min-h-[60vh] flex items-center justify-center pt-32 pb-20"
     >
-        <!-- Animated Background -->
-        <div class="absolute inset-0">
-            <!-- Animated blobs -->
-            <div
-                class="blob w-[600px] h-[600px] bg-primary-600/20 top-[-10%] left-[-10%]"
-                style="animation-delay: 0s"
-            ></div>
-            <div
-                class="blob w-[500px] h-[500px] bg-secondary-600/20 bottom-[-10%] right-[-5%]"
-                style="animation-delay: 2s"
-            ></div>
-            <div
-                class="blob w-[400px] h-[400px] bg-gold-500/10 top-[40%] left-[60%]"
-                style="animation-delay: 4s"
-            ></div>
-
-            <!-- Pattern overlay -->
-            <div class="absolute inset-0 hero-pattern opacity-20"></div>
-
-            <!-- Background image with overlay -->
+        <!-- Hero Background -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-black/60 z-10"></div>
             <img
                 src="/img/heroImg.jpg"
                 alt="Hero Background"
-                class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay"
+                class="w-full h-full object-cover"
             />
-
-            <!-- Gradient overlay for better text readability -->
-            <div
-                class="absolute inset-0 bg-gradient-to-b from-transparent via-primary-950/60 to-primary-950"
-            ></div>
         </div>
 
-        <!-- Content -->
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-            <div class="max-w-4xl mx-auto text-center">
-                <!-- Badge -->
-                <div
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 mb-8 animate-fade-in-down mx-auto"
+        <div
+            class="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center"
+        >
+            <span
+                class="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 text-xs font-bold tracking-widest mb-6 animate-fade-in uppercase"
+            >
+                LAYANAN 24/7 TERSEDIA
+            </span>
+            <h1
+                class="text-5xl md:text-6xl lg:text-7xl font-black font-serif text-white mb-8 animate-fade-in-up leading-tight drop-shadow-sm"
+            >
+                Elegansi dalam
+                <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
+                    >Setiap Perjalanan</span
                 >
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span
-                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
-                        ></span>
-                        <span
-                            class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"
-                        ></span>
-                    </span>
-                    <span
-                        class="text-sm font-medium text-white/90 tracking-wide"
-                        >Layanan 24/7 Tersedia</span
-                    >
-                </div>
+            </h1>
+            <p
+                class="text-xl text-gray-200 max-w-2xl mx-auto animate-fade-in-up stagger-1 mb-10 font-light"
+            >
+                Nikmati pengalaman perjalanan bus terbaik dengan armada modern,
+                fasilitas lengkap, dan pelayanan profesional dari TUJAGO.
+            </p>
 
-                <!-- Title -->
-                <h1
-                    class="hero-title text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-8 leading-tight animate-fade-in-down stagger-1 tracking-tight font-serif"
+            <!-- CTA (Optional, kept minimal) -->
+            <div
+                class="flex flex-wrap justify-center gap-4 animate-fade-in-up stagger-2"
+            >
+                <Link
+                    :href="route('frontend.fleet.index')"
+                    class="px-8 py-3 rounded-full bg-brand-red text-white font-bold hover:bg-red-700 transition-all shadow-lg shadow-brand-red/30"
                 >
-                    Elegansi dalam
-                    <span
-                        class="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 to-gold-500"
-                        >Setiap Perjalanan</span
-                    >
-                </h1>
-
-                <!-- Subtitle -->
-                <p
-                    class="text-lg md:text-xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in-up stagger-2 font-light"
-                >
-                    Nikmati pengalaman perjalanan bus terbaik dengan armada
-                    modern, fasilitas lengkap, dan pelayanan profesional dari
-                    TUJAGO.
-                </p>
-
-                <!-- CTA Buttons -->
-                <div
-                    class="flex flex-wrap justify-center gap-5 animate-fade-in-up stagger-3"
-                >
-                    <Link
-                        :href="route('frontend.booking.index')"
-                        class="btn-premium group px-8 py-4 text-lg"
-                    >
-                        <span class="flex items-center gap-3">
-                            <i
-                                class="fas fa-ticket-alt group-hover:rotate-12 transition-transform"
-                            ></i>
-                            Pesan Tiket
-                        </span>
-                    </Link>
-                    <Link
-                        :href="route('frontend.fleet.index')"
-                        class="btn-secondary-premium group px-8 py-4 text-lg"
-                    >
-                        <i
-                            class="fas fa-bus mr-2 group-hover:-translate-x-1 transition-transform"
-                        ></i>
-                        Lihat Armada
-                    </Link>
-                </div>
+                    <i class="fas fa-bus mr-2"></i> Lihat Armada
+                </Link>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Booking Form Section -->
-    <section
-        class="relative z-20 -mt-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-24"
-    >
+    <section class="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
         <div
-            class="glass-white dark:glass-dark rounded-3xl p-8 md:p-10 shadow-2xl border-t border-white/50"
+            class="bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-10 shadow-xl border border-gray-100 dark:border-gray-700"
         >
             <form
                 :action="route('frontend.booking.index')"
@@ -673,58 +617,52 @@ const formatNumber = (num) => {
         </div>
     </section>
 
-    <!-- Stats Section -->
+    <!-- Stats Section (Unified Background) -->
     <section
         id="stats-section"
-        class="py-32 relative overflow-hidden bg-primary-950"
+        class="py-20 relative bg-brand-red text-white overflow-hidden"
     >
-        <!-- Background -->
-        <div class="absolute inset-0">
-            <div class="absolute inset-0 hero-pattern opacity-10"></div>
-            <div
-                class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
-            ></div>
-            <div
-                class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
-            ></div>
-        </div>
-
+        <div
+            class="absolute inset-0 opacity-10 pattern-dots pointer-events-none"
+        ></div>
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-                <div class="group">
+            <div
+                class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center divide-y md:divide-y-0 md:divide-x divide-white/20"
+            >
+                <div class="group p-4">
                     <div
-                        class="stats-number mb-2 group-hover:scale-110 transition-transform duration-500"
+                        class="text-5xl md:text-6xl font-black mb-2 group-hover:scale-110 transition-transform duration-300"
                     >
                         {{ displayFleetCount }}+
                     </div>
                     <p
-                        class="text-lg text-slate-400 font-medium tracking-wide uppercase"
+                        class="text-lg font-medium tracking-widest uppercase opacity-80"
                     >
                         Armada Bus
                     </p>
                 </div>
 
-                <div class="group">
+                <div class="group p-4">
                     <div
-                        class="stats-number mb-2 group-hover:scale-110 transition-transform duration-500"
+                        class="text-5xl md:text-6xl font-black mb-2 group-hover:scale-110 transition-transform duration-300"
                     >
                         {{ displayRouteCount }}+
                     </div>
                     <p
-                        class="text-lg text-slate-400 font-medium tracking-wide uppercase"
+                        class="text-lg font-medium tracking-widest uppercase opacity-80"
                     >
                         Rute Perjalanan
                     </p>
                 </div>
 
-                <div class="group">
+                <div class="group p-4">
                     <div
-                        class="stats-number mb-2 group-hover:scale-110 transition-transform duration-500"
+                        class="text-5xl md:text-6xl font-black mb-2 group-hover:scale-110 transition-transform duration-300"
                     >
                         {{ formatNumber(displayCustomerCount) }}+
                     </div>
                     <p
-                        class="text-lg text-slate-400 font-medium tracking-wide uppercase"
+                        class="text-lg font-medium tracking-widest uppercase opacity-80"
                     >
                         Pelanggan Puas
                     </p>

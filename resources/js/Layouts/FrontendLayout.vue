@@ -366,15 +366,17 @@ const isActive = (routeName) => {
 
         <!-- Footer -->
         <footer
-            class="bg-gray-900 text-white relative overflow-hidden border-t border-white/10"
+            class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white relative overflow-hidden border-t border-gray-200 dark:border-white/10 transition-colors duration-300"
         >
-            <!-- Background Pattern -->
-            <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <!-- Background Pattern (Subtle for both) -->
+            <div
+                class="absolute inset-0 opacity-30 dark:opacity-10 pointer-events-none"
+            >
                 <div
-                    class="absolute -top-24 -left-24 w-96 h-96 bg-brand-red/20 rounded-full blur-[100px]"
+                    class="absolute -top-24 -left-24 w-96 h-96 bg-brand-red/10 dark:bg-brand-red/20 rounded-full blur-[100px]"
                 ></div>
                 <div
-                    class="absolute bottom-0 right-0 w-80 h-80 bg-blue-600/20 rounded-full blur-[100px]"
+                    class="absolute bottom-0 right-0 w-80 h-80 bg-blue-100 dark:bg-blue-600/20 rounded-full blur-[100px]"
                 ></div>
             </div>
 
@@ -393,7 +395,7 @@ const isActive = (routeName) => {
                             <img
                                 src="/img/logoNoBg.png"
                                 alt="Logo"
-                                class="h-12 w-12 brightness-200"
+                                class="h-12 w-12 dark:brightness-200"
                             />
                             <div class="flex flex-col">
                                 <span
@@ -402,14 +404,14 @@ const isActive = (routeName) => {
                                     <span class="text-brand-red">TUJAGO</span>
                                 </span>
                                 <span
-                                    class="text-[0.65rem] font-bold text-gray-400 tracking-[0.2em] uppercase leading-none ml-0.5"
+                                    class="text-[0.65rem] font-bold text-gray-500 dark:text-gray-400 tracking-[0.2em] uppercase leading-none ml-0.5"
                                 >
                                     Tunggal Jaya Go
                                 </span>
                             </div>
                         </Link>
                         <p
-                            class="text-gray-400 mb-8 leading-relaxed font-light text-sm"
+                            class="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed font-light text-sm"
                         >
                             Partner perjalanan terpercaya Anda dengan armada bus
                             modern dan pelayanan premium. Kenyamanan dan
@@ -418,7 +420,7 @@ const isActive = (routeName) => {
                         <div class="flex space-x-3">
                             <a
                                 href="#"
-                                class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:scale-110 transition-all duration-300 group"
+                                class="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:scale-110 transition-all duration-300 group"
                             >
                                 <i
                                     class="fab fa-facebook-f group-hover:text-white text-gray-400 transition-colors text-sm"
@@ -426,7 +428,7 @@ const isActive = (routeName) => {
                             </a>
                             <a
                                 href="#"
-                                class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-sky-500 hover:border-sky-400 hover:scale-110 transition-all duration-300 group"
+                                class="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-sky-500 hover:border-sky-400 hover:scale-110 transition-all duration-300 group"
                             >
                                 <i
                                     class="fab fa-twitter group-hover:text-white text-gray-400 transition-colors text-sm"
@@ -434,7 +436,7 @@ const isActive = (routeName) => {
                             </a>
                             <a
                                 href="#"
-                                class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-pink-600 hover:border-pink-500 hover:scale-110 transition-all duration-300 group"
+                                class="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-pink-600 hover:border-pink-500 hover:scale-110 transition-all duration-300 group"
                             >
                                 <i
                                     class="fab fa-instagram group-hover:text-white text-gray-400 transition-colors text-sm"
@@ -442,7 +444,7 @@ const isActive = (routeName) => {
                             </a>
                             <a
                                 href="#"
-                                class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-blue-700 hover:border-blue-600 hover:scale-110 transition-all duration-300 group"
+                                class="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-blue-700 hover:border-blue-600 hover:scale-110 transition-all duration-300 group"
                             >
                                 <i
                                     class="fab fa-linkedin-in group-hover:text-white text-gray-400 transition-colors text-sm"
@@ -454,7 +456,7 @@ const isActive = (routeName) => {
                     <!-- Quick Links -->
                     <div>
                         <h3
-                            class="text-lg font-bold mb-6 text-white border-b-2 border-brand-red inline-block pb-2"
+                            class="text-lg font-bold mb-6 text-gray-900 dark:text-white border-b-2 border-brand-red inline-block pb-2"
                         >
                             Link Cepat
                         </h3>
@@ -486,7 +488,7 @@ const isActive = (routeName) => {
                             >
                                 <Link
                                     :href="route(item.route)"
-                                    class="text-gray-400 hover:text-brand-red transition-colors flex items-center group"
+                                    class="text-gray-500 dark:text-gray-400 hover:text-brand-red transition-colors flex items-center group"
                                 >
                                     <i
                                         class="fas fa-chevron-right text-[10px] mr-2 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 text-brand-red"
@@ -500,31 +502,31 @@ const isActive = (routeName) => {
                     <!-- Services (From Blade) -->
                     <div>
                         <h3
-                            class="text-lg font-bold mb-6 text-white border-b-2 border-brand-red inline-block pb-2"
+                            class="text-lg font-bold mb-6 text-gray-900 dark:text-white border-b-2 border-brand-red inline-block pb-2"
                         >
                             Layanan
                         </h3>
                         <ul class="space-y-3 text-sm">
                             <li
-                                class="flex items-center text-gray-400 hover:text-white transition-colors"
+                                class="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                             >
                                 <i class="fas fa-bus mr-3 text-brand-red"></i>
                                 Transportasi Kota
                             </li>
                             <li
-                                class="flex items-center text-gray-400 hover:text-white transition-colors"
+                                class="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                             >
                                 <i class="fas fa-route mr-3 text-brand-red"></i>
                                 Perjalanan Antar Kota
                             </li>
                             <li
-                                class="flex items-center text-gray-400 hover:text-white transition-colors"
+                                class="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                             >
                                 <i class="fas fa-plane mr-3 text-brand-red"></i>
                                 Antar Jemput Bandara
                             </li>
                             <li
-                                class="flex items-center text-gray-400 hover:text-white transition-colors"
+                                class="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                             >
                                 <i
                                     class="fas fa-map-marked-alt mr-3 text-brand-red"
@@ -532,7 +534,7 @@ const isActive = (routeName) => {
                                 Paket Wisata
                             </li>
                             <li
-                                class="flex items-center text-gray-400 hover:text-white transition-colors"
+                                class="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                             >
                                 <i
                                     class="fas fa-building mr-3 text-brand-red"
@@ -545,19 +547,21 @@ const isActive = (routeName) => {
                     <!-- Contact -->
                     <div>
                         <h3
-                            class="text-lg font-bold mb-6 text-white border-b-2 border-brand-red inline-block pb-2"
+                            class="text-lg font-bold mb-6 text-gray-900 dark:text-white border-b-2 border-brand-red inline-block pb-2"
                         >
                             Hubungi Kami
                         </h3>
-                        <ul class="space-y-4 text-gray-400 text-sm">
+                        <ul
+                            class="space-y-4 text-gray-500 dark:text-gray-400 text-sm"
+                        >
                             <li class="flex items-start space-x-3 group">
                                 <div class="mt-1 flex-shrink-0">
                                     <i
-                                        class="fas fa-map-marker-alt text-brand-red group-hover:text-white transition-colors"
+                                        class="fas fa-map-marker-alt text-brand-red group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
                                     ></i>
                                 </div>
                                 <span
-                                    class="group-hover:text-gray-300 transition-colors leading-relaxed"
+                                    class="group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors leading-relaxed"
                                 >
                                     Jl. Transportation No. 123, Jakarta 12345
                                 </span>
@@ -565,11 +569,11 @@ const isActive = (routeName) => {
                             <li class="flex items-center space-x-3 group">
                                 <div class="flex-shrink-0">
                                     <i
-                                        class="fas fa-phone-alt text-brand-red group-hover:text-white transition-colors"
+                                        class="fas fa-phone-alt text-brand-red group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
                                     ></i>
                                 </div>
                                 <span
-                                    class="group-hover:text-gray-300 transition-colors"
+                                    class="group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors"
                                 >
                                     +62 21 1234 5678
                                 </span>
@@ -577,11 +581,11 @@ const isActive = (routeName) => {
                             <li class="flex items-center space-x-3 group">
                                 <div class="flex-shrink-0">
                                     <i
-                                        class="fas fa-envelope text-brand-red group-hover:text-white transition-colors"
+                                        class="fas fa-envelope text-brand-red group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
                                     ></i>
                                 </div>
                                 <span
-                                    class="group-hover:text-gray-300 transition-colors"
+                                    class="group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors"
                                 >
                                     info@tujago.com
                                 </span>
@@ -589,11 +593,11 @@ const isActive = (routeName) => {
                             <li class="flex items-center space-x-3 group">
                                 <div class="flex-shrink-0">
                                     <i
-                                        class="fas fa-clock text-brand-red group-hover:text-white transition-colors"
+                                        class="fas fa-clock text-brand-red group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
                                     ></i>
                                 </div>
                                 <span
-                                    class="group-hover:text-gray-300 transition-colors"
+                                    class="group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors"
                                 >
                                     Senin - Jumat, 08:00 - 20:00
                                 </span>
@@ -603,12 +607,12 @@ const isActive = (routeName) => {
                 </div>
 
                 <div
-                    class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm"
+                    class="border-t border-gray-200 dark:border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm"
                 >
                     <p>
                         &copy; {{ new Date().getFullYear() }}
                         <span
-                            class="text-white hover:text-brand-red cursor-pointer transition-colors"
+                            class="text-gray-900 dark:text-white hover:text-brand-red cursor-pointer transition-colors"
                             >TUJAGO (Tunggal Jaya Go)</span
                         >. All rights reserved.
                     </p>

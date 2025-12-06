@@ -27,7 +27,7 @@ class HomeController extends Controller
         $fleetCount = Bus::count();
         
         // Get fleet data for display
-        $fleet = Bus::limit(6)->get();
+        $fleet = Bus::with('media')->limit(6)->get();
         
         // Get route count
         $routeCount = BusRoute::count();
