@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
 
@@ -105,45 +105,50 @@ const logout = () => {
     router.post(route("logout"));
 };
 
-// Flash Message State
-const showSuccess = ref(false);
-const showError = ref(false);
+// Toast Notification System
+const toasts = ref([]);
+
+const addToast = (message, type = "success") => {
+    const id = Date.now();
+    toasts.value.push({
+        id,
+        message,
+        type,
+    });
+
+    // Auto dismiss
+    setTimeout(() => {
+        removeToast(id);
+    }, 5000);
+};
+
+const removeToast = (id) => {
+    toasts.value = toasts.value.filter((t) => t.id !== id);
+};
+
+// Flash Message Watchers
 const flashSuccess = computed(() => page.props.flash.success);
 const flashError = computed(() => page.props.flash.error);
 
-import { watch as vueWatch } from "vue"; // Rename to avoid conflict if any, or just use watch
-
-vueWatch(
+watch(
     flashSuccess,
     (newValue) => {
         if (newValue) {
-            showSuccess.value = true;
-            // Auto dismiss after 5 seconds
-            setTimeout(() => {
-                showSuccess.value = false;
-            }, 5000);
+            addToast(newValue, "success");
         }
     },
     { immediate: true }
 );
 
-vueWatch(
+watch(
     flashError,
     (newValue) => {
         if (newValue) {
-            showError.value = true;
+            addToast(newValue, "error");
         }
     },
     { immediate: true }
 );
-
-const closeSuccess = () => {
-    showSuccess.value = false;
-};
-
-const closeError = () => {
-    showError.value = false;
-};
 </script>
 
 <template>
@@ -200,13 +205,15 @@ const closeError = () => {
 
                     <div class="flex flex-col">
                         <span
-                            class="font-bold text-xl tracking-tight leading-none font-serif text-gray-900 dark:text-white group-hover:text-red-500 transition-colors duration-300"
-                            >Tunggal Jaya</span
+                            class="text-2xl font-black tracking-tighter italic bg-clip-text text-transparent bg-gradient-to-r from-brand-red via-red-500 to-orange-500 transform -skew-x-6 drop-shadow-sm"
                         >
+                            TUJAGO
+                        </span>
                         <span
-                            class="text-[10px] text-gray-500 font-bold tracking-[0.2em] uppercase mt-1"
-                            >Admin Panel</span
+                            class="text-[0.6rem] font-bold text-gray-500 dark:text-gray-400 tracking-[0.2em] uppercase ml-0.5"
                         >
+                            Tunggal Jaya Go
+                        </span>
                     </div>
                 </div>
                 <button
@@ -1107,71 +1114,93 @@ const closeError = () => {
             <main
                 class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50/50 dark:bg-gray-950 p-6 md:p-8"
             >
-                <!-- Flash Messages with Modern Alert Style -->
-                <transition-group
-                    enter-active-class="transition duration-400 ease-out"
-                    enter-from-class="transform -translate-y-4 opacity-0 scale-95"
-                    enter-to-class="transform translate-y-0 opacity-100 scale-100"
-                    leave-active-class="transition duration-200 ease-in"
-                    leave-from-class="transform translate-y-0 opacity-100 scale-100"
-                    leave-to-class="transform -translate-y-4 opacity-0 scale-95"
+                <!-- Global Toast Notifications Stack -->
+                <div
+                    class="fixed top-24 right-6 z-50 flex flex-col gap-3 pointer-events-none w-full max-w-sm"
                 >
-                    <div
-                        v-if="showSuccess"
-                        key="success"
-                        class="mb-8 flex items-center w-full max-w-3xl mx-auto p-4 rounded-2xl bg-white dark:bg-gray-900 border border-green-100 dark:border-green-900/50 shadow-lg shadow-green-500/10"
+                    <TransitionGroup
+                        enter-active-class="transition ease-out duration-300 transform"
+                        enter-from-class="translate-x-full opacity-0"
+                        enter-to-class="translate-x-0 opacity-100"
+                        leave-active-class="transition ease-in duration-200 transform"
+                        leave-from-class="translate-x-0 opacity-100"
+                        leave-to-class="translate-x-full opacity-0"
                     >
                         <div
-                            class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-500"
+                            v-for="toast in toasts"
+                            :key="toast.id"
+                            class="pointer-events-auto w-full backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-white/20 relative overflow-hidden group hover:-translate-x-1 transition-transform cursor-pointer"
+                            :class="[
+                                toast.type === 'success'
+                                    ? 'bg-white/90 dark:bg-gray-900/90 border-green-500/20'
+                                    : 'bg-white/90 dark:bg-gray-900/90 border-red-500/20',
+                            ]"
+                            @click="removeToast(toast.id)"
                         >
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="ml-4 flex-1">
-                            <h3
-                                class="text-sm font-bold text-gray-900 dark:text-white font-serif"
-                            >
-                                Berhasil
-                            </h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ flashSuccess }}
-                            </p>
-                        </div>
-                        <button
-                            @click="closeSuccess"
-                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        >
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+                            <!-- Side Indicator Line -->
+                            <div
+                                class="absolute left-0 top-0 bottom-0 w-1"
+                                :class="
+                                    toast.type === 'success'
+                                        ? 'bg-gradient-to-b from-green-400 to-green-600'
+                                        : 'bg-gradient-to-b from-red-400 to-red-600'
+                                "
+                            ></div>
 
-                    <div
-                        v-if="showError"
-                        key="error"
-                        class="mb-8 flex items-center w-full max-w-3xl mx-auto p-4 rounded-2xl bg-white dark:bg-gray-900 border border-red-100 dark:border-red-900/50 shadow-lg shadow-red-500/10"
-                    >
-                        <div
-                            class="flex-shrink-0 h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-red-500"
-                        >
-                            <i class="fas fa-exclamation"></i>
+                            <div class="flex items-start gap-4 pl-2">
+                                <div class="flex-shrink-0 mt-0.5">
+                                    <div
+                                        class="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
+                                        :class="
+                                            toast.type === 'success'
+                                                ? 'bg-green-100 dark:bg-green-900/50 text-green-600'
+                                                : 'bg-red-100 dark:bg-red-900/50 text-red-600'
+                                        "
+                                    >
+                                        <i
+                                            :class="
+                                                toast.type === 'success'
+                                                    ? 'fas fa-check'
+                                                    : 'fas fa-exclamation'
+                                            "
+                                        ></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4
+                                        class="text-sm font-bold truncate"
+                                        :class="
+                                            toast.type === 'success'
+                                                ? 'text-green-700 dark:text-green-400'
+                                                : 'text-red-700 dark:text-red-400'
+                                        "
+                                    >
+                                        {{
+                                            toast.type === "success"
+                                                ? "Berhasil!"
+                                                : "Terjadi Kesalahan"
+                                        }}
+                                    </h4>
+                                    <p
+                                        class="text-xs text-gray-600 dark:text-gray-300 mt-1 leading-relaxed font-medium"
+                                    >
+                                        {{ toast.message }}
+                                    </p>
+                                </div>
+                                <button
+                                    class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors"
+                                >
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            <!-- Shimmer Effect -->
+                            <div
+                                class="absolute inset-0 -translate-x-full group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent z-10"
+                            ></div>
                         </div>
-                        <div class="ml-4 flex-1">
-                            <h3
-                                class="text-sm font-bold text-gray-900 dark:text-white font-serif"
-                            >
-                                Gagal
-                            </h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ flashError }}
-                            </p>
-                        </div>
-                        <button
-                            @click="closeError"
-                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        >
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </transition-group>
+                    </TransitionGroup>
+                </div>
 
                 <slot />
             </main>

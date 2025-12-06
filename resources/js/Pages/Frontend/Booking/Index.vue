@@ -119,7 +119,7 @@ watch(
                 class="text-lg text-slate-300 max-w-2xl mx-auto animate-fade-in-up stagger-1 leading-relaxed"
             >
                 Temukan jadwal terbaik dengan standar kenyamanan tertinggi untuk
-                perjalanan Anda bersama Tunggal Jaya.
+                perjalanan Anda bersama TUJAGO.
             </p>
         </div>
     </div>

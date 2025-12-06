@@ -240,7 +240,7 @@ const formatNumber = (num) => {
                         >
                             {{
                                 bus.description ||
-                                "Nikmati perjalanan nyaman dengan fasilitas lengkap bersama Tunggal Jaya Transport."
+                                "Nikmati perjalanan nyaman dengan fasilitas lengkap bersama TUJAGO."
                             }}
                         </p>
 

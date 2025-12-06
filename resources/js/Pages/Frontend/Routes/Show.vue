@@ -137,7 +137,7 @@ const formatTime = (dateString) => {
                                     routeModel.origin +
                                     " menuju " +
                                     routeModel.destination +
-                                    " bersama Tunggal Jaya Transport. Rute ini menawarkan pemandangan indah dan fasilitas lengap di setiap armada kami."
+                                    " bersama TUJAGO. Rute ini menawarkan pemandangan indah dan fasilitas lengap di setiap armada kami."
                             }}
                         </p>
                     </div>

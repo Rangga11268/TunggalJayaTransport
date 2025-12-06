@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import FlashMessages from "@/Components/FlashMessages.vue";
 
 const page = usePage();
 const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
+
 const isDarkMode = ref(false);
 
 const navLinks = [
@@ -24,6 +25,10 @@ onMounted(() => {
     if (isDarkMode.value) {
         document.documentElement.classList.add("dark");
     }
+});
+
+onUnmounted(() => {
+    window.removeEventListener("scroll", handleScroll);
 });
 
 const handleScroll = () => {
@@ -100,12 +105,18 @@ const isActive = (routeName) => {
                                 class="h-10 w-10 md:h-12 md:w-12 relative z-10 transition-transform duration-500 group-hover:scale-110 drop-shadow-lg"
                             />
                         </div>
-                        <span
-                            class="text-xl md:text-2xl font-extrabold tracking-tight font-serif transition-all duration-300 group-hover:tracking-normal"
-                        >
-                            <span class="text-brand-red">Tunggal</span>
-                            <span class="text-brand-dark">Jaya</span>
-                        </span>
+                        <div class="flex flex-col">
+                            <span
+                                class="text-2xl font-black tracking-tighter font-serif leading-none"
+                            >
+                                <span class="text-brand-red">TUJAGO</span>
+                            </span>
+                            <span
+                                class="text-[0.65rem] font-bold text-gray-500 dark:text-gray-400 tracking-[0.2em] uppercase leading-none ml-0.5"
+                            >
+                                Tunggal Jaya Go
+                            </span>
+                        </div>
                     </Link>
 
                     <!-- Desktop Navigation -->
@@ -384,10 +395,18 @@ const isActive = (routeName) => {
                                 alt="Logo"
                                 class="h-12 w-12 brightness-200"
                             />
-                            <span class="text-2xl font-bold font-serif">
-                                <span class="text-brand-red">Tunggal</span>
-                                <span class="text-brand-dark">Jaya</span>
-                            </span>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-2xl font-black tracking-tighter font-serif leading-none"
+                                >
+                                    <span class="text-brand-red">TUJAGO</span>
+                                </span>
+                                <span
+                                    class="text-[0.65rem] font-bold text-gray-400 tracking-[0.2em] uppercase leading-none ml-0.5"
+                                >
+                                    Tunggal Jaya Go
+                                </span>
+                            </div>
                         </Link>
                         <p
                             class="text-gray-400 mb-8 leading-relaxed font-light text-sm"
@@ -564,7 +583,7 @@ const isActive = (routeName) => {
                                 <span
                                     class="group-hover:text-gray-300 transition-colors"
                                 >
-                                    info@tunggaljayatransport.com
+                                    info@tujago.com
                                 </span>
                             </li>
                             <li class="flex items-center space-x-3 group">
@@ -590,7 +609,7 @@ const isActive = (routeName) => {
                         &copy; {{ new Date().getFullYear() }}
                         <span
                             class="text-white hover:text-brand-red cursor-pointer transition-colors"
-                            >Tunggal Jaya Transport</span
+                            >TUJAGO (Tunggal Jaya Go)</span
                         >. All rights reserved.
                     </p>
                     <div class="flex space-x-6 mt-4 md:mt-0">

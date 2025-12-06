@@ -32,7 +32,7 @@ const formatDate = (dateString) => {
                 </h1>
                 <p class="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
                     Kumpulan informasi, tips perjalanan, dan berita terbaru dari
-                    Tunggal Jaya Transport.
+                    TUJAGO.
                 </p>
             </div>
 

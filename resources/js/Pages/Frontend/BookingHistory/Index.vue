@@ -73,7 +73,7 @@ const formatTime = (dateString) => {
                 </h3>
                 <p class="text-gray-500 mb-8 max-w-md mx-auto">
                     Anda belum melakukan pemesanan tiket apapun. Mulai
-                    petualangan Anda bersama Tunggal Jaya Transport sekarang!
+                    petualangan Anda bersama TUJAGO sekarang!
                 </p>
                 <Link
                     :href="route('booking.index')"

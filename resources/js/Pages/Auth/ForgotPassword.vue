@@ -20,7 +20,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Lupa Kata Sandi - Tunggal Jaya Transport" />
+    <Head title="Lupa Kata Sandi - TUJAGO (Tunggal Jaya Go)" />
 
     <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
         <!-- Left Side: Visual -->
@@ -150,7 +150,7 @@ const submit = () => {
             <div
                 class="mt-8 lg:absolute lg:bottom-8 text-center text-xs text-gray-400"
             >
-                &copy; {{ new Date().getFullYear() }} Tunggal Jaya Transport.
+                &copy; {{ new Date().getFullYear() }} TUJAGO (Tunggal Jaya Go).
                 All rights reserved.
             </div>
         </div>

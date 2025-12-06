@@ -266,7 +266,7 @@ const formatNumber = (num) => {
                 >
                     Nikmati pengalaman perjalanan bus terbaik dengan armada
                     modern, fasilitas lengkap, dan pelayanan profesional dari
-                    Tunggal Jaya.
+                    TUJAGO.
                 </p>
 
                 <!-- CTA Buttons -->
@@ -509,7 +509,7 @@ const formatNumber = (num) => {
                     Kenapa Memilih
                     <span
                         class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-secondary-600"
-                        >Tunggal Jaya?</span
+                        >TUJAGO?</span
                     >
                 </h2>
                 <p

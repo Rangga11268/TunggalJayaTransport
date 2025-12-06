@@ -104,7 +104,7 @@ const submit = () => {
                             <p
                                 class="text-gray-500 dark:text-gray-400 text-sm mt-1"
                             >
-                                info@tunggaljayatransport.com
+                                info@tujago.com
                             </p>
                             <span
                                 class="text-xs text-gray-400 font-medium mt-2 block"

@@ -27,7 +27,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Masuk - Tunggal Jaya Transport" />
+    <Head title="Masuk - TUJAGO (Tunggal Jaya Go)" />
 
     <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
         <!-- Left Side: Visual -->
@@ -45,9 +45,13 @@ const submit = () => {
             <div class="relative z-10 text-center px-12">
                 <div class="mb-8 flex justify-center">
                     <div
-                        class="w-24 h-24 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-2xl shadow-brand-red/20"
+                        class="w-32 h-32 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-2xl shadow-brand-red/20 animate-pulse-slow p-4"
                     >
-                        <i class="fas fa-bus text-5xl text-brand-red"></i>
+                        <img
+                            src="/img/logoNoBg.png"
+                            alt="Logo TUJAGO"
+                            class="w-full h-full object-contain drop-shadow-lg"
+                        />
                     </div>
                 </div>
                 <h2 class="text-4xl font-serif font-bold text-white mb-6">
@@ -58,7 +62,7 @@ const submit = () => {
                 >
                     Akses akun Anda untuk mengelola pemesanan tiket, melihat
                     riwayat perjalanan, dan nikmati layanan prioritas dari
-                    Tunggal Jaya Transport.
+                    TUJAGO (Tunggal Jaya Go).
                 </p>
             </div>
         </div>
@@ -71,9 +75,13 @@ const submit = () => {
                 <!-- Mobile Logo (Visible only on small screens) -->
                 <div class="lg:hidden text-center mb-8">
                     <div
-                        class="inline-flex w-16 h-16 rounded-full bg-primary-900/10 items-center justify-center mb-4"
+                        class="inline-flex w-20 h-20 rounded-full bg-primary-900/10 items-center justify-center mb-4 p-3"
                     >
-                        <i class="fas fa-bus text-3xl text-brand-red"></i>
+                        <img
+                            src="/img/logoNoBg.png"
+                            alt="Logo TUJAGO"
+                            class="w-full h-full object-contain"
+                        />
                     </div>
                     <h2
                         class="text-2xl font-bold text-gray-900 dark:text-white"
@@ -264,7 +272,7 @@ const submit = () => {
             <div
                 class="mt-8 lg:absolute lg:bottom-8 text-center text-xs text-gray-400"
             >
-                &copy; {{ new Date().getFullYear() }} Tunggal Jaya Transport.
+                &copy; {{ new Date().getFullYear() }} TUJAGO (Tunggal Jaya Go).
                 All rights reserved.
             </div>
         </div>
