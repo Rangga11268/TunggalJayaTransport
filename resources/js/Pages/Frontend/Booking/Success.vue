@@ -1,7 +1,9 @@
 <script setup>
 import { Head, Link } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 defineOptions({ layout: FrontendLayout });
 
@@ -26,6 +28,86 @@ const formatCurrency = (value) => {
         currency: "IDR",
         minimumFractionDigits: 0,
     }).format(value);
+};
+
+const isChecking = ref(false);
+
+const checkPaymentStatus = async (orderId) => {
+    if (!orderId || isChecking.value) return;
+
+    isChecking.value = true;
+
+    try {
+        const response = await axios.get(
+            route("frontend.booking.success", { id: props.booking.id })
+        ); // We might need a dedicated status API endpoint or use the one we improved
+        // The one we improved is /booking/payment/status/{orderId}
+        const statusResponse = await axios.get(
+            route("frontend.payment.status", { orderId: orderId })
+        );
+
+        const data = statusResponse.data;
+
+        if (data.status === "success") {
+            const trxStatus = data.transaction_status;
+
+            if (trxStatus === "capture" || trxStatus === "settlement") {
+                Swal.fire({
+                    icon: "success",
+                    title: "Pembayaran Berhasil!",
+                    text: "Terima kasih, pembayaran Anda telah dikonfirmasi.",
+                    showConfirmButton: false,
+                    timer: 2000,
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else if (trxStatus === "pending") {
+                Swal.fire({
+                    icon: "info",
+                    title: "Menunggu Pembayaran",
+                    text: 'Sistem mencatat status pembayaran masih "pending". Jika sudah bayar, mohon tunggu beberapa saat.',
+                    footer:
+                        "<small>Status dari Gateway: " + trxStatus + "</small>",
+                    confirmButtonColor: "#3b82f6",
+                });
+            } else if (trxStatus === "expire") {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Pembayaran Kadaluarsa",
+                    text: "Waktu pembayaran telah habis. Silakan lakukan pemesanan ulang.",
+                    confirmButtonColor: "#ef4444",
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Status belum berubah",
+                    text: "Status saat ini: " + trxStatus,
+                    confirmButtonColor: "#f59e0b",
+                });
+            }
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Gagal Cek Status",
+                text:
+                    data.message ||
+                    "Terjadi kesalahan saat menghubungi server.",
+                confirmButtonColor: "#ef4444",
+            });
+        }
+    } catch (error) {
+        console.error("Error checking status:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Koneksi Error",
+            text: "Gagal menghubungi server.",
+            confirmButtonColor: "#ef4444",
+        });
+    } finally {
+        isChecking.value = false;
+    }
 };
 </script>
 
@@ -83,13 +165,39 @@ const formatCurrency = (value) => {
                             >
                                 <i class="fas fa-check-circle mr-2"></i> Lunas
                             </span>
-                            <span
-                                v-else
-                                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
-                            >
-                                <i class="fas fa-clock mr-2"></i> Menunggu
-                                Pembayaran
-                            </span>
+                            <div v-else class="flex flex-col items-end gap-2">
+                                <span
+                                    class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
+                                >
+                                    <i class="fas fa-clock mr-2"></i> Menunggu
+                                    Konfirmasi
+                                </span>
+                                <button
+                                    v-if="booking.midtrans_transaction_id"
+                                    @click="
+                                        checkPaymentStatus(
+                                            booking.midtrans_transaction_id
+                                        )
+                                    "
+                                    :disabled="isChecking"
+                                    class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-3 py-1.5 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors flex items-center"
+                                >
+                                    <i
+                                        :class="[
+                                            'fas',
+                                            isChecking
+                                                ? 'fa-spinner fa-spin'
+                                                : 'fa-sync-alt',
+                                            'mr-1',
+                                        ]"
+                                    ></i>
+                                    {{
+                                        isChecking
+                                            ? "Checking..."
+                                            : "Cek Status Pembayaran"
+                                    }}
+                                </button>
+                            </div>
                         </div>
                     </div>
 

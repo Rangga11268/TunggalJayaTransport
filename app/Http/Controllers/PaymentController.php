@@ -74,7 +74,8 @@ class PaymentController extends Controller
         if ($result['status'] === 'success') {
             return response()->json([
                 'status' => 'success',
-                'data' => $result['data']
+                'data' => $result['data'],
+                'transaction_status' => $result['transaction_status'] ?? 'unknown'
             ]);
         }
 

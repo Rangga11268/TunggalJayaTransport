@@ -96,13 +96,34 @@ class MidtransService
 
                 // Update booking status based on payment result
                 $booking = $paymentHistory->booking;
-                if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
+            } else {
+                // Fallback: If PaymentHistory missing, try to find booking by order_id (booking_code)
+                // Assuming order_id format is typically BOOKINGCODE_TIMESTAMP
+                $parts = explode('_', $orderId);
+                $bookingCode = $parts[0];
+                $booking = \App\Models\Booking::where('booking_code', $bookingCode)->first();
+                
+                if ($booking) {
+                    Log::warning('PaymentHistory not found for order ' . $orderId . ', but Booking found: ' . $booking->id);
+                    // Create missing PaymentHistory? Optional, but at least update Booking.
+                } else {
+                    Log::error('PaymentHistory AND Booking not found for order: ' . $orderId);
+                    return [
+                        'status' => 'error',
+                        'message' => 'Booking not found for this transaction'
+                    ];
+                }
+            }
+            
+            if ($booking) {
+                 if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
                     // Payment successful
                     $booking->update([
                         'payment_status' => 'paid',
+                        'booking_status' => 'confirmed', // Ensure booking is confirmed
                         'midtrans_transaction_id' => $orderId
                     ]);
-                } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire') {
+                } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire' || $transactionStatus === 'deny') {
                     // Payment failed/expired
                     $booking->update([
                         'payment_status' => 'failed',
@@ -119,7 +140,8 @@ class MidtransService
 
             return [
                 'status' => 'success',
-                'data' => $status
+                'data' => $status,
+                'transaction_status' => $transactionStatus // Expose specifically for frontend
             ];
         } catch (\Exception $e) {
             Log::error('Midtrans Get Status Error: ' . $e->getMessage());
