@@ -61,7 +61,7 @@ class SearchController extends Controller
         // Sort by relevance (this is a simple implementation)
         $results = $allResults->sortByDesc('published_at')->values();
         
-        return view('frontend.search.index', [
+        return \Inertia\Inertia::render('Frontend/Search/Index', [
             'results' => $results,
             'query' => $query,
             'totalResults' => $results->count()

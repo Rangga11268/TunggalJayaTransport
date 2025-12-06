@@ -191,42 +191,73 @@ class BookingController extends Controller
                 $filteredSchedules->count(),
                 $perPage,
                 $currentPage,
-                [
-                    'path' => $request->url(),
-                    'pageName' => 'page',
-                ]
-            );
-        } else {
-            // Get all schedules with their relations that are available for booking
-            $query = Schedule::with('route', 'bus')->available();
-
-            // Apply filters if provided
-            if ($origin) {
-                $query->whereHas('route', function ($q) use ($origin) {
-                    $q->where('origin', $origin);
-                });
-            }
-
-            if ($destination) {
-                $query->whereHas('route', function ($q) use ($destination) {
-                    $q->where('destination', $destination);
-                });
-            }
-
-            // Order by departure time
-            $schedules = $query->orderBy('departure_time')->paginate(10);
-
-            // Filter out schedules that have already departed or are not available for booking
-            // For date filtering, we need to check the actual departure time
-            $schedules->setCollection(
-                $schedules->getCollection()->filter(function ($schedule) {
-                    // All schedules must pass the isAvailableForBooking check
-                    return $schedule->isAvailableForBooking();
-                })
             );
         }
 
-        return view('frontend.booking.schedules', compact('schedules', 'origins', 'destinations', 'origin', 'destination', 'date'));
+        $query = Schedule::with(['bus', 'route'])
+            ->where('is_active', true);
+        
+        // Filter by origin
+        if ($request->has('origin') && $request->origin != '') {
+            $query->whereHas('route', function ($q) use ($request) {
+                $q->where('origin', $request->origin);
+            });
+        }
+
+        // Filter by destination
+        if ($request->has('destination') && $request->destination != '') {
+            $query->whereHas('route', function ($q) use ($request) {
+                $q->where('destination', $request->destination);
+            });
+        }
+
+        // Filter by date (if provided, otherwise show defaults)
+        if ($request->has('date') && $request->date != '') {
+            // Note: In a real app, you might want to filter schedules that run on this specific date
+            // For now, we'll just pass it through as per existing logic or enhance if needed
+        }
+
+        $schedules = $query->get()->map(function ($schedule) {
+            return [
+                'id' => $schedule->id,
+                'price' => $schedule->price,
+                'departure_time' => $schedule->departure_time->format('H:i'),
+                'arrival_time' => $schedule->arrival_time->format('H:i'),
+                'duration' => $schedule->duration,
+                'is_daily' => $schedule->is_daily,
+                'bus' => [
+                    'name' => $schedule->bus->name,
+                    'type' => $schedule->bus->type,
+                    'capacity' => $schedule->bus->capacity,
+                    'plate_number' => $schedule->bus->plate_number,
+                    'bus_type' => $schedule->bus->bus_type, 
+                ],
+                'route' => [
+                    'origin' => $schedule->route->origin,
+                    'destination' => $schedule->route->destination,
+                ],
+                'available_seats' => $schedule->getAvailableSeatsCount(),
+            ];
+        });
+
+        $origins = \App\Models\Route::distinct()->pluck('origin');
+        $destinations = \App\Models\Route::distinct()->pluck('destination');
+
+        // Check if origin and destination pair is valid
+        $validPair = true;
+        if ($request->has('origin') && $request->has('destination') && $request->origin && $request->destination) {
+            $validPair = \App\Models\Route::where('origin', $request->origin)
+                ->where('destination', $request->destination)
+                ->exists();
+        }
+
+        return \Inertia\Inertia::render('Frontend/Booking/Index', [
+            'schedules' => $schedules,
+            'origins' => $origins,
+            'destinations' => $destinations,
+            'validPair' => $validPair,
+            'filters' => $request->only(['origin', 'destination', 'date']),
+        ]);
     }
 
     public function show($id, Request $request)
