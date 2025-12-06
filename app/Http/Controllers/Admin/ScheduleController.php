@@ -7,6 +7,7 @@ use App\Models\Schedule;
 use App\Models\Bus;
 use App\Models\Route as BusRoute;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Carbon\Carbon;
 
 class ScheduleController extends Controller
@@ -16,9 +17,20 @@ class ScheduleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Schedule::with(['bus', 'route']);
+        $query = Schedule::with(['bus', 'route'])
+            ->when($request->search, function ($query, $search) {
+                $query->whereHas('bus', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('plate_number', 'like', "%{$search}%");
+                })
+                ->orWhereHas('route', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('origin', 'like', "%{$search}%")
+                      ->orWhere('destination', 'like', "%{$search}%");
+                });
+            });
         
-        // Apply filters
+        // Apply specific filters if provided
         if ($request->filled('bus_id')) {
             $query->where('bus_id', $request->bus_id);
         }
@@ -31,9 +43,34 @@ class ScheduleController extends Controller
             $query->where('status', $request->status);
         }
         
-        $schedules = $query->latest()->paginate(10);
+        $schedules = $query->latest()->paginate(10)->withQueryString();
+
+        // Transform data for frontend
+        $schedules->getCollection()->transform(function ($schedule) {
+            return [
+                'id' => $schedule->id,
+                'bus' => $schedule->bus,
+                'route' => $schedule->route,
+                'price' => $schedule->price,
+                'status' => $schedule->status,
+                'schedule_type' => $schedule->schedule_type,
+                'departure_time' => $schedule->departure_time,
+                'arrival_time' => $schedule->arrival_time,
+                'is_daily' => $schedule->is_daily,
+                // Add formatted fields for display
+                'formatted_departure' => Carbon::parse($schedule->departure_time)->format('d M Y H:i'),
+                'formatted_arrival' => Carbon::parse($schedule->arrival_time)->format('d M Y H:i'),
+                'time_only_departure' => Carbon::parse($schedule->departure_time)->format('H:i'),
+                'time_only_arrival' => Carbon::parse($schedule->arrival_time)->format('H:i'),
+            ];
+        });
         
-        return view('admin.schedules.index', compact('schedules'));
+        return Inertia::render('Admin/Schedules/Index', [
+            'schedules' => $schedules,
+            'filters' => $request->only(['search', 'bus_id', 'route_id', 'status']),
+            'buses' => Bus::select('id', 'name')->get(),
+            'routes' => BusRoute::select('id', 'name')->get(),
+        ]);
     }
 
     /**
@@ -41,9 +78,10 @@ class ScheduleController extends Controller
      */
     public function create()
     {
-        $buses = Bus::all();
-        $routes = BusRoute::all();
-        return view('admin.schedules.create', compact('buses', 'routes'));
+        $buses = Bus::where('status', 'active')->select('id', 'name', 'plate_number', 'bus_type', 'capacity')->get();
+        $routes = BusRoute::select('id', 'name', 'origin', 'destination', 'duration')->get();
+        
+        return Inertia::render('Admin/Schedules/Create', compact('buses', 'routes'));
     }
 
     /**
@@ -78,6 +116,7 @@ class ScheduleController extends Controller
         if ($request->schedule_type == 'daily_recurring') {
             // For daily recurring schedules, we store only the time part
             $data['is_daily'] = true;
+            $data['schedule_type'] = 'daily_recurring';
             
             // Using today as base date to show current relevant time
             $baseDate = date('Y-m-d');
@@ -87,14 +126,21 @@ class ScheduleController extends Controller
         } else {
             // For daily schedules, combine date and time
             $data['is_daily'] = false;
+            $data['schedule_type'] = 'daily';
             // Store datetime in WIB directly without converting to UTC
             $data['departure_time'] = $request->departure_date . ' ' . $request->departure_time . ':00';
             $data['arrival_time'] = $request->departure_date . ' ' . $request->arrival_time . ':00';
+            
+            // Handle arrival next day logic simply
+            if ($request->arrival_time < $request->departure_time) {
+                 $arrivalDate = Carbon::parse($request->departure_date)->addDay()->format('Y-m-d');
+                 $data['arrival_time'] = $arrivalDate . ' ' . $request->arrival_time . ':00';
+            }
         }
 
         Schedule::create($data);
 
-        return redirect()->route('admin.schedules.index')->with('create_success', 'Jadwal berhasil dibuat.');
+        return redirect()->route('admin.schedules.index')->with('success', 'Jadwal berhasil dibuat.');
     }
 
     /**
@@ -102,8 +148,8 @@ class ScheduleController extends Controller
      */
     public function show(string $id)
     {
-        $schedule = Schedule::with(['bus', 'route', 'bookings'])->findOrFail($id);
-        return view('admin.schedules.show', compact('schedule'));
+        // For now, redirect to edit
+        return redirect()->route('admin.schedules.edit', $id);
     }
 
     /**
@@ -113,15 +159,29 @@ class ScheduleController extends Controller
     {
         $schedule = Schedule::findOrFail($id);
         
-        // Check if schedule has already departed
-        if ($schedule->hasDeparted()) {
-            return redirect()->route('admin.schedules.index')
-                ->with('warning', 'This schedule has already departed and cannot be edited. You can create a new schedule for tomorrow or delete this one.');
-        }
+        // Prepare additional data for editing generic/recurring schedules vs specific dated ones
+        $isRecurring = $schedule->schedule_type === 'daily_recurring';
         
-        $buses = Bus::all();
-        $routes = BusRoute::all();
-        return view('admin.schedules.edit', compact('schedule', 'buses', 'routes'));
+        $editData = [
+            'id' => $schedule->id,
+            'bus_id' => $schedule->bus_id,
+            'route_id' => $schedule->route_id,
+            'price' => $schedule->price,
+            'status' => $schedule->status,
+            'schedule_type' => $schedule->schedule_type,
+            'departure_time' => Carbon::parse($schedule->departure_time)->format('H:i'),
+            'arrival_time' => Carbon::parse($schedule->arrival_time)->format('H:i'),
+            'departure_date' => $isRecurring ? null : Carbon::parse($schedule->departure_time)->format('Y-m-d'),
+        ];
+        
+        $buses = Bus::where('status', 'active')->select('id', 'name', 'plate_number', 'bus_type', 'capacity')->get();
+        $routes = BusRoute::select('id', 'name', 'origin', 'destination', 'duration')->get();
+        
+        return Inertia::render('Admin/Schedules/Edit', [
+            'schedule' => $editData,
+            'buses' => $buses,
+            'routes' => $routes
+        ]);
     }
 
     /**
@@ -130,12 +190,6 @@ class ScheduleController extends Controller
     public function update(Request $request, string $id)
     {
         $schedule = Schedule::findOrFail($id);
-
-        // Check if schedule has already departed
-        if ($schedule->hasDeparted()) {
-            return redirect()->route('admin.schedules.index')
-                ->with('warning', 'This schedule has already departed and cannot be updated. You can create a new schedule for tomorrow or delete this one.');
-        }
 
         // Validasi dasar
         $rules = [
@@ -148,7 +202,6 @@ class ScheduleController extends Controller
             'schedule_type' => 'required|in:daily,daily_recurring',
         ];
 
-        // Tambahkan validasi tambahan berdasarkan jenis jadwal
         if ($request->schedule_type == 'daily') {
             $rules['departure_date'] = 'required|date';
         }
@@ -157,30 +210,28 @@ class ScheduleController extends Controller
 
         // Prepare data for update
         $data = $request->only([
-            'bus_id', 'route_id', 'departure_time', 'arrival_time', 'price', 'status'
+            'bus_id', 'route_id', 'price', 'status', 'schedule_type'
         ]);
 
-        // Handle departure date and time based on schedule type
         if ($request->schedule_type == 'daily_recurring') {
-            // For daily recurring schedules, we store only the time part
             $data['is_daily'] = true;
-            
-            // Using today as base date to show current relevant time
-            $baseDate = date('Y-m-d');
-            // Store times in WIB directly without converting to UTC
+            $baseDate = date('Y-m-d'); // Keep using today for time-only storage convention
             $data['departure_time'] = $baseDate . ' ' . $request->departure_time . ':00';
             $data['arrival_time'] = $baseDate . ' ' . $request->arrival_time . ':00';
         } else {
-            // For daily schedules, combine date and time
             $data['is_daily'] = false;
-            // Store datetime in WIB directly without converting to UTC
             $data['departure_time'] = $request->departure_date . ' ' . $request->departure_time . ':00';
             $data['arrival_time'] = $request->departure_date . ' ' . $request->arrival_time . ':00';
+            
+            if ($request->arrival_time < $request->departure_time) {
+                 $arrivalDate = Carbon::parse($request->departure_date)->addDay()->format('Y-m-d');
+                 $data['arrival_time'] = $arrivalDate . ' ' . $request->arrival_time . ':00';
+            }
         }
 
         $schedule->update($data);
 
-        return redirect()->route('admin.schedules.index')->with('update_success', 'Jadwal berhasil diperbarui.');
+        return redirect()->route('admin.schedules.index')->with('success', 'Jadwal berhasil diperbarui.');
     }
 
     /**
@@ -189,48 +240,8 @@ class ScheduleController extends Controller
     public function destroy(string $id)
     {
         $schedule = Schedule::findOrFail($id);
-        
-        // Check if schedule has already departed
-        if ($schedule->hasDeparted()) {
-            // For schedules that have departed, we can delete them
-            $schedule->delete();
-            return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal berhasil dihapus.');
-        } else {
-            // For schedules that haven't departed yet
-            $schedule->delete();
-            return redirect()->route('admin.schedules.index')->with('delete_success', 'Jadwal berhasil dihapus.');
-        }
-    }
-    
-    /**
-     * Create a new daily schedule for tomorrow based on an existing daily recurring schedule
-     */
-    public function createNextDaySchedule(string $id)
-    {
-        $schedule = Schedule::findOrFail($id);
-        
-        // Only allow this for daily recurring schedules
-        if (!$schedule->is_daily) {
-            return redirect()->route('admin.schedules.index')->with('error', 'Hanya jadwal harian berulang yang bisa digunakan untuk membuat jadwal hari berikutnya.');
-        }
-        
-        // For daily recurring schedules, we don't need to check if they've departed
-        // as they are available every day. Instead, we'll create a specific daily schedule
-        // for tomorrow based on this recurring schedule.
-        
-        // Create a new daily schedule for tomorrow
-        $tomorrow = Carbon::tomorrow('Asia/Jakarta');
-        
-        $newSchedule = new Schedule();
-        $newSchedule->bus_id = $schedule->bus_id;
-        $newSchedule->route_id = $schedule->route_id;
-        $newSchedule->departure_time = $tomorrow->format('Y-m-d') . ' ' . $schedule->departure_time->format('H:i:s');
-        $newSchedule->arrival_time = $tomorrow->format('Y-m-d') . ' ' . $schedule->arrival_time->format('H:i:s');
-        $newSchedule->price = $schedule->price;
-        $newSchedule->status = 'active';
-        $newSchedule->is_daily = false; // This is a specific daily schedule, not recurring
-        $newSchedule->save();
-        
-        return redirect()->route('admin.schedules.index')->with('create_success', 'Jadwal untuk hari besok berhasil dibuat.');
+        $schedule->delete();
+
+        return redirect()->route('admin.schedules.index')->with('success', 'Jadwal berhasil dihapus.');
     }
 }

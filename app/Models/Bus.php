@@ -36,4 +36,9 @@ class Bus extends Model implements HasMedia
     {
         return $this->belongsToMany(Conductor::class)->withTimestamps();
     }
+
+    public function getImageUrlAttribute()
+    {
+        return $this->getFirstMediaUrl('buses');
+    }
 }

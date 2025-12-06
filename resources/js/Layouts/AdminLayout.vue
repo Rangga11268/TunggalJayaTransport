@@ -50,8 +50,7 @@ const checkActiveRoutes = () => {
     if (
         route().current("admin.buses.*") ||
         route().current("admin.routes.*") ||
-        route().current("admin.schedules.*") ||
-        route().current("admin.schedule-management.*")
+        route().current("admin.schedules.*")
     ) {
         transportOpen.value = true;
     }
@@ -466,31 +465,6 @@ const closeError = () => {
                                         "
                                     ></span>
                                     Jadwal
-                                </span>
-                            </Link>
-                            <Link
-                                :href="route('admin.schedule-management.index')"
-                                :class="[
-                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
-                                    route().current(
-                                        'admin.schedule-management.*'
-                                    )
-                                        ? 'text-white font-bold'
-                                        : 'text-gray-500 hover:text-white',
-                                ]"
-                            >
-                                <span class="flex items-center gap-2">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full"
-                                        :class="
-                                            route().current(
-                                                'admin.schedule-management.*'
-                                            )
-                                                ? 'bg-brand-red'
-                                                : 'bg-gray-700'
-                                        "
-                                    ></span>
-                                    Papan Jadwal
                                 </span>
                             </Link>
                         </div>

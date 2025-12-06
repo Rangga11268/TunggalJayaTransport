@@ -5,16 +5,28 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Route as BusRoute;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class RouteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $routes = BusRoute::latest()->paginate(10);
-        return view('admin.routes.index', compact('routes'));
+        $routes = BusRoute::when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('origin', 'like', "%{$search}%")
+                      ->orWhere('destination', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Admin/Routes/Index', [
+            'routes' => $routes,
+            'filters' => $request->only(['search'])
+        ]);
     }
 
     /**
@@ -22,7 +34,7 @@ class RouteController extends Controller
      */
     public function create()
     {
-        return view('admin.routes.create');
+        return Inertia::render('Admin/Routes/Create');
     }
 
     /**
@@ -41,7 +53,7 @@ class RouteController extends Controller
 
         BusRoute::create($request->all());
 
-        return redirect()->route('admin.routes.index')->with('create_success', 'Rute berhasil dibuat.');
+        return redirect()->route('admin.routes.index')->with('success', 'Rute berhasil dibuat.');
     }
 
     /**
@@ -49,8 +61,8 @@ class RouteController extends Controller
      */
     public function show(string $id)
     {
-        $route = BusRoute::findOrFail($id);
-        return view('admin.routes.show', compact('route'));
+        // For now, redirect to edit as we don't have a dedicated show page yet
+        return redirect()->route('admin.routes.edit', $id);
     }
 
     /**
@@ -58,8 +70,8 @@ class RouteController extends Controller
      */
     public function edit(string $id)
     {
-        $route = BusRoute::findOrFail($id);
-        return view('admin.routes.edit', compact('route'));
+        $busRoute = BusRoute::findOrFail($id);
+        return Inertia::render('Admin/Routes/Edit', compact('busRoute'));
     }
 
     /**
@@ -80,7 +92,7 @@ class RouteController extends Controller
 
         $route->update($request->all());
 
-        return redirect()->route('admin.routes.index')->with('update_success', 'Rute berhasil diperbarui.');
+        return redirect()->route('admin.routes.index')->with('success', 'Rute berhasil diperbarui.');
     }
 
     /**
@@ -91,6 +103,6 @@ class RouteController extends Controller
         $route = BusRoute::findOrFail($id);
         $route->delete();
 
-        return redirect()->route('admin.routes.index')->with('delete_success', 'Rute berhasil dihapus.');
+        return redirect()->route('admin.routes.index')->with('success', 'Rute berhasil dihapus.');
     }
 }
