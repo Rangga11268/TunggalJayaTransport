@@ -27,6 +27,7 @@ class BookingController extends Controller
         $date = $request->get('date');
         $classes = $request->get('class') ? explode(',', $request->get('class')) : [];
         $times = $request->get('time') ? explode(',', $request->get('time')) : [];
+        $searchDate = $date ? Carbon::parse($date) : null;
 
         $schedules = collect();
         $validPair = false;
@@ -45,7 +46,6 @@ class BookingController extends Controller
                 $validPair = true;
                 // Get schedules for these routes that are available for booking
                 $routeIds = $validRoutes->pluck('id');
-                $searchDate = $date ? Carbon::parse($date) : null;
 
                 // Build query
                 $query = Schedule::whereIn('route_id', $routeIds)
@@ -107,8 +107,8 @@ class BookingController extends Controller
             
             $allSchedules = $query->get();
 
-            $schedules = $allSchedules->filter(function ($schedule) use ($classes, $times) {
-                if (!$schedule->isAvailableForBooking()) return false;
+            $schedules = $allSchedules->filter(function ($schedule) use ($classes, $times, $searchDate) {
+                if (!$schedule->isAvailableForBooking($searchDate)) return false;
 
                 // Class Filter
                 if (!empty($classes)) {

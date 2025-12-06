@@ -58,10 +58,10 @@ class ScheduleController extends Controller
                 'arrival_time' => $schedule->arrival_time,
                 'is_daily' => $schedule->is_daily,
                 // Add formatted fields for display
-                'formatted_departure' => Carbon::parse($schedule->departure_time)->format('d M Y H:i'),
-                'formatted_arrival' => Carbon::parse($schedule->arrival_time)->format('d M Y H:i'),
-                'time_only_departure' => Carbon::parse($schedule->departure_time)->format('H:i'),
-                'time_only_arrival' => Carbon::parse($schedule->arrival_time)->format('H:i'),
+                'formatted_departure' => $schedule->getActualDepartureTime()->format('d M Y H:i'),
+                'formatted_arrival' => $schedule->getActualArrivalTime()->format('d M Y H:i'),
+                'time_only_departure' => $schedule->getActualDepartureTime()->format('H:i'),
+                'time_only_arrival' => $schedule->getActualArrivalTime()->format('H:i'),
             ];
         });
         
