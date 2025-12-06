@@ -163,14 +163,61 @@ class ReportController extends Controller
     public function exportPdf(Request $request)
     {
         $this->validateReportRequest($request);
-        $data = $this->getReportData($request);
+        
+        // Re-build query to get raw items for the detailed PDF report
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $routeId = $request->input('route_id');
+        $busId = $request->input('bus_id');
+        
+        $start = Carbon::parse($startDate)->startOfDay();
+        $end = Carbon::parse($endDate)->endOfDay();
+
+        $query = Booking::whereBetween('created_at', [$start, $end])
+            ->with(['schedule.route', 'schedule.bus', 'user']);
+            
+        // For reports, we typically want finalized/paid bookings
+        $query->where('payment_status', 'paid');
+        
+        if ($routeId) {
+            $query->whereHas('schedule', function($q) use ($routeId) {
+                $q->where('route_id', $routeId);
+            });
+        }
+        
+        if ($busId) {
+            $query->whereHas('schedule', function($q) use ($busId) {
+                $q->where('bus_id', $busId);
+            });
+        }
+        
+        // Get all items
+        $items = $query->orderBy('created_at', 'desc')->get();
+        
+        // Calculate totals for the summary cards
+        $totalRevenue = $items->sum('total_price');
+        $totalBookings = $items->count();
+        $totalPassengers = $items->sum('number_of_seats');
+
+        // Logic for selected filters display
+        $selectedRouteObj = $routeId ? TransportRoute::find($routeId) : null;
+        $selectedBusObj = $busId ? Bus::find($busId) : null;
+        
+        $selectedRoute = $selectedRouteObj ? ($selectedRouteObj->origin . ' - ' . $selectedRouteObj->destination) : null;
+        $selectedBus = $selectedBusObj ? ($selectedBusObj->name . ' (' . $selectedBusObj->plate_number . ')') : null;
         
         $pdf = Pdf::loadView('admin.reports.pdf', [
-            'filters' => $request->all(),
-            'selectedRoute' => $data['selectedRoute'],
-            'selectedBus' => $data['selectedBus'], 
-            'reportData' => $data['reportData'],
-            'reportType' => $request->report_type
+            'items' => $items,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'routeId' => $routeId, // Passed for conditional checks in view
+            'busId' => $busId,     // Passed for conditional checks in view
+            'totalRevenue' => $totalRevenue,
+            'totalBookings' => $totalBookings,
+            'totalPassengers' => $totalPassengers,
+            'reportType' => $request->report_type,
+            'selectedRoute' => $selectedRoute,
+            'selectedBus' => $selectedBus
         ]);
         
         return $pdf->download('laporan_' . $request->report_type . '_' . now()->format('YmdHis') . '.pdf');
