@@ -45,15 +45,31 @@ const formatTime = (dateString) => {
 <template>
     <Head title="Riwayat Pemesanan" />
 
+    <!-- Clean Title Section -->
+    <div class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+        <span
+            class="inline-block px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-bold tracking-widest mb-6 animate-fade-in uppercase"
+        >
+            RIWAYAT PERJALANAN
+        </span>
+        <h1
+            class="text-4xl md:text-5xl lg:text-6xl font-black font-serif text-gray-900 dark:text-white mb-6 animate-fade-in-up"
+        >
+            Riwayat
+            <span
+                class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
+                >Pemesanan</span
+            >
+        </h1>
+        <p
+            class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-1"
+        >
+            Lihat semua riwayat perjalanan dan status tiket Anda bersama TUJAGO.
+        </p>
+    </div>
+
     <div class="bg-gray-50 dark:bg-gray-950 min-h-screen py-12">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1
-                class="text-3xl font-black text-gray-900 dark:text-white mb-8 flex items-center"
-            >
-                <i class="fas fa-history text-brand-red mr-4"></i>
-                Riwayat Pemesanan
-            </h1>
-
             <!-- Empty State -->
             <div
                 v-if="bookings.data.length === 0"

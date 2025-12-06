@@ -22,20 +22,32 @@ const formatDate = (dateString) => {
 <template>
     <Head title="Berita & Artikel" />
 
+    <!-- Clean Title Section -->
+    <div class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+        <span
+            class="inline-block px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-bold tracking-widest mb-6 animate-fade-in uppercase"
+        >
+            INFORMASI TERBARU
+        </span>
+        <h1
+            class="text-4xl md:text-5xl lg:text-6xl font-black font-serif text-gray-900 dark:text-white mb-6 animate-fade-in-up"
+        >
+            Berita &
+            <span
+                class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
+                >Artikel</span
+            >
+        </h1>
+        <p
+            class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-1"
+        >
+            Kumpulan informasi, tips perjalanan, dan berita terbaru dari TUJAGO.
+        </p>
+    </div>
+
+    <!-- Main Content -->
     <div class="bg-gray-50 dark:bg-gray-950 min-h-screen py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h1
-                    class="text-3xl font-black text-gray-900 dark:text-white sm:text-4xl mb-4"
-                >
-                    Berita & Artikel Terbaru
-                </h1>
-                <p class="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-                    Kumpulan informasi, tips perjalanan, dan berita terbaru dari
-                    TUJAGO.
-                </p>
-            </div>
-
             <!-- Categories -->
             <div class="flex flex-wrap justify-center gap-3 mb-10">
                 <Link
