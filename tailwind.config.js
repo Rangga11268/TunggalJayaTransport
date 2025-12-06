@@ -65,6 +65,25 @@ export default {
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
             },
+            keyframes: {
+                fadeIn: {
+                    "0%": { opacity: "0" },
+                    "100%": { opacity: "1" },
+                },
+                fadeInUp: {
+                    "0%": { opacity: "0", transform: "translateY(20px)" },
+                    "100%": { opacity: "1", transform: "translateY(0)" },
+                },
+                slowZoom: {
+                    "0%": { transform: "scale(1)" },
+                    "100%": { transform: "scale(1.05)" },
+                },
+            },
+            animation: {
+                "fade-in": "fadeIn 1s ease-out forwards",
+                "fade-in-up": "fadeInUp 0.8s ease-out forwards",
+                "slow-zoom": "slowZoom 20s ease-in-out infinite alternate",
+            },
         },
     },
 

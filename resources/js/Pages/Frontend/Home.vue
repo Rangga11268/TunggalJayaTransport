@@ -175,6 +175,22 @@ onMounted(() => {
     const statsSection = document.getElementById("stats-section");
     if (statsSection) observer.observe(statsSection);
 
+    // Generic Scroll Observer
+    const scrollObserver = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("active");
+                }
+            });
+        },
+        { threshold: 0.1 }
+    );
+
+    document.querySelectorAll(".scroll-reveal").forEach((el) => {
+        scrollObserver.observe(el);
+    });
+
     // Close dropdowns on outside click
     document.addEventListener("click", (e) => {
         if (!e.target.closest(".origin-input"))
@@ -194,15 +210,17 @@ const formatNumber = (num) => {
 
     <!-- Clean Title Section (Home Variant with Hero Image) -->
     <div
-        class="relative min-h-[60vh] flex items-center justify-center pt-32 pb-20"
+        class="relative min-h-screen flex items-center justify-center pt-52 pb-40 overflow-hidden"
     >
         <!-- Hero Background -->
         <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-black/60 z-10"></div>
+            <div
+                class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/80 z-10"
+            ></div>
             <img
                 src="/img/heroImg.jpg"
                 alt="Hero Background"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover scale-105 animate-slow-zoom"
             />
         </div>
 
@@ -210,73 +228,100 @@ const formatNumber = (num) => {
             class="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center"
         >
             <span
-                class="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 text-xs font-bold tracking-widest mb-6 animate-fade-in uppercase"
+                class="inline-block px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium tracking-[0.2em] text-xs mb-8 animate-fade-in uppercase shadow-lg"
             >
-                LAYANAN 24/7 TERSEDIA
+                PREMIUM BUS TRANSPORTATION
             </span>
             <h1
-                class="text-5xl md:text-6xl lg:text-7xl font-black font-serif text-white mb-8 animate-fade-in-up leading-tight drop-shadow-sm"
+                class="text-5xl md:text-7xl lg:text-8xl font-black font-serif text-white mb-8 animate-fade-in-up leading-tight drop-shadow-2xl tracking-tight"
             >
                 Elegansi dalam
                 <span
-                    class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
+                    class="block text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-red-500 to-orange-400"
                     >Setiap Perjalanan</span
                 >
             </h1>
             <p
-                class="text-xl text-gray-200 max-w-2xl mx-auto animate-fade-in-up stagger-1 mb-10 font-light"
+                class="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto animate-fade-in-up stagger-1 mb-12 font-light leading-relaxed"
             >
                 Nikmati pengalaman perjalanan bus terbaik dengan armada modern,
                 fasilitas lengkap, dan pelayanan profesional dari TUJAGO.
             </p>
 
-            <!-- CTA (Optional, kept minimal) -->
+            <!-- Search Button -->
             <div
                 class="flex flex-wrap justify-center gap-4 animate-fade-in-up stagger-2"
             >
                 <Link
                     :href="route('frontend.fleet.index')"
-                    class="px-8 py-3 rounded-full bg-brand-red text-white font-bold hover:bg-red-700 transition-all shadow-lg shadow-brand-red/30"
+                    class="btn-premium transform hover:scale-105 transition-all"
                 >
                     <i class="fas fa-bus mr-2"></i> Lihat Armada
+                </Link>
+                <Link
+                    :href="route('frontend.routes.index')"
+                    class="btn-secondary-premium transform hover:scale-105 transition-all"
+                >
+                    <i class="fas fa-map-marked-alt mr-2"></i> Rute Populer
                 </Link>
             </div>
         </div>
     </div>
 
+    <!-- Wave Divider 1 -->
+    <div class="relative -mt-24 z-10">
+        <svg
+            class="fill-white dark:fill-gray-900 w-full h-24 transform scale-y-50 origin-bottom"
+            viewBox="0 0 1440 320"
+        >
+            <path
+                fill-opacity="1"
+                d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
+        </svg>
+    </div>
+
     <!-- Booking Form Section -->
-    <section class="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+    <section
+        class="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 mb-32"
+    >
         <div
-            class="bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-10 shadow-xl border border-gray-100 dark:border-gray-700"
+            class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-[2rem] p-8 md:p-12 shadow-2xl shadow-black/20 border border-white/50 dark:border-gray-700"
         >
             <form
                 :action="route('frontend.booking.index')"
                 method="GET"
-                class="space-y-6"
+                class="space-y-8"
             >
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div
+                    class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center"
+                >
                     <!-- Origin -->
                     <div class="md:col-span-3 origin-input relative group">
-                        <label
-                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2"
-                        >
-                            Kota Asal
-                        </label>
-                        <div class="relative">
+                        <div class="relative z-0 w-full group">
                             <input
                                 v-model="origin"
                                 @input="filterOrigins"
                                 @focus="showOriginDropdown = true"
                                 name="origin"
                                 type="text"
-                                placeholder="Pilih kota asal..."
-                                class="input-premium pl-12 border-gray-200 focus:border-primary-500 focus:ring-primary-500"
+                                placeholder=" "
+                                class="block py-4 pl-12 pr-4 w-full text-base font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 rounded-xl border-none appearance-none focus:outline-none focus:ring-0 focus:bg-white dark:focus:bg-gray-950 focus:shadow-md transition-all peer"
                                 autocomplete="off"
                             />
-                            <i
-                                class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-primary-500 text-lg"
-                            ></i>
+                            <div
+                                class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-brand-red/10 flex items-center justify-center text-brand-red transition-all peer-focus:scale-90 peer-focus:bg-brand-red peer-focus:text-white"
+                            >
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <label
+                                for="origin"
+                                class="absolute text-sm font-medium text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-12 peer-focus:text-brand-red peer-focus:dark:text-brand-red peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 uppercase tracking-wider"
+                            >
+                                Kota Asal
+                            </label>
                         </div>
+
                         <!-- Dropdown -->
                         <transition
                             enter-active-class="transition duration-200 ease-out"
@@ -290,16 +335,16 @@ const formatNumber = (num) => {
                                 v-if="
                                     showOriginDropdown && filteredOrigins.length
                                 "
-                                class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 max-h-56 overflow-y-auto"
+                                class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 max-h-56 overflow-y-auto custom-scrollbar"
                             >
                                 <div
                                     v-for="item in filteredOrigins"
                                     :key="item"
                                     @click="selectOrigin(item)"
-                                    class="px-4 py-3 cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/30 text-gray-700 dark:text-gray-200 flex items-center gap-3 transition-colors"
+                                    class="px-4 py-3 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-200 flex items-center gap-3 transition-colors group"
                                 >
                                     <i
-                                        class="fas fa-location-dot text-primary-500"
+                                        class="fas fa-location-dot text-gray-300 group-hover:text-brand-red transition-colors"
                                     ></i>
                                     {{ item }}
                                 </div>
@@ -309,12 +354,12 @@ const formatNumber = (num) => {
 
                     <!-- Swap Button -->
                     <div
-                        class="hidden md:flex md:col-span-1 items-end justify-center pb-1"
+                        class="hidden md:flex md:col-span-1 items-end justify-center pb-2"
                     >
                         <button
                             type="button"
                             @click="swapLocations"
-                            class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-primary-100 hover:text-primary-600 dark:hover:bg-primary-900/30 dark:hover:text-primary-400 transition-colors flex items-center justify-center transform hover:rotate-180 duration-300"
+                            class="w-12 h-12 rounded-full bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-400 hover:text-brand-red hover:border-brand-red/30 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex items-center justify-center transform hover:rotate-180 duration-500 shadow-sm"
                         >
                             <i class="fas fa-exchange-alt"></i>
                         </button>
@@ -322,26 +367,30 @@ const formatNumber = (num) => {
 
                     <!-- Destination -->
                     <div class="md:col-span-3 destination-input relative group">
-                        <label
-                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2"
-                        >
-                            Kota Tujuan
-                        </label>
-                        <div class="relative">
+                        <div class="relative z-0 w-full group">
                             <input
                                 v-model="destination"
                                 @input="filterDestinations"
                                 @focus="showDestinationDropdown = true"
                                 name="destination"
                                 type="text"
-                                placeholder="Pilih kota tujuan..."
-                                class="input-premium pl-12 border-gray-200 focus:border-secondary-500 focus:ring-secondary-500"
+                                placeholder=" "
+                                class="block py-4 pl-12 pr-4 w-full text-base font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 rounded-xl border-none appearance-none focus:outline-none focus:ring-0 focus:bg-white dark:focus:bg-gray-950 focus:shadow-md transition-all peer"
                                 autocomplete="off"
                             />
-                            <i
-                                class="fas fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-secondary-500 text-lg"
-                            ></i>
+                            <div
+                                class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 transition-all peer-focus:scale-90 peer-focus:bg-orange-500 peer-focus:text-white"
+                            >
+                                <i class="fas fa-location-dot"></i>
+                            </div>
+                            <label
+                                for="destination"
+                                class="absolute text-sm font-medium text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-12 peer-focus:text-orange-500 peer-focus:dark:text-orange-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 uppercase tracking-wider"
+                            >
+                                Kota Tujuan
+                            </label>
                         </div>
+
                         <!-- Dropdown -->
                         <transition
                             enter-active-class="transition duration-200 ease-out"
@@ -356,16 +405,16 @@ const formatNumber = (num) => {
                                     showDestinationDropdown &&
                                     filteredDestinations.length
                                 "
-                                class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 max-h-56 overflow-y-auto"
+                                class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 max-h-56 overflow-y-auto custom-scrollbar"
                             >
                                 <div
                                     v-for="item in filteredDestinations"
                                     :key="item"
                                     @click="selectDestination(item)"
-                                    class="px-4 py-3 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900/30 text-gray-700 dark:text-gray-200 flex items-center gap-3 transition-colors"
+                                    class="px-4 py-3 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-900/20 text-gray-700 dark:text-gray-200 flex items-center gap-3 transition-colors group"
                                 >
                                     <i
-                                        class="fas fa-location-dot text-secondary-500"
+                                        class="fas fa-location-dot text-gray-300 group-hover:text-orange-500 transition-colors"
                                     ></i>
                                     {{ item }}
                                 </div>
@@ -373,39 +422,38 @@ const formatNumber = (num) => {
                         </transition>
                     </div>
 
-                    <!-- Date -->
-                    <div class="md:col-span-2">
-                        <label
-                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2"
-                        >
-                            Tanggal
-                        </label>
-                        <div class="relative">
+                    <!-- Date & Class (Grid Nested) -->
+                    <div class="md:col-span-4 grid grid-cols-2 gap-4">
+                        <!-- Date -->
+                        <div class="relative z-0 w-full group">
                             <input
                                 v-model="date"
                                 name="date"
                                 type="date"
                                 :min="today"
-                                class="input-premium pl-12 border-gray-200 focus:border-primary-500 focus:ring-primary-500"
+                                placeholder=" "
+                                class="block py-4 pl-12 pr-4 w-full text-base font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 rounded-xl border-none appearance-none focus:outline-none focus:ring-0 focus:bg-white dark:focus:bg-gray-950 focus:shadow-md transition-all peer"
                             />
-                            <i
-                                class="fas fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-primary-500 text-lg"
-                            ></i>
+                            <div
+                                class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 transition-all peer-focus:scale-90 peer-focus:bg-blue-500 peer-focus:text-white"
+                            >
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <label
+                                class="absolute text-sm font-medium text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-12 peer-focus:text-blue-500 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 uppercase tracking-wider"
+                            >
+                                Tanggal
+                            </label>
                         </div>
-                    </div>
 
-                    <!-- Bus Type -->
-                    <div class="md:col-span-2">
-                        <label
-                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2"
-                        >
-                            Kelas
-                        </label>
-                        <div class="relative">
+                        <!-- Bus Type -->
+                        <div class="relative z-0 w-full group">
                             <select
                                 v-model="busType"
                                 name="bus_type"
-                                class="input-premium pl-12 appearance-none cursor-pointer border-gray-200 focus:border-gold-500 focus:ring-gold-500"
+                                id="bus_type"
+                                class="block py-4 pl-12 pr-8 w-full text-base font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 rounded-xl border-none appearance-none focus:outline-none focus:ring-0 focus:bg-white dark:focus:bg-gray-950 focus:shadow-md transition-all peer cursor-pointer"
+                                placeholder=" "
                             >
                                 <option
                                     v-for="type in busTypes"
@@ -415,11 +463,19 @@ const formatNumber = (num) => {
                                     {{ type.name }}
                                 </option>
                             </select>
+                            <label
+                                for="bus_type"
+                                class="absolute text-sm font-medium text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-12 peer-focus:text-gold-500 peer-focus:dark:text-gold-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 uppercase tracking-wider"
+                            >
+                                Kelas Buss
+                            </label>
+                            <div
+                                class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-gold-500/10 flex items-center justify-center text-gold-500 transition-all peer-focus:scale-90 peer-focus:bg-gold-500 peer-focus:text-white"
+                            >
+                                <i class="fas fa-crown"></i>
+                            </div>
                             <i
                                 class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"
-                            ></i>
-                            <i
-                                class="fas fa-crown absolute left-4 top-1/2 -translate-y-1/2 text-gold-500 text-lg"
                             ></i>
                         </div>
                     </div>
@@ -428,9 +484,11 @@ const formatNumber = (num) => {
                     <div class="md:col-span-1 flex items-end">
                         <button
                             type="submit"
-                            class="w-full h-[50px] btn-premium rounded-xl shadow-lg hover:shadow-primary-500/30 flex items-center justify-center"
+                            class="w-full h-[56px] bg-brand-red hover:bg-red-700 text-white rounded-xl shadow-lg hover:shadow-brand-red/40 flex items-center justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 group"
                         >
-                            <i class="fas fa-search text-xl"></i>
+                            <i
+                                class="fas fa-search text-xl group-hover:rotate-90 transition-transform duration-300"
+                            ></i>
                         </button>
                     </div>
                 </div>
@@ -439,25 +497,38 @@ const formatNumber = (num) => {
     </section>
 
     <!-- Features Section -->
-    <section class="py-24 bg-gray-50 dark:bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="py-24 bg-gray-50 dark:bg-gray-900 overflow-hidden relative">
+        <!-- Scroll Reveal Content -->
+        <!-- Decorative blobs -->
+        <div
+            class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none"
+        >
+            <div
+                class="absolute -top-24 -left-24 w-96 h-96 bg-brand-red/5 rounded-full blur-3xl"
+            ></div>
+            <div
+                class="absolute top-1/2 -right-24 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl"
+            ></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-16">
                 <span
-                    class="inline-block px-4 py-2 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-sm font-bold mb-4 tracking-wide"
+                    class="inline-block px-4 py-2 rounded-full bg-brand-red/10 text-brand-red text-xs font-bold tracking-[0.2em] mb-4 uppercase"
                 >
                     FASILITAS UNGGULAN
                 </span>
                 <h2
-                    class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-800 dark:text-white mb-6 font-serif"
+                    class="text-3xl md:text-5xl font-black text-gray-800 dark:text-white mb-6 font-serif"
                 >
                     Kenapa Memilih
                     <span
-                        class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-secondary-600"
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
                         >TUJAGO?</span
                     >
                 </h2>
                 <p
-                    class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed"
+                    class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed font-light"
                 >
                     Kami berkomitmen memberikan layanan transportasi terbaik
                     dengan berbagai fasilitas premium untuk kenyamanan Anda.
@@ -468,27 +539,33 @@ const formatNumber = (num) => {
                 <div
                     v-for="(feature, index) in features"
                     :key="index"
-                    class="card-premium p-8 text-center group hover:bg-white dark:hover:bg-gray-800 relative overflow-hidden"
-                    :style="{ animationDelay: `${index * 0.1}s` }"
+                    class="scroll-reveal group bg-white dark:bg-gray-800 p-8 rounded-3xl transition-all duration-300 hover:shadow-2xl hover:shadow-brand-red/10 border border-transparent hover:border-gray-100 dark:hover:border-gray-700 relative overflow-hidden"
+                    :style="{
+                        animationDelay: `${index * 0.1}s`,
+                        transitionDelay: `${index * 0.1}s`,
+                    }"
                 >
                     <!-- Background blob on hover -->
                     <div
-                        class="absolute -top-10 -right-10 w-32 h-32 bg-primary-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"
+                        class="absolute -top-10 -right-10 w-32 h-32 bg-gray-50 dark:bg-gray-700 rounded-full blur-2xl group-hover:bg-brand-red/5 transition-colors duration-500"
                     ></div>
 
                     <div
-                        class="feature-icon-box mx-auto mb-6 shadow-lg text-white relative z-10"
+                        class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-300 relative z-10"
                         :class="feature.gradient"
                     >
-                        <i :class="feature.icon" class="text-2xl"></i>
+                        <i
+                            :class="feature.icon"
+                            class="text-2xl text-white"
+                        ></i>
                     </div>
                     <h3
-                        class="text-xl font-bold text-gray-800 dark:text-white mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors relative z-10 font-serif"
+                        class="text-xl font-bold text-gray-800 dark:text-white mb-3 group-hover:text-brand-red transition-colors relative z-10 font-serif"
                     >
                         {{ feature.title }}
                     </h3>
                     <p
-                        class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm relative z-10"
+                        class="text-gray-500 dark:text-gray-400 leading-relaxed text-sm relative z-10"
                     >
                         {{ feature.description }}
                     </p>
@@ -496,6 +573,19 @@ const formatNumber = (num) => {
             </div>
         </div>
     </section>
+
+    <!-- Wave Divider 2 -->
+    <div class="relative z-10 -mt-1 bg-gray-50 dark:bg-gray-900">
+        <svg
+            class="fill-white dark:fill-gray-950 w-full h-24 transform scale-y-50 origin-top rotate-180"
+            viewBox="0 0 1440 320"
+        >
+            <path
+                fill-opacity="1"
+                d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
+        </svg>
+    </div>
 
     <!-- Popular Routes Section -->
     <section class="py-24 bg-white dark:bg-gray-950 relative">
@@ -510,19 +600,19 @@ const formatNumber = (num) => {
             >
                 <div>
                     <span
-                        class="inline-block px-4 py-2 rounded-full bg-secondary-100 dark:bg-secondary-900/30 text-secondary-600 dark:text-secondary-400 text-sm font-bold mb-4 tracking-wide"
+                        class="inline-block px-4 py-2 rounded-full bg-brand-red/10 text-brand-red text-xs font-bold tracking-[0.2em] mb-4 uppercase"
                     >
                         RUTE TERPOPULER
                     </span>
                     <h2
-                        class="text-3xl md:text-4xl font-extrabold text-gray-800 dark:text-white font-serif"
+                        class="text-3xl md:text-5xl font-black text-gray-800 dark:text-white font-serif"
                     >
                         Jelajahi Destinasi Favorit
                     </h2>
                 </div>
                 <Link
                     :href="route('frontend.routes.index')"
-                    class="group inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-bold hover:text-primary-700 transition-colors"
+                    class="group inline-flex items-center gap-2 text-brand-red font-bold hover:text-red-700 transition-colors bg-red-50 px-6 py-3 rounded-full hover:bg-red-100"
                 >
                     Lihat Semua Rute
                     <i
@@ -533,85 +623,95 @@ const formatNumber = (num) => {
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div
-                    v-for="busRoute in featuredRoutes"
+                    v-for="(busRoute, index) in featuredRoutes"
                     :key="busRoute.id"
-                    class="card-premium group hover:border-primary-500/30"
+                    class="scroll-reveal bg-white dark:bg-gray-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group"
+                    :style="{ transitionDelay: `${index * 0.1}s` }"
                 >
-                    <div class="p-8">
-                        <div class="flex items-center justify-between mb-8">
-                            <div class="flex-1">
-                                <p
-                                    class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1"
-                                >
-                                    Dari
-                                </p>
-                                <p
-                                    class="font-bold text-gray-800 dark:text-white text-xl font-serif"
-                                >
-                                    {{ busRoute.origin }}
-                                </p>
-                            </div>
+                    <div
+                        class="flex items-center justify-between mb-8 relative"
+                    >
+                        <!-- Connecting Line -->
+                        <div
+                            class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 dark:bg-gray-800 -z-0"
+                        ></div>
 
-                            <div class="px-4">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300"
-                                >
-                                    <i class="fas fa-arrow-right"></i>
-                                </div>
-                            </div>
-
-                            <div class="flex-1 text-right">
-                                <p
-                                    class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1"
-                                >
-                                    Ke
-                                </p>
-                                <p
-                                    class="font-bold text-gray-800 dark:text-white text-xl font-serif"
-                                >
-                                    {{ busRoute.destination }}
-                                </p>
-                            </div>
+                        <div
+                            class="relative z-10 bg-white dark:bg-gray-900 pr-2"
+                        >
+                            <p
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1"
+                            >
+                                Dari
+                            </p>
+                            <p
+                                class="font-bold text-gray-800 dark:text-white text-xl font-serif"
+                            >
+                                {{ busRoute.origin }}
+                            </p>
                         </div>
 
                         <div
-                            class="flex items-center gap-6 py-4 border-t border-gray-100 dark:border-gray-700 mb-6"
+                            class="relative z-10 w-12 h-12 rounded-full bg-brand-red/5 flex items-center justify-center text-brand-red group-hover:bg-brand-red group-hover:text-white transition-all duration-300 shadow-sm"
                         >
-                            <div
-                                v-if="busRoute.distance"
-                                class="flex items-center gap-2 text-gray-500 dark:text-gray-400"
-                            >
-                                <i class="fas fa-road text-primary-500"></i>
-                                <span class="text-sm font-medium"
-                                    >{{ busRoute.distance }} km</span
-                                >
-                            </div>
-                            <div
-                                v-if="busRoute.duration"
-                                class="flex items-center gap-2 text-gray-500 dark:text-gray-400"
-                            >
-                                <i class="fas fa-clock text-secondary-500"></i>
-                                <span class="text-sm font-medium"
-                                    >{{
-                                        Math.round(busRoute.duration / 60)
-                                    }}
-                                    jam</span
-                                >
-                            </div>
+                            <i
+                                class="fas fa-arrow-right transform group-hover:rotate-45 transition-transform duration-300"
+                            ></i>
                         </div>
 
-                        <Link
-                            :href="
-                                route('frontend.booking.index', {
-                                    origin: busRoute.origin,
-                                    destination: busRoute.destination,
-                                })
-                            "
-                            class="block w-full text-center py-4 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold hover:bg-primary-600 dark:hover:bg-primary-500 dark:hover:text-white transition-all duration-300 shadow-lg hover:shadow-primary-500/30"
+                        <div
+                            class="relative z-10 bg-white dark:bg-gray-900 pl-2 text-right"
                         >
-                            Pesan Sekarang
-                        </Link>
+                            <p
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1"
+                            >
+                                Ke
+                            </p>
+                            <p
+                                class="font-bold text-gray-800 dark:text-white text-xl font-serif"
+                            >
+                                {{ busRoute.destination }}
+                            </p>
+                        </div>
                     </div>
+
+                    <div
+                        class="flex items-center gap-6 py-4 border-t border-gray-100 dark:border-gray-800 mb-6"
+                    >
+                        <div
+                            v-if="busRoute.distance"
+                            class="flex items-center gap-2 text-gray-500 dark:text-gray-400"
+                        >
+                            <i class="fas fa-road text-brand-red/70"></i>
+                            <span class="text-sm font-medium"
+                                >{{ busRoute.distance }} km</span
+                            >
+                        </div>
+                        <div
+                            v-if="busRoute.duration"
+                            class="flex items-center gap-2 text-gray-500 dark:text-gray-400"
+                        >
+                            <i class="fas fa-clock text-orange-500/70"></i>
+                            <span class="text-sm font-medium"
+                                >{{
+                                    Math.round(busRoute.duration / 60)
+                                }}
+                                jam</span
+                            >
+                        </div>
+                    </div>
+
+                    <Link
+                        :href="
+                            route('frontend.booking.index', {
+                                origin: busRoute.origin,
+                                destination: busRoute.destination,
+                            })
+                        "
+                        class="block w-full text-center py-4 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold hover:bg-brand-red dark:hover:bg-brand-red hover:shadow-lg hover:shadow-brand-red/30 transition-all duration-300"
+                    >
+                        Pesan Sekarang
+                    </Link>
                 </div>
             </div>
         </div>
@@ -620,49 +720,57 @@ const formatNumber = (num) => {
     <!-- Stats Section (Unified Background) -->
     <section
         id="stats-section"
-        class="py-20 relative bg-brand-red text-white overflow-hidden"
+        class="py-24 relative bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden"
     >
         <div
-            class="absolute inset-0 opacity-10 pattern-dots pointer-events-none"
+            class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"
         ></div>
+        <!-- Gradient blobs -->
+        <div
+            class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-red/20 rounded-full blur-[100px]"
+        ></div>
+        <div
+            class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[100px]"
+        ></div>
+
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div
-                class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center divide-y md:divide-y-0 md:divide-x divide-white/20"
+                class="scroll-reveal grid grid-cols-1 md:grid-cols-3 gap-12 text-center divide-y md:divide-y-0 md:divide-x divide-white/10"
             >
-                <div class="group p-4">
+                <div class="group p-8">
                     <div
-                        class="text-5xl md:text-6xl font-black mb-2 group-hover:scale-110 transition-transform duration-300"
+                        class="text-6xl md:text-7xl font-black mb-4 group-hover:scale-110 transition-transform duration-300 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500"
                     >
                         {{ displayFleetCount }}+
                     </div>
                     <p
-                        class="text-lg font-medium tracking-widest uppercase opacity-80"
+                        class="text-sm font-bold tracking-[0.3em] uppercase opacity-60 text-brand-red"
                     >
                         Armada Bus
                     </p>
                 </div>
 
-                <div class="group p-4">
+                <div class="group p-8">
                     <div
-                        class="text-5xl md:text-6xl font-black mb-2 group-hover:scale-110 transition-transform duration-300"
+                        class="text-6xl md:text-7xl font-black mb-4 group-hover:scale-110 transition-transform duration-300 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500"
                     >
                         {{ displayRouteCount }}+
                     </div>
                     <p
-                        class="text-lg font-medium tracking-widest uppercase opacity-80"
+                        class="text-sm font-bold tracking-[0.3em] uppercase opacity-60 text-brand-red"
                     >
                         Rute Perjalanan
                     </p>
                 </div>
 
-                <div class="group p-4">
+                <div class="group p-8">
                     <div
-                        class="text-5xl md:text-6xl font-black mb-2 group-hover:scale-110 transition-transform duration-300"
+                        class="text-6xl md:text-7xl font-black mb-4 group-hover:scale-110 transition-transform duration-300 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500"
                     >
                         {{ formatNumber(displayCustomerCount) }}+
                     </div>
                     <p
-                        class="text-lg font-medium tracking-widest uppercase opacity-80"
+                        class="text-sm font-bold tracking-[0.3em] uppercase opacity-60 text-brand-red"
                     >
                         Pelanggan Puas
                     </p>
@@ -676,12 +784,12 @@ const formatNumber = (num) => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <span
-                    class="inline-block px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-sm font-bold mb-4 tracking-wide"
+                    class="inline-block px-4 py-2 rounded-full bg-emerald-100/50 text-emerald-600 text-xs font-bold tracking-[0.2em] mb-4 uppercase"
                 >
                     ARMADA KAMI
                 </span>
                 <h2
-                    class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-800 dark:text-white mb-6 font-serif"
+                    class="text-3xl md:text-5xl font-black text-gray-800 dark:text-white mb-6 font-serif"
                 >
                     Kenyamanan
                     <span
@@ -690,7 +798,7 @@ const formatNumber = (num) => {
                     >
                 </h2>
                 <p
-                    class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg"
+                    class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg font-light"
                 >
                     Armada bus terbaru dengan standar keamanan dan kenyamanan
                     tertinggi.
@@ -701,7 +809,7 @@ const formatNumber = (num) => {
                 <div
                     v-for="bus in fleet"
                     :key="bus.id"
-                    class="card-premium overflow-hidden group"
+                    class="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden group shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
                 >
                     <div
                         class="h-64 bg-gray-200 dark:bg-gray-800 relative overflow-hidden"
@@ -724,29 +832,29 @@ const formatNumber = (num) => {
 
                         <!-- Overlay gradient -->
                         <div
-                            class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"
+                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80"
                         ></div>
 
                         <!-- Type Badge -->
                         <div class="absolute bottom-4 left-4">
                             <span
-                                class="px-3 py-1 rounded-lg bg-white/20 backdrop-blur-md text-white text-sm font-bold border border-white/20"
+                                class="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold border border-white/20 uppercase tracking-wider"
                             >
                                 {{ bus.bus_type }}
                             </span>
                         </div>
                     </div>
 
-                    <div class="p-6">
+                    <div class="p-8">
                         <h3
-                            class="text-xl font-bold text-gray-800 dark:text-white mb-4 font-serif"
+                            class="text-2xl font-bold text-gray-800 dark:text-white mb-4 font-serif group-hover:text-brand-red transition-colors"
                         >
                             {{ bus.name }}
                         </h3>
 
-                        <div class="flex flex-wrap gap-3 mb-6">
+                        <div class="flex flex-wrap gap-3 mb-8">
                             <span
-                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-medium"
+                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 text-xs font-bold uppercase tracking-wide"
                             >
                                 <img
                                     src="/img/car-seat.png"
@@ -756,7 +864,7 @@ const formatNumber = (num) => {
                                 {{ bus.capacity }} Kursi
                             </span>
                             <span
-                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-medium"
+                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 text-xs font-bold uppercase tracking-wide"
                             >
                                 <i class="fas fa-id-card text-gray-400"></i>
                                 {{ bus.plate_number }}
@@ -764,34 +872,43 @@ const formatNumber = (num) => {
                         </div>
 
                         <div
-                            class="pt-6 border-t border-gray-100 dark:border-gray-700"
+                            class="pt-6 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center"
                         >
                             <div
-                                class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400"
+                                class="flex items-center gap-4 text-gray-500 dark:text-gray-400"
                             >
-                                <span class="flex items-center gap-1.5">
-                                    <i
-                                        class="fas fa-snowflake text-sky-400"
-                                    ></i>
-                                    AC
-                                </span>
-                                <span class="flex items-center gap-1.5">
-                                    <i class="fas fa-wifi text-primary-400"></i>
-                                    WiFi
-                                </span>
-                                <span class="flex items-center gap-1.5">
-                                    <i class="fas fa-bolt text-gold-400"></i>
-                                    USB
-                                </span>
+                                <i
+                                    class="fas fa-snowflake hover:text-sky-400 transition-colors"
+                                    title="AC"
+                                ></i>
+                                <i
+                                    class="fas fa-wifi hover:text-primary-400 transition-colors"
+                                    title="WiFi"
+                                ></i>
+                                <i
+                                    class="fas fa-bolt hover:text-gold-400 transition-colors"
+                                    title="USB"
+                                ></i>
                             </div>
+
+                            <Link
+                                :href="route('frontend.fleet.index')"
+                                class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-brand-red hover:text-white transition-all transform hover:rotate-45"
+                            >
+                                <i class="fas fa-arrow-right"></i>
+                            </Link>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="text-center mt-16">
-                <Link :href="route('frontend.fleet.index')" class="btn-premium">
+                <Link
+                    :href="route('frontend.fleet.index')"
+                    class="inline-flex items-center px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-full shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-700 hover:border-brand-red transition-all"
+                >
                     Lihat Seluruh Armada
+                    <i class="fas fa-arrow-right ml-2 text-brand-red"></i>
                 </Link>
             </div>
         </div>
