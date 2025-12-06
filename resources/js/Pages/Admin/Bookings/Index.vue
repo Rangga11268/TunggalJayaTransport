@@ -261,8 +261,7 @@ const translateStatus = (status) => {
                                     >
                                         {{
                                             formatDate(
-                                                booking.schedule
-                                                    ?.departure_time,
+                                                booking.departure_time,
                                                 true
                                             )
                                         }}

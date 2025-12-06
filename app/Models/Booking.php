@@ -33,6 +33,25 @@ class Booking extends Model implements HasMedia
         'payment_started_at' => 'datetime',
     ];
 
+    protected $appends = ['departure_time'];
+
+    public function getDepartureTimeAttribute()
+    {
+        if (!$this->schedule) {
+            return null;
+        }
+
+        $timeString = $this->schedule->departure_time->format('H:i:s');
+        
+        // If booking_date exists, combine it with schedule time
+        if ($this->booking_date) {
+            return $this->booking_date->setTimeFromTimeString($timeString);
+        }
+
+        // Fallback to schedule's departure time (even if it's 2000)
+        return $this->schedule->departure_time;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
