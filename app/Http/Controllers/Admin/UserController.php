@@ -6,19 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $users = User::whereHas('roles', function($query) {
             $query->whereIn('name', ['admin', 'schedule_manager']);
-        })->with('roles')->latest()->paginate(10);
+        })
+        ->when($request->search, function ($query, $search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        })
+        ->with('roles')
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
         
-        return view('admin.users.index', compact('users'));
+        return Inertia::render('Admin/Users/Index', [
+            'users' => $users,
+            'filters' => $request->only(['search']),
+        ]);
     }
 
     /**
@@ -27,7 +41,9 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::whereIn('name', ['admin', 'schedule_manager'])->get();
-        return view('admin.users.create', compact('roles'));
+        return Inertia::render('Admin/Users/Create', [
+            'roles' => $roles
+        ]);
     }
 
     /**
@@ -55,7 +71,7 @@ class UserController extends Controller
             $user->syncRoles($roleIds);
         }
 
-        return redirect()->route('admin.users.index')->with('create_success', 'Pengguna berhasil dibuat.');
+        return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dibuat.');
     }
 
     /**
@@ -63,11 +79,11 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::whereHas('roles', function($query) {
-            $query->whereIn('name', ['admin', 'schedule_manager']);
-        })->with('roles')->findOrFail($id);
-        
-        return view('admin.users.show', compact('user'));
+        // We typically don't need a separate show page for users in this context, 
+        // usually edit is enough. But if needed, we can implement it.
+        // For now, redirect to edit or implementing a read-only view. 
+        // The Blade version had a show view. Let's redirect to Edit for simplicity or standard.
+         return redirect()->route('admin.users.edit', $id);
     }
 
     /**
@@ -77,10 +93,16 @@ class UserController extends Controller
     {
         $user = User::whereHas('roles', function($query) {
             $query->whereIn('name', ['admin', 'schedule_manager']);
-        })->findOrFail($id);
+        })->with('roles')->findOrFail($id);
         
         $roles = Role::whereIn('name', ['admin', 'schedule_manager'])->get();
-        return view('admin.users.edit', compact('user', 'roles'));
+        
+        return Inertia::render('Admin/Users/Edit', [
+            'user' => $user,
+            'roles' => $roles,
+            // Pass current role IDs for easy binding
+            'currentRoles' => $user->roles->pluck('id')->toArray() 
+        ]);
     }
 
     /**
@@ -103,7 +125,7 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         
-        if ($request->password) {
+        if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
         
@@ -114,10 +136,12 @@ class UserController extends Controller
             $roleIds = array_map('intval', $request->roles);
             $user->syncRoles($roleIds);
         } else {
+            // Be careful, this removes all roles if not sent. 
+            // In our Edit form we will ensure roles are sent.
             $user->syncRoles([]);
         }
 
-        return redirect()->route('admin.users.index')->with('update_success', 'Pengguna berhasil diperbarui.');
+        return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
 
     /**
@@ -136,6 +160,6 @@ class UserController extends Controller
         
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('delete_success', 'Pengguna berhasil dihapus.');
+        return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dihapus.');
     }
 }

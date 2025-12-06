@@ -10,6 +10,13 @@ class Conductor extends Model implements HasMedia
 {
     use InteractsWithMedia;
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->getFirstMediaUrl('conductors') ?: null;
+    }
+
     protected $fillable = [
         'name',
         'employee_id',

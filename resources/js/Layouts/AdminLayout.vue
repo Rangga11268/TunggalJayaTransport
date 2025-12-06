@@ -587,7 +587,7 @@ const closeError = () => {
                                                 : 'bg-gray-700'
                                         "
                                     ></span>
-                                    Pelanggan
+                                    Admin & Staff
                                 </span>
                             </Link>
                             <Link
