@@ -24,40 +24,34 @@ const submit = () => {
     <Head title="Hubungi Kami" />
 
     <div class="bg-gray-50 dark:bg-gray-950 min-h-screen font-sans">
-        <!-- Header Section -->
-        <div class="relative bg-white dark:bg-gray-900 pt-32 pb-20 px-6">
-            <div class="max-w-4xl mx-auto text-center relative z-10">
+        <!-- Clean Title Section -->
+        <div
+            class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center"
+        >
+            <span
+                class="inline-block px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-bold tracking-widest mb-6 animate-fade-in uppercase"
+            >
+                HUBUNGI KAMI
+            </span>
+            <h1
+                class="text-4xl md:text-5xl lg:text-6xl font-black font-serif text-gray-900 dark:text-white mb-6 animate-fade-in-up"
+            >
+                Hubungi
                 <span
-                    class="text-brand-red font-bold tracking-widest uppercase text-sm mb-4 block animate-fade-in-up"
-                    >24/7 Support</span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
+                    >Kami</span
                 >
-                <h1
-                    class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 leading-tight animate-fade-in-up stagger-1"
-                >
-                    Kami Siap<br />
-                    <span
-                        class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
-                        >Mendengar Anda.</span
-                    >
-                </h1>
-                <p
-                    class="text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-2"
-                >
-                    Apapun pertanyaan atau kebutuhan perjalanan Anda, tim
-                    profesional kami siap membantu kapan saja.
-                </p>
-            </div>
-
-            <!-- Background Decorative Blob -->
-            <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-tr from-blue-100 to-indigo-100 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-full blur-[100px] -z-0"
-            ></div>
+            </h1>
+            <p
+                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-1"
+            >
+                Kami siap membantu Anda. Hubungi kami untuk pertanyaan, kritik,
+                atau saran.
+            </p>
         </div>
 
         <!-- Main Content: Split Layout -->
-        <div
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 -mt-10 relative z-20"
-        >
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-20">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                 <!-- Left: Contact Info & Map (Visual) -->
                 <div class="space-y-8">

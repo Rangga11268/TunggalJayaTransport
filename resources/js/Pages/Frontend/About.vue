@@ -41,58 +41,38 @@ const faqs = [
     <div
         class="font-sans antialiased text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-950 overflow-x-hidden"
     >
-        <!-- Hero Section: Immersive & Clean -->
-        <div class="relative h-[70vh] min-h-[500px] flex items-center">
-            <!-- Background Image with Parallax-like fix -->
-            <div class="absolute inset-0 z-0">
-                <div
-                    class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10"
-                ></div>
-                <img
-                    src="/img/heroImg.jpg"
-                    alt="Luxury Bus"
-                    class="w-full h-full object-cover"
-                />
-            </div>
-
-            <div class="container mx-auto px-6 relative z-20">
-                <div class="max-w-3xl animate-fade-in-up">
-                    <span
-                        class="text-brand-red font-bold tracking-[0.2em] uppercase mb-4 block"
-                        >Sejak 1973</span
-                    >
-                    <h1
-                        class="text-5xl md:text-7xl font-black text-white leading-tight mb-8"
-                    >
-                        Perjalanan
-                        <span
-                            class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-rose-600"
-                            >Legendaris</span
-                        ><br />
-                        Melintasi Waktu.
-                    </h1>
-                    <p
-                        class="text-xl text-gray-300 leading-relaxed max-w-2xl mb-10 border-l-4 border-brand-red pl-6"
-                    >
-                        Dari sepeda penjual ubi hingga menjadi raja jalanan
-                        Sumatera. Sebuah kisah tentang mimpi, kerja keras, dan
-                        dedikasi melayani negeri.
-                    </p>
-                    <a
-                        href="#history"
-                        class="group inline-flex items-center text-white font-semibold tracking-wide border-b border-transparent hover:border-brand-red transition-all"
-                    >
-                        Telusuri Sejarah Kami
-                        <i
-                            class="fas fa-arrow-down ml-3 group-hover:translate-y-1 transition-transform"
-                        ></i>
-                    </a>
-                </div>
-            </div>
+        <!-- Clean Title Section -->
+        <div
+            class="pt-24 pb-0 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center"
+        >
+            <span
+                class="inline-block px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-bold tracking-widest mb-6 animate-fade-in uppercase"
+            >
+                SEJAK 1973
+            </span>
+            <h1
+                class="text-4xl md:text-5xl lg:text-6xl font-black font-serif text-gray-900 dark:text-white mb-6 animate-fade-in-up"
+            >
+                Tentang
+                <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
+                    >Kami</span
+                >
+            </h1>
+            <p
+                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-1"
+            >
+                Dari sepeda penjual ubi hingga menjadi raja jalanan Sumatera.
+                Sebuah kisah tentang mimpi, kerja keras, dan dedikasi melayani
+                negeri.
+            </p>
         </div>
 
         <!-- The Legacy Section (History) -->
-        <div id="history" class="py-24 relative bg-white dark:bg-gray-950">
+        <div
+            id="history"
+            class="pt-16 pb-24 relative bg-white dark:bg-gray-950"
+        >
             <!-- Decorative "1973" watermark -->
             <div
                 class="absolute top-0 right-0 text-[15rem] font-black text-gray-50 dark:text-gray-900/50 leading-none select-none z-0 pointer-events-none opacity-50 overflow-hidden"
