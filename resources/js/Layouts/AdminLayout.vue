@@ -20,6 +20,17 @@ const contentOpen = ref(false);
 const transportOpen = ref(false);
 const usersOpen = ref(false);
 const userDropdownOpen = ref(false);
+const notificationDropdownOpen = ref(false);
+
+const markAsRead = (id) => {
+    router.post(
+        route("admin.notifications.markAsRead", id),
+        {},
+        {
+            preserveScroll: true,
+        }
+    );
+};
 
 // Initialize dropdowns based on current route
 onMounted(() => {
@@ -823,16 +834,177 @@ const closeError = () => {
                     </button>
 
                     <!-- Notifications -->
-                    <button
-                        class="relative p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors group"
-                    >
-                        <i
-                            class="far fa-bell text-xl group-hover:animate-swing"
-                        ></i>
-                        <span
-                            class="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-950 animate-bounce"
-                        ></span>
-                    </button>
+                    <div class="relative">
+                        <button
+                            @click="
+                                notificationDropdownOpen =
+                                    !notificationDropdownOpen
+                            "
+                            class="relative p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors group"
+                        >
+                            <i
+                                class="far fa-bell text-xl group-hover:animate-swing"
+                            ></i>
+                            <span
+                                v-if="
+                                    $page.props.auth
+                                        .unread_notifications_count > 0
+                                "
+                                class="absolute top-2 right-2 h-4 w-4 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center ring-2 ring-white dark:ring-gray-950 animate-bounce font-bold"
+                            >
+                                {{
+                                    $page.props.auth.unread_notifications_count
+                                }}
+                            </span>
+                        </button>
+
+                        <!-- Notification Dropdown -->
+                        <div
+                            v-if="notificationDropdownOpen"
+                            class="absolute right-0 mt-4 w-80 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-black/50 border border-gray-100 dark:border-gray-800 py-2 z-50 transform origin-top-right transition-all animate-fade-in-up"
+                        >
+                            <div
+                                class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
+                            >
+                                <h3
+                                    class="font-bold text-gray-900 dark:text-white"
+                                >
+                                    Notifikasi
+                                </h3>
+                                <Link
+                                    v-if="
+                                        $page.props.auth
+                                            .unread_notifications_count > 0
+                                    "
+                                    :href="
+                                        route('admin.notifications.markAllRead')
+                                    "
+                                    method="post"
+                                    as="button"
+                                    class="text-xs text-brand-red hover:text-red-700 font-medium"
+                                >
+                                    Tandai semua dibaca
+                                </Link>
+                            </div>
+
+                            <div
+                                class="max-h-80 overflow-y-auto custom-scrollbar"
+                            >
+                                <template
+                                    v-if="
+                                        $page.props.auth.notifications &&
+                                        $page.props.auth.notifications.length >
+                                            0
+                                    "
+                                >
+                                    <div
+                                        v-for="notification in $page.props.auth
+                                            .notifications"
+                                        :key="notification.id"
+                                        class="p-4 border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors relative"
+                                        :class="
+                                            !notification.read_at
+                                                ? 'bg-red-50/50 dark:bg-red-900/10'
+                                                : ''
+                                        "
+                                    >
+                                        <div class="flex gap-3">
+                                            <div class="flex-shrink-0 mt-1">
+                                                <div
+                                                    class="w-8 h-8 rounded-full bg-brand-red/10 text-brand-red flex items-center justify-center"
+                                                >
+                                                    <i
+                                                        class="fas fa-ticket-alt text-xs"
+                                                    ></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p
+                                                    class="text-sm font-medium text-gray-900 dark:text-white truncate"
+                                                >
+                                                    {{
+                                                        notification.data
+                                                            .message
+                                                    }}
+                                                </p>
+                                                <p
+                                                    class="text-xs text-gray-500 mt-0.5"
+                                                >
+                                                    {{
+                                                        notification.data.route
+                                                    }}
+                                                </p>
+                                                <p
+                                                    class="text-[10px] text-gray-400 mt-1"
+                                                >
+                                                    {{
+                                                        new Date(
+                                                            notification.created_at
+                                                        ).toLocaleString(
+                                                            "id-ID",
+                                                            {
+                                                                day: "numeric",
+                                                                month: "short",
+                                                                hour: "2-digit",
+                                                                minute: "2-digit",
+                                                            }
+                                                        )
+                                                    }}
+                                                </p>
+                                            </div>
+                                            <div
+                                                v-if="!notification.read_at"
+                                                class="flex-shrink-0"
+                                            >
+                                                <span
+                                                    class="w-2 h-2 bg-brand-red rounded-full block mt-2"
+                                                ></span>
+                                            </div>
+                                        </div>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'admin.bookings.show',
+                                                    notification.data.booking_id
+                                                )
+                                            "
+                                            @click="markAsRead(notification.id)"
+                                            class="absolute inset-0 z-10"
+                                        ></Link>
+                                    </div>
+                                </template>
+                                <div
+                                    v-else
+                                    class="p-8 text-center text-gray-500"
+                                >
+                                    <i
+                                        class="far fa-bell-slash text-2xl mb-2 opacity-50"
+                                    ></i>
+                                    <p class="text-xs">
+                                        Tidak ada notifikasi baru
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="p-2 border-t border-gray-100 dark:border-gray-800 text-center"
+                            >
+                                <Link
+                                    :href="route('admin.notifications.index')"
+                                    class="text-xs text-gray-500 hover:text-brand-red font-medium transition-colors"
+                                >
+                                    Lihat Semua Notifikasi
+                                </Link>
+                            </div>
+                        </div>
+
+                        <!-- Click Outside -->
+                        <div
+                            v-if="notificationDropdownOpen"
+                            class="fixed inset-0 z-40"
+                            @click="notificationDropdownOpen = false"
+                        ></div>
+                    </div>
 
                     <!-- View Website -->
                     <Link

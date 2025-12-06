@@ -14,13 +14,31 @@ use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ConductorController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ScheduleManagementController;
+use App\Http\Controllers\Admin\NotificationController;
 
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule_manager'])->group(function () {
+    // Notification Routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Test route for role verification
     Route::get('/test-roles', [DashboardController::class, 'testRoles'])->name('test-roles');
+
+    // Test Notification Route
+    Route::get('/test-notification', function () {
+        $booking = \App\Models\Booking::with(['user', 'schedule.route'])->latest()->first();
+        if (!$booking) {
+            return redirect()->back()->with('error', 'Belum ada data booking. Silakan buat booking baru di frontend terlebih dahulu.');
+        }
+        
+        \Illuminate\Support\Facades\Notification::send(auth()->user(), new \App\Notifications\NewBookingNotification($booking));
+        
+        return redirect()->back()->with('success', 'Notifikasi test berhasil dikirim! Silakan cek lonceng.');
+    })->name('test-notification');
 
     // Bus Management (schedule managers can manage buses)
     Route::resource('buses', BusController::class)->middleware('role:admin,schedule_manager');

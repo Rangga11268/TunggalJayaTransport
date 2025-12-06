@@ -43,7 +43,10 @@ class HandleInertiaRequests extends Middleware
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
                     'role' => $request->user()->role,
+                    'avatar' => $request->user()->avatar, // Ensure avatar is shared if needed
                 ] : null,
+                'notifications' => $request->user() ? $request->user()->notifications()->latest()->take(5)->get() : [],
+                'unread_notifications_count' => $request->user() ? $request->user()->unreadNotifications()->count() : 0,
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),

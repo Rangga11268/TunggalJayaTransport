@@ -430,6 +430,10 @@ class BookingController extends Controller
         $booking->startPayment(); // Start payment timer
         $booking->save();
 
+        // Send notification to admins
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewBookingNotification($booking));
+
         // Redirect to confirmation page with booking details
         return redirect()->route('frontend.booking.confirmation', ['booking' => $booking->id]);
     }
