@@ -17,7 +17,7 @@ use App\Http\Controllers\Admin\ScheduleManagementController;
 use App\Http\Controllers\Admin\NotificationController;
 
 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule_manager'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,schedule_manager', 'phone.verified'])->group(function () {
     // Notification Routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');

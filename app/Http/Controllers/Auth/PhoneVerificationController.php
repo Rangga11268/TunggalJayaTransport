@@ -8,7 +8,8 @@ use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class PhoneVerificationController extends Controller
 {
@@ -19,7 +20,7 @@ class PhoneVerificationController extends Controller
         $this->otpService = $otpService;
     }
 
-    public function show(): View
+    public function show(): \Inertia\Response
     {
         $user = Auth::user();
         
@@ -34,25 +35,36 @@ class PhoneVerificationController extends Controller
             $debugOtp = $this->otpService->getDebugOtp();
         }
 
-        return view('auth.verify-phone', compact('debugOtp'));
+        return Inertia::render('Auth/VerifyPhone', [
+            'debugOtp' => $debugOtp,
+            'status' => session('status'),
+        ]);
     }
 
     public function sendOtp(Request $request): RedirectResponse
     {
         $request->validate([
-            'phone' => 'required|string'
+            'phone' => 'nullable|string',
+            'method' => 'required|in:whatsapp,email'
         ]);
 
-        $phone = $request->phone;
-        
-        // Update phone user
         $user = Auth::user();
-        $user->update(['phone' => $phone]);
+        if ($request->phone) {
+            $user->update(['phone' => $request->phone]);
+        }
         
+        $method = $request->method;
+        $identifier = $method === 'email' ? $user->email : $user->phone;
+
+        if (!$identifier) {
+             return redirect()->back()->withErrors(['phone' => 'Kontak tujuan tidak ditemukan.']);
+        }
+
         // Generate OTP
-        $this->otpService->generate($phone);
+        $this->otpService->generate($identifier, $method);
         
-        return redirect()->back()->with('status', 'Kode OTP telah dikirim ke nomor anda.');
+        $destination = $method === 'email' ? 'email' : 'nomor WhatsApp';
+        return redirect()->back()->with('status', "Kode OTP telah dikirim ke $destination anda.");
     }
 
     public function verifyOtp(Request $request): RedirectResponse
@@ -63,16 +75,18 @@ class PhoneVerificationController extends Controller
 
         $user = Auth::user();
         
-        if (!$user->phone) {
-            return redirect()->back()->withErrors(['phone' => 'Nomor telepon belum diatur.']);
+        // Try verifying with phone
+        $isValid = false;
+        if ($user->phone && $this->otpService->verify($user->phone, $request->otp)) {
+            $isValid = true;
+        } elseif ($user->email && $this->otpService->verify($user->email, $request->otp)) {
+            $isValid = true;
         }
-
-        $isValid = $this->otpService->verify($user->phone, $request->otp);
 
         if ($isValid) {
             // Update status verifikasi
             $user->update([
-                'phone_verified_at' => now(),
+                'phone_verified_at' => now(), // Still use this column for "verified status"
                 'is_verified' => true
             ]);
             
@@ -87,19 +101,25 @@ class PhoneVerificationController extends Controller
             }
         }
 
-        return redirect()->back()->withErrors(['otp' => 'Kode OTP tidak valid.']);
+        return redirect()->back()->withErrors(['otp' => 'Kode OTP tidak valid atau kadaluarsa.']);
     }
 
-    public function resendOtp(): RedirectResponse
+    public function resendOtp(Request $request): RedirectResponse
     {
         $user = Auth::user();
         
-        if (!$user->phone) {
-            return redirect()->back()->withErrors(['phone' => 'Nomor telepon belum diatur.']);
+        // Default to phone if not specified, or support method in request
+        $method = $request->input('method', 'whatsapp');
+        
+        $identifier = $method === 'email' ? $user->email : $user->phone;
+
+        if (!$identifier) {
+             return redirect()->back()->withErrors(['phone' => 'Kontak tujuan tidak ditemukan.']);
         }
         
-        $this->otpService->generate($user->phone);
+        $this->otpService->generate($identifier, $method);
         
-        return redirect()->back()->with('status', 'Kode OTP baru telah dikirim.');
+        $destination = $method === 'email' ? 'email' : 'nomor WhatsApp';
+        return redirect()->back()->with('status', "Kode OTP baru telah dikirim ke $destination.");
     }
 }

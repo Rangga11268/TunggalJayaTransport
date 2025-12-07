@@ -75,11 +75,6 @@ const submit = () => {
                             class="w-full h-full object-contain"
                         />
                     </div>
-                    <h2
-                        class="text-2xl font-bold text-gray-900 dark:text-white"
-                    >
-                        Buat Akun Baru
-                    </h2>
                 </div>
 
                 <div class="text-center lg:text-left">

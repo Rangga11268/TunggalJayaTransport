@@ -16,9 +16,9 @@ Route::prefix('')->name('frontend.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\BookingController::class, 'index'])->name('booking.index');
         Route::get('/schedules', [App\Http\Controllers\Frontend\BookingController::class, 'schedules'])->name('booking.schedules');
         Route::get('/{id}', [App\Http\Controllers\Frontend\BookingController::class, 'show'])->name('booking.show');
-        Route::post('/', [App\Http\Controllers\Frontend\BookingController::class, 'store'])->middleware('auth')->name('booking.store');
-        Route::post('/select-seats', [App\Http\Controllers\Frontend\BookingController::class, 'selectSeats'])->middleware('auth')->name('booking.select-seats');
-        Route::post('/process-payment', [App\Http\Controllers\Frontend\BookingController::class, 'processPayment'])->middleware('auth')->name('booking.process-payment');
+        Route::post('/', [App\Http\Controllers\Frontend\BookingController::class, 'store'])->middleware(['auth', 'phone.verified'])->name('booking.store');
+        Route::post('/select-seats', [App\Http\Controllers\Frontend\BookingController::class, 'selectSeats'])->middleware(['auth', 'phone.verified'])->name('booking.select-seats');
+        Route::post('/process-payment', [App\Http\Controllers\Frontend\BookingController::class, 'processPayment'])->middleware(['auth', 'phone.verified'])->name('booking.process-payment');
         Route::post('/check-availability', [App\Http\Controllers\Frontend\BookingController::class, 'checkAvailability'])->name('check-availability');
 
         Route::get('/confirmation/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'confirmation'])->name('booking.confirmation');
@@ -53,9 +53,9 @@ Route::prefix('')->name('frontend.')->group(function () {
 
 Route::get('/dashboard', function () {
     return redirect()->route('admin.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'phone.verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'phone.verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

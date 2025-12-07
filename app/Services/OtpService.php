@@ -2,62 +2,89 @@
 
 namespace App\Services;
 
-use App\Models\OtpCode;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OtpMail;
 
 class OtpService
 {
     public const OTP_LENGTH = 6;
     public const OTP_EXPIRY_MINUTES = 10;
+    public const MAX_ATTEMPTS = 3;
 
-    public function generate(string $phone): string
+    public function generate(string $identifier, string $method = 'whatsapp'): string
     {
-        // Hapus OTP lama yang belum digunakan
-        $this->deleteUnusedOtp($phone);
-
+        // Check rate limiting / existing otp (Optional, simple override here)
+        
         // Generate OTP baru
         $otp = $this->createOtpString();
         
-        // Simpan ke database
-        OtpCode::create([
-            'phone' => $phone,
+        // Simpan ke Cache
+        $cacheKey = "otp_verification:{$identifier}";
+        Cache::put($cacheKey, [
             'otp' => $otp,
-            'expires_at' => Carbon::now()->addMinutes(self::OTP_EXPIRY_MINUTES),
-        ]);
+            'attempts' => 0
+        ], now()->addMinutes(self::OTP_EXPIRY_MINUTES));
 
         // Simpan OTP ke session untuk keperluan development/testing
         if (app()->environment('local', 'development', 'testing')) {
             Session::put('debug_otp', $otp);
-            Session::put('debug_phone', $phone);
+            Session::put('debug_identifier', $identifier);
         }
 
-        // Simulasikan pengiriman SMS
-        // Di implementasi nyata, tambahkan integrasi SMS gateway di sini
-        Log::info("OTP $otp dikirim ke nomor $phone");
+        if ($method === 'email') {
+            $this->sendViaEmail($identifier, $otp);
+        } else {
+            // WhatsApp / SMS
+            $this->sendViaWhatsapp($identifier, $otp);
+        }
         
         return $otp;
     }
 
-    public function verify(string $phone, string $otp): bool
+    public function verify(string $identifier, string $otp): bool
     {
-        $otpRecord = OtpCode::where('phone', $phone)
-            ->where('otp', $otp)
-            ->first();
+        $cacheKey = "otp_verification:{$identifier}";
+        $data = Cache::get($cacheKey);
 
-        if (!$otpRecord) {
+        if (!$data) {
+            return false; 
+        }
+
+        if ($data['otp'] !== $otp) {
+            // Increment attempts
+            $data['attempts']++;
+            if ($data['attempts'] >= self::MAX_ATTEMPTS) {
+                Cache::forget($cacheKey);
+            } else {
+                Cache::put($cacheKey, $data, now()->addMinutes(self::OTP_EXPIRY_MINUTES));
+            }
             return false;
         }
 
-        if (!$otpRecord->isUsable()) {
-            return false;
-        }
-
-        // Tandai OTP sebagai sudah digunakan
-        $otpRecord->update(['used' => true]);
-
+        // Valid, clear cache
+        Cache::forget($cacheKey);
+        
         return true;
+    }
+
+    private function sendViaEmail(string $email, string $otp): void
+    {
+        try {
+            Mail::to($email)->send(new OtpMail($otp));
+            Log::info("OTP $otp sent to email $email");
+        } catch (\Exception $e) {
+            Log::error("Failed to send OTP email: " . $e->getMessage());
+        }
+    }
+
+    private function sendViaWhatsapp(string $phone, string $otp): void
+    {
+        // Simulasikan pengiriman SMS/WA
+        // Di implementasi nyata, tambahkan integrasi SMS gateway di sini
+        Log::info("OTP $otp dikirim ke nomor $phone");
     }
 
     public function getDebugOtp(): ?string
@@ -71,20 +98,12 @@ class OtpService
     public function clearDebugOtp(): void
     {
         if (app()->environment('local', 'development', 'testing')) {
-            Session::forget(['debug_otp', 'debug_phone']);
+            Session::forget(['debug_otp', 'debug_identifier']);
         }
     }
 
     private function createOtpString(): string
     {
         return str_pad(random_int(0, pow(10, self::OTP_LENGTH) - 1), self::OTP_LENGTH, '0', STR_PAD_LEFT);
-    }
-
-    private function deleteUnusedOtp(string $phone): void
-    {
-        OtpCode::where('phone', $phone)
-            ->where('used', false)
-            ->where('expires_at', '>', Carbon::now())
-            ->delete();
     }
 }
