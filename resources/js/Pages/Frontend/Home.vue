@@ -717,63 +717,83 @@ const formatNumber = (num) => {
         </div>
     </section>
 
-    <!-- Stats Section (Unified Background) -->
+    <!-- Stats Section (Redesigned) -->
     <section
         id="stats-section"
-        class="py-24 relative bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden"
+        class="py-24 relative bg-gray-900 overflow-hidden"
     >
+        <!-- Background Elements -->
+        <div class="absolute inset-0 bg-[#0B0F19]"></div>
         <div
-            class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"
-        ></div>
-        <!-- Gradient blobs -->
-        <div
-            class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-red/20 rounded-full blur-[100px]"
+            class="absolute top-0 left-1/4 w-96 h-96 bg-brand-red/10 rounded-full blur-[128px]"
         ></div>
         <div
-            class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[100px]"
+            class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[128px]"
         ></div>
 
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div
-                class="scroll-reveal grid grid-cols-1 md:grid-cols-3 gap-12 text-center divide-y md:divide-y-0 md:divide-x divide-white/10"
-            >
-                <div class="group p-8">
-                    <div
-                        class="text-6xl md:text-7xl font-black mb-4 group-hover:scale-110 transition-transform duration-300 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500"
-                    >
-                        {{ displayFleetCount }}+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Fleet Card -->
+                <div
+                    class="scroll-reveal group relative p-10 rounded-[2.5rem] bg-white/5 backdrop-blur-sm border border-white/5 overflow-hidden hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-red/10"
+                >
+                    <i
+                        class="fas fa-bus absolute -right-6 -bottom-6 text-[10rem] text-white/[0.03] group-hover:scale-110 group-hover:rotate-12 transition-transform duration-700 ease-out"
+                    ></i>
+                    <div class="relative z-10 text-center">
+                        <div
+                            class="text-6xl md:text-8xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-gray-500 tracking-tight"
+                        >
+                            {{ displayFleetCount }}+
+                        </div>
+                        <p
+                            class="text-sm font-bold tracking-[0.3em] uppercase text-brand-red"
+                        >
+                            Armada Bus
+                        </p>
                     </div>
-                    <p
-                        class="text-sm font-bold tracking-[0.3em] uppercase opacity-60 text-brand-red"
-                    >
-                        Armada Bus
-                    </p>
                 </div>
 
-                <div class="group p-8">
-                    <div
-                        class="text-6xl md:text-7xl font-black mb-4 group-hover:scale-110 transition-transform duration-300 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500"
-                    >
-                        {{ displayRouteCount }}+
+                <!-- Route Card -->
+                <div
+                    class="scroll-reveal group relative p-10 rounded-[2.5rem] bg-white/5 backdrop-blur-sm border border-white/5 overflow-hidden hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/10 delay-100"
+                >
+                    <i
+                        class="fas fa-map-marked-alt absolute -right-6 -bottom-6 text-[10rem] text-white/[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-700 ease-out"
+                    ></i>
+                    <div class="relative z-10 text-center">
+                        <div
+                            class="text-6xl md:text-8xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-gray-500 tracking-tight"
+                        >
+                            {{ displayRouteCount }}+
+                        </div>
+                        <p
+                            class="text-sm font-bold tracking-[0.3em] uppercase text-blue-400"
+                        >
+                            Rute Perjalanan
+                        </p>
                     </div>
-                    <p
-                        class="text-sm font-bold tracking-[0.3em] uppercase opacity-60 text-brand-red"
-                    >
-                        Rute Perjalanan
-                    </p>
                 </div>
 
-                <div class="group p-8">
-                    <div
-                        class="text-6xl md:text-7xl font-black mb-4 group-hover:scale-110 transition-transform duration-300 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500"
-                    >
-                        {{ formatNumber(displayCustomerCount) }}+
+                <!-- Customer Card -->
+                <div
+                    class="scroll-reveal group relative p-10 rounded-[2.5rem] bg-white/5 backdrop-blur-sm border border-white/5 overflow-hidden hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/10 delay-200"
+                >
+                    <i
+                        class="fas fa-users absolute -right-6 -bottom-6 text-[10rem] text-white/[0.03] group-hover:scale-110 group-hover:rotate-6 transition-transform duration-700 ease-out"
+                    ></i>
+                    <div class="relative z-10 text-center">
+                        <div
+                            class="text-6xl md:text-8xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-gray-500 tracking-tight"
+                        >
+                            {{ formatNumber(displayCustomerCount) }}+
+                        </div>
+                        <p
+                            class="text-sm font-bold tracking-[0.3em] uppercase text-emerald-400"
+                        >
+                            Pelanggan Puas
+                        </p>
                     </div>
-                    <p
-                        class="text-sm font-bold tracking-[0.3em] uppercase opacity-60 text-brand-red"
-                    >
-                        Pelanggan Puas
-                    </p>
                 </div>
             </div>
         </div>

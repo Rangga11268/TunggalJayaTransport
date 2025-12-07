@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -109,6 +109,36 @@ const checkPaymentStatus = async (orderId) => {
         isChecking.value = false;
     }
 };
+// Helper to safely get route description
+const routeDescription = computed(() => {
+    const s = props.booking?.schedule;
+    const r = s?.route;
+
+    if (!r) return "Info Rute Tidak Tersedia";
+
+    // Prioritize specific description if available
+    if (
+        r.description &&
+        r.description.trim() !== "-" &&
+        r.description.trim() !== ""
+    )
+        return r.description;
+
+    // Fallback to Origin - Destination
+    if (r.origin && r.destination) {
+        return `${r.origin} - ${r.destination}`;
+    }
+
+    return "Info Rute Tidak Tersedia";
+});
+
+const busName = computed(() => {
+    return props.booking?.schedule?.bus?.name || "Info Bus Tidak Tersedia";
+});
+
+const busPlate = computed(() => {
+    return props.booking?.schedule?.bus?.plate_number || "-";
+});
 </script>
 
 <template>
@@ -213,17 +243,7 @@ const checkPaymentStatus = async (orderId) => {
                                 <div>
                                     <p class="text-sm text-gray-500">Rute</p>
                                     <p class="font-medium dark:text-gray-200">
-                                        {{
-                                            booking.schedule?.route?.origin ||
-                                            "-"
-                                        }}
-                                        <i
-                                            class="fas fa-arrow-right mx-2 text-xs text-gray-400"
-                                        ></i>
-                                        {{
-                                            booking.schedule?.route
-                                                ?.destination || "-"
-                                        }}
+                                        {{ routeDescription }}
                                     </p>
                                 </div>
                                 <div>
@@ -235,11 +255,7 @@ const checkPaymentStatus = async (orderId) => {
                                 <div>
                                     <p class="text-sm text-gray-500">Bus</p>
                                     <p class="font-medium dark:text-gray-200">
-                                        {{ booking.schedule?.bus?.name || "-" }}
-                                        ({{
-                                            booking.schedule?.bus
-                                                ?.plate_number || "-"
-                                        }})
+                                        {{ busName }} ({{ busPlate }})
                                     </p>
                                 </div>
                             </div>

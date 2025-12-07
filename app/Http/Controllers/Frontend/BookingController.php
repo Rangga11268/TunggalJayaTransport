@@ -431,7 +431,7 @@ class BookingController extends Controller
         $booking->save();
 
         // Send notification to admins
-        $admins = \App\Models\User::where('role', 'admin')->get();
+        $admins = \App\Models\User::role('admin')->get();
         \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewBookingNotification($booking));
 
         // Redirect to confirmation page with booking details
