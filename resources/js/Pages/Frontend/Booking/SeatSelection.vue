@@ -316,14 +316,14 @@ const busType = computed(() => {
                                 <!-- Driver (RIGHT - RHD) -->
                                 <div class="flex flex-col items-center">
                                     <div
-                                        class="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center shadow-lg border-2 border-gray-600 mb-2"
+                                        class="w-16 h-16 bg-gray-200 dark:bg-gray-700/50 rounded-2xl flex items-center justify-center border-2 border-gray-300 dark:border-gray-600 mb-2 opacity-80"
                                     >
                                         <i
-                                            class="fas fa-steering-wheel text-3xl text-gray-400"
+                                            class="fas fa-steering-wheel text-3xl text-gray-400 dark:text-gray-500"
                                         ></i>
                                     </div>
                                     <span
-                                        class="text-[10px] font-black text-gray-500 uppercase tracking-widest"
+                                        class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest"
                                         >Sopir</span
                                     >
                                 </div>

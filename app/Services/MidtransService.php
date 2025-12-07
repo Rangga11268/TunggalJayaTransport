@@ -18,6 +18,13 @@ class MidtransService
         Config::$isProduction = config('midtrans.environment') === 'production';
         Config::$isSanitized = true;
         Config::$is3ds = true;
+
+        Log::info('Midtrans Config Loaded', [
+            'is_production' => Config::$isProduction,
+            'environment_config' => config('midtrans.environment'),
+            'server_key_prefix' => substr(Config::$serverKey, 0, 5) . '...',
+            'client_key_prefix' => substr(Config::$clientKey, 0, 5) . '...',
+        ]);
     }
 
     /**
@@ -144,6 +151,14 @@ class MidtransService
                 'transaction_status' => $transactionStatus // Expose specifically for frontend
             ];
         } catch (\Exception $e) {
+            // Check if it's a 404 (Transaction doesn't exist)
+            if (strpos($e->getMessage(), '404') !== false || $e->getCode() == 404) {
+                 return [
+                    'status' => 'not_found',
+                    'message' => 'Transaction has not been created yet (waiting for payment)'
+                ];
+            }
+
             Log::error('Midtrans Get Status Error: ' . $e->getMessage());
             return [
                 'status' => 'error',

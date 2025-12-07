@@ -34,35 +34,49 @@ class PaymentService
             ];
         }
 
+        // Sanitize phone number (digits only, max 20)
+        $phone = preg_replace('/[^0-9]/', '', $booking->passenger_phone);
+        $phone = substr($phone, 0, 19);
+
+        // Sanitize item name (max 50 chars)
+        $itemName = 'Bus Ticket - ' . $booking->schedule->route->name;
+        if (strlen($itemName) > 50) {
+            $itemName = substr($itemName, 0, 47) . '...';
+        }
+
         // Prepare order details for Midtrans
         $orderData = [
             'transaction_details' => [
-                'order_id' => $booking->booking_code . '_' . time(),
+                'order_id' => $booking->booking_code . '_' . time(), // Ensure uniqueness
                 'gross_amount' => (int) $booking->total_price,
             ],
             'customer_details' => [
-                'first_name' => $booking->passenger_name,
+                'first_name' => substr($booking->passenger_name, 0, 50), // Safe limit
                 'email' => $booking->passenger_email,
-                'phone' => $booking->passenger_phone,
+                'phone' => $phone,
             ],
             'item_details' => [
                 [
-                    'id' => $booking->id,
+                    'id' => substr((string)$booking->id, 0, 50),
                     'price' => (int) $booking->total_price,
                     'quantity' => 1,
-                    'name' => 'Bus Ticket - ' . $booking->schedule->route->name,
+                    'name' => $itemName,
                 ]
             ],
-            'custom_field1' => $booking->id,
+            'custom_field1' => (string)$booking->id,
         ];
 
         // Handle enabled payments
         if ($paymentMethod && $paymentMethod !== 'all') {
             if ($paymentMethod === 'e_wallet') {
                 // If generic e_wallet, allow common ones or don't restrict
-                $orderData['enabled_payments'] = ['gopay', 'shopeepay', 'qris'];
+                $orderData['enabled_payments'] = ['gopay', 'shopeepay', 'qris', 'dana', 'linkaja'];
             } elseif ($paymentMethod === 'bank_transfer') {
                 $orderData['enabled_payments'] = ['bca_va', 'bni_va', 'bri_va', 'permata_va'];
+            } elseif (in_array($paymentMethod, ['gopay', 'shopeepay', 'dana', 'linkaja', 'qris'])) {
+                 // For specific e-wallets, allow alternatives/fallback to ensure Snap opens successfully
+                 // often 'dana' requires 'gopay' or 'qris' to be active if direct 'dana' isn't configured
+                 $orderData['enabled_payments'] = array_unique([$paymentMethod, 'gopay', 'qris', 'other_qris']);
             } else {
                 $orderData['enabled_payments'] = [$paymentMethod];
             }

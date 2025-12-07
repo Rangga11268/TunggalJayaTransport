@@ -61,18 +61,82 @@ class PaymentController extends Controller
     public function status($orderId)
     {
         $paymentHistory = PaymentHistory::where('transaction_id', $orderId)->first();
+        $booking = null;
 
+        // Fallback: Check Booking table if PaymentHistory not found
         if (!$paymentHistory) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Payment history not found'
-            ], 404);
+            $booking = Booking::where('midtrans_transaction_id', $orderId)->first();
+            
+            if (!$booking) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Transaction not found'
+                ], 404);
+            }
+        } else {
+            $booking = $paymentHistory->booking;
         }
 
+        // 1. Check status of the requested Order ID
         $result = $this->midtransService->getTransactionStatus($orderId);
 
-        if ($result['status'] === 'success') {
+        // If explicitly successful, return immediately
+        if ($result['status'] === 'success' && 
+           ($result['transaction_status'] == 'settlement' || $result['transaction_status'] == 'capture')) {
             return response()->json([
+                'status' => 'success',
+                'data' => $result['data'],
+                'transaction_status' => $result['transaction_status']
+            ]);
+        }
+
+        // 2. Smart Recovery: If the requested ID is not paid (pending/not_found/etc), 
+        // check IF ANY OTHER transaction for this booking was paid.
+        // This handles the case where user clicked "Pay" multiple times (generating new IDs) 
+        // but paid for an OLDER Snap token.
+        
+        if ($booking) {
+            // Get all transaction IDs associated with this booking from PaymentHistory
+            $allTransactions = PaymentHistory::where('booking_id', $booking->id)
+                ->where('transaction_id', '!=', $orderId) // Exclude current one we already checked
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            foreach ($allTransactions as $history) {
+                // Check status of these other transactions
+                $recoveryResult = $this->midtransService->getTransactionStatus($history->transaction_id);
+                
+                if ($recoveryResult['status'] === 'success' && 
+                   ($recoveryResult['transaction_status'] == 'settlement' || $recoveryResult['transaction_status'] == 'capture')) {
+                    
+                    // Found a PAID transaction!
+                    // Update the booking to point to this valid transaction instead
+                    $booking->update([
+                        'payment_status' => 'paid',
+                        'midtrans_transaction_id' => $history->transaction_id
+                    ]);
+
+                    return response()->json([
+                        'status' => 'success',
+                        'data' => $recoveryResult['data'],
+                        'transaction_status' => $recoveryResult['transaction_status'],
+                        'message' => 'Payment recovered from previous attempt'
+                    ]);
+                }
+            }
+        }
+        
+        // Handle "not_found" specifically (waiting for payment creation)
+        if ($result['status'] === 'not_found') {
+             return response()->json([
+                'status' => 'success', // Retain success for frontend logic
+                'transaction_status' => 'not_found', // Custom status for frontend
+                'message' => $result['message']
+            ]);
+        }
+
+        if ($result['status'] === 'success') {
+             return response()->json([
                 'status' => 'success',
                 'data' => $result['data'],
                 'transaction_status' => $result['transaction_status'] ?? 'unknown'

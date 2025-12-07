@@ -38,10 +38,7 @@ const checkPaymentStatus = async (orderId) => {
     isChecking.value = true;
 
     try {
-        const response = await axios.get(
-            route("frontend.booking.success", { id: props.booking.id })
-        ); // We might need a dedicated status API endpoint or use the one we improved
-        // The one we improved is /booking/payment/status/{orderId}
+        // Fetch status directly
         const statusResponse = await axios.get(
             route("frontend.payment.status", { orderId: orderId })
         );
@@ -61,13 +58,17 @@ const checkPaymentStatus = async (orderId) => {
                 }).then(() => {
                     window.location.reload();
                 });
-            } else if (trxStatus === "pending") {
+            } else if (trxStatus === "pending" || trxStatus === "not_found") {
                 Swal.fire({
                     icon: "info",
                     title: "Menunggu Pembayaran",
-                    text: 'Sistem mencatat status pembayaran masih "pending". Jika sudah bayar, mohon tunggu beberapa saat.',
+                    text: "Sistem mencatat status pembayaran belum selesai. Silakan selesaikan pembayaran Anda.",
                     footer:
-                        "<small>Status dari Gateway: " + trxStatus + "</small>",
+                        "<small>Status dari Gateway: " +
+                        (trxStatus === "not_found"
+                            ? "Waiting for Payment Link"
+                            : trxStatus) +
+                        "</small>",
                     confirmButtonColor: "#3b82f6",
                 });
             } else if (trxStatus === "expire") {
@@ -99,10 +100,14 @@ const checkPaymentStatus = async (orderId) => {
         }
     } catch (error) {
         console.error("Error checking status:", error);
+
+        const errorMessage =
+            error.response?.data?.message || "Gagal menghubungi server.";
+
         Swal.fire({
             icon: "error",
-            title: "Koneksi Error",
-            text: "Gagal menghubungi server.",
+            title: "Gagal Cek Status",
+            text: errorMessage,
             confirmButtonColor: "#ef4444",
         });
     } finally {

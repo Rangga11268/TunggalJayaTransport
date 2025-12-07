@@ -293,6 +293,13 @@
             <div class="booking-info">
                 <div class="code-label">Booking Reference</div>
                 <div class="code-value">{{ $booking->booking_code }}</div>
+                <div style="margin-top: 8px;">
+                    @php
+                        $dns1d = new Milon\Barcode\DNS1D();
+                        $barcode = $dns1d->getBarcodePNG($booking->booking_code, 'C128', 2, 40);
+                    @endphp
+                    <img src="data:image/png;base64,{{ $barcode }}" alt="Barcode" style="height: 35px; width: auto;">
+                </div>
             </div>
         </div>
 
