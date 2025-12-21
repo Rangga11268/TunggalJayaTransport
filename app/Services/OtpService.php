@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OtpMail;
+use Illuminate\Support\Facades\Http;
 
 class OtpService
 {
@@ -82,9 +83,25 @@ class OtpService
 
     private function sendViaWhatsapp(string $phone, string $otp): void
     {
-        // Pura-pura kirim SMS/WA
-        // Di implementasi nyata, tambahkan integrasi SMS gateway di sini
-        Log::info("OTP $otp dikirim ke nomor $phone");
+        $token = config('services.fonnte.token');
+        
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => $token,
+            ])->post('https://api.fonnte.com/send', [
+                'target' => $phone,
+                'message' => "*TUNGGAL JAYA TRANSPORT*\n\nKode OTP Verifikasi Anda: *$otp*\n\nJANGAN BERIKAN KODE INI KEPADA SIAPAPUN - TERMASUK PIHAK TUNGGAL JAYA TRANSPORT.\n\nKode berlaku selama " . self::OTP_EXPIRY_MINUTES . " menit.",
+                'countryCode' => '62', // optional, default country code
+            ]);
+
+            if ($response->successful()) {
+                Log::info("OTP sent via Fonnte to $phone: " . $response->body());
+            } else {
+                Log::error("Fonnte API Error ($phone): " . $response->body());
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to send WA via Fonnte: " . $e->getMessage());
+        }
     }
 
     public function getDebugOtp(): ?string
