@@ -67,20 +67,7 @@ class PaymentService
         ];
 
         // Handle enabled payments
-        if ($paymentMethod && $paymentMethod !== 'all') {
-            if ($paymentMethod === 'e_wallet') {
-                // If generic e_wallet, allow common ones or don't restrict
-                $orderData['enabled_payments'] = ['gopay', 'shopeepay', 'qris', 'dana', 'linkaja'];
-            } elseif ($paymentMethod === 'bank_transfer') {
-                $orderData['enabled_payments'] = ['bca_va', 'bni_va', 'bri_va', 'permata_va'];
-            } elseif (in_array($paymentMethod, ['gopay', 'shopeepay', 'dana', 'linkaja', 'qris'])) {
-                 // For specific e-wallets, allow alternatives/fallback to ensure Snap opens successfully
-                 // often 'dana' requires 'gopay' or 'qris' to be active if direct 'dana' isn't configured
-                 $orderData['enabled_payments'] = array_unique([$paymentMethod, 'gopay', 'qris', 'other_qris']);
-            } else {
-                $orderData['enabled_payments'] = [$paymentMethod];
-            }
-        }
+        $orderData['enabled_payments'] = $this->getEnabledPayments($paymentMethod);
 
         // Create transaction in Midtrans
         $result = $this->midtransService->createTransaction($orderData);
@@ -142,5 +129,32 @@ class PaymentService
         }
 
         return true;
+    }
+    /**
+     * Get enabled payments based on selected method
+     * 
+     * @param string $paymentMethod
+     * @return array|null
+     */
+    private function getEnabledPayments($paymentMethod)
+    {
+        if (!$paymentMethod || $paymentMethod === 'all') {
+            return null; // Let Midtrans handle default
+        }
+
+        if ($paymentMethod === 'e_wallet') {
+            return ['gopay', 'shopeepay', 'qris', 'dana', 'linkaja'];
+        }
+
+        if ($paymentMethod === 'bank_transfer') {
+            return ['bca_va', 'bni_va', 'bri_va', 'permata_va'];
+        }
+
+        if (in_array($paymentMethod, ['gopay', 'shopeepay', 'dana', 'linkaja', 'qris'])) {
+             // For specific e-wallets, allow alternatives/fallback
+             return array_unique([$paymentMethod, 'gopay', 'qris', 'other_qris']);
+        }
+
+        return [$paymentMethod];
     }
 }

@@ -19,8 +19,12 @@ class BookingController extends Controller
     public function index(Request $request)
     {
         // Get all unique origins and destinations for the dropdowns
-        $origins = BusRoute::pluck('origin')->unique()->values();
-        $destinations = BusRoute::pluck('destination')->unique()->values();
+        $origins = \Illuminate\Support\Facades\Cache::remember('route_origins', 60, function () {
+            return BusRoute::pluck('origin')->unique()->values();
+        });
+        $destinations = \Illuminate\Support\Facades\Cache::remember('route_destinations', 60, function () {
+            return BusRoute::pluck('destination')->unique()->values();
+        });
 
         $origin = $request->get('origin');
         $destination = $request->get('destination');
@@ -47,9 +51,20 @@ class BookingController extends Controller
                 // Get schedules for these routes that are available for booking
                 $routeIds = $validRoutes->pluck('id');
 
-                // Build query
+                // Build query with Eager Loading to prevents N+1
                 $query = Schedule::whereIn('route_id', $routeIds)
                         ->with('route', 'bus')
+                        ->withSum(['bookings as booked_seats_count' => function ($q) use ($searchDate) {
+                            $q->where('booking_status', 'confirmed')
+                              ->where('payment_status', 'paid');
+                            
+                            if ($searchDate) {
+                                $q->whereDate('booking_date', $searchDate);
+                            } else {
+                                // If no date selected, count future bookings (matching Schedule model logic)
+                                $q->whereDate('booking_date', '>=', Carbon::today());
+                            }
+                        }], 'number_of_seats')
                         ->available();
 
                 $allSchedules = $query->get();
@@ -58,16 +73,39 @@ class BookingController extends Controller
                 $schedules = $allSchedules->filter(function ($schedule) use ($searchDate, $classes, $times) {
                     // 1. Availability Check
                     $isAvailable = false;
+                    
+                    // Use the eager loaded count instead of querying DB
+                    $bookedSeats = $schedule->booked_seats_count ?? 0;
+                    $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
+                    $hasSeats = $availableSeats > 0;
+
                     if ($searchDate) {
                         if (!$schedule->is_daily) {
-                            $isAvailable = $schedule->departure_time->toDateString() === $searchDate->toDateString()
-                                && $schedule->isAvailableForBooking($searchDate);
+                            $dateMatch = $schedule->departure_time->toDateString() === $searchDate->toDateString();
+                            $active = $schedule->status === 'active';
+                            // Check past departure
+                             $checkDeparture = $schedule->departure_time instanceof Carbon ? $schedule->departure_time : Carbon::parse($schedule->departure_time);
+                            $notDeparted = !$checkDeparture->isPast();
+                            
+                            $isAvailable = $dateMatch && $active && $notDeparted && $hasSeats;
                         } else {
-                            $isAvailable = $schedule->isAvailableForBooking($searchDate);
+                            // Recurring
+                             $isAvailable = $schedule->status === 'active' && $hasSeats;
+                             // We also need to check if the specific daily departure time has passed for TODAY if searchDate is today
+                             if ($searchDate->isToday()) {
+                                 $timeStr = $schedule->departure_time instanceof Carbon ? $schedule->departure_time->format('H:i:s') : Carbon::parse($schedule->departure_time)->format('H:i:s');
+                                 $todayDeparture = Carbon::today()->setTimeFromTimeString($timeStr);
+                                 if ($todayDeparture->isPast()) {
+                                     // If we are looking for "today" but bus left, it's not available for today.
+                                     // But logic in model might say "available for recurring" generally.
+                                     // Here we are strict: if user searches for DATE, and time passed, it's not available.
+                                     $isAvailable = false;
+                                 }
+                             }
                         }
                     } else {
                         // If no date selected, just check generic availability
-                         $isAvailable = $schedule->isAvailableForBooking();
+                         $isAvailable = $schedule->status === 'active' && $hasSeats;
                     }
 
                     if (!$isAvailable) return false;
@@ -100,15 +138,23 @@ class BookingController extends Controller
         } else {
             // Default: Fetch all available schedules if no specific search
             $validPair = true;
-            // For default view, we still want to apply filters if they exist (though usually filters are used with search)
+            // For default view, still eager load to prevent N+1
              $query = Schedule::with('route', 'bus')
+                ->withSum(['bookings as booked_seats_count' => function ($q) {
+                        $q->where('booking_status', 'confirmed')
+                          ->where('payment_status', 'paid')
+                          ->whereDate('booking_date', '>=', Carbon::today());
+                }], 'number_of_seats')
                 ->available()
                 ->orderBy('departure_time');
             
             $allSchedules = $query->get();
 
             $schedules = $allSchedules->filter(function ($schedule) use ($classes, $times, $searchDate) {
-                if (!$schedule->isAvailableForBooking($searchDate)) return false;
+                // Simplified manual check using pre-loaded data
+                $bookedSeats = $schedule->booked_seats_count ?? 0;
+                $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
+                if ($availableSeats <= 0) return false;
 
                 // Class Filter
                 if (!empty($classes)) {
@@ -119,12 +165,11 @@ class BookingController extends Controller
 
                 // Time Filter
                 if (!empty($times)) {
-                     // Without a date, we check the base departure time
-                    $departureTime = $schedule->getActualDepartureTime(); // Defaults to today/tomorrow logic
+                    $departureTime = $schedule->getActualDepartureTime(); 
                     $hour = $departureTime->hour;
                     $timeMatch = false;
 
-                   foreach ($times as $time) {
+                    foreach ($times as $time) {
                         if ($time === 'morning' && $hour >= 0 && $hour < 12) $timeMatch = true;
                         if ($time === 'afternoon' && $hour >= 12 && $hour < 18) $timeMatch = true;
                         if ($time === 'evening' && $hour >= 18 && $hour <= 23) $timeMatch = true;
@@ -140,13 +185,18 @@ class BookingController extends Controller
         // Transform schedules for frontend
         $schedules = $schedules->map(function ($schedule) use ($date) {
             $checkDate = $date ? Carbon::parse($date) : null;
+            
+            // Calculate available seats using the eager loaded value
+            $bookedSeats = $schedule->booked_seats_count ?? 0;
+            $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
+
             return [
                 'id' => $schedule->id,
                 'price' => $schedule->price,
                 'departure_time' => $schedule->getActualDepartureTime($checkDate)->format('H:i'),
                 'arrival_time' => $schedule->getActualArrivalTime($checkDate)->format('H:i'),
                 'duration' => $schedule->route->formatted_duration,
-                'available_seats' => $schedule->getAvailableSeatsCount($checkDate),
+                'available_seats' => $availableSeats, // Use pre-calculated value
                 'bus' => [
                     'name' => $schedule->bus->name,
                     'bus_type' => $schedule->bus->bus_type,
@@ -169,8 +219,12 @@ class BookingController extends Controller
     public function schedules(Request $request)
     {
         // Get all unique origins and destinations for the dropdowns
-        $origins = BusRoute::pluck('origin')->unique()->values();
-        $destinations = BusRoute::pluck('destination')->unique()->values();
+        $origins = \Illuminate\Support\Facades\Cache::remember('route_origins', 60, function () {
+            return BusRoute::pluck('origin')->unique()->values();
+        });
+        $destinations = \Illuminate\Support\Facades\Cache::remember('route_destinations', 60, function () {
+            return BusRoute::pluck('destination')->unique()->values();
+        });
 
         $origin = $request->get('origin');
         $destination = $request->get('destination');
@@ -478,53 +532,76 @@ class BookingController extends Controller
             'seat_numbers.*' => 'integer|min:1|max:40'
         ]);
 
-        $booking = Booking::with('schedule.bus')->findOrFail($request->booking_id);
+        try {
+            return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+                // Lock the booking row
+                $booking = Booking::lockForUpdate()->findOrFail($request->booking_id);
+                
+                // Lock the schedule row to serialize concurrent bookings for this bus
+                // This prevents race conditions where two users book the same seat at the same exact moment
+                $schedule = Schedule::lockForUpdate()->with('bus')->find($booking->schedule_id);
 
-        // Check if the schedule has already departed
-        if ($booking->schedule->hasDeparted()) {
-            return response()->json(['success' => false, 'message' => 'The schedule for this booking has already departed.']);
+                if (!$schedule) {
+                     return response()->json(['success' => false, 'message' => 'Schedule not found.']);
+                }
+
+                // Check if the schedule has already departed
+                if ($schedule->hasDeparted()) {
+                    return response()->json(['success' => false, 'message' => 'The schedule for this booking has already departed.']);
+                }
+
+                // Check if the schedule is still available for booking
+                if (!$schedule->isAvailableForBooking()) {
+                    return response()->json(['success' => false, 'message' => 'The schedule for this booking is no longer available.']);
+                }
+
+                // Validate that the number of selected seats matches the requested number
+                if (count($request->seat_numbers) != $booking->number_of_seats) {
+                    return response()->json(['success' => false, 'message' => 'Please select exactly ' . $booking->number_of_seats . ' seats.']);
+                }
+
+                // Check if there are enough seats available for the booking date
+                // Note: getAvailableSeatsCount usually excludes the current user's partially completed booking? 
+                // In this controller logic, the booking exists but seat_numbers is null.
+                // The getAvailableSeatsCount checks 'confirmed'/'paid' bookings. 
+                // Our current booking is 'confirmed' but seats are null, so it shouldn't affect the count yet.
+                $availableSeats = $schedule->getAvailableSeatsCount($booking->booking_date);
+                
+                // Add back the current booking's seats calculation if logic changes, but currently safe:
+                // If capacity is 40, 38 booked. Available = 2.
+                // My booking needs 2. 2 <= 2. OK.
+                
+                if (count($request->seat_numbers) > $availableSeats) {
+                    return response()->json(['success' => false, 'message' => "Only {$availableSeats} seats are available for this schedule on {$booking->booking_date}. Please select fewer seats."]);
+                }
+
+                // Check if any of the selected seats are already booked for the same date
+                // Since we hold the lock on Schedule, no other transaction can be inserting conflicts right now
+                $occupiedSeats = $schedule->getBookedSeatNumbers($booking->booking_date);
+                $selectedSeats = array_map('strval', $request->seat_numbers);
+
+                // Check for conflicts
+                $conflictingSeats = array_intersect($selectedSeats, $occupiedSeats);
+                if (!empty($conflictingSeats)) {
+                    return response()->json(['success' => false, 'message' => 'Some seats are already booked: ' . implode(', ', $conflictingSeats)]);
+                }
+
+                // Validate that all seat numbers are unique
+                if (count($selectedSeats) != count(array_unique($selectedSeats))) {
+                    return response()->json(['success' => false, 'message' => 'Please select unique seats.']);
+                }
+
+                $seatNumbers = implode(',', $request->seat_numbers);
+
+                $booking->seat_numbers = $seatNumbers;
+                $booking->save();
+
+                return response()->json(['success' => true, 'message' => 'Seats selected successfully']);
+            });
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Seat selection error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'An error occurred while selecting seats. Please try again.']);
         }
-
-        // Check if the schedule is still available for booking
-        if (!$booking->schedule->isAvailableForBooking()) {
-            return response()->json(['success' => false, 'message' => 'The schedule for this booking is no longer available.']);
-        }
-
-        // Validate that the number of selected seats matches the requested number
-        if (count($request->seat_numbers) != $booking->number_of_seats) {
-            return response()->json(['success' => false, 'message' => 'Please select exactly ' . $booking->number_of_seats . ' seats.']);
-        }
-
-        // Check if there are enough seats available for the booking date
-        $availableSeats = $booking->schedule->getAvailableSeatsCount($booking->booking_date);
-        // Add back the current booking's seats as they are being reselected
-        $availableSeats += $booking->number_of_seats;
-
-        if (count($request->seat_numbers) > $availableSeats) {
-            return response()->json(['success' => false, 'message' => "Only {$availableSeats} seats are available for this schedule on {$booking->booking_date}. Please select fewer seats."]);
-        }
-
-        // Check if any of the selected seats are already booked for the same date
-        $occupiedSeats = $booking->schedule->getBookedSeatNumbers($booking->booking_date);
-        $selectedSeats = array_map('strval', $request->seat_numbers);
-
-        // Check for conflicts
-        $conflictingSeats = array_intersect($selectedSeats, $occupiedSeats);
-        if (!empty($conflictingSeats)) {
-            return response()->json(['success' => false, 'message' => 'Some seats are already booked: ' . implode(', ', $conflictingSeats)]);
-        }
-
-        // Validate that all seat numbers are unique
-        if (count($selectedSeats) != count(array_unique($selectedSeats))) {
-            return response()->json(['success' => false, 'message' => 'Please select unique seats.']);
-        }
-
-        $seatNumbers = implode(',', $request->seat_numbers);
-
-        $booking->seat_numbers = $seatNumbers;
-        $booking->save();
-
-        return response()->json(['success' => true, 'message' => 'Seats selected successfully']);
     }
 
     public function processPayment(Request $request)

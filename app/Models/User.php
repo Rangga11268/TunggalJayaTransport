@@ -13,6 +13,13 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles;
 
+    // Role Constants
+    const ROLE_ADMIN = 'admin';
+    const ROLE_SCHEDULE_MANAGER = 'schedule_manager';
+    const ROLE_CUSTOMER = 'customer';
+    const ROLE_DRIVER = 'driver';
+    const ROLE_CONDUCTOR = 'conductor';
+
     /**
      * The attributes that are mass assignable.
      *
