@@ -131,7 +131,7 @@ class PaymentService
         return true;
     }
     /**
-     * Get enabled payments based on selected method
+     * Ambil metode pembayaran yang aktif
      * 
      * @param string $paymentMethod
      * @return array|null
@@ -139,7 +139,7 @@ class PaymentService
     private function getEnabledPayments($paymentMethod)
     {
         if (!$paymentMethod || $paymentMethod === 'all') {
-            return null; // Let Midtrans handle default
+            return null; // Biarin default dari Midtrans
         }
 
         if ($paymentMethod === 'e_wallet') {
@@ -151,7 +151,7 @@ class PaymentService
         }
 
         if (in_array($paymentMethod, ['gopay', 'shopeepay', 'dana', 'linkaja', 'qris'])) {
-             // For specific e-wallets, allow alternatives/fallback
+             // Kalo pilih e-wallet spefisik, kasih opsi lain juga buat jaga-jaga
              return array_unique([$paymentMethod, 'gopay', 'qris', 'other_qris']);
         }
 

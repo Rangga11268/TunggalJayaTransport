@@ -25,13 +25,13 @@ class Schedule extends Model
     ];
 
     /**
-     * Boot the model.
+     * Booting model-nya.
      */
     protected static function boot()
     {
         parent::boot();
 
-        // When retrieving the model, convert times to WIB
+        // Pas load data, ubah jam ke WIB biar ga pusing
         static::retrieved(function ($schedule) {
             if ($schedule->departure_time instanceof Carbon) {
                 $schedule->departure_time = $schedule->departure_time->setTimezone('Asia/Jakarta');
@@ -64,14 +64,14 @@ class Schedule extends Model
             ->where('payment_status', 'paid')
             ->where('booking_status', '!=', 'cancelled');
 
-        // If checking for a specific date, we need to filter by booking_date
+        // Kalo ngecek tanggal tertentu, filter pake booking_date
         if ($forDate) {
             $query->whereDate('booking_date', $forDate);
         } else {
-            // For daily recurring schedules, if no specific date provided, we might want to count upcoming bookings
-            // This will help maintain existing behavior for cases where no date is specified
+            // Buat jadwal harian, kalo ga ada tanggal spesifik, itung yang kedepannya aja
+            // Biar logicnya tetep jalan kaya biasanya
             if ($this->is_daily) {
-                // For recurring schedules, count bookings for future dates only
+                // Untuk jadwal recurring, itung bookingan masa depan aja
                 $query->whereDate('booking_date', '>=', Carbon::today());
             }
         }
@@ -81,7 +81,7 @@ class Schedule extends Model
 
     public function getAvailableSeatsCount($forDate = null)
     {
-        // Only count confirmed bookings that are paid and not cancelled
+        // Cuma itung yang udah confirm & lunas, cancel ga dianggep
         $bookedSeats = $this->getBookedSeatsCount($forDate);
 
         $available = $this->bus->capacity - $bookedSeats;
@@ -90,18 +90,18 @@ class Schedule extends Model
 
     public function getBookedSeatNumbers($forDate = null)
     {
-        // Get seat numbers for confirmed bookings that are paid and not cancelled
+        // Ambil nomor kursi yang udah laku (confirmed & paid)
         $query = $this->bookings()
             ->where('booking_status', 'confirmed')
             ->where('payment_status', 'paid')
-            ->where('booking_status', '!=', 'cancelled') // Exclude cancelled bookings
+            ->where('booking_status', '!=', 'cancelled') // Yang cancel gausah diajak
             ->whereNotNull('seat_numbers');
 
-        // Filter by date if specified
+        // Filter tanggal kalo ada request
         if ($forDate) {
             $query->whereDate('booking_date', $forDate);
         } elseif ($this->is_daily) {
-            // For recurring schedules without a specific date, consider future bookings only
+            // Kalo recurring dan ga ada tanggal, ambil yang depan-depan aja
             $query->whereDate('booking_date', '>=', Carbon::today());
         }
 
@@ -119,126 +119,111 @@ class Schedule extends Model
     }
 
     /**
-     * Get the actual departure datetime for display/booking purposes
-     * For daily recurring schedules, calculates the next occurrence
-     * For daily schedules, returns the stored datetime
-     * Returns times in WIB timezone for display
+     * Ambil jam berangkat asli buat display/booking.
+     * Kalo jadwal harian, itung kapan next trip-nya.
+     * Kalo jadwal biasa, ya balikin aja datetime yang kesimpen.
+     * Balikin format WIB biar user lokal ga bingung.
      */
     public function getActualDepartureTime($forDate = null)
     {
         $departureTime = null;
 
         if ($this->is_daily) {
-            // For daily recurring schedules, we show the time for the specified date or the next available time
+            // Buat recurring, tampilin jam buat tanggal yg diminta atau jadwal terdekat selanjutnya
             if ($forDate) {
                 $departureTime = $forDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
             } else {
                 $now = Carbon::now('Asia/Jakarta');
                 $today = Carbon::today('Asia/Jakarta');
-                // Get today's departure time
+                // Ambil jam berangkat hari ini
                 $todayDeparture = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
 
-                // If departure time hasn't passed yet today, return today
+                // Kalo belum lewat jamnya hari ini, pake yg hari ini
                 if ($todayDeparture->isFuture()) {
                     $departureTime = $todayDeparture;
                 } else {
-                    // Otherwise, return tomorrow's departure time
+                    // Kalo udah lewat, ya berarti besok
                     $departureTime = $today->copy()->addDay()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
                 }
             }
         } else {
-            // For daily schedules, return the stored datetime
+            // Jadwal biasa, easy peasy
             $departureTime = $this->departure_time;
         }
 
-        // Convert to WIB timezone for display
+        // Convert ke WIB
         return $departureTime->setTimezone('Asia/Jakarta');
     }
 
     /**
-     * Get the actual arrival datetime for display/booking purposes
-     * For daily recurring schedules, calculates the next occurrence
-     * For daily schedules, returns the stored datetime
-     * Returns times in WIB timezone for display
+     * Sama kayak getActualDepartureTime tapi versi Arrival.
+     * Logic-nya miriplah, males jelasin ulang wkwk.
      */
     public function getActualArrivalTime($forDate = null)
     {
         $arrivalTime = null;
 
         if ($this->is_daily) {
-            // For daily recurring schedules, we show the time for the specified date or the next available time
             if ($forDate) {
                 $arrivalTime = $forDate->copy()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
             } else {
                 $now = Carbon::now('Asia/Jakarta');
                 $today = Carbon::today('Asia/Jakarta');
 
-                // Get today's departure time
                 $todayDeparture = $today->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
 
-                // If departure time hasn't passed yet today, return today's arrival time
                 if ($todayDeparture->isFuture()) {
                     $arrivalTime = $today->copy()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
                 } else {
-                    // Otherwise, return tomorrow's arrival time
                     $arrivalTime = $today->copy()->addDay()->setTimeFromTimeString($this->arrival_time->format('H:i:s'));
                 }
             }
         } else {
-            // For daily schedules, return the stored datetime
             $arrivalTime = $this->arrival_time;
         }
 
-        // Convert to WIB timezone for display
         return $arrivalTime->setTimezone('Asia/Jakarta');
     }
 
     /**
-     * Check if the schedule departure time has passed
-     * For daily recurring schedules, checks if today's occurrence has passed (but they're always available for future dates)
-     * For daily schedules, checks if the stored departure time has passed
-     * 
-     * Note: All times are now stored and retrieved in Asia/Jakarta timezone (WIB)
+     * Cek apa busnya udah cabut.
+     * Kalo recurring, cek trip hari ini udah lewat apa belum.
+     * Note: Semua pake WIB (Asia/Jakarta)
      */
     public function hasDeparted($forDate = null)
     {
-        // Use local timezone (WIB) for checking departure time
+        // Pake WIB dong pastinya
         $now = Carbon::now('Asia/Jakarta');
 
         if ($this->is_daily) {
-            // For daily recurring schedules, check if the specified day's departure has passed
+            // Cek departure time hari yg diminta
             $checkDate = $forDate ?: Carbon::today('Asia/Jakarta');
             $checkDeparture = $checkDate->copy()->setTimeFromTimeString($this->departure_time->format('H:i:s'));
 
-            // Check if the specified day's departure time has passed
+            // Lewat ga?
             return $checkDeparture->isPast();
         }
 
-        // For daily schedules, check against stored departure time
-        // Make sure we're comparing with the actual datetime
+        // Jadwal biasa
         if ($this->departure_time instanceof Carbon) {
-            // Already in local timezone, no need to convert
             return $this->departure_time->isPast();
         }
 
-        // If it's not a Carbon instance, try to parse it
         try {
             $departureTime = Carbon::parse($this->departure_time);
-            // Already in local timezone, no need to convert
             return $departureTime->isPast();
         } catch (\Exception $e) {
-            // If parsing fails, fallback to basic comparison
             return false;
         }
     }
 
     /**
-     * Get departure time in a specific timezone
+     * Ambil jam berangkat sesuai zona waktu target
      */
     public function getDepartureTimeInTimezone($timezone = null)
     {
         if ($timezone === null) {
-            // Use system timezone
+            // Pake timezone sistem
             $timezone = Carbon::now()->timezone;
         }
 
@@ -267,42 +252,41 @@ class Schedule extends Model
     }
 
     /**
-     * Check if the schedule is available for booking
+     * Cek jadwalnya masih bisa dibooking ga
      */
     public function isAvailableForBooking($forDate = null)
     {
-        // Check if schedule is active
+        // Aktif ga nih?
         if ($this->status !== 'active') {
             return false;
         }
 
-        // Check if the schedule has already departed
-        // For daily recurring schedules, this checks if the current day's departure has passed
+        // Udah cabut belom?
         if ($this->hasDeparted($forDate)) {
             return false;
         }
 
-        // Check if there are available seats for the specific date
+        // Masih ada kursi kosong ga?
         return $this->getAvailableSeatsCount($forDate) > 0;
     }
 
     
 
     /**
-     * Get all upcoming dates for a schedule within a date range
+     * Ambil tanggal-tanggal berangkat kedepannya (range date)
      */
     public function getUpcomingDates($startDate = null, $endDate = null, $limit = 10)
     {
-        // For daily recurring schedules, return a range of dates
+        // Buat jadwal harian, balikin range tanggal
         if ($this->is_daily) {
             $startDate = $startDate ? \Carbon\Carbon::parse($startDate) : \Carbon\Carbon::today('Asia/Jakarta');
-            $endDate = $endDate ? \Carbon\Carbon::parse($endDate) : $startDate->copy()->addMonths(3); // Default 3 months
+            $endDate = $endDate ? \Carbon\Carbon::parse($endDate) : $startDate->copy()->addMonths(3); // Default 3 bulan
 
             $dates = collect();
             $currentDate = $startDate->copy();
             $count = 0;
 
-            // Generate dates for each day in the range
+            // Loop tiap hari
             while ($currentDate->lte($endDate) && $count < $limit) {
                 $dates->push($currentDate->copy());
                 $currentDate->addDay();
@@ -312,32 +296,32 @@ class Schedule extends Model
             return $dates;
         }
 
-        // For non-recurring schedules, return empty collection
+        // Kalo bukan recurring, ya kosong
         return collect();
     }
 
     /**
-     * Get bookings that should be cancelled when schedule departs
+     * Ambil bookingan yang harus dicancel kalo busnya berangkat
      */
     public function getBookingsToCancel()
     {
-        // For daily recurring schedules, return ALL non-cancelled bookings
-        // since the seats need to be available again the next day
+        // Kalo daily, balikin SEMUA yang belom cancel
+        // soalnya kursinya harus kosong lagi besoknya
         if ($this->is_daily) {
             return $this->bookings()
-                ->where('booking_status', '!=', 'cancelled') // Not already cancelled
+                ->where('booking_status', '!=', 'cancelled') // Yang belom dicancel
                 ->get();
         } else {
-            // For regular schedules, only return pending payments
+            // Kalo reguler, cuma yg payment pending aja yg dicancel
             return $this->bookings()
-                ->where('booking_status', '!=', 'cancelled') // Not already cancelled
-                ->where('payment_status', 'pending') // Only pending payments
+                ->where('booking_status', '!=', 'cancelled') // Yang belom dicancel
+                ->where('payment_status', 'pending') // Yang belom bayar
                 ->get();
         }
     }
 
     /**
-     * Scope for available schedules only
+     * Scope buat jadwal yang 'available' aja
      */
     public function scopeAvailable($query)
     {

@@ -30,46 +30,46 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:'.App\Models\U
 
 
 
-    // Bus Management (schedule managers can manage buses)
+    // Urusan Bus (Manager jadwal boleh akses)
     Route::resource('buses', BusController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN.','.App\Models\User::ROLE_SCHEDULE_MANAGER);
 
-    // AJAX route to check if plate number exists
+    // Cek plat nomor ada ga via AJAX
     Route::get('/buses/check-plate/{plateNumber}', [BusController::class, 'checkPlateNumber'])->name('buses.check-plate');
 
-    // Route Management (schedule managers can manage routes)
+    // Atur Rute
     Route::resource('routes', RouteController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN.','.App\Models\User::ROLE_SCHEDULE_MANAGER);
 
-    // Schedule Management (schedule managers can manage schedules)
+    // Kelola Jadwal
     Route::resource('schedules', ScheduleController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN.','.App\Models\User::ROLE_SCHEDULE_MANAGER);
     Route::post('/schedules/{schedule}/create-next-day', [ScheduleController::class, 'createNextDaySchedule'])->name('schedules.create-next-day')->middleware('role:'.App\Models\User::ROLE_ADMIN.','.App\Models\User::ROLE_SCHEDULE_MANAGER);
     
-    // Schedule Management Dashboard
+    // Dashboard Jadwal
     Route::get('/schedule-management', [ScheduleManagementController::class, 'index'])->name('schedule-management.index')->middleware('role:'.App\Models\User::ROLE_ADMIN.','.App\Models\User::ROLE_SCHEDULE_MANAGER);
     Route::get('/schedule-management/{id}', [ScheduleManagementController::class, 'show'])->name('schedule-management.show')->middleware('role:'.App\Models\User::ROLE_ADMIN.','.App\Models\User::ROLE_SCHEDULE_MANAGER);
     
     
 
-    // Booking Management (only admins can manage bookings)
+    // Data Booking (Khusus admin yang megang duit/tiket)
     Route::resource('bookings', BookingController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
 
-    // News Management (only admins can manage news)
+    // Fitur Berita
     Route::resource('news', NewsController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
 
-    // Category Management (only admins can manage categories)
+    // Kategori
     Route::resource('categories', CategoryController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
 
 
 
-    // User Management (only admins can manage users)
+    // Kelola User
     Route::resource('users', UserController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
 
-    // Driver Management (only admins can manage drivers)
+    // Data Supir
     Route::resource('drivers', DriverController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
 
-    // Conductor Management (only admins can manage conductors)
+    // Data Kondektur
     Route::resource('conductors', ConductorController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
 
-    // Reports (admins and schedule managers can view reports)
+    // Laporan (Admin & Manager bisa liat)
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index')->middleware('role:'.App\Models\User::ROLE_ADMIN.','.App\Models\User::ROLE_SCHEDULE_MANAGER);
     Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales')->middleware('role:'.App\Models\User::ROLE_ADMIN);
     Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('reports.occupancy')->middleware('role:'.App\Models\User::ROLE_ADMIN.','.App\Models\User::ROLE_SCHEDULE_MANAGER);

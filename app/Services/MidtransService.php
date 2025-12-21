@@ -12,7 +12,7 @@ class MidtransService
 {
     public function __construct()
     {
-        // Set Midtrans configuration
+        // Setting dulu config Midtrans-nya
         Config::$serverKey = config('midtrans.server_key');
         Config::$clientKey = config('midtrans.client_key');
         Config::$isProduction = config('midtrans.environment') === 'production';
@@ -36,12 +36,12 @@ class MidtransService
     public function createTransaction($orderData)
     {
         try {
-            // Add callbacks configuration if not already present
+            // Tambah config callback kalo belum ada
             if (!isset($orderData['callbacks'])) {
                 $bookingId = $orderData['booking_id'] ?? $orderData['custom_field1'] ?? '';
                 $callbackUrl = route('frontend.booking.success', ['id' => $bookingId]);
 
-                // Log the callback URL for debugging
+                // Log URL callback buat debug nanti
                 \Log::info('Midtrans callback URL generated', [
                     'booking_id' => $bookingId,
                     'callback_url' => $callbackUrl
@@ -52,7 +52,7 @@ class MidtransService
                 ];
             }
 
-            // Create snap token
+            // Bikin token Snap biar bisa pop-up
             $snapToken = Snap::createTransaction($orderData)->token;
 
             return [
@@ -80,20 +80,20 @@ class MidtransService
         try {
             $status = Transaction::status($orderId);
 
-            // Log the raw status for debugging
+            // Log status mentahannya dulu
             Log::info('Midtrans Transaction Status Raw:', ['order_id' => $orderId, 'status' => (array)$status]);
 
-            // Safely get properties whether it's an object or array
+            // Ambil property-nya pelan-pelan biar ga error (kadang object kadang array)
             $transactionStatus = is_object($status) ? $status->transaction_status : $status['transaction_status'];
             $fraudStatus = is_object($status) ? ($status->fraud_status ?? 'accept') : ($status['fraud_status'] ?? 'accept');
             $paymentType = is_object($status) ? ($status->payment_type ?? 'unknown') : ($status['payment_type'] ?? 'unknown');
             $grossAmount = is_object($status) ? ($status->gross_amount ?? 0) : ($status['gross_amount'] ?? 0);
 
-            // Find the payment history record
+            // Cari history pembayarannya
             $paymentHistory = PaymentHistory::where('transaction_id', $orderId)->first();
 
             if ($paymentHistory) {
-                // Update payment history
+                // Update history pembayaran
                 $paymentHistory->update([
                     'transaction_status' => $transactionStatus,
                     'fraud_status' => $fraudStatus,
@@ -101,11 +101,11 @@ class MidtransService
                     'gross_amount' => $grossAmount
                 ]);
 
-                // Update booking status based on payment result
+                // Update status booking sesuai hasil bayar
                 $booking = $paymentHistory->booking;
             } else {
-                // Fallback: If PaymentHistory missing, try to find booking by order_id (booking_code)
-                // Assuming order_id format is typically BOOKINGCODE_TIMESTAMP
+                // Jaga-jaga: Kalo history ga ada, coba cari booking pake order_id (booking_code)
+                // Asumsi format order_id biasanya KODBOOKING_TIMESTAMP
                 $parts = explode('_', $orderId);
                 $bookingCode = $parts[0];
                 $booking = \App\Models\Booking::where('booking_code', $bookingCode)->first();
@@ -124,20 +124,20 @@ class MidtransService
             
             if ($booking) {
                  if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
-                    // Payment successful
+                    // Pembayaran sukses mantap
                     $booking->update([
                         'payment_status' => 'paid',
                         'booking_status' => 'confirmed', // Ensure booking is confirmed
                         'midtrans_transaction_id' => $orderId
                     ]);
                 } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire' || $transactionStatus === 'deny') {
-                    // Payment failed/expired
+                    // Pembayaran gagal atau kadaluarsa
                     $booking->update([
                         'payment_status' => 'failed',
                         'midtrans_transaction_id' => $orderId
                     ]);
                 } elseif ($transactionStatus === 'pending') {
-                    // Waiting for payment
+                    // Masih nunggu dibayar
                     $booking->update([
                         'payment_status' => 'pending',
                         'midtrans_transaction_id' => $orderId
@@ -148,10 +148,10 @@ class MidtransService
             return [
                 'status' => 'success',
                 'data' => $status,
-                'transaction_status' => $transactionStatus // Expose specifically for frontend
+                'transaction_status' => $transactionStatus // Kasih tau statusnya buat frontend
             ];
         } catch (\Exception $e) {
-            // Check if it's a 404 (Transaction doesn't exist)
+            // Cek kalo 404 (Transaksi ga ada)
             if (strpos($e->getMessage(), '404') !== false || $e->getCode() == 404) {
                  return [
                     'status' => 'not_found',
@@ -181,7 +181,7 @@ class MidtransService
         $paymentType = $payload['payment_type'] ?? 'unknown';
         $grossAmount = $payload['gross_amount'] ?? 0;
 
-        // Find the payment history record
+        // Cari history pembayarannya
         $paymentHistory = PaymentHistory::where('transaction_id', $orderId)->first();
 
         if (!$paymentHistory) {
@@ -191,7 +191,7 @@ class MidtransService
             ];
         }
 
-        // Update payment history
+        // Update history pembayaran
         $paymentHistory->update([
             'transaction_status' => $transactionStatus,
             'fraud_status' => $fraudStatus,
@@ -199,22 +199,22 @@ class MidtransService
             'gross_amount' => $grossAmount
         ]);
 
-        // Update booking status based on payment result
+        // Update status booking sesuai hasil bayar
         $booking = $paymentHistory->booking;
         if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
-            // Payment successful
+            // Pembayaran sukses
             $booking->update([
                 'payment_status' => 'paid',
                 'midtrans_transaction_id' => $orderId
             ]);
         } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire') {
-            // Payment failed/expired
+            // Pembayaran gagal/kadaluarsa
             $booking->update([
                 'payment_status' => 'failed',
                 'midtrans_transaction_id' => $orderId
             ]);
         } elseif ($transactionStatus === 'pending') {
-            // Waiting for payment
+            // Masih nunggu dibayar
             $booking->update([
                 'payment_status' => 'pending',
                 'midtrans_transaction_id' => $orderId

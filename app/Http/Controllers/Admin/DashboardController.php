@@ -17,13 +17,13 @@ class DashboardController extends Controller
         $totalSchedules = Schedule::count();
         $totalUsers = User::count();
         
-        // Get recent bookings with their schedules
+        // Ambil booking yg baru-baru aja
         $recentBookings = Booking::with('schedule.route', 'user')
             ->latest()
             ->take(5)
             ->get();
             
-        // Get upcoming schedules
+        // Ambil jadwal yg mau berangkat bentar lagi
         $upcomingSchedules = Schedule::with('route', 'bus')
             ->where('departure_time', '>', now())
             ->orderBy('departure_time')
@@ -33,7 +33,7 @@ class DashboardController extends Controller
         return \Inertia\Inertia::render('Admin/Dashboard', compact('totalBookings', 'totalRevenue', 'totalSchedules', 'totalUsers', 'recentBookings', 'upcomingSchedules'));
     }
     
-    // Test method to verify role-based access control
+    // Cek role user buat ngetes doang
     public function testRoles()
     {
         $user = auth()->user();

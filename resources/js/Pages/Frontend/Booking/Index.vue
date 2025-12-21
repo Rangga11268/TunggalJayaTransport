@@ -24,7 +24,7 @@ const form = useForm({
 });
 
 const search = () => {
-    // Convert arrays to comma-separated strings for URL params
+    // Ubah array jadi string koma-komaan buat URL
     const params = {
         ...form,
         class: form.class.length ? form.class.join(",") : null,
@@ -57,14 +57,14 @@ const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("id-ID", options);
 };
 
-// Swap functionality
+// Tuker kota asal sama tujuan
 const swapLocations = () => {
     const temp = form.origin;
     form.origin = form.destination;
     form.destination = temp;
 };
 
-// Auto-search when filters change
+// Cari otomatis pas filter ganti
 watch(
     () => [form.origin, form.destination, form.date, form.class, form.time],
     () => {

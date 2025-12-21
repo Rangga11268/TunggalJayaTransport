@@ -16,19 +16,19 @@ class OtpService
 
     public function generate(string $identifier, string $method = 'whatsapp'): string
     {
-        // Check rate limiting / existing otp (Optional, simple override here)
+        // Cek limit request OTP, tapi disini hajar aja dulu (override)
         
-        // Generate OTP baru
+        // Bikin kode OTP baru yang fresh
         $otp = $this->createOtpString();
         
-        // Simpan ke Cache
+        // Simpan di Cache biar cepet
         $cacheKey = "otp_verification:{$identifier}";
         Cache::put($cacheKey, [
             'otp' => $otp,
             'attempts' => 0
         ], now()->addMinutes(self::OTP_EXPIRY_MINUTES));
 
-        // Simpan OTP ke session untuk keperluan development/testing
+        // Simpan OTP di session buat iseng-iseng testing dev
         if (app()->environment('local', 'development', 'testing')) {
             Session::put('debug_otp', $otp);
             Session::put('debug_identifier', $identifier);
@@ -37,7 +37,7 @@ class OtpService
         if ($method === 'email') {
             $this->sendViaEmail($identifier, $otp);
         } else {
-            // WhatsApp / SMS
+            // Kirim via WA / SMS
             $this->sendViaWhatsapp($identifier, $otp);
         }
         
@@ -54,7 +54,7 @@ class OtpService
         }
 
         if ($data['otp'] !== $otp) {
-            // Increment attempts
+            // Tambah counter percobaan
             $data['attempts']++;
             if ($data['attempts'] >= self::MAX_ATTEMPTS) {
                 Cache::forget($cacheKey);
@@ -64,7 +64,7 @@ class OtpService
             return false;
         }
 
-        // Valid, clear cache
+        // Valid nih, bersihin cache-nya
         Cache::forget($cacheKey);
         
         return true;
@@ -82,7 +82,7 @@ class OtpService
 
     private function sendViaWhatsapp(string $phone, string $otp): void
     {
-        // Simulasikan pengiriman SMS/WA
+        // Pura-pura kirim SMS/WA
         // Di implementasi nyata, tambahkan integrasi SMS gateway di sini
         Log::info("OTP $otp dikirim ke nomor $phone");
     }

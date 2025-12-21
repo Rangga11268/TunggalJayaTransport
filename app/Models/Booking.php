@@ -43,12 +43,12 @@ class Booking extends Model implements HasMedia
 
         $timeString = $this->schedule->departure_time->format('H:i:s');
         
-        // If booking_date exists, combine it with schedule time
+        // Kalo ada booking_date, gabungin sama jam jadwal
         if ($this->booking_date) {
             return $this->booking_date->setTimeFromTimeString($timeString);
         }
 
-        // Fallback to schedule's departure time (even if it's 2000)
+        // Fallback ke jam jadwal (walaupun taun jebot 2000)
         return $this->schedule->departure_time;
     }
 
@@ -82,11 +82,11 @@ class Booking extends Model implements HasMedia
     
     public function setSeatNumbersAttribute($value)
     {
-        // Validate that seat numbers don't exceed the number of seats booked
+        // Validasi jumlah kursi, jangan sampe lebih dari yg di-booking
         if ($value) {
             $seatNumbers = explode(',', $value);
             if (count($seatNumbers) > $this->number_of_seats) {
-                throw new \InvalidArgumentException('Number of seat numbers cannot exceed the number of seats booked');
+                throw new \InvalidArgumentException('Kebanyakan milih kursi woy, jatahnya cuma ' . $this->number_of_seats);
             }
         }
         
@@ -95,20 +95,20 @@ class Booking extends Model implements HasMedia
     
     public function setNumberOfSeatsAttribute($value)
     {
-        // Validate that the number of seats doesn't exceed bus capacity
+        // Validasi lagi, jangan maruk melebihi kapasitas bus
         if ($this->schedule && $value > $this->schedule->bus->capacity) {
-            throw new \InvalidArgumentException('Number of seats cannot exceed bus capacity');
+            throw new \InvalidArgumentException('Busnya ga muat bos');
         }
         
         $this->attributes['number_of_seats'] = $value;
     }
     
     /**
-     * Check if payment has expired
+     * Cek apa pembayarannya udah expired
      */
     public function isPaymentExpired()
     {
-        // Payment expires after 30 minutes if it's still pending
+        // Expired 30 menit kalo masih pending, kelamaan nunggu keburu diambil orang
         if ($this->payment_status === 'pending' && $this->payment_started_at) {
             return $this->payment_started_at->addMinutes(30)->isPast();
         }

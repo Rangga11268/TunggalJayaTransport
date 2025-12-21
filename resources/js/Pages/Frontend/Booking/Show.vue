@@ -52,10 +52,10 @@ const formatCurrency = (value) => {
 
 const formatTime = (dateString) => {
     if (!dateString) return "";
-    // If it's already a time string like "14:00", return it
+    // Kalo udah format jam "14:00", balikin aja
     if (dateString.length === 5 && dateString.includes(":")) return dateString;
 
-    // Otherwise parse it as date
+    // Kalo bukan, parsing dulu jadi date
     const date = new Date(dateString);
     return date
         .toLocaleTimeString("id-ID", {

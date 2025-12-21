@@ -63,7 +63,7 @@ class PaymentController extends Controller
         $paymentHistory = PaymentHistory::where('transaction_id', $orderId)->first();
         $booking = null;
 
-        // Fallback: Check Booking table if PaymentHistory not found
+        // Coba cek di tabel Booking kalo history ga ketemu, kali aja nyelip
         if (!$paymentHistory) {
             $booking = Booking::where('midtrans_transaction_id', $orderId)->first();
             
@@ -77,10 +77,10 @@ class PaymentController extends Controller
             $booking = $paymentHistory->booking;
         }
 
-        // 1. Check status of the requested Order ID
+        // 1. Cek status Order ID yang diminta ke Midtrans
         $result = $this->midtransService->getTransactionStatus($orderId);
 
-        // If explicitly successful, return immediately
+        // Kalo sukses yaudah balikin aja langsung
         if ($result['status'] === 'success' && 
            ($result['transaction_status'] == 'settlement' || $result['transaction_status'] == 'capture')) {
             return response()->json([
@@ -90,27 +90,26 @@ class PaymentController extends Controller
             ]);
         }
 
-        // 2. Smart Recovery: If the requested ID is not paid (pending/not_found/etc), 
-        // check IF ANY OTHER transaction for this booking was paid.
-        // This handles the case where user clicked "Pay" multiple times (generating new IDs) 
-        // but paid for an OLDER Snap token.
+        // 2. Smart Recovery: Kalo ID ini belom dibayar (pending/not_found), 
+        // coba cek ID lain siapa tau user iseng bikin banyak tapi bayar yang lama.
+        // Ini buat jaga-jaga kalo user klik "Bayar" berkali-kali (bikin ID baru) tapi bayar pake Snap token yang lama.
         
         if ($booking) {
-            // Get all transaction IDs associated with this booking from PaymentHistory
+            // Ambil semua ID transaksi buat booking ini dari history
             $allTransactions = PaymentHistory::where('booking_id', $booking->id)
-                ->where('transaction_id', '!=', $orderId) // Exclude current one we already checked
+                ->where('transaction_id', '!=', $orderId) // Jangan cek yang tadi udah dicek
                 ->orderBy('created_at', 'desc')
                 ->get();
 
             foreach ($allTransactions as $history) {
-                // Check status of these other transactions
+                // Cekin satu-satu statusnya
                 $recoveryResult = $this->midtransService->getTransactionStatus($history->transaction_id);
                 
                 if ($recoveryResult['status'] === 'success' && 
                    ($recoveryResult['transaction_status'] == 'settlement' || $recoveryResult['transaction_status'] == 'capture')) {
                     
-                    // Found a PAID transaction!
-                    // Update the booking to point to this valid transaction instead
+                    // Nah ketemu yang udah LUNAS!
+                    // Pake ID yang ini aja, update bookingnya biar bener
                     $booking->update([
                         'payment_status' => 'paid',
                         'midtrans_transaction_id' => $history->transaction_id
@@ -126,11 +125,11 @@ class PaymentController extends Controller
             }
         }
         
-        // Handle "not_found" specifically (waiting for payment creation)
+        // Kalo ga ketemu alias not_found, yaudah bilang aja nunggu pembayaran
         if ($result['status'] === 'not_found') {
              return response()->json([
-                'status' => 'success', // Retain success for frontend logic
-                'transaction_status' => 'not_found', // Custom status for frontend
+                'status' => 'success', // Tetep success biar frontend ga panik
+                'transaction_status' => 'not_found', 
                 'message' => $result['message']
             ]);
         }
@@ -157,10 +156,10 @@ class PaymentController extends Controller
      */
     public function webhook(Request $request)
     {
-        // Validate payload first
+        // Validasi payload dulu
         $payload = $request->all();
         
-        // Validate the notification from Midtrans
+        // Validasi notifikasinya beneran dari Midtrans ga
         $isValid = $this->midtransService->validateNotification($payload);
         
         if (!$isValid) {
@@ -170,7 +169,7 @@ class PaymentController extends Controller
             ], 400);
         }
 
-        // Process the webhook
+        // Proses webhooknya
         $result = $this->midtransService->handleWebhook($payload);
 
         if ($result['status'] === 'success') {

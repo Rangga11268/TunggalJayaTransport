@@ -24,12 +24,12 @@ class PhoneVerificationController extends Controller
     {
         $user = Auth::user();
         
-        // Jika user sudah fully verified, arahkan ke dashboard
+        // Kalo user udah verifikasi full, langsung lempar ke dashboard
         if ($user->isFullyVerified()) {
             return redirect()->intended(route('dashboard', absolute: false));
         }
 
-        // Dapatkan OTP untuk keperluan debugging di lingkungan development
+        // Ambil OTP buat debug kalo lagi di local
         $debugOtp = null;
         if (app()->environment('local', 'development', 'testing')) {
             $debugOtp = $this->otpService->getDebugOtp();
@@ -60,7 +60,7 @@ class PhoneVerificationController extends Controller
              return redirect()->back()->withErrors(['phone' => 'Kontak tujuan tidak ditemukan.']);
         }
 
-        // Generate OTP
+        // Generate OTP dulu bos
         $this->otpService->generate($identifier, $method);
         
         $destination = $method === 'email' ? 'email' : 'nomor WhatsApp';
@@ -75,7 +75,7 @@ class PhoneVerificationController extends Controller
 
         $user = Auth::user();
         
-        // Try verifying with phone
+        // Coba verifikasi pake nomor HP
         $isValid = false;
         if ($user->phone && $this->otpService->verify($user->phone, $request->otp)) {
             $isValid = true;
@@ -84,15 +84,15 @@ class PhoneVerificationController extends Controller
         }
 
         if ($isValid) {
-            // Update status verifikasi
+            // Update status verifikasi jadi OK
             $user->update([
                 'phone_verified_at' => now(), // Still use this column for "verified status"
                 'is_verified' => true
             ]);
             
-            $this->otpService->clearDebugOtp(); // Clear OTP dari session setelah verifikasi berhasil
+            $this->otpService->clearDebugOtp(); // Hapus OTP debug biar bersih
             
-            // Redirect berdasarkan role user setelah verifikasi selesai
+            // Cek role-nya, admin ke dashboard admin, user biasa ke home aja
             if ($user->hasRole('admin') || $user->hasRole('schedule_manager')) {
                 return redirect()->intended(route('admin.dashboard', absolute: false));
             } else {
@@ -108,7 +108,7 @@ class PhoneVerificationController extends Controller
     {
         $user = Auth::user();
         
-        // Default to phone if not specified, or support method in request
+        // Default ke HP kalo ga milih, atau ikutin request
         $method = $request->input('method', 'whatsapp');
         
         $identifier = $method === 'email' ? $user->email : $user->phone;

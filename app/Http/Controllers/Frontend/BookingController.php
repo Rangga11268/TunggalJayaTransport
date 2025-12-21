@@ -18,7 +18,7 @@ class BookingController extends Controller
 {
     public function index(Request $request)
     {
-        // Get all unique origins and destinations for the dropdowns
+        // Ambil data asal & tujuan buat dropdown
         $origins = \Illuminate\Support\Facades\Cache::remember('route_origins', 60, function () {
             return BusRoute::pluck('origin')->unique()->values();
         });
@@ -37,7 +37,7 @@ class BookingController extends Controller
         $validPair = false;
 
         if ($origin && $destination) {
-            // Check if this is a valid route pair (in either direction)
+            // Cek rutenya valid ga, bolak balik aman
             $validRoutes = BusRoute::where(function ($query) use ($origin, $destination) {
                 $query->where('origin', $origin)
                     ->where('destination', $destination);
@@ -48,10 +48,11 @@ class BookingController extends Controller
 
             if ($validRoutes->count() > 0) {
                 $validPair = true;
-                // Get schedules for these routes that are available for booking
+                // Ambil ID rutenya
                 $routeIds = $validRoutes->pluck('id');
 
-                // Build query with Eager Loading to prevents N+1
+                // Query jadwal, sekalian load relasi biar ga lemot (N+1 issue)
+                // Itung sekalian yang udah booking biar gak query ulang di loop
                 $query = Schedule::whereIn('route_id', $routeIds)
                         ->with('route', 'bus')
                         ->withSum(['bookings as booked_seats_count' => function ($q) use ($searchDate) {
@@ -61,7 +62,7 @@ class BookingController extends Controller
                             if ($searchDate) {
                                 $q->whereDate('booking_date', $searchDate);
                             } else {
-                                // If no date selected, count future bookings (matching Schedule model logic)
+                                // Kalo ga pilih tanggal, anggep buat hari ini kedepan
                                 $q->whereDate('booking_date', '>=', Carbon::today());
                             }
                         }], 'number_of_seats')
@@ -533,62 +534,53 @@ class BookingController extends Controller
         ]);
 
         try {
+            // Pake transaction biar aman, ga ada drama kursi ganda pas rame
             return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
-                // Lock the booking row
+                // Kunci datanya biar user lain ngantri bentar
                 $booking = Booking::lockForUpdate()->findOrFail($request->booking_id);
                 
-                // Lock the schedule row to serialize concurrent bookings for this bus
-                // This prevents race conditions where two users book the same seat at the same exact moment
+                // Kunci juga jadwalnya, ini paling penting biar ga overbooking
                 $schedule = Schedule::lockForUpdate()->with('bus')->find($booking->schedule_id);
 
                 if (!$schedule) {
-                     return response()->json(['success' => false, 'message' => 'Schedule not found.']);
+                     return response()->json(['success' => false, 'message' => 'Jadwal ga ketemu entah kemana.']);
                 }
 
-                // Check if the schedule has already departed
+                // Cek klo busnya udah jalan
                 if ($schedule->hasDeparted()) {
-                    return response()->json(['success' => false, 'message' => 'The schedule for this booking has already departed.']);
+                    return response()->json(['success' => false, 'message' => 'Yah, busnya udah berangkat bos.']);
                 }
 
-                // Check if the schedule is still available for booking
+                // Masih bisa dibooking ga?
                 if (!$schedule->isAvailableForBooking()) {
-                    return response()->json(['success' => false, 'message' => 'The schedule for this booking is no longer available.']);
+                    return response()->json(['success' => false, 'message' => 'Jadwal ini udah ga bisa dibooking lagi.']);
                 }
 
-                // Validate that the number of selected seats matches the requested number
+                // Pastikan jumlah kursi yg dipilih sama
                 if (count($request->seat_numbers) != $booking->number_of_seats) {
-                    return response()->json(['success' => false, 'message' => 'Please select exactly ' . $booking->number_of_seats . ' seats.']);
+                    return response()->json(['success' => false, 'message' => 'Pilih ' . $booking->number_of_seats . ' kursi ya, jangan lebih jangan kurang.']);
                 }
 
-                // Check if there are enough seats available for the booking date
-                // Note: getAvailableSeatsCount usually excludes the current user's partially completed booking? 
-                // In this controller logic, the booking exists but seat_numbers is null.
-                // The getAvailableSeatsCount checks 'confirmed'/'paid' bookings. 
-                // Our current booking is 'confirmed' but seats are null, so it shouldn't affect the count yet.
+                // Hitung sisa kursi real-time
                 $availableSeats = $schedule->getAvailableSeatsCount($booking->booking_date);
                 
-                // Add back the current booking's seats calculation if logic changes, but currently safe:
-                // If capacity is 40, 38 booked. Available = 2.
-                // My booking needs 2. 2 <= 2. OK.
-                
                 if (count($request->seat_numbers) > $availableSeats) {
-                    return response()->json(['success' => false, 'message' => "Only {$availableSeats} seats are available for this schedule on {$booking->booking_date}. Please select fewer seats."]);
+                    return response()->json(['success' => false, 'message' => "Sisa kursi cuma {$availableSeats} nih untuk tanggal segitu."]);
                 }
 
-                // Check if any of the selected seats are already booked for the same date
-                // Since we hold the lock on Schedule, no other transaction can be inserting conflicts right now
+                // Cek apakah kursi yg dipilih udah ada yg punya
                 $occupiedSeats = $schedule->getBookedSeatNumbers($booking->booking_date);
                 $selectedSeats = array_map('strval', $request->seat_numbers);
 
-                // Check for conflicts
+                // Cari yang bentrok
                 $conflictingSeats = array_intersect($selectedSeats, $occupiedSeats);
                 if (!empty($conflictingSeats)) {
-                    return response()->json(['success' => false, 'message' => 'Some seats are already booked: ' . implode(', ', $conflictingSeats)]);
+                    return response()->json(['success' => false, 'message' => 'Kursi nomor ' . implode(', ', $conflictingSeats) . ' udah keduluan orang lain. Cari yg lain ya.']);
                 }
 
-                // Validate that all seat numbers are unique
+                // Cek duplikat input
                 if (count($selectedSeats) != count(array_unique($selectedSeats))) {
-                    return response()->json(['success' => false, 'message' => 'Please select unique seats.']);
+                    return response()->json(['success' => false, 'message' => 'Jangan pilih kursi yang sama dua kali dong.']);
                 }
 
                 $seatNumbers = implode(',', $request->seat_numbers);
@@ -596,11 +588,11 @@ class BookingController extends Controller
                 $booking->seat_numbers = $seatNumbers;
                 $booking->save();
 
-                return response()->json(['success' => true, 'message' => 'Seats selected successfully']);
+                return response()->json(['success' => true, 'message' => 'Sip, kursi berhasil diamankan']);
             });
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Seat selection error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'An error occurred while selecting seats. Please try again.']);
+            \Illuminate\Support\Facades\Log::error('Gagal pilih kursi: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Ada masalah pas milih kursi, coba lagi bentar.']);
         }
     }
 

@@ -51,7 +51,7 @@ class BookingController extends Controller
     {
         return Inertia::render('Admin/Bookings/Create', [
             'schedules' => Schedule::with(['route', 'bus'])
-                ->where('departure_time', '>', now()) // Only show future schedules
+                ->where('departure_time', '>', now()) // Cuma jadwal masa depan
                 ->get()
                 ->map(function ($schedule) {
                     return [
@@ -62,7 +62,7 @@ class BookingController extends Controller
                         'bus_capacity' => $schedule->bus->capacity,
                     ];
                 }),
-             // We can optionally pass users if needed, or rely on free text entry for simplicity as per current controller
+             // Bisa sih oper data user kalo mau, tapi sementara manual aja input teks biasa
         ]);
     }
 
@@ -72,49 +72,38 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            // 'user_id' => 'required|exists:users,id', // Optional in manual booking? The original controller required it. Let's make it optional or assume admin booking uses a default/null user if not selected.
-            // Actually original controller required user_id. Let's stick to required for now, or handle it.
-            // Admin manual booking might be for a guest? 
-            // The original controller code: 'user_id' => 'required|exists:users,id'.
-            // I'll keep it simple for now, maybe associate with the admin user or a specific guest user?
-            // Or better, let's look at the original Store method again.
-            // It uses $request->user_id. 
-            // I will allow creating a user or selecting one?
-            // For now, I'll remove the strict user_id requirement for Admin creation if the original system allowed "Guest" text. 
-            // Wait, original validation WAS strict: required|exists:users,id.
-            // This means we MUST select a user. I will fetch users in create then.
+            // Harus pilih user biar jelas siapa yg booking
             'user_id' => 'required|exists:users,id', 
             'schedule_id' => 'required|exists:schedules,id',
             'passenger_name' => 'required|string|max:255',
             'passenger_phone' => 'required|string|max:20',
             'passenger_email' => 'required|email|max:255',
             'seat_numbers' => 'required|string|max:255',
-            // 'total_price' => 'required|numeric|min:0', // Auto-calculate? The original requested it.
+            // Total harga harus diisi
             'total_price' => 'required|numeric|min:0',
             'payment_status' => 'required|in:pending,paid,failed,refunded',
             'booking_status' => 'required|in:pending,confirmed,cancelled,completed',
-            'number_of_seats' => 'required|integer|min:1', // Added this as Model has it
+            'number_of_seats' => 'required|integer|min:1', // Penting nih, jangan lupa
         ]);
 
         $schedule = Schedule::findOrFail($request->schedule_id);
         
-        // Basic validations
+        // Validasi dasar dulu bos
         if ($schedule->hasDeparted()) {
              return redirect()->back()->withErrors(['schedule_id' => 'Cannot create booking for a schedule that has already departed.']);
         }
         
-        // Check availability (simple check)
-        // Note: Model has isAvailableForBooking, but we also need to check seat count vs requested
-        // The original code passed 'seat_numbers' string. 
+        // Cek ketersediaan (cek simpel aja)
+        // Model udah pinter method isAvailableForBooking, tapi kita perlu cek jumlah kursi juga
         
-        // Booking Code
+        // Bikin Kode Booking biar keren
         $bookingCode = 'BK' . time() . rand(100, 999);
         
         $booking = new Booking();
         $booking->booking_code = $bookingCode;
         $booking->user_id = $request->user_id;
         $booking->schedule_id = $request->schedule_id;
-        $booking->booking_date = now(); // Add booking date
+        $booking->booking_date = now(); // Tanggal booking hari ini
         $booking->passenger_name = $request->passenger_name;
         $booking->passenger_phone = $request->passenger_phone;
         $booking->passenger_email = $request->passenger_email;
@@ -140,7 +129,7 @@ class BookingController extends Controller
     {
         $booking = Booking::with(['user', 'schedule.route', 'schedule.bus', 'paymentHistories'])->findOrFail($id);
         
-        // Transform for display
+        // Format dulu buat tampilan
         $booking->departure_time = $booking->schedule->getActualDepartureTime()->format('d M Y H:i');
         
         return Inertia::render('Admin/Bookings/Show', [
@@ -157,8 +146,7 @@ class BookingController extends Controller
         
         return Inertia::render('Admin/Bookings/Edit', [
             'booking' => $booking,
-            // Pass minimal schedule info if not changing schedule OR full list if changing is allowed
-            // Loading all schedules might be heavy. Let's load the current one + future ones.
+            // Load semua jadwal berat bos. Load yang sekarang + yang akan datang aja
              'schedules' => Schedule::with(['route', 'bus'])
                 ->where('id', $booking->schedule_id)
                 ->orWhere('departure_time', '>', now())
