@@ -73,43 +73,27 @@ class BookingController extends Controller
                 // Filter schedules
                 $schedules = $allSchedules->filter(function ($schedule) use ($searchDate, $classes, $times) {
                     // 1. Availability Check
-                    $isAvailable = false;
                     
                     // Use the eager loaded count instead of querying DB
                     $bookedSeats = $schedule->booked_seats_count ?? 0;
                     $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
                     $hasSeats = $availableSeats > 0;
 
+                    $active = $schedule->status === 'active';
+                    if (!$active) return false;
+
                     if ($searchDate) {
                         if (!$schedule->is_daily) {
                             $dateMatch = $schedule->departure_time->toDateString() === $searchDate->toDateString();
-                            $active = $schedule->status === 'active';
-                            // Check past departure
-                             $checkDeparture = $schedule->departure_time instanceof Carbon ? $schedule->departure_time : Carbon::parse($schedule->departure_time);
-                            $notDeparted = !$checkDeparture->isPast();
+                            // For specific date search:
+                            // We SHOW departed schedules so users know they missed it (with visual cue),
+                            // BUT we might want to hide them if they are from previous days (which is handled by dateMatch).
+                            // If it's today and departed, show it.
                             
-                            $isAvailable = $dateMatch && $active && $notDeparted && $hasSeats;
-                        } else {
-                            // Recurring
-                             $isAvailable = $schedule->status === 'active' && $hasSeats;
-                             // We also need to check if the specific daily departure time has passed for TODAY if searchDate is today
-                             if ($searchDate->isToday()) {
-                                 $timeStr = $schedule->departure_time instanceof Carbon ? $schedule->departure_time->format('H:i:s') : Carbon::parse($schedule->departure_time)->format('H:i:s');
-                                 $todayDeparture = Carbon::today()->setTimeFromTimeString($timeStr);
-                                 if ($todayDeparture->isPast()) {
-                                     // If we are looking for "today" but bus left, it's not available for today.
-                                     // But logic in model might say "available for recurring" generally.
-                                     // Here we are strict: if user searches for DATE, and time passed, it's not available.
-                                     $isAvailable = false;
-                                 }
-                             }
-                        }
-                    } else {
-                        // If no date selected, just check generic availability
-                         $isAvailable = $schedule->status === 'active' && $hasSeats;
+                            if (!$dateMatch) return false;
+                        } 
+                        // For daily, it matches every day.
                     }
-
-                    if (!$isAvailable) return false;
 
                     // 2. Class Filter
                     if (!empty($classes)) {
@@ -157,6 +141,12 @@ class BookingController extends Controller
                 $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
                 if ($availableSeats <= 0) return false;
 
+                // Hide non-daily schedules that are in the past
+                if (!$schedule->is_daily) {
+                    $departure = $schedule->departure_time instanceof Carbon ? $schedule->departure_time : Carbon::parse($schedule->departure_time);
+                    if ($departure->isPast()) return false;
+                }
+
                 // Class Filter
                 if (!empty($classes)) {
                     if (!in_array($schedule->bus->bus_type, $classes)) {
@@ -190,6 +180,9 @@ class BookingController extends Controller
             // Calculate available seats using the eager loaded value
             $bookedSeats = $schedule->booked_seats_count ?? 0;
             $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
+            
+            // Check departure status
+            $hasDeparted = $schedule->hasDeparted($checkDate);
 
             return [
                 'id' => $schedule->id,
@@ -198,6 +191,7 @@ class BookingController extends Controller
                 'arrival_time' => $schedule->getActualArrivalTime($checkDate)->format('H:i'),
                 'duration' => $schedule->route->formatted_duration,
                 'available_seats' => $availableSeats, // Use pre-calculated value
+                'has_departed' => $hasDeparted,
                 'bus' => [
                     'name' => $schedule->bus->name,
                     'bus_type' => $schedule->bus->bus_type,

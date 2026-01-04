@@ -665,8 +665,20 @@ watch(
 
                                 <!-- Right: Price & Action -->
                                 <div
-                                    class="p-8 md:w-72 bg-gray-50/80 dark:bg-gray-800/20 flex flex-col justify-center items-center text-center space-y-5 shrink-0"
+                                    class="p-8 md:w-72 bg-gray-50/80 dark:bg-gray-800/20 flex flex-col justify-center items-center text-center space-y-5 shrink-0 relative"
                                 >
+                                    <!-- Departed Overlay -->
+                                    <div
+                                        v-if="schedule.has_departed"
+                                        class="absolute inset-0 bg-white/50 dark:bg-gray-900/50 backdrop-blur-[1px] z-10 flex items-center justify-center"
+                                    >
+                                        <div
+                                            class="bg-red-600 text-white px-6 py-2 rounded-full font-bold shadow-lg transform -rotate-12 border-2 border-white"
+                                        >
+                                            SUDAH BERANGKAT
+                                        </div>
+                                    </div>
+
                                     <div>
                                         <div
                                             class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1"
@@ -675,6 +687,10 @@ watch(
                                         </div>
                                         <div
                                             class="text-3xl font-black text-brand-red tracking-tight"
+                                            :class="{
+                                                'opacity-50 grayscale':
+                                                    schedule.has_departed,
+                                            }"
                                         >
                                             {{ formatPrice(schedule.price) }}
                                         </div>
@@ -682,6 +698,7 @@ watch(
 
                                     <div class="w-full space-y-3">
                                         <Link
+                                            v-if="!schedule.has_departed"
                                             :href="
                                                 route('frontend.booking.show', {
                                                     id: schedule.id,
@@ -692,6 +709,13 @@ watch(
                                         >
                                             Pilih Tiket
                                         </Link>
+                                        <button
+                                            v-else
+                                            disabled
+                                            class="w-full py-3.5 text-base bg-gray-300 dark:bg-gray-700 text-gray-500 rounded-xl font-bold cursor-not-allowed"
+                                        >
+                                            Tidak Tersedia
+                                        </button>
 
                                         <div
                                             class="text-xs font-semibold text-gray-500 flex items-center justify-center bg-white dark:bg-gray-800 py-2 rounded-lg border border-gray-200 dark:border-gray-700"
