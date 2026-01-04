@@ -16,25 +16,10 @@ const formatPrice = (price) => {
     }).format(price || 0);
 };
 
-const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const options = {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    };
-    return new Date(dateString).toLocaleDateString("id-ID", options);
-};
-
 const formatTime = (dateString) => {
     if (!dateString) return "";
-    // If it's already a time string like "14:00", return it
     if (dateString.length === 5 && dateString.includes(":")) return dateString;
 
-    // Otherwise parse it as date
     const date = new Date(dateString);
     return date
         .toLocaleTimeString("id-ID", {
@@ -50,63 +35,88 @@ const formatTime = (dateString) => {
     <Head :title="`${routeModel.origin} - ${routeModel.destination}`" />
 
     <!-- Hero Header -->
-    <div class="relative bg-primary-950 py-24 overflow-hidden">
+    <div
+        class="relative bg-gray-950 min-h-[50vh] flex items-center justify-center overflow-hidden"
+    >
         <!-- Background Elements -->
         <div class="absolute inset-0">
-            <div class="absolute inset-0 hero-pattern opacity-10"></div>
             <div
-                class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary-900/50 to-transparent"
+                class="absolute top-0 right-0 w-[500px] h-[500px] bg-rose-600/10 rounded-full blur-[120px]"
             ></div>
-            <!-- Stars -->
-            <div class="stars absolute inset-0 opacity-50"></div>
+            <div
+                class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-rose-600/10 rounded-full blur-[120px]"
+            ></div>
+            <!-- Grid Pattern -->
+            <div
+                class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20"
+            ></div>
         </div>
 
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+            class="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left"
+        >
             <Link
                 :href="route('frontend.routes.index')"
-                class="inline-flex items-center space-x-2 text-gray-400 hover:text-white transition-colors mb-6"
+                class="inline-flex items-center space-x-2 text-gray-400 hover:text-white transition-colors mb-8 group"
             >
-                <i class="fas fa-arrow-left"></i>
-                <span>Kembali ke Daftar Rute</span>
+                <i
+                    class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"
+                ></i>
+                <span
+                    class="font-manrope font-bold text-sm uppercase tracking-widest"
+                    >Kembali ke Daftar</span
+                >
             </Link>
 
             <div
-                class="flex flex-col md:flex-row md:items-center justify-between"
+                class="flex flex-col md:flex-row md:items-end justify-between gap-8"
             >
                 <div>
                     <span
-                        class="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/90 text-xs font-bold mb-4 tracking-wide"
+                        class="inline-block py-1 px-3 rounded-full bg-rose-900/30 text-rose-500 border border-rose-900/50 text-[10px] font-bold tracking-widest uppercase mb-4 font-unbounded"
                     >
-                        DETAIL RUTE
+                        Detail Rute
                     </span>
                     <h1
-                        class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-2 font-serif"
+                        class="text-4xl md:text-6xl font-black text-white mb-2 font-unbounded leading-tight"
                     >
                         {{ routeModel.origin }}
-                        <span class="text-gray-400 mx-2 text-2xl md:text-4xl"
-                            ><i class="fas fa-long-arrow-alt-right"></i
+                        <span
+                            class="text-rose-600 mx-2 text-2xl md:text-4xl align-middle"
+                            ><i class="fas fa-arrow-right"></i
                         ></span>
                         {{ routeModel.destination }}
                     </h1>
-                    <div class="flex items-center space-x-6 text-gray-300 mt-4">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-clock text-gold-400"></i>
-                            <span>{{
+                    <div
+                        class="flex flex-wrap items-center gap-6 text-gray-400 mt-6 font-manrope"
+                    >
+                        <div
+                            class="flex items-center space-x-2 bg-white/5 px-4 py-2 rounded-lg border border-white/10"
+                        >
+                            <i class="fas fa-clock text-rose-500"></i>
+                            <span class="font-bold text-white">{{
                                 routeModel.formatted_duration || "6 Jam"
                             }}</span>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-road text-gold-400"></i>
-                            <span>{{ routeModel.distance }} km</span>
+                        <div
+                            class="flex items-center space-x-2 bg-white/5 px-4 py-2 rounded-lg border border-white/10"
+                        >
+                            <i class="fas fa-road text-rose-500"></i>
+                            <span class="font-bold text-white"
+                                >{{ routeModel.distance }} km</span
+                            >
                         </div>
                     </div>
                 </div>
-                <div class="mt-6 md:mt-0">
+
+                <!-- CTA -->
+                <div class="flex-shrink-0">
                     <Link
                         :href="route('frontend.booking.index')"
-                        class="btn-premium"
+                        class="inline-flex items-center justify-center px-8 py-4 bg-white text-black rounded-xl font-bold font-unbounded text-xs uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all duration-300 shadow-xl shadow-white/5 hover:shadow-rose-600/30"
                     >
-                        Pesan Tiket Sekarang
+                        Pesan Tiket
+                        <i class="fas fa-ticket-alt ml-3"></i>
                     </Link>
                 </div>
             </div>
@@ -114,89 +124,56 @@ const formatTime = (dateString) => {
     </div>
 
     <!-- Main Content -->
-    <div class="bg-gray-50 dark:bg-gray-950 min-h-screen py-12">
+    <div class="bg-gray-50 dark:bg-[#050505] min-h-screen py-16 font-sans">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left Column: Details & Map -->
-                <div class="lg:col-span-2 space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <!-- Left Column: Details -->
+                <div class="lg:col-span-2 space-y-12">
                     <!-- Description -->
                     <div
-                        class="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800"
+                        class="bg-white dark:bg-[#111] rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-2xl shadow-gray-200 dark:shadow-none"
                     >
                         <h3
-                            class="text-xl font-bold text-gray-800 dark:text-white mb-4"
+                            class="text-xl font-black text-gray-900 dark:text-white mb-6 font-unbounded flex items-center"
                         >
+                            <i
+                                class="fas fa-info-circle text-rose-600 mr-3"
+                            ></i>
                             Tentang Rute Ini
                         </h3>
                         <p
-                            class="text-gray-600 dark:text-gray-400 leading-relaxed"
+                            class="text-gray-500 dark:text-gray-400 leading-loose font-manrope"
                         >
                             {{
                                 routeModel.description ||
-                                "Nikmati perjalanan yang nyaman dan aman dari " +
-                                    routeModel.origin +
-                                    " menuju " +
-                                    routeModel.destination +
-                                    " bersama TUJAGO. Rute ini menawarkan pemandangan indah dan fasilitas lengap di setiap armada kami."
+                                "Nikmati perjalanan premium yang nyaman dan aman. Rute ini dirancang untuk memberikan pengalaman perjalanan terbaik dengan armada terbaru kami."
                             }}
                         </p>
                     </div>
 
-                    <!-- Map Placeholder -->
+                    <!-- Schedules -->
                     <div
-                        class="bg-white dark:bg-gray-900 rounded-3xl p-2 shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden"
+                        class="bg-white dark:bg-[#111] rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-2xl shadow-gray-200 dark:shadow-none"
                     >
-                        <div
-                            class="relative w-full h-80 bg-gray-200 dark:bg-gray-800 rounded-2xl flex items-center justify-center"
-                        >
-                            <!-- This would be a real map component (Google Maps / Leaflet) -->
-                            <div
-                                class="absolute inset-0 opacity-20"
-                                style="
-                                    background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg');
-                                    background-size: cover;
-                                    background-position: center;
-                                "
-                            ></div>
-
-                            <div class="text-center relative z-10">
-                                <div
-                                    class="w-16 h-16 bg-white dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-bounce"
-                                >
-                                    <i
-                                        class="fas fa-map-marked-alt text-2xl text-primary-600"
-                                    ></i>
-                                </div>
-                                <h4
-                                    class="text-lg font-bold text-gray-700 dark:text-gray-300"
-                                >
-                                    Peta Rute
-                                </h4>
-                                <p class="text-sm text-gray-500">
-                                    Visualisasi rute perjalanan
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Available Schedules -->
-                    <div
-                        class="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800"
-                    >
-                        <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center justify-between mb-8">
                             <h3
-                                class="text-xl font-bold text-gray-800 dark:text-white"
+                                class="text-xl font-black text-gray-900 dark:text-white font-unbounded flex items-center"
                             >
-                                Jadwal Keberangkatan
+                                <i
+                                    class="fas fa-calendar-alt text-rose-600 mr-3"
+                                ></i>
+                                Jadwal Tersedia
                             </h3>
-                            <span class="text-sm text-gray-500"
-                                >{{
+                            <span
+                                class="px-3 py-1 rounded bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400 text-xs font-bold font-manrope"
+                            >
+                                {{
                                     routeModel.available_schedules
                                         ? routeModel.available_schedules.length
                                         : 0
                                 }}
-                                jadwal ditemukan</span
-                            >
+                                Opsi
+                            </span>
                         </div>
 
                         <div
@@ -209,154 +186,171 @@ const formatTime = (dateString) => {
                             <div
                                 v-for="schedule in routeModel.available_schedules"
                                 :key="schedule.id"
-                                class="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all group"
+                                class="group flex flex-col md:flex-row md:items-center justify-between p-6 rounded-2xl bg-gray-50 dark:bg-[#161616] border border-gray-100 dark:border-white/5 hover:border-rose-600 dark:hover:border-rose-600 transition-all duration-300"
                             >
                                 <div
-                                    class="flex items-center space-x-4 mb-4 md:mb-0"
+                                    class="flex items-center gap-6 mb-4 md:mb-0"
                                 >
-                                    <div
-                                        class="flex flex-col items-center min-w-[60px]"
-                                    >
-                                        <span
-                                            class="text-lg font-bold text-gray-800 dark:text-white"
-                                            >{{
+                                    <div class="text-center min-w-[80px]">
+                                        <h4
+                                            class="text-2xl font-black text-gray-900 dark:text-white font-unbounded"
+                                        >
+                                            {{
                                                 formatTime(
                                                     schedule.departure_time
                                                 )
-                                            }}</span
+                                            }}
+                                        </h4>
+                                        <p
+                                            class="text-xs text-rose-600 font-bold uppercase tracking-wider font-manrope"
                                         >
-                                        <span class="text-xs text-gray-500"
-                                            >Berangkat</span
-                                        >
+                                            WIB
+                                        </p>
                                     </div>
                                     <div
-                                        class="w-px h-10 bg-gray-200 dark:bg-gray-700"
+                                        class="w-[1px] h-12 bg-gray-200 dark:bg-white/10"
                                     ></div>
                                     <div>
-                                        <h4
-                                            class="font-bold text-gray-800 dark:text-white"
+                                        <h5
+                                            class="font-bold text-gray-900 dark:text-white font-manrope text-lg"
                                         >
                                             {{
                                                 schedule.bus?.name ||
                                                 "Armada TJT"
                                             }}
-                                        </h4>
+                                        </h5>
                                         <span
-                                            class="inline-block px-2 py-0.5 mt-1 rounded text-xs font-bold bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
-                                        >
-                                            {{
+                                            class="text-xs text-gray-500 dark:text-gray-400"
+                                            >{{
                                                 schedule.bus?.bus_type ||
                                                 "Executive"
                                             }}
-                                        </span>
+                                            Class</span
+                                        >
                                     </div>
                                 </div>
 
                                 <div
-                                    class="flex items-center justify-between md:space-x-8"
+                                    class="flex items-center justify-between md:gap-8"
                                 >
                                     <div class="text-right">
                                         <p
-                                            class="text-lg font-bold text-brand-red"
+                                            class="text-xl font-black text-rose-600 font-unbounded"
                                         >
                                             {{ formatPrice(schedule.price) }}
                                         </p>
-                                        <p class="text-xs text-gray-500">
-                                            /kursi
+                                        <p
+                                            class="text-[10px] text-gray-400 uppercase tracking-wider"
+                                        >
+                                            Per Kursi
                                         </p>
                                     </div>
                                     <Link
                                         :href="route('frontend.booking.index')"
-                                        class="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg text-sm font-bold hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all"
+                                        class="w-10 h-10 rounded-full bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 flex items-center justify-center text-rose-600 hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all duration-300"
                                     >
-                                        Pilih
+                                        <i class="fas fa-chevron-right"></i>
                                     </Link>
                                 </div>
                             </div>
                         </div>
 
-                        <div v-else class="text-center py-12">
+                        <div
+                            v-else
+                            class="text-center py-12 border-dashed border-2 border-gray-100 dark:border-white/5 rounded-2xl"
+                        >
                             <i
-                                class="fas fa-calendar-times text-4xl text-gray-300 mb-3"
+                                class="fas fa-bus-alt text-4xl text-gray-300 mb-4"
                             ></i>
-                            <p class="text-gray-500">
-                                Tidak ada jadwal tersedia saat ini.
+                            <p class="text-gray-500 font-manrope">
+                                Belum ada jadwal keberangkatan untuk rute ini.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column: Info Card -->
-                <div class="space-y-6">
+                <!-- Right Column: Sidebar -->
+                <div class="space-y-8">
+                    <!-- Map Card -->
                     <div
-                        class="bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-lg border border-gray-100 dark:border-gray-800 sticky top-24"
+                        class="bg-white dark:bg-[#111] rounded-3xl p-2 border border-gray-100 dark:border-white/5 shadow-2xl shadow-gray-200 dark:shadow-none"
                     >
-                        <h3
-                            class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center"
+                        <div
+                            class="relative w-full h-64 bg-gray-200 dark:bg-[#1a1a1a] rounded-2xl flex items-center justify-center overflow-hidden group"
                         >
-                            <i
-                                class="fas fa-info-circle text-primary-500 mr-2"
-                            ></i>
-                            Info Penting
-                        </h3>
-                        <ul class="space-y-4">
-                            <li
-                                class="flex items-start text-sm text-gray-600 dark:text-gray-400"
-                            >
+                            <!-- Stylized Map Background -->
+                            <div
+                                class="absolute inset-0 opacity-30 dark:opacity-20 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-cover bg-center grayscale group-hover:scale-110 transition-transform duration-700"
+                            ></div>
+
+                            <div class="relative z-10 text-center">
+                                <div
+                                    class="w-12 h-12 bg-white text-rose-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
+                                >
+                                    <i class="fas fa-map-marked-alt"></i>
+                                </div>
+                                <p
+                                    class="text-xs font-bold text-gray-500 uppercase tracking-widest font-unbounded"
+                                >
+                                    Peta Rute
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div
+                        class="bg-gray-900 dark:bg-[#111] rounded-3xl p-8 text-white relative overflow-hidden"
+                    >
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-rose-600/20 rounded-full blur-3xl -mr-16 -mt-16"
+                        ></div>
+
+                        <h4
+                            class="text-lg font-black font-unbounded mb-6 flex items-center"
+                        >
+                            <i class="fas fa-shield-alt text-rose-600 mr-3"></i>
+                            Info Perjalanan
+                        </h4>
+
+                        <ul
+                            class="space-y-4 font-manrope text-sm text-gray-300"
+                        >
+                            <li class="flex items-start">
                                 <i
-                                    class="fas fa-check text-green-500 mt-1 mr-3"
+                                    class="fas fa-check-circle text-rose-600 mt-1 mr-3"
                                 ></i>
                                 <span
-                                    >Harap datang 30 menit sebelum
+                                    >Check-in min. 30 menit sebelum
                                     keberangkatan.</span
                                 >
                             </li>
-                            <li
-                                class="flex items-start text-sm text-gray-600 dark:text-gray-400"
-                            >
+                            <li class="flex items-start">
                                 <i
-                                    class="fas fa-check text-green-500 mt-1 mr-3"
+                                    class="fas fa-check-circle text-rose-600 mt-1 mr-3"
                                 ></i>
-                                <span
-                                    >Tunjukkan e-tiket kepada petugas saat
-                                    check-in.</span
-                                >
+                                <span>Maksimal bagasi 20kg per penumpang.</span>
                             </li>
-                            <li
-                                class="flex items-start text-sm text-gray-600 dark:text-gray-400"
-                            >
+                            <li class="flex items-start">
                                 <i
-                                    class="fas fa-check text-green-500 mt-1 mr-3"
+                                    class="fas fa-check-circle text-rose-600 mt-1 mr-3"
                                 ></i>
-                                <span
-                                    >Barang bawaan maksimal 20kg per
-                                    penumpang.</span
-                                >
-                            </li>
-                            <li
-                                class="flex items-start text-sm text-gray-600 dark:text-gray-400"
-                            >
-                                <i
-                                    class="fas fa-check text-green-500 mt-1 mr-3"
-                                ></i>
-                                <span
-                                    >Dilarang membawa hewan peliharaan & barang
-                                    berbahaya.</span
-                                >
+                                <span>Dilarang membawa hewan peliharaan.</span>
                             </li>
                         </ul>
 
-                        <div
-                            class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700"
-                        >
-                            <p class="text-xs text-center text-gray-500">
-                                Butuh bantuan?
+                        <div class="mt-8 pt-6 border-t border-white/10">
+                            <p
+                                class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold"
+                            >
+                                Butuh Bantuan?
                             </p>
                             <a
                                 href="#"
-                                class="block w-full py-2 mt-2 text-center border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                                class="flex items-center text-white hover:text-rose-500 transition-colors font-bold"
                             >
-                                <i class="fab fa-whatsapp mr-2"></i> Hubungi CS
+                                <i class="fab fa-whatsapp text-lg mr-2"></i>
+                                Chat CS Kami
                             </a>
                         </div>
                     </div>
