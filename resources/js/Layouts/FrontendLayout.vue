@@ -143,9 +143,6 @@ const isActive = (routeName) => {
         <!-- Branded Preloader -->
         <BrandedPreloader />
 
-        <!-- Noise Texture Overlay -->
-        <div class="noise-overlay"></div>
-
         <!-- WhatsApp Floating Button -->
         <WhatsAppButton />
 
