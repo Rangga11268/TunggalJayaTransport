@@ -375,8 +375,6 @@ class BookingController extends Controller
                 ->withInput();
         }
 
-        // Overwrite departure_time and arrival_time with actual dates for display
-        // This ensures the frontend shows the correct date (e.g., Today/Tomorrow) instead of the base date (2000-01-01)
         $schedule->departure_time = $schedule->getActualDepartureTime($checkDate);
         $schedule->arrival_time = $schedule->getActualArrivalTime($checkDate);
 
@@ -521,10 +519,11 @@ class BookingController extends Controller
 
     public function selectSeats(Request $request)
     {
+        // Validasi awal cuma cek tipe data aja
         $request->validate([
             'booking_id' => 'required|exists:bookings,id',
             'seat_numbers' => 'required|array|min:1',
-            'seat_numbers.*' => 'integer|min:1|max:100' // Increased limit for larger buses
+            'seat_numbers.*' => 'integer|min:1' // Max kita cek manual nanti sesuai kapasitas bus
         ]);
 
         try {
@@ -538,6 +537,17 @@ class BookingController extends Controller
 
                 if (!$schedule) {
                      return response()->json(['success' => false, 'message' => 'Jadwal ga ketemu entah kemana.']);
+                }
+
+                // VALIDASI DINAMIS: Cek kapasitas bus
+                $busCapacity = $schedule->bus->capacity;
+                foreach ($request->seat_numbers as $seat) {
+                    if ($seat > $busCapacity) {
+                        return response()->json([
+                            'success' => false, 
+                            'message' => "Kursi nomor {$seat} ga valid bos. Kapasitas bus cuma {$busCapacity} kursi."
+                        ]);
+                    }
                 }
 
                 // Cek klo busnya udah jalan
