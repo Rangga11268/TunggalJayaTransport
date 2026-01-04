@@ -153,7 +153,7 @@ watch(
 
 <template>
     <div
-        class="flex min-h-screen bg-gray-50 dark:bg-gray-950 font-sans text-gray-900 dark:text-gray-100"
+        class="flex min-h-screen bg-gray-50 dark:bg-gray-950 font-manrope text-gray-900 dark:text-gray-100"
     >
         <!-- Sidebar -->
         <aside
@@ -205,7 +205,7 @@ watch(
 
                     <div class="flex flex-col">
                         <span
-                            class="text-2xl font-black tracking-tighter italic bg-clip-text text-transparent bg-gradient-to-r from-brand-red via-red-500 to-orange-500 transform -skew-x-6 drop-shadow-sm"
+                            class="text-2xl font-black font-unbounded tracking-tighter italic bg-clip-text text-transparent bg-gradient-to-r from-brand-red via-red-500 to-orange-500 transform -skew-x-6 drop-shadow-sm"
                         >
                             TUJAGO
                         </span>
@@ -294,7 +294,7 @@ watch(
                 <!-- Section: Management -->
                 <div class="pt-4 pb-2" v-show="sidebarOpen || isMobile">
                     <p
-                        class="px-4 text-[10px] font-extrabold text-gray-400 dark:text-gray-600 uppercase tracking-widest flex items-center gap-2"
+                        class="px-4 text-[10px] font-black font-unbounded text-gray-400 dark:text-gray-600 uppercase tracking-widest flex items-center gap-2"
                     >
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-brand-red/50"
@@ -554,7 +554,7 @@ watch(
                 <!-- Section: Users & System -->
                 <div class="pt-4 pb-2" v-show="sidebarOpen || isMobile">
                     <p
-                        class="px-4 text-[10px] font-extrabold text-gray-400 dark:text-gray-600 uppercase tracking-widest flex items-center gap-2"
+                        class="px-4 text-[10px] font-black font-unbounded text-gray-400 dark:text-gray-600 uppercase tracking-widest flex items-center gap-2"
                     >
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-brand-red/50"
@@ -762,12 +762,12 @@ watch(
                     </div>
                     <div class="flex-1 min-w-0">
                         <p
-                            class="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-brand-red transition-colors"
+                            class="text-sm font-black font-unbounded text-gray-900 dark:text-white truncate group-hover:text-brand-red transition-colors"
                         >
                             {{ user.name }}
                         </p>
                         <p
-                            class="text-[10px] text-gray-500 dark:text-gray-400 truncate"
+                            class="text-[10px] font-bold font-manrope text-gray-500 dark:text-gray-400 truncate"
                         >
                             Administrator
                         </p>
@@ -808,7 +808,7 @@ watch(
                     </button>
                     <div>
                         <h1
-                            class="text-xl font-bold text-gray-800 dark:text-white tracking-tight font-serif"
+                            class="text-xl font-black text-gray-800 dark:text-white tracking-tight font-unbounded"
                         >
                             {{ title || "Dasbor" }}
                         </h1>
@@ -874,7 +874,7 @@ watch(
                                 class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
                             >
                                 <h3
-                                    class="font-bold text-gray-900 dark:text-white"
+                                    class="font-black font-unbounded text-gray-900 dark:text-white"
                                 >
                                     Notifikasi
                                 </h3>
