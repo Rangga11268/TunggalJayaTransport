@@ -23,93 +23,96 @@ const submit = () => {
 <template>
     <Head title="Hubungi Kami" />
 
-    <div class="bg-gray-50 dark:bg-gray-950 min-h-screen font-sans">
-        <!-- Clean Title Section -->
-        <div
-            class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center"
-        >
+    <div
+        class="bg-gray-50 dark:bg-[#050505] min-h-screen font-sans selection:bg-rose-600 selection:text-white"
+    >
+        <!-- Hero Header -->
+        <div class="relative pt-32 pb-12 text-center overflow-hidden">
+            <!-- Decor -->
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-rose-600/10 rounded-full blur-[120px] -z-10"
+            ></div>
+
             <span
-                class="inline-block px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-bold tracking-widest mb-6 animate-fade-in uppercase"
+                class="inline-block py-1 px-3 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-600 border border-rose-100 dark:border-rose-900/20 text-xs font-bold tracking-widest uppercase mb-6 font-unbounded animate-fade-in-up"
             >
-                HUBUNGI KAMI
+                Bantuan & Dukungan
             </span>
             <h1
-                class="text-4xl md:text-5xl lg:text-6xl font-black font-serif text-gray-900 dark:text-white mb-6 animate-fade-in-up"
+                class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded animate-fade-in-up"
             >
-                Hubungi
-                <span
-                    class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
-                    >Kami</span
-                >
+                Hubungi <span class="text-rose-600">Kami</span>
             </h1>
             <p
-                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-1"
+                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope animate-fade-in-up"
+                style="animation-delay: 0.1s"
             >
-                Kami siap membantu Anda. Hubungi kami untuk pertanyaan, kritik,
-                atau saran.
+                Punya pertanyaan atau butuh bantuan perjalanan? Tim support kami
+                siap melayani Anda 24/7.
             </p>
         </div>
 
-        <!-- Main Content: Split Layout -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-20">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-                <!-- Left: Contact Info & Map (Visual) -->
-                <div class="space-y-8">
-                    <!-- Floating Info Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+                <!-- Left Column: Contact Info & Map -->
+                <div
+                    class="space-y-8 animate-fade-in-up"
+                    style="animation-delay: 0.2s"
+                >
+                    <!-- Info Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div
-                            class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow"
+                            class="bg-white dark:bg-[#111] p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-xl hover:translate-y-[-5px] transition-transform duration-300"
                         >
                             <div
-                                class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4"
+                                class="w-12 h-12 bg-rose-50 dark:bg-rose-900/10 rounded-2xl flex items-center justify-center text-rose-600 mb-6"
                             >
                                 <i class="fas fa-phone-alt text-xl"></i>
                             </div>
                             <h3
-                                class="font-bold text-gray-900 dark:text-white text-lg"
+                                class="font-bold text-lg text-gray-900 dark:text-white font-unbounded mb-1"
                             >
                                 Telepon
                             </h3>
                             <p
-                                class="text-gray-500 dark:text-gray-400 text-sm mt-1"
+                                class="text-gray-500 dark:text-gray-400 font-manrope text-sm"
                             >
                                 +62 21 1234 5678
                             </p>
                             <span
-                                class="text-xs text-green-600 font-medium mt-2 block"
-                                >Senin-Jumat: 8 pagi - 8 malam<br />Sabtu-Minggu:
-                                9 pagi - 5 sore</span
+                                class="inline-block mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-50 dark:bg-emerald-900/10 px-2 py-1 rounded-lg"
+                                >Online 24 Jam</span
                             >
                         </div>
 
                         <div
-                            class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow"
+                            class="bg-white dark:bg-[#111] p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-xl hover:translate-y-[-5px] transition-transform duration-300"
                         >
                             <div
-                                class="w-12 h-12 bg-orange-50 dark:bg-orange-900/30 rounded-full flex items-center justify-center text-orange-600 dark:text-orange-400 mb-4"
+                                class="w-12 h-12 bg-blue-50 dark:bg-blue-900/10 rounded-2xl flex items-center justify-center text-blue-600 mb-6"
                             >
                                 <i class="fas fa-envelope text-xl"></i>
                             </div>
                             <h3
-                                class="font-bold text-gray-900 dark:text-white text-lg"
+                                class="font-bold text-lg text-gray-900 dark:text-white font-unbounded mb-1"
                             >
                                 Email
                             </h3>
                             <p
-                                class="text-gray-500 dark:text-gray-400 text-sm mt-1"
+                                class="text-gray-500 dark:text-gray-400 font-manrope text-sm"
                             >
-                                info@tujago.com
+                                support@tujago.com
                             </p>
                             <span
-                                class="text-xs text-gray-400 font-medium mt-2 block"
-                                >Kami biasanya merespon dalam waktu 24 jam</span
+                                class="inline-block mt-4 text-[10px] font-bold uppercase tracking-wider text-blue-500 bg-blue-50 dark:bg-blue-900/10 px-2 py-1 rounded-lg"
+                                >Respon Cepat</span
                             >
                         </div>
                     </div>
 
-                    <!-- Map Container -->
+                    <!-- Map -->
                     <div
-                        class="relative h-[300px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800 group"
+                        class="relative h-[400px] rounded-[2.5rem] overflow-hidden shadow-2xl border border-gray-200 dark:border-white/10 group"
                     >
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253840.4878845067!2d106.68942964135938!3d-6.229728025238589!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e34b9d!2sJakarta%2C%20Special%20Capital%20Region%20of%20Jakarta!5e0!3m2!1sen!2sid!4v1633072877145!5m2!1sen!2sid"
@@ -121,101 +124,40 @@ const submit = () => {
                             "
                             allowfullscreen=""
                             loading="lazy"
-                            class="group-hover:filter-none transition-all duration-700"
+                            class="group-hover:filter-none transition-all duration-700 opacity-80 group-hover:opacity-100"
                         >
                         </iframe>
-
-                        <!-- Location Overlay -->
-                        <div class="absolute bottom-4 left-4 right-4">
+                        <div class="absolute bottom-6 left-6 right-6">
                             <div
-                                class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md p-3 rounded-xl shadow-lg flex items-start"
+                                class="bg-white/90 dark:bg-black/80 backdrop-blur-md p-4 rounded-2xl flex items-center gap-4"
                             >
                                 <i
-                                    class="fas fa-map-marker-alt text-brand-red text-xl mt-1 mr-3"
+                                    class="fas fa-map-marker-alt text-rose-600 text-2xl"
                                 ></i>
                                 <div>
                                     <h4
-                                        class="font-bold text-gray-900 dark:text-white text-sm"
+                                        class="font-bold text-gray-900 dark:text-white font-unbounded text-sm"
                                     >
                                         Kantor Pusat
                                     </h4>
                                     <p
-                                        class="text-xs text-gray-600 dark:text-gray-400"
+                                        class="text-xs text-gray-500 dark:text-gray-400 font-manrope"
                                     >
-                                        Jl. Transportation No. 123, Jakarta
-                                        12345
+                                        Jl. Transportasi No. 88, Jakarta Selatan
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Social Media (Added from Blade) -->
-                    <div
-                        class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700"
-                    >
-                        <h3
-                            class="font-bold text-gray-900 dark:text-white mb-4"
-                        >
-                            Ikuti Kami
-                        </h3>
-                        <div class="flex gap-4">
-                            <a
-                                href="#"
-                                class="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors"
-                            >
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                            <a
-                                href="#"
-                                class="w-10 h-10 rounded-full bg-blue-400 hover:bg-blue-500 text-white flex items-center justify-center transition-colors"
-                            >
-                                <i class="fab fa-twitter"></i>
-                            </a>
-                            <a
-                                href="#"
-                                class="w-10 h-10 rounded-full bg-pink-600 hover:bg-pink-700 text-white flex items-center justify-center transition-colors"
-                            >
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                            <a
-                                href="#"
-                                class="w-10 h-10 rounded-full bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center transition-colors"
-                            >
-                                <i class="fab fa-linkedin-in"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Emergency Callout -->
-                    <div
-                        class="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-2xl p-6 flex items-center justify-between shadow-xl"
-                    >
-                        <div>
-                            <p
-                                class="text-xs uppercase tracking-wider text-gray-400 mb-1"
-                            >
-                                Butuh Bantuan Mendesak?
-                            </p>
-                            <p class="text-2xl font-bold">+62 21 1234 5678</p>
-                            <p class="text-xs text-gray-400 mt-1">
-                                Layanan Pelanggan 24/7
-                            </p>
-                        </div>
-                        <div
-                            class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center animate-pulse"
-                        >
-                            <i class="fas fa-phone text-white"></i>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Right: Contact Form (Functional) -->
+                <!-- Right Column: Form -->
                 <div
-                    class="bg-white dark:bg-gray-900 rounded-3xl p-8 lg:p-10 shadow-xl border border-gray-100 dark:border-gray-800 h-fit"
+                    class="bg-white dark:bg-[#111] p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 h-fit animate-fade-in-up"
+                    style="animation-delay: 0.3s"
                 >
                     <h2
-                        class="text-2xl font-bold text-gray-900 dark:text-white mb-8"
+                        class="text-2xl font-black font-unbounded text-gray-900 dark:text-white mb-8"
                     >
                         Kirim Pesan
                     </h2>
@@ -224,32 +166,28 @@ const submit = () => {
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
                                 <label
-                                    for="name"
-                                    class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                                    class="text-xs font-bold text-gray-500 uppercase tracking-wider font-unbounded ml-1"
                                     >Nama Lengkap</label
                                 >
                                 <input
-                                    id="name"
                                     v-model="form.name"
                                     type="text"
-                                    class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-transparent focus:bg-white focus:border-brand-red focus:ring-0 transition-all font-medium"
-                                    placeholder="John Doe"
+                                    class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all font-manrope text-gray-900 dark:text-white"
+                                    placeholder="Nama Anda"
                                     required
                                 />
                                 <InputError :message="form.errors.name" />
                             </div>
                             <div class="space-y-2">
                                 <label
-                                    for="email"
-                                    class="text-sm font-semibold text-gray-700 dark:text-gray-300"
-                                    >Email Address</label
+                                    class="text-xs font-bold text-gray-500 uppercase tracking-wider font-unbounded ml-1"
+                                    >Email</label
                                 >
                                 <input
-                                    id="email"
                                     v-model="form.email"
                                     type="email"
-                                    class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-transparent focus:bg-white focus:border-brand-red focus:ring-0 transition-all font-medium"
-                                    placeholder="john@example.com"
+                                    class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all font-manrope text-gray-900 dark:text-white"
+                                    placeholder="email@anda.com"
                                     required
                                 />
                                 <InputError :message="form.errors.email" />
@@ -258,16 +196,14 @@ const submit = () => {
 
                         <div class="space-y-2">
                             <label
-                                for="subject"
-                                class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                                class="text-xs font-bold text-gray-500 uppercase tracking-wider font-unbounded ml-1"
                                 >Subjek</label
                             >
                             <input
-                                id="subject"
                                 v-model="form.subject"
                                 type="text"
-                                class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-transparent focus:bg-white focus:border-brand-red focus:ring-0 transition-all font-medium"
-                                placeholder="Perihal pesan Anda"
+                                class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all font-manrope text-gray-900 dark:text-white"
+                                placeholder="Perihal"
                                 required
                             />
                             <InputError :message="form.errors.subject" />
@@ -275,16 +211,14 @@ const submit = () => {
 
                         <div class="space-y-2">
                             <label
-                                for="message"
-                                class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                                class="text-xs font-bold text-gray-500 uppercase tracking-wider font-unbounded ml-1"
                                 >Pesan</label
                             >
                             <textarea
-                                id="message"
                                 v-model="form.message"
                                 rows="5"
-                                class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-transparent focus:bg-white focus:border-brand-red focus:ring-0 transition-all font-medium resize-none"
-                                placeholder="Tuliskan pesan Anda disini..."
+                                class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all font-manrope text-gray-900 dark:text-white resize-none"
+                                placeholder="Tulis pesan Anda disini..."
                                 required
                             ></textarea>
                             <InputError :message="form.errors.message" />
@@ -293,93 +227,18 @@ const submit = () => {
                         <button
                             type="submit"
                             :disabled="form.processing"
-                            class="w-full bg-brand-red text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center"
+                            class="w-full py-5 bg-rose-600 text-white font-black font-unbounded rounded-2xl shadow-lg shadow-rose-600/30 hover:bg-rose-700 hover:scale-[1.02] hover:shadow-rose-600/50 transition-all duration-300 disabled:opacity-70 flex items-center justify-center gap-3"
                         >
-                            <span
-                                v-if="form.processing"
-                                class="flex items-center"
-                                ><i class="fas fa-spinner fa-spin mr-2"></i>
+                            <span v-if="form.processing"
+                                ><i class="fas fa-spinner fa-spin"></i>
                                 Mengirim...</span
                             >
                             <span v-else
-                                >Kirim Pesan Sekarang
-                                <i class="fas fa-paper-plane ml-2"></i
+                                >Kirim Pesan <i class="fas fa-paper-plane"></i
                             ></span>
                         </button>
                     </form>
                 </div>
-            </div>
-
-            <!-- Alternative Connections Section -->
-            <div class="mt-24 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <a
-                    href="#"
-                    class="group bg-white dark:bg-gray-800 p-8 rounded-3xl border border-gray-100 dark:border-gray-700 hover:border-brand-red hover:shadow-xl transition-all duration-300"
-                >
-                    <div
-                        class="w-14 h-14 bg-green-50 dark:bg-green-900/20 rounded-2xl flex items-center justify-center text-green-600 mb-6 group-hover:scale-110 transition-transform"
-                    >
-                        <i class="fas fa-comments text-2xl"></i>
-                    </div>
-                    <h3
-                        class="font-bold text-xl text-gray-900 dark:text-white mb-2"
-                    >
-                        Live Chat
-                    </h3>
-                    <p class="text-gray-500 text-sm mb-4">
-                        Ngobrol langsung dengan agen kami.
-                    </p>
-                    <span
-                        class="text-brand-red font-bold text-sm group-hover:underline"
-                        >Mulai Chat &rarr;</span
-                    >
-                </a>
-
-                <a
-                    href="#"
-                    class="group bg-white dark:bg-gray-800 p-8 rounded-3xl border border-gray-100 dark:border-gray-700 hover:border-brand-red hover:shadow-xl transition-all duration-300"
-                >
-                    <div
-                        class="w-14 h-14 bg-purple-50 dark:bg-purple-900/20 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform"
-                    >
-                        <i class="fas fa-book-open text-2xl"></i>
-                    </div>
-                    <h3
-                        class="font-bold text-xl text-gray-900 dark:text-white mb-2"
-                    >
-                        Help Center
-                    </h3>
-                    <p class="text-gray-500 text-sm mb-4">
-                        Panduan lengkap pertanyaan umum.
-                    </p>
-                    <span
-                        class="text-brand-red font-bold text-sm group-hover:underline"
-                        >Lihat Panduan &rarr;</span
-                    >
-                </a>
-
-                <a
-                    href="#"
-                    class="group bg-white dark:bg-gray-800 p-8 rounded-3xl border border-gray-100 dark:border-gray-700 hover:border-brand-red hover:shadow-xl transition-all duration-300"
-                >
-                    <div
-                        class="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 transition-transform"
-                    >
-                        <i class="fas fa-mobile-android-alt text-2xl"></i>
-                    </div>
-                    <h3
-                        class="font-bold text-xl text-gray-900 dark:text-white mb-2"
-                    >
-                        Get the App
-                    </h3>
-                    <p class="text-gray-500 text-sm mb-4">
-                        Download untuk kemudahan transaksi.
-                    </p>
-                    <span
-                        class="text-brand-red font-bold text-sm group-hover:underline"
-                        >Download Sekarang &rarr;</span
-                    >
-                </a>
             </div>
         </div>
     </div>

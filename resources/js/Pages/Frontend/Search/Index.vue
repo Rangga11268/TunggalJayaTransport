@@ -48,7 +48,7 @@ const formatDate = (dateString) => {
             class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
             <h1
-                class="text-4xl md:text-5xl font-extrabold text-white mb-6 font-serif animate-fade-in-up"
+                class="text-4xl md:text-5xl font-extrabold text-white mb-6 font-unbounded animate-fade-in-up"
             >
                 Hasil Pencarian
             </h1>

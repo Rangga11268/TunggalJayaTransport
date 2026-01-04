@@ -53,7 +53,7 @@ const formatTime = (dateString) => {
             RIWAYAT PERJALANAN
         </span>
         <h1
-            class="text-4xl md:text-5xl lg:text-6xl font-black font-serif text-gray-900 dark:text-white mb-6 animate-fade-in-up"
+            class="text-4xl md:text-5xl lg:text-6xl font-black font-unbounded text-gray-900 dark:text-white mb-6 animate-fade-in-up"
         >
             Riwayat
             <span

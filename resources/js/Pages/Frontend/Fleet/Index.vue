@@ -15,10 +15,9 @@ const searchQuery = ref("");
 
 const busTypes = [
     { id: "all", name: "Semua Kelas" },
-    { id: "Economy", name: "Ekonomi" },
+    { id: "Executive", name: "Executive" },
     { id: "Business", name: "Bisnis" },
-    { id: "Executive", name: "Eksekutif" },
-    { id: "Suite", name: "Suite Class" },
+    { id: "Economy", name: "Ekonomi" },
 ];
 
 const filteredBuses = computed(() => {
@@ -31,270 +30,308 @@ const filteredBuses = computed(() => {
         return matchesType && matchesSearch;
     });
 });
-
-const formatNumber = (num) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-};
 </script>
 
 <template>
     <Head title="Armada Kami" />
 
-    <!-- Clean Title Section -->
-    <div class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
-        <span
-            class="inline-block px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-bold tracking-widest mb-6 animate-fade-in uppercase"
-        >
-            MODERN & NYAMAN
-        </span>
-        <h1
-            class="text-4xl md:text-5xl lg:text-6xl font-black font-serif text-gray-900 dark:text-white mb-6 animate-fade-in-up"
-        >
-            Armada
-            <span
-                class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
-                >Premium Kami</span
-            >
-        </h1>
-        <p
-            class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-1"
-        >
-            Pilihan armada terbaik dengan standar keselamatan dan kenyamanan
-            tinggi untuk pengalaman perjalanan yang tak terlupakan.
-        </p>
-    </div>
-
-    <!-- Main Content -->
-    <div class="bg-gray-50 dark:bg-gray-950 min-h-screen py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Filter Section -->
+    <div
+        class="min-h-screen bg-gray-50 dark:bg-[#050505] font-sans selection:bg-rose-600 selection:text-white"
+    >
+        <!-- Hero Header -->
+        <div class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+            <!-- Background Gradients -->
             <div
-                class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 sticky top-24 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800"
+                class="absolute top-0 right-0 w-[500px] h-[500px] bg-rose-600/5 rounded-full blur-[120px] -z-10"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-rose-600/5 rounded-full blur-[120px] -z-10"
+            ></div>
+
+            <div class="max-w-7xl mx-auto text-center relative z-10">
+                <span
+                    class="inline-block py-1 px-3 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-600 border border-rose-100 dark:border-rose-900/20 text-xs font-bold tracking-widest uppercase mb-6 font-unbounded animate-fade-in-up"
+                >
+                    Modern & Nyaman
+                </span>
+                <h1
+                    class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded animate-fade-in-up"
+                    style="animation-delay: 0.1s"
+                >
+                    Armada <span class="text-rose-600">Premium</span>
+                </h1>
+                <p
+                    class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope animate-fade-in-up"
+                    style="animation-delay: 0.2s"
+                >
+                    Jelajahi pilihan armada terbaik kami yang dirancang dengan
+                    standar keselamatan tertinggi dan kenyamanan tanpa kompromi.
+                </p>
+            </div>
+        </div>
+
+        <!-- Filter & Search Section -->
+        <div
+            class="sticky top-24 z-30 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-16"
+        >
+            <div
+                class="bg-white/80 dark:bg-[#111]/80 backdrop-blur-xl p-4 md:p-6 rounded-2xl shadow-xl shadow-black/5 border border-gray-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 animate-fade-in-up"
+                style="animation-delay: 0.3s"
             >
                 <!-- Search -->
-                <div class="relative w-full md:w-96">
+                <div class="relative w-full md:w-96 group">
+                    <div
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+                    >
+                        <i
+                            class="fas fa-search text-gray-400 group-focus-within:text-rose-600 transition-colors"
+                        ></i>
+                    </div>
                     <input
                         v-model="searchQuery"
                         type="text"
                         placeholder="Cari nama bus..."
-                        class="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        class="block w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-[#1a1a1a] border-transparent focus:border-rose-600 focus:bg-white dark:focus:bg-[#0a0a0a] focus:ring-0 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 transition-all font-manrope"
                     />
-                    <i
-                        class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                    ></i>
                 </div>
 
-                <!-- Type Filters -->
+                <!-- Filters -->
                 <div class="flex flex-wrap gap-2 justify-center">
                     <button
                         v-for="type in busTypes"
                         :key="type.id"
                         @click="selectedType = type.id"
-                        class="px-4 py-2 rounded-full text-sm font-bold transition-all duration-300"
+                        class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider font-unbounded transition-all duration-300 border"
                         :class="
                             selectedType === type.id
-                                ? 'bg-brand-red text-white shadow-lg shadow-brand-red/30 scale-105'
-                                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                ? 'bg-rose-600 text-white border-rose-600 shadow-lg shadow-rose-600/30'
+                                : 'bg-transparent text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/10 hover:border-gray-400 dark:hover:border-white/30'
                         "
                     >
                         {{ type.name }}
                     </button>
                 </div>
             </div>
+        </div>
 
+        <!-- Main Grid -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
             <!-- Empty State -->
             <div
                 v-if="filteredBuses.length === 0"
-                class="text-center py-24 bg-white dark:bg-gray-900 rounded-3xl border border-dashed border-gray-300 dark:border-gray-700"
+                class="text-center py-32 border-2 border-dashed border-gray-200 dark:border-white/5 rounded-3xl animate-fade-in-up"
             >
                 <div
-                    class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6"
+                    class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 dark:bg-white/5 mb-6"
                 >
-                    <i class="fas fa-bus text-4xl text-gray-400"></i>
+                    <i class="fas fa-bus text-3xl text-gray-400"></i>
                 </div>
                 <h3
-                    class="text-xl font-bold text-gray-800 dark:text-white mb-2"
+                    class="text-xl font-bold font-unbounded text-gray-900 dark:text-white mb-2"
                 >
                     Armada Tidak Ditemukan
                 </h3>
-                <p class="text-gray-500 dark:text-gray-400">
-                    Coba ubah filter atau kata kunci pencarian Anda.
+                <p class="text-gray-500 dark:text-gray-400 font-manrope">
+                    Silakan coba kata kunci atau filter lain.
                 </p>
                 <button
                     @click="
                         selectedType = 'all';
                         searchQuery = '';
                     "
-                    class="mt-6 text-primary-600 font-bold hover:underline"
+                    class="mt-8 text-rose-600 font-bold text-sm uppercase tracking-wider hover:underline font-unbounded"
                 >
-                    Reset Filter
+                    Reset Semua Filter
                 </button>
             </div>
 
-            <!-- Bus Grid -->
+            <!-- Bus Cards -->
             <div
                 v-else
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
                 <div
                     v-for="(bus, index) in filteredBuses"
                     :key="bus.id"
-                    class="card-premium overflow-hidden group hover:-translate-y-2 transition-transform duration-500"
-                    :style="{ animationDelay: `${index * 0.1}s` }"
+                    class="group relative bg-white dark:bg-[#111] rounded-[2rem] overflow-hidden border border-gray-100 dark:border-white/5 hover:border-rose-600/30 transition-all duration-500 hover:shadow-2xl hover:shadow-rose-600/10 flex flex-col h-full animate-fade-in-up"
+                    :style="{ animationDelay: `${index * 0.1 + 0.4}s` }"
                 >
-                    <div
-                        class="relative h-64 bg-gray-200 dark:bg-gray-800 overflow-hidden"
-                    >
+                    <!-- Image Area -->
+                    <div class="relative h-72 overflow-hidden">
                         <img
                             v-if="bus.media && bus.media.length"
                             :src="bus.media[0].original_url"
                             :alt="bus.name"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div
                             v-else
-                            class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100 dark:bg-gray-800"
+                            class="w-full h-full bg-gray-100 dark:bg-[#1a1a1a] flex items-center justify-center"
                         >
-                            <i class="fas fa-bus text-5xl mb-4 opacity-50"></i>
+                            <i
+                                class="fas fa-bus text-4xl text-gray-300 dark:text-white/20"
+                            ></i>
                         </div>
 
                         <!-- Gradient Overlay -->
                         <div
-                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80"
+                            class="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-80"
                         ></div>
 
-                        <!-- Badge -->
-                        <div class="absolute top-4 right-4">
+                        <!-- Top Badges -->
+                        <div
+                            class="absolute top-6 left-6 right-6 flex justify-between items-start"
+                        >
                             <span
-                                class="px-3 py-1 rounded-lg bg-black/50 backdrop-blur-md text-white text-xs font-bold border border-white/20 shadow-lg"
+                                class="px-3 py-1 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest font-unbounded"
                             >
                                 {{ bus.plate_number }}
                             </span>
+                            <span
+                                v-if="bus.year"
+                                class="px-3 py-1 rounded-lg bg-black/50 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold uppercase tracking-widest font-unbounded"
+                            >
+                                {{ bus.year }}
+                            </span>
                         </div>
 
-                        <!-- Type Badge -->
-                        <div class="absolute bottom-4 left-4">
+                        <!-- Bottom Content (Over Image) -->
+                        <div class="absolute bottom-6 left-6 right-6 z-10">
+                            <h3
+                                class="text-2xl font-black font-unbounded text-white mb-1 group-hover:text-rose-500 transition-colors"
+                            >
+                                {{ bus.name }}
+                            </h3>
                             <span
-                                class="px-3 py-1 rounded-lg bg-primary-600 text-white text-sm font-bold shadow-lg"
+                                class="inline-block px-3 py-1 rounded bg-rose-600 text-white text-[10px] font-bold uppercase tracking-widest font-unbounded"
                             >
                                 {{ bus.bus_type }}
                             </span>
                         </div>
                     </div>
 
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3
-                                    class="text-xl font-bold text-gray-800 dark:text-white font-serif"
-                                >
-                                    {{ bus.name }}
-                                </h3>
-                                <p
-                                    class="text-sm text-gray-500 dark:text-gray-400"
-                                >
-                                    {{
-                                        bus.year
-                                            ? `Tahun ${bus.year}`
-                                            : "Armada Terbaru"
-                                    }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-wrap gap-2 mb-6">
-                            <span
-                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold"
+                    <!-- Details Body -->
+                    <div class="p-8 flex-grow flex flex-col">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div
+                                class="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-3 py-2 rounded-lg border border-gray-100 dark:border-white/5"
                             >
                                 <img
                                     src="/img/car-seat.png"
                                     alt="seat"
-                                    class="w-3.5 h-3.5 opacity-70"
+                                    class="w-4 h-4 opacity-50 dark:invert"
                                 />
-                                {{ bus.capacity }} Seat
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold"
+                                <span
+                                    class="text-xs font-bold text-gray-700 dark:text-gray-300 font-manrope"
+                                    >{{ bus.capacity }} Seat</span
+                                >
+                            </div>
+                            <div
+                                class="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-3 py-2 rounded-lg border border-gray-100 dark:border-white/5"
                             >
-                                <i class="fas fa-check-circle text-[10px]"></i>
-                                Available
-                            </span>
+                                <i
+                                    class="fas fa-check-circle text-rose-600 text-xs"
+                                ></i>
+                                <span
+                                    class="text-xs font-bold text-gray-700 dark:text-gray-300 font-manrope"
+                                    >Ready</span
+                                >
+                            </div>
                         </div>
 
                         <p
-                            class="text-gray-600 dark:text-gray-400 text-sm mb-6 line-clamp-2"
+                            class="text-sm text-gray-500 dark:text-gray-400 font-manrope leading-relaxed mb-8 flex-grow line-clamp-3"
                         >
                             {{
                                 bus.description ||
-                                "Nikmati perjalanan nyaman dengan fasilitas lengkap bersama TUJAGO."
+                                "Rasakan kenyamanan perjalanan dengan armada premium kami yang dilengkapi berbagai fasilitas modern."
                             }}
                         </p>
 
                         <div
-                            class="pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center"
+                            class="pt-6 border-t border-gray-100 dark:border-white/5 flex items-center justify-between"
                         >
-                            <div class="flex -space-x-2">
+                            <div class="flex -space-x-3">
+                                <!-- Fake avatars for "social proof" feel -->
                                 <div
                                     v-for="i in 3"
                                     :key="i"
-                                    class="w-8 h-8 rounded-full bg-gray-200 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[10px] text-gray-500"
+                                    class="w-8 h-8 rounded-full border-2 border-white dark:border-[#111] bg-gray-200 dark:bg-[#222] flex items-center justify-center text-[10px] text-gray-500"
                                 >
                                     <i class="fas fa-user"></i>
                                 </div>
                             </div>
                             <Link
                                 :href="route('frontend.booking.index')"
-                                class="text-primary-600 dark:text-primary-400 font-bold text-sm hover:underline"
+                                class="flex items-center gap-2 text-sm font-bold font-unbounded text-rose-600 hover:text-rose-500 transition-colors group/link"
                             >
-                                Pesan Tiket
+                                Pesan Sekarang
+                                <i
+                                    class="fas fa-arrow-right transform group-hover/link:translate-x-1 transition-transform"
+                                ></i>
                             </Link>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Facilities Section -->
+            <!-- Global Facilities Section -->
             <div
-                class="bg-white dark:bg-gray-900 rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100 dark:border-gray-800"
+                class="mt-32 relative bg-[#111] rounded-[3rem] p-12 md:p-24 overflow-hidden text-center animate-fade-in-up"
             >
-                <div class="text-center mb-12">
-                    <h2
-                        class="text-3xl font-bold text-gray-800 dark:text-white font-serif mb-4"
+                <!-- Decorative Bg -->
+                <div
+                    class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-4xl bg-rose-600/10 blur-[150px] rounded-full pointer-events-none"
+                ></div>
+
+                <div class="relative z-10">
+                    <span
+                        class="inline-block py-1 px-3 rounded-full bg-white/10 text-white border border-white/20 text-[10px] font-bold tracking-widest uppercase mb-6 font-unbounded"
                     >
-                        Fasilitas Standar
+                        Standar Pelayanan
+                    </span>
+                    <h2
+                        class="text-3xl md:text-5xl font-black text-white font-unbounded mb-6"
+                    >
+                        Fasilitas <span class="text-rose-600">Premium</span>
                     </h2>
                     <p
-                        class="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto"
+                        class="text-gray-400 max-w-2xl mx-auto font-manrope mb-16"
                     >
-                        Setiap armada kami dilengkapi dengan fasilitas standar
-                        untuk menjamin kenyamanan Anda selama perjalanan.
+                        Kami memastikan setiap perjalanan Anda dilengkapi dengan
+                        fasilitas terbaik untuk menjamin kenyamanan dari awal
+                        hingga akhir.
                     </p>
-                </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                     <div
-                        v-for="facility in facilities"
-                        :key="facility.name"
-                        class="text-center group"
+                        class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12"
                     >
                         <div
-                            class="w-16 h-16 mx-auto bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors duration-300"
+                            v-for="facility in facilities"
+                            :key="facility.name"
+                            class="group"
                         >
-                            <i
-                                :class="[
-                                    facility.icon,
-                                    'text-2xl text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors',
-                                ]"
-                            ></i>
+                            <div
+                                class="w-20 h-20 mx-auto bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-rose-600 group-hover:border-rose-600 transition-all duration-300 shadow-xl"
+                            >
+                                <i
+                                    :class="[
+                                        facility.icon,
+                                        'text-3xl text-gray-400 group-hover:text-white transition-colors',
+                                    ]"
+                                ></i>
+                            </div>
+                            <h4
+                                class="text-lg font-bold text-white font-unbounded mb-2"
+                            >
+                                {{ facility.name }}
+                            </h4>
+                            <p
+                                class="text-xs text-gray-500 group-hover:text-gray-300 transition-colors font-manrope"
+                            >
+                                {{ facility.description }}
+                            </p>
                         </div>
-                        <h4
-                            class="font-bold text-gray-800 dark:text-white mb-1"
-                        >
-                            {{ facility.name }}
-                        </h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                            {{ facility.description }}
-                        </p>
                     </div>
                 </div>
             </div>

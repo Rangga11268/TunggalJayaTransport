@@ -15,159 +15,157 @@ const faqs = [
     {
         id: 1,
         question: "Bagaimana cara memesan tiket?",
-        answer: "Anda dapat memesan tiket melalui website kami, aplikasi mobile, atau dengan mengunjungi salah satu kantor penjualan tiket kami. Sistem pemesanan online kami tersedia 24/7 untuk kenyamanan Anda.",
+        answer: "Anda dapat memesan tiket melalui website kami dengan memilih rute, tanggal, dan kursi. Pembayaran dapat dilakukan secara online dengan berbagai metode yang tersedia.",
     },
     {
         id: 2,
-        question: "Metode pembayaran apa yang Anda terima?",
-        answer: "Kami menerima uang tunai, kartu kredit, kartu debit, dan pembayaran digital melalui aplikasi mobile kami. Semua kartu kredit utama termasuk Visa, Mastercard, dan American Express diterima.",
+        question: "Apakah tiket bisa di-refund?",
+        answer: "Kebijakan pengembalian dana (refund) bergantung pada jenis tiket dan waktu pembatalan. Tiket Executive dan di atasnya umumnya mendukung refund dengan potongan biaya administrasi.",
     },
     {
         id: 3,
-        question: "Bisakah saya membatalkan atau mengganti pemesanan saya?",
-        answer: "Ya, Anda dapat membatalkan atau mengganti pemesanan Anda hingga 2 jam sebelum keberangkatan, tergantung pada kebijakan pembatalan kami. Pembatalan yang dilakukan kurang dari 24 jam sebelum keberangkatan mungkin dikenakan biaya.",
+        question: "Apakah ada fasilitas makan?",
+        answer: "Ya, untuk perjalanan jarak jauh kelas Executive dan Suite, kami menyediakan layanan makan prasmanan gratis satu kali di rest area mitra kami.",
     },
     {
         id: 4,
-        question: "Fasilitas apa yang tersedia di bus Anda?",
-        answer: "Bus-bus kami dilengkapi dengan kursi nyaman yang dapat direbahkan, AC, toilet di dalam bus, WiFi gratis, port pengisian daya, dan sistem hiburan. Layanan premium mungkin termasuk makanan dan minuman.",
+        question: "Berapa kapasitas bagasi per penumpang?",
+        answer: "Setiap penumpang berhak membawa bagasi kabin maksimal 7kg dan bagasi bawah maksimal 20kg tanpa biaya tambahan.",
     },
 ];
+
+const stats = [
+    { label: "Armada Modern", value: "100+" },
+    { label: "Rute Tujuan", value: "50+" },
+    { label: "Tahun Pengalaman", value: "50+" },
+    { label: "Penumpang Puas", value: "1M+" },
+];
+
+const videoRef = ref(null);
+const isPlaying = ref(true); // Default autoplay
+
+const toggleVideo = () => {
+    if (videoRef.value) {
+        if (isPlaying.value) {
+            videoRef.value.pause();
+        } else {
+            videoRef.value.play();
+        }
+        isPlaying.value = !isPlaying.value;
+    }
+};
 </script>
 
 <template>
     <Head title="Tentang Kami" />
 
     <div
-        class="font-sans antialiased text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-950 overflow-x-hidden"
+        class="bg-gray-50 dark:bg-[#050505] min-h-screen font-sans selection:bg-rose-600 selection:text-white"
     >
-        <!-- Clean Title Section -->
-        <div
-            class="pt-24 pb-0 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center"
-        >
-            <span
-                class="inline-block px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-bold tracking-widest mb-6 animate-fade-in uppercase"
-            >
-                SEJAK 1973
-            </span>
-            <h1
-                class="text-4xl md:text-5xl lg:text-6xl font-black font-serif text-gray-900 dark:text-white mb-6 animate-fade-in-up"
-            >
-                Tentang
+        <!-- Hero Section -->
+        <div class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+            <!-- Abstract Background -->
+            <div
+                class="absolute top-0 right-0 w-[600px] h-[600px] bg-rose-600/5 rounded-full blur-[120px] -z-10"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-rose-600/5 rounded-full blur-[100px] -z-10"
+            ></div>
+
+            <div class="max-w-7xl mx-auto text-center relative z-10">
                 <span
-                    class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
-                    >Kami</span
+                    class="inline-block py-1 px-3 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-600 border border-rose-100 dark:border-rose-900/20 text-xs font-bold tracking-widest uppercase mb-6 font-unbounded animate-fade-in-up"
                 >
-            </h1>
-            <p
-                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-1"
-            >
-                Dari sepeda penjual ubi hingga menjadi raja jalanan Sumatera.
-                Sebuah kisah tentang mimpi, kerja keras, dan dedikasi melayani
-                negeri.
-            </p>
+                    Sejak 1973
+                </span>
+                <h1
+                    class="text-4xl md:text-7xl font-black text-gray-900 dark:text-white mb-8 font-unbounded animate-fade-in-up"
+                    style="animation-delay: 0.1s"
+                >
+                    Evolusi <span class="text-rose-600">Transportasi</span>
+                </h1>
+                <p
+                    class="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-3xl mx-auto font-manrope leading-relaxed animate-fade-in-up"
+                    style="animation-delay: 0.2s"
+                >
+                    Dari sepeda penjual ubi hingga menjadi raja jalanan modern.
+                    Kisah ketangguhan, inovasi, dan dedikasi melayani perjalanan
+                    nusantara.
+                </p>
+            </div>
         </div>
 
-        <!-- The Legacy Section (History) -->
-        <div
-            id="history"
-            class="pt-16 pb-24 relative bg-white dark:bg-gray-950"
-        >
-            <!-- Decorative "1973" watermark -->
+        <!-- Story / History Section -->
+        <section class="py-20 bg-white dark:bg-[#111] relative overflow-hidden">
             <div
-                class="absolute top-0 right-0 text-[15rem] font-black text-gray-50 dark:text-gray-900/50 leading-none select-none z-0 pointer-events-none opacity-50 overflow-hidden"
+                class="absolute -right-20 top-20 text-[20rem] font-black text-gray-100 dark:text-white/5 font-unbounded select-none pointer-events-none opacity-50"
             >
                 1973
             </div>
 
-            <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div
-                    class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center"
+                    class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
                 >
-                    <!-- Text Content -->
-                    <div class="space-y-8">
-                        <div>
-                            <h2
-                                class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 mb-2"
-                            >
-                                Awal Mula yang Sederhana
-                            </h2>
-                            <div
-                                class="h-1 w-20 bg-brand-red rounded-full"
-                            ></div>
-                        </div>
-
-                        <div
-                            class="prose prose-lg text-gray-600 dark:text-gray-300"
+                    <div>
+                        <h2
+                            class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white font-unbounded mb-8 leading-tight"
                         >
-                            <p class="leading-relaxed">
-                                Semua bermula dari tekad
-                                <strong>H. Asim</strong> pada tahun 1973. Jauh
-                                sebelum armada bus gagah melintasi jalan tol,
-                                beliau merintis jalan dengan sepeda onthel,
-                                menjual ubi dari Sumatera hingga ke hiruk pikuk
-                                Jakarta.
+                            Berawal dari <br /><span class="text-rose-600"
+                                >Tekad Kuat</span
+                            >
+                        </h2>
+                        <div
+                            class="space-y-6 text-gray-600 dark:text-gray-400 font-manrope text-lg leading-relaxed"
+                        >
+                            <p>
+                                Semua bermula dari H. Asim pada tahun 1973.
+                                Tanpa modal besar, hanya bermodalkan keberanian
+                                dan sepeda onthel, beliau merintis usaha dengan
+                                berjualan ubi dari Sumatera hingga Jakarta.
                             </p>
-                            <p class="leading-relaxed">
-                                Mimpi itu mahal, namun tekadnya tak ternilai.
-                                Dengan modal <strong>Rp100 juta</strong> hasil
-                                keringat bertahun-tahun, beliau membeli satu
-                                unit bus medium seharga Rp49 juta. Itulah
-                                tonggak pertama berdirinya
-                                <strong>Tunggal Jaya Transport</strong> nama
-                                yang diambil dari sang Ayah sebagai doa
-                                keberkahan abadi.
+                            <p>
+                                Mimpi itu mahal, namun kerja keras tak pernah
+                                mengkhianati. Dengan tabungan 100 juta rupiah
+                                hasil keringat bertahun-tahun, beliau membeli
+                                satu unit bus medium. Itulah awal lahirnya
+                                Tunggal Jaya Transport, nama yang diambil dari
+                                sang Ayah sebagai doa keberkahan abadi.
                             </p>
                         </div>
 
                         <div
-                            class="flex items-center gap-8 py-6 border-y border-gray-100 dark:border-gray-800"
+                            class="mt-10 pt-10 border-t border-gray-100 dark:border-white/10 grid grid-cols-2 gap-8"
                         >
                             <div>
                                 <span
-                                    class="block text-3xl font-bold text-gray-900 dark:text-white"
-                                    >50+</span
+                                    class="block text-4xl font-black text-gray-900 dark:text-white font-unbounded mb-1"
+                                    >Gen-2</span
                                 >
                                 <span
-                                    class="text-sm text-gray-500 uppercase tracking-wider"
-                                    >Tahun Pengalaman</span
+                                    class="text-xs font-bold text-gray-500 uppercase tracking-widest font-unbounded"
+                                    >Era Kepemimpinan Baru</span
                                 >
                             </div>
-                            <div
-                                class="h-12 w-px bg-gray-200 dark:bg-gray-700"
-                            ></div>
                             <div>
                                 <span
-                                    class="block text-3xl font-bold text-gray-900 dark:text-white"
-                                    >Generasi ke-2</span
+                                    class="block text-4xl font-black text-gray-900 dark:text-white font-unbounded mb-1"
+                                    >Digital</span
                                 >
                                 <span
-                                    class="text-sm text-gray-500 uppercase tracking-wider"
-                                    >Dipimpin Bpk. Didi</span
+                                    class="text-xs font-bold text-gray-500 uppercase tracking-widest font-unbounded"
+                                    >Transformasi Teknologi</span
                                 >
                             </div>
                         </div>
                     </div>
 
-                    <!-- Media Content -->
                     <div class="relative">
                         <div
-                            class="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl relative group"
+                            class="aspect-[4/3] rounded-[2rem] overflow-hidden shadow-2xl shadow-rose-600/20 group"
                         >
-                            <!-- Overlay Play Button -->
-                            <div
-                                class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/20 transition-all z-20 pointer-events-none"
-                            >
-                                <div
-                                    class="w-20 h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50 group-hover:scale-110 transition-transform"
-                                >
-                                    <i
-                                        class="fas fa-play text-white text-2xl ml-1"
-                                    ></i>
-                                </div>
-                            </div>
-                            <!-- Video -->
                             <video
+                                ref="videoRef"
                                 class="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-[1.5s]"
                                 autoplay
                                 muted
@@ -175,166 +173,141 @@ const faqs = [
                                 playsinline
                             >
                                 <source
-                                    src="/video/cinematiic 2.mp4"
+                                    src="/video/cinematic 1.mp4"
                                     type="video/mp4"
                                 />
                             </video>
+
+                            <!-- Invisible Play/Pause Toggle -->
+                            <div
+                                class="absolute inset-0 cursor-pointer"
+                                title="Klik untuk Putar/Jeda"
+                                @click="toggleVideo"
+                            ></div>
                         </div>
-                        <!-- Decorative Blob -->
+
+                        <!-- Blob Decor -->
                         <div
-                            class="absolute -bottom-10 -left-10 w-full h-full bg-brand-red/5 rounded-3xl -z-10"
+                            class="absolute -bottom-8 -left-8 w-64 h-64 bg-rose-600/20 rounded-full blur-3xl -z-10"
                         ></div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Vision & Mission (Dark Mode Premium) -->
-        <div class="py-24 bg-gray-900 text-white relative overflow-hidden">
-            <!-- Abstract Patterns -->
+        <!-- Stats Section -->
+        <section class="py-20 bg-rose-600 relative overflow-hidden">
+            <!-- Pattern -->
             <div
-                class="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20"
-            >
-                <div
-                    class="absolute -top-24 -left-24 w-96 h-96 bg-brand-red/30 rounded-full blur-[100px]"
-                ></div>
-                <div
-                    class="absolute bottom-0 right-0 w-80 h-80 bg-blue-600/30 rounded-full blur-[100px]"
-                ></div>
-            </div>
+                class="absolute inset-0 opacity-10"
+                style="
+                    background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+                "
+            ></div>
 
-            <div class="container mx-auto px-6 relative z-10">
-                <div class="text-center mb-16">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-4">
-                        Visi & Misi
-                    </h2>
-                    <p class="text-gray-400 max-w-2xl mx-auto">
-                        Filosofi yang menggerakkan setiap roda armada kami untuk
-                        melayani Anda lebih baik setiap harinya.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-                    <!-- Vision Card -->
-                    <div
-                        class="group bg-white/5 border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-all duration-300"
-                    >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div
+                    class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/20"
+                >
+                    <div v-for="stat in stats" :key="stat.label" class="group">
                         <div
-                            class="w-16 h-16 bg-gradient-to-br from-brand-red to-pink-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-brand-red/20 group-hover:scale-110 transition-transform"
+                            class="text-5xl md:text-6xl font-black text-white font-unbounded mb-2 group-hover:scale-110 transition-transform duration-300"
                         >
-                            <i class="fas fa-eye text-3xl text-white"></i>
+                            {{ stat.value }}
                         </div>
-                        <h3 class="text-2xl font-bold mb-4">Visi Kami</h3>
-                        <p class="text-gray-300 leading-relaxed mb-6">
-                            "Menjadi penyedia transportasi terkemuka di kawasan
-                            ini, dikenal karena komitmen kami terhadap
-                            keselamatan, kenyamanan, dan tanggung jawab
-                            lingkungan."
-                        </p>
                         <div
-                            class="pl-4 border-l-2 border-brand-red/50 italic text-gray-400"
+                            class="text-rose-100 text-sm font-bold uppercase tracking-widest font-unbounded"
                         >
-                            Menghubungkan orang, menghubungkan masa depan.
+                            {{ stat.label }}
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
 
-                    <!-- Mission Card -->
+        <!-- Vision & Mission -->
+        <section class="py-24 bg-gray-50 dark:bg-[#050505] relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+                    <!-- Vision -->
                     <div
-                        class="group bg-white/5 border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-all duration-300"
+                        class="group bg-white dark:bg-[#111] p-10 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-white/5 hover:border-rose-600/30 transition-all duration-500 relative overflow-hidden"
                     >
                         <div
-                            class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform"
+                            class="absolute top-0 right-0 w-32 h-32 bg-rose-600/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-rose-600/20"
+                        ></div>
+                        <i
+                            class="fas fa-eye text-4xl text-rose-600 mb-6 block"
+                        ></i>
+                        <h3
+                            class="text-2xl font-black font-unbounded text-gray-900 dark:text-white mb-4"
                         >
-                            <i class="fas fa-rocket text-3xl text-white"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-6">Misi Kami</h3>
-                        <ul class="space-y-4">
-                            <li class="flex items-start">
+                            Visi Kami
+                        </h3>
+                        <p
+                            class="text-gray-600 dark:text-gray-400 font-manrope leading-relaxed"
+                        >
+                            "Menjadi pionir transportasi darat modern yang
+                            menghubungkan setiap sudut nusantara dengan standar
+                            keselamatan dan kenyamanan kelas dunia."
+                        </p>
+                    </div>
+
+                    <!-- Mission -->
+                    <div
+                        class="group bg-white dark:bg-[#111] p-10 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-white/5 hover:border-rose-600/30 transition-all duration-500 relative overflow-hidden"
+                    >
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-blue-600/20"
+                        ></div>
+                        <i
+                            class="fas fa-rocket text-4xl text-blue-600 mb-6 block"
+                        ></i>
+                        <h3
+                            class="text-2xl font-black font-unbounded text-gray-900 dark:text-white mb-4"
+                        >
+                            Misi Kami
+                        </h3>
+                        <ul
+                            class="space-y-4 text-gray-600 dark:text-gray-400 font-manrope"
+                        >
+                            <li class="flex items-start gap-3">
                                 <i
-                                    class="fas fa-check-circle text-blue-500 mt-1 mr-3"
+                                    class="fas fa-check-circle text-blue-600 mt-1"
                                 ></i>
-                                <span class="text-gray-300"
-                                    >Layanan aman dan andal prioritas
-                                    utama.</span
+                                <span
+                                    >Inovasi armada berkelanjutan dengan
+                                    teknologi terbaru.</span
                                 >
                             </li>
-                            <li class="flex items-start">
+                            <li class="flex items-start gap-3">
                                 <i
-                                    class="fas fa-check-circle text-blue-500 mt-1 mr-3"
+                                    class="fas fa-check-circle text-blue-600 mt-1"
                                 ></i>
-                                <span class="text-gray-300"
-                                    >Kenyamanan & kepuasan penumpang tanpa
-                                    kompromi.</span
-                                >
-                            </li>
-                            <li class="flex items-start">
-                                <i
-                                    class="fas fa-check-circle text-blue-500 mt-1 mr-3"
-                                ></i>
-                                <span class="text-gray-300"
-                                    >Inovasi armada berkelanjutan.</span
+                                <span
+                                    >Pelayanan prima yang memprioritaskan
+                                    kepuasan penumpang.</span
                                 >
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Stats Counter -->
-        <div class="py-16 bg-brand-red">
-            <div class="container mx-auto px-6">
-                <div
-                    class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/20"
-                >
-                    <div class="p-4">
-                        <div class="text-5xl font-black text-white mb-2">
-                            50+
-                        </div>
-                        <div class="text-white/80 font-medium tracking-wide">
-                            Destinasi
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <div class="text-5xl font-black text-white mb-2">
-                            100+
-                        </div>
-                        <div class="text-white/80 font-medium tracking-wide">
-                            Armada Modern
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <div class="text-5xl font-black text-white mb-2">
-                            200+
-                        </div>
-                        <div class="text-white/80 font-medium tracking-wide">
-                            Tim Profesional
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <div class="text-5xl font-black text-white mb-2">
-                            1J+
-                        </div>
-                        <div class="text-white/80 font-medium tracking-wide">
-                            Penumpang
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </section>
 
         <!-- FAQ Section -->
-        <div class="py-24 bg-gray-50 dark:bg-gray-950">
-            <div class="container mx-auto px-6 max-w-4xl">
+        <section class="py-24 bg-white dark:bg-[#111]">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
                     <span
-                        class="text-brand-red font-bold uppercase tracking-wider text-sm"
-                        >Pusat Bantuan</span
+                        class="inline-block py-1 px-3 rounded-full bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 text-xs font-bold tracking-widest uppercase mb-4 font-unbounded"
                     >
+                        Pusat Bantuan
+                    </span>
                     <h2
-                        class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mt-2"
+                        class="text-3xl font-black font-unbounded text-gray-900 dark:text-white"
                     >
-                        Sering Ditanyakan
+                        Pertanyaan Umum
                     </h2>
                 </div>
 
@@ -342,9 +315,9 @@ const faqs = [
                     <div
                         v-for="faq in faqs"
                         :key="faq.id"
-                        class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden transition-all duration-300"
+                        class="bg-gray-50 dark:bg-[#161616] rounded-2xl border border-gray-100 dark:border-white/5 overflow-hidden transition-all duration-300"
                         :class="{
-                            'shadow-md border-brand-red/30':
+                            'border-rose-600 dark:border-rose-600 shadow-lg shadow-rose-600/10':
                                 activeFaq === faq.id,
                         }"
                     >
@@ -353,35 +326,26 @@ const faqs = [
                             class="w-full flex items-center justify-between p-6 text-left"
                         >
                             <span
-                                class="font-bold text-gray-800 dark:text-gray-100 text-lg"
+                                class="font-bold font-unbounded text-sm md:text-base text-gray-900 dark:text-white"
                                 >{{ faq.question }}</span
                             >
-                            <span
-                                class="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center transition-transform duration-300"
+                            <i
+                                class="fas fa-chevron-down text-gray-400 transition-transform duration-300"
                                 :class="{
-                                    'bg-brand-red text-white rotate-180':
+                                    'rotate-180 text-rose-600':
                                         activeFaq === faq.id,
                                 }"
-                            >
-                                <i class="fas fa-chevron-down text-sm"></i>
-                            </span>
+                            ></i>
                         </button>
                         <div
                             v-show="activeFaq === faq.id"
-                            class="px-6 pb-6 text-gray-600 dark:text-gray-400 leading-relaxed border-t border-gray-50 dark:border-gray-800 pt-4"
+                            class="px-6 pb-6 text-sm text-gray-600 dark:text-gray-400 font-manrope leading-relaxed border-t border-gray-200 dark:border-white/5 pt-4"
                         >
                             {{ faq.answer }}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 </template>
-
-<style scoped>
-/* Optional specific overrides if tailwind isn't enough */
-.hero-text-shadow {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-</style>

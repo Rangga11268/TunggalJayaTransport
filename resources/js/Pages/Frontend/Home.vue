@@ -84,6 +84,15 @@ const features = [
     },
 ];
 
+const formatDate = (dateString) => {
+    if (!dateString) return "Tanggal Belum Tersedia";
+    return new Date(dateString).toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+};
+
 // Computed
 const today = computed(() => new Date().toISOString().split("T")[0]);
 
@@ -633,7 +642,97 @@ onMounted(() => {
             </div>
         </section>
 
-        <!-- CTA / FOOTER PREVIEW (Modern Marquee) -->
+        <!-- LATEST NEWS SECTION -->
+        <section
+            v-if="latestNews && latestNews.length > 0"
+            class="py-24 bg-gray-50 dark:bg-[#050505] relative overflow-hidden"
+        >
+            <!-- Decor -->
+            <div
+                class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"
+            ></div>
+
+            <div class="max-w-7xl mx-auto px-6 relative z-10">
+                <div class="text-center mb-16">
+                    <span
+                        class="inline-block py-1 px-3 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-600 border border-rose-100 dark:border-rose-900/20 text-xs font-bold tracking-widest uppercase mb-6 font-unbounded animate-on-scroll"
+                    >
+                        Update Terbaru
+                    </span>
+                    <h2
+                        class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white font-unbounded mb-6 animate-on-scroll"
+                    >
+                        Berita & <span class="text-rose-600">Artikel</span>
+                    </h2>
+                    <p
+                        class="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope animate-on-scroll"
+                    >
+                        Ikuti perkembangan terbaru, tips perjalanan, dan agenda
+                        kegiatan dari Tunggal Jaya Transport.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <Link
+                        v-for="(news, index) in latestNews"
+                        :key="news.id"
+                        :href="route('frontend.news.show', news.slug)"
+                        class="group bg-white dark:bg-[#111] rounded-[2rem] overflow-hidden border border-gray-100 dark:border-white/5 hover:border-rose-600/30 transition-all duration-500 hover:shadow-2xl hover:shadow-rose-600/10 flex flex-col h-full animate-on-scroll"
+                    >
+                        <div class="relative h-60 overflow-hidden">
+                            <img
+                                :src="news.image_url"
+                                :alt="news.title"
+                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                            />
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent opacity-60"
+                            ></div>
+                            <span
+                                class="absolute top-4 left-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold rounded-lg uppercase tracking-widest font-unbounded"
+                            >
+                                {{ news.category?.name || "Info" }}
+                            </span>
+                        </div>
+                        <div class="p-8 flex-grow flex flex-col">
+                            <div
+                                class="text-xs text-gray-400 mb-4 font-manrope flex items-center gap-2"
+                            >
+                                <i class="far fa-calendar text-rose-600"></i>
+                                <span>{{
+                                    formatDate(
+                                        news.published_at || news.created_at
+                                    )
+                                }}</span>
+                            </div>
+                            <h3
+                                class="text-lg font-bold font-unbounded text-gray-900 dark:text-white mb-4 leading-tight group-hover:text-rose-600 transition-colors line-clamp-2"
+                            >
+                                {{ news.title }}
+                            </h3>
+                            <p
+                                class="text-sm text-gray-500 dark:text-gray-400 font-manrope line-clamp-3 mb-6 flex-grow"
+                            >
+                                {{ news.excerpt }}
+                            </p>
+                            <span
+                                class="text-xs font-bold font-unbounded text-rose-600 uppercase tracking-wider group-hover:underline"
+                                >Baca Selengkapnya</span
+                            >
+                        </div>
+                    </Link>
+                </div>
+
+                <div class="text-center mt-12 animate-on-scroll">
+                    <Link
+                        :href="route('frontend.news.index')"
+                        class="inline-flex items-center gap-2 text-sm font-bold font-unbounded text-gray-900 dark:text-white hover:text-rose-600 transition-colors"
+                    >
+                        Lihat Semua Berita <i class="fas fa-arrow-right"></i>
+                    </Link>
+                </div>
+            </div>
+        </section>
         <section
             class="relative py-40 bg-rose-600 overflow-hidden flex items-center justify-center"
         >
@@ -699,13 +798,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.font-unbounded {
-    font-family: "Unbounded", sans-serif;
-}
-.font-manrope {
-    font-family: "Manrope", sans-serif;
-}
-
 @keyframes subtle-zoom {
     0% {
         transform: scale(1.05);
