@@ -114,7 +114,7 @@ const faqs = [
                                 keringat bertahun-tahun, beliau membeli satu
                                 unit bus medium seharga Rp49 juta. Itulah
                                 tonggak pertama berdirinya
-                                <strong>TUJAGO (Tunggal Jaya Go)</strong>—nama
+                                <strong>Tunggal Jaya Transport</strong> nama
                                 yang diambil dari sang Ayah sebagai doa
                                 keberkahan abadi.
                             </p>

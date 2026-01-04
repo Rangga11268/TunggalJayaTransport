@@ -10,6 +10,13 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('img/logoNoBg.png') }}">
     
+    <!-- PWA -->
+    <meta name="theme-color" content="#e11d48">
+    <link rel="manifest" href="/build/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="{{ asset('img/logoNoBg.png') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

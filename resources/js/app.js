@@ -28,3 +28,18 @@ createInertiaApp({
         showSpinner: true,
     },
 });
+
+import { registerSW } from "virtual:pwa-register";
+
+if (import.meta.env.PROD) {
+    registerSW({
+        immediate: true,
+        onNeedRefresh() {
+            console.log("New content available, click to reload.");
+            // In a real app, show a toast here
+        },
+        onOfflineReady() {
+            console.log("App ready to work offline");
+        },
+    });
+}
