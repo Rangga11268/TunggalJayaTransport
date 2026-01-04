@@ -1,7 +1,12 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// Register ScrollTrigger
+gsap.registerPlugin(ScrollTrigger);
 
 defineOptions({ layout: FrontendLayout });
 
@@ -19,66 +24,70 @@ const props = defineProps({
 
 const page = usePage();
 
-// Booking form state
+// Form State
 const origin = ref("");
 const destination = ref("");
 const date = ref("");
-const busType = ref("all");
+const busType = ref("");
 const showOriginDropdown = ref(false);
 const showDestinationDropdown = ref(false);
 const filteredOrigins = ref([]);
 const filteredDestinations = ref([]);
 
-// Counter animation
-const displayFleetCount = ref(0);
-const displayRouteCount = ref(0);
-const displayCustomerCount = ref(0);
-const statsVisible = ref(false);
-
-// Today's date for min date
-const today = computed(() => {
-    const now = new Date();
-    return now.toISOString().split("T")[0];
-});
+// UI State
+const isScrolled = ref(false);
+const currentHeroImage = ref(0);
+const heroImages = [
+    "/img/heroImg.jpg", // Ensure this exists or use a fallback
+    // Add more if available
+];
 
 const busTypes = [
-    { id: "all", name: "Semua Tipe", icon: "fas fa-bus" },
-    { id: "economy", name: "Ekonomi", icon: "fas fa-coins" },
-    { id: "business", name: "Bisnis", icon: "fas fa-briefcase" },
-    { id: "executive", name: "Eksekutif", icon: "fas fa-crown" },
+    { id: "", name: "All Classes", icon: "fas fa-layer-group" },
+    { id: "Executive", name: "Executive Class", icon: "fas fa-crown" },
+    { id: "Business", name: "Business Class", icon: "fas fa-briefcase" },
+    { id: "Economy", name: "Economy Class", icon: "fas fa-piggy-bank" },
 ];
 
 const features = [
     {
+        title: "Leg Rest",
+        desc: "Maksimal selunjur",
         icon: "fas fa-couch",
-        title: "Kursi Premium",
-        description:
-            "Desain kursi ergonomis dengan leg room luas untuk kenyamanan maksimal",
-        gradient: "bg-gradient-to-br from-primary-500 to-primary-700",
+        color: "text-rose-400",
+        bg: "bg-rose-400/10",
+        colSpan: "col-span-1 md:col-span-2",
     },
     {
+        title: "Entertain",
+        desc: "Audio Video on Demand",
         icon: "fas fa-tv",
-        title: "Hiburan Modern",
-        description:
-            "TV LCD layar lebar & sistem audio surround untuk perjalanan menyenangkan",
-        gradient: "bg-gradient-to-br from-secondary-500 to-secondary-700",
+        color: "text-blue-400",
+        bg: "bg-blue-400/10",
+        colSpan: "col-span-1",
     },
     {
-        icon: "fas fa-wifi",
-        title: "WiFi Gratis",
-        description:
-            "Internet berkecepatan tinggi gratis untuk tetap produktif",
-        gradient: "bg-gradient-to-br from-gold-500 to-gold-700",
+        title: "Snack",
+        desc: "Gratis snack & minum",
+        icon: "fas fa-cookie-bite",
+        color: "text-amber-400",
+        bg: "bg-amber-400/10",
+        colSpan: "col-span-1",
     },
     {
-        icon: "fas fa-snowflake",
-        title: "AC Premium",
-        description:
-            "Sistem pendingin udara canggih dengan kontrol suhu optimal",
-        gradient: "bg-gradient-to-br from-emerald-500 to-teal-600",
+        title: "Charger",
+        desc: "USB Port tiap kursi",
+        icon: "fas fa-bolt",
+        color: "text-emerald-400",
+        bg: "bg-emerald-400/10",
+        colSpan: "col-span-1 md:col-span-2",
     },
 ];
 
+// Computed
+const today = computed(() => new Date().toISOString().split("T")[0]);
+
+// Methods
 const filterOrigins = () => {
     if (!origin.value) {
         filteredOrigins.value = props.origins || [];
@@ -101,936 +110,638 @@ const filterDestinations = () => {
     showDestinationDropdown.value = true;
 };
 
-const selectOrigin = (value) => {
-    origin.value = value;
+const selectOrigin = (val) => {
+    origin.value = val;
     showOriginDropdown.value = false;
 };
 
-const selectDestination = (value) => {
-    destination.value = value;
+const selectDestination = (val) => {
+    destination.value = val;
     showDestinationDropdown.value = false;
 };
 
 const swapLocations = () => {
-    const temp = origin.value;
-    origin.value = destination.value;
-    destination.value = temp;
+    [origin.value, destination.value] = [destination.value, origin.value];
 };
 
-const animateCounter = (target, end, duration = 2500) => {
-    const startTime = performance.now();
-
-    const update = (currentTime) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easeOut = 1 - Math.pow(1 - progress, 4);
-
-        if (target === "fleet")
-            displayFleetCount.value = Math.floor(easeOut * end);
-        if (target === "route")
-            displayRouteCount.value = Math.floor(easeOut * end);
-        if (target === "customer")
-            displayCustomerCount.value = Math.floor(easeOut * end);
-
-        if (progress < 1) {
-            requestAnimationFrame(update);
-        }
-    };
-
-    requestAnimationFrame(update);
+const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+    }).format(price);
 };
 
+// Animations
 onMounted(() => {
     filteredOrigins.value = props.origins || [];
     filteredDestinations.value = props.destinations || [];
 
-    // Intersection observer for stats counter
-    const observer = new IntersectionObserver(
-        (entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting && !statsVisible.value) {
-                    statsVisible.value = true;
-                    setTimeout(
-                        () => animateCounter("fleet", props.fleetCount || 25),
-                        100
-                    );
-                    setTimeout(
-                        () => animateCounter("route", props.routeCount || 50),
-                        300
-                    );
-                    setTimeout(
-                        () =>
-                            animateCounter(
-                                "customer",
-                                props.customerCount || 10000
-                            ),
-                        500
-                    );
-                }
-            });
-        },
-        { threshold: 0.3 }
-    );
-
-    const statsSection = document.getElementById("stats-section");
-    if (statsSection) observer.observe(statsSection);
-
-    // Generic Scroll Observer
-    const scrollObserver = new IntersectionObserver(
-        (entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add("active");
-                }
-            });
-        },
-        { threshold: 0.1 }
-    );
-
-    document.querySelectorAll(".scroll-reveal").forEach((el) => {
-        scrollObserver.observe(el);
+    // GSAP Hero Animation
+    gsap.from(".hero-text-char", {
+        y: 100,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.05,
+        ease: "power4.out",
     });
 
-    // Close dropdowns on outside click
+    gsap.from(".hero-console", {
+        y: 50,
+        opacity: 0,
+        duration: 1,
+        delay: 0.5,
+        ease: "power3.out",
+    });
+
+    // Scroll Trigger for Bento Grid
+    gsap.utils.toArray(".bento-item").forEach((item, i) => {
+        gsap.from(item, {
+            scrollTrigger: {
+                trigger: item,
+                start: "top 85%",
+            },
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            delay: i * 0.1,
+            ease: "back.out(1.7)",
+        });
+    });
+
+    // Close dropdowns on click outside
     document.addEventListener("click", (e) => {
-        if (!e.target.closest(".origin-input"))
+        if (!e.target.closest(".origin-group"))
             showOriginDropdown.value = false;
-        if (!e.target.closest(".destination-input"))
+        if (!e.target.closest(".destination-group"))
             showDestinationDropdown.value = false;
     });
 });
-
-const formatNumber = (num) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-};
 </script>
 
 <template>
-    <Head title="Beranda" />
+    <Head title="Future Travel" />
 
-    <!-- Clean Title Section (Home Variant with Hero Image) -->
     <div
-        class="relative min-h-screen flex items-center justify-center pt-52 pb-40 overflow-hidden"
+        class="bg-gray-50 dark:bg-[#050505] min-h-screen text-gray-900 dark:text-gray-100 font-manrope selection:bg-rose-600 selection:text-white overflow-x-hidden transition-colors duration-300"
     >
-        <!-- Hero Background -->
-        <div class="absolute inset-0 z-0">
-            <div
-                class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/80 z-10"
-            ></div>
-            <img
-                src="/img/heroImg.jpg"
-                alt="Hero Background"
-                class="w-full h-full object-cover scale-105 animate-slow-zoom"
-            />
-        </div>
-
-        <div
-            class="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center"
+        <!-- HERO SECTION -->
+        <section
+            class="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 overflow-hidden"
         >
-            <span
-                class="inline-block px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium tracking-[0.2em] text-xs mb-8 animate-fade-in uppercase shadow-lg"
-            >
-                PREMIUM BUS TRANSPORTATION
-            </span>
-            <h1
-                class="text-5xl md:text-7xl lg:text-8xl font-black font-serif text-white mb-8 animate-fade-in-up leading-tight drop-shadow-2xl tracking-tight"
-            >
-                Elegansi dalam
-                <span
-                    class="block text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-red-500 to-orange-400"
-                    >Setiap Perjalanan</span
-                >
-            </h1>
-            <p
-                class="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto animate-fade-in-up stagger-1 mb-12 font-light leading-relaxed"
-            >
-                Nikmati pengalaman perjalanan bus terbaik dengan armada modern,
-                fasilitas lengkap, dan pelayanan profesional dari TUJAGO.
-            </p>
-
-            <!-- Search Button -->
-            <div
-                class="flex flex-wrap justify-center gap-4 animate-fade-in-up stagger-2"
-            >
-                <Link
-                    :href="route('frontend.fleet.index')"
-                    class="btn-premium transform hover:scale-105 transition-all"
-                >
-                    <i class="fas fa-bus mr-2"></i> Lihat Armada
-                </Link>
-                <Link
-                    :href="route('frontend.routes.index')"
-                    class="btn-secondary-premium transform hover:scale-105 transition-all"
-                >
-                    <i class="fas fa-map-marked-alt mr-2"></i> Rute Populer
-                </Link>
-            </div>
-        </div>
-    </div>
-
-    <!-- Wave Divider 1 -->
-    <div class="relative -mt-24 z-10">
-        <svg
-            class="fill-white dark:fill-gray-900 w-full h-24 transform scale-y-50 origin-bottom"
-            viewBox="0 0 1440 320"
-        >
-            <path
-                fill-opacity="1"
-                d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-            ></path>
-        </svg>
-    </div>
-
-    <!-- Booking Form Section -->
-    <section
-        class="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 mb-32"
-    >
-        <div
-            class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-[2rem] p-8 md:p-12 shadow-2xl shadow-black/20 border border-white/50 dark:border-gray-700"
-        >
-            <form
-                :action="route('frontend.booking.index')"
-                method="GET"
-                class="space-y-8"
-            >
+            <!-- Minimal Background -->
+            <div class="absolute inset-0 z-0 select-none">
+                <!-- Solid Overlays -->
                 <div
-                    class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center"
-                >
-                    <!-- Origin -->
-                    <div class="md:col-span-3 origin-input relative group">
-                        <div class="relative z-0 w-full group">
-                            <input
-                                v-model="origin"
-                                @input="filterOrigins"
-                                @focus="showOriginDropdown = true"
-                                name="origin"
-                                type="text"
-                                placeholder=" "
-                                class="block py-4 pl-12 pr-4 w-full text-base font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 rounded-xl border-none appearance-none focus:outline-none focus:ring-0 focus:bg-white dark:focus:bg-gray-950 focus:shadow-md transition-all peer"
-                                autocomplete="off"
-                            />
-                            <div
-                                class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-brand-red/10 flex items-center justify-center text-brand-red transition-all peer-focus:scale-90 peer-focus:bg-brand-red peer-focus:text-white"
-                            >
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <label
-                                for="origin"
-                                class="absolute text-sm font-medium text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-12 peer-focus:text-brand-red peer-focus:dark:text-brand-red peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 uppercase tracking-wider"
-                            >
-                                Kota Asal
-                            </label>
-                        </div>
-
-                        <!-- Dropdown -->
-                        <transition
-                            enter-active-class="transition duration-200 ease-out"
-                            enter-from-class="opacity-0 scale-95"
-                            enter-to-class="opacity-100 scale-100"
-                            leave-active-class="transition duration-150 ease-in"
-                            leave-from-class="opacity-100 scale-100"
-                            leave-to-class="opacity-0 scale-95"
-                        >
-                            <div
-                                v-if="
-                                    showOriginDropdown && filteredOrigins.length
-                                "
-                                class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 max-h-56 overflow-y-auto custom-scrollbar"
-                            >
-                                <div
-                                    v-for="item in filteredOrigins"
-                                    :key="item"
-                                    @click="selectOrigin(item)"
-                                    class="px-4 py-3 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-200 flex items-center gap-3 transition-colors group"
-                                >
-                                    <i
-                                        class="fas fa-location-dot text-gray-300 group-hover:text-brand-red transition-colors"
-                                    ></i>
-                                    {{ item }}
-                                </div>
-                            </div>
-                        </transition>
-                    </div>
-
-                    <!-- Swap Button -->
-                    <div
-                        class="hidden md:flex md:col-span-1 items-end justify-center pb-2"
-                    >
-                        <button
-                            type="button"
-                            @click="swapLocations"
-                            class="w-12 h-12 rounded-full bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-400 hover:text-brand-red hover:border-brand-red/30 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex items-center justify-center transform hover:rotate-180 duration-500 shadow-sm"
-                        >
-                            <i class="fas fa-exchange-alt"></i>
-                        </button>
-                    </div>
-
-                    <!-- Destination -->
-                    <div class="md:col-span-3 destination-input relative group">
-                        <div class="relative z-0 w-full group">
-                            <input
-                                v-model="destination"
-                                @input="filterDestinations"
-                                @focus="showDestinationDropdown = true"
-                                name="destination"
-                                type="text"
-                                placeholder=" "
-                                class="block py-4 pl-12 pr-4 w-full text-base font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 rounded-xl border-none appearance-none focus:outline-none focus:ring-0 focus:bg-white dark:focus:bg-gray-950 focus:shadow-md transition-all peer"
-                                autocomplete="off"
-                            />
-                            <div
-                                class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 transition-all peer-focus:scale-90 peer-focus:bg-orange-500 peer-focus:text-white"
-                            >
-                                <i class="fas fa-location-dot"></i>
-                            </div>
-                            <label
-                                for="destination"
-                                class="absolute text-sm font-medium text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-12 peer-focus:text-orange-500 peer-focus:dark:text-orange-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 uppercase tracking-wider"
-                            >
-                                Kota Tujuan
-                            </label>
-                        </div>
-
-                        <!-- Dropdown -->
-                        <transition
-                            enter-active-class="transition duration-200 ease-out"
-                            enter-from-class="opacity-0 scale-95"
-                            enter-to-class="opacity-100 scale-100"
-                            leave-active-class="transition duration-150 ease-in"
-                            leave-from-class="opacity-100 scale-100"
-                            leave-to-class="opacity-0 scale-95"
-                        >
-                            <div
-                                v-if="
-                                    showDestinationDropdown &&
-                                    filteredDestinations.length
-                                "
-                                class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 max-h-56 overflow-y-auto custom-scrollbar"
-                            >
-                                <div
-                                    v-for="item in filteredDestinations"
-                                    :key="item"
-                                    @click="selectDestination(item)"
-                                    class="px-4 py-3 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-900/20 text-gray-700 dark:text-gray-200 flex items-center gap-3 transition-colors group"
-                                >
-                                    <i
-                                        class="fas fa-location-dot text-gray-300 group-hover:text-orange-500 transition-colors"
-                                    ></i>
-                                    {{ item }}
-                                </div>
-                            </div>
-                        </transition>
-                    </div>
-
-                    <!-- Date & Class (Grid Nested) -->
-                    <div class="md:col-span-4 grid grid-cols-2 gap-4">
-                        <!-- Date -->
-                        <div class="relative z-0 w-full group">
-                            <input
-                                v-model="date"
-                                name="date"
-                                type="date"
-                                :min="today"
-                                placeholder=" "
-                                class="block py-4 pl-12 pr-4 w-full text-base font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 rounded-xl border-none appearance-none focus:outline-none focus:ring-0 focus:bg-white dark:focus:bg-gray-950 focus:shadow-md transition-all peer"
-                            />
-                            <div
-                                class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 transition-all peer-focus:scale-90 peer-focus:bg-blue-500 peer-focus:text-white"
-                            >
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <label
-                                class="absolute text-sm font-medium text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-12 peer-focus:text-blue-500 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 uppercase tracking-wider"
-                            >
-                                Tanggal
-                            </label>
-                        </div>
-
-                        <!-- Bus Type -->
-                        <div class="relative z-0 w-full group">
-                            <select
-                                v-model="busType"
-                                name="bus_type"
-                                id="bus_type"
-                                class="block py-4 pl-12 pr-8 w-full text-base font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 rounded-xl border-none appearance-none focus:outline-none focus:ring-0 focus:bg-white dark:focus:bg-gray-950 focus:shadow-md transition-all peer cursor-pointer"
-                                placeholder=" "
-                            >
-                                <option
-                                    v-for="type in busTypes"
-                                    :key="type.id"
-                                    :value="type.id"
-                                >
-                                    {{ type.name }}
-                                </option>
-                            </select>
-                            <label
-                                for="bus_type"
-                                class="absolute text-sm font-medium text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-12 peer-focus:text-gold-500 peer-focus:dark:text-gold-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 uppercase tracking-wider"
-                            >
-                                Kelas Buss
-                            </label>
-                            <div
-                                class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-gold-500/10 flex items-center justify-center text-gold-500 transition-all peer-focus:scale-90 peer-focus:bg-gold-500 peer-focus:text-white"
-                            >
-                                <i class="fas fa-crown"></i>
-                            </div>
-                            <i
-                                class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"
-                            ></i>
-                        </div>
-                    </div>
-
-                    <!-- Search Button -->
-                    <div class="md:col-span-1 flex items-end">
-                        <button
-                            type="submit"
-                            class="w-full h-[56px] bg-brand-red hover:bg-red-700 text-white rounded-xl shadow-lg hover:shadow-brand-red/40 flex items-center justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 group"
-                        >
-                            <i
-                                class="fas fa-search text-xl group-hover:rotate-90 transition-transform duration-300"
-                            ></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="py-24 bg-gray-50 dark:bg-gray-900 overflow-hidden relative">
-        <!-- Scroll Reveal Content -->
-        <!-- Decorative blobs -->
-        <div
-            class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none"
-        >
-            <div
-                class="absolute -top-24 -left-24 w-96 h-96 bg-brand-red/5 rounded-full blur-3xl"
-            ></div>
-            <div
-                class="absolute top-1/2 -right-24 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl"
-            ></div>
-        </div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-16">
-                <span
-                    class="inline-block px-4 py-2 rounded-full bg-brand-red/10 text-brand-red text-xs font-bold tracking-[0.2em] mb-4 uppercase"
-                >
-                    FASILITAS UNGGULAN
-                </span>
-                <h2
-                    class="text-3xl md:text-5xl font-black text-gray-800 dark:text-white mb-6 font-serif"
-                >
-                    Kenapa Memilih
-                    <span
-                        class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500"
-                        >TUJAGO?</span
-                    >
-                </h2>
-                <p
-                    class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed font-light"
-                >
-                    Kami berkomitmen memberikan layanan transportasi terbaik
-                    dengan berbagai fasilitas premium untuk kenyamanan Anda.
-                </p>
+                    class="absolute inset-0 bg-white/90 dark:bg-black/70 z-10 transition-colors duration-300"
+                ></div>
+                <img
+                    src="/img/heroImg.jpg"
+                    alt="Background"
+                    class="w-full h-full object-cover grayscale opacity-40 dark:opacity-50 scale-105 animate-subtle-zoom"
+                />
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div
-                    v-for="(feature, index) in features"
-                    :key="index"
-                    class="scroll-reveal group bg-white dark:bg-gray-800 p-8 rounded-3xl transition-all duration-300 hover:shadow-2xl hover:shadow-brand-red/10 border border-transparent hover:border-gray-100 dark:hover:border-gray-700 relative overflow-hidden"
-                    :style="{
-                        animationDelay: `${index * 0.1}s`,
-                        transitionDelay: `${index * 0.1}s`,
-                    }"
-                >
-                    <!-- Background blob on hover -->
+            <div
+                class="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center"
+            >
+                <!-- Hero Typography -->
+                <div class="lg:col-span-7 space-y-8 text-center lg:text-left">
                     <div
-                        class="absolute -top-10 -right-10 w-32 h-32 bg-gray-50 dark:bg-gray-700 rounded-full blur-2xl group-hover:bg-brand-red/5 transition-colors duration-500"
-                    ></div>
-
-                    <div
-                        class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-300 relative z-10"
-                        :class="feature.gradient"
+                        class="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 backdrop-blur-md mb-4 shadow-sm"
                     >
-                        <i
-                            :class="feature.icon"
-                            class="text-2xl text-white"
-                        ></i>
+                        <span
+                            class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"
+                        ></span>
+                        <span
+                            class="text-xs font-bold tracking-[0.2em] font-unbounded text-rose-600 dark:text-white uppercase"
+                            >Revolusi Perjalanan Darat</span
+                        >
                     </div>
-                    <h3
-                        class="text-xl font-bold text-gray-800 dark:text-white mb-3 group-hover:text-brand-red transition-colors relative z-10 font-serif"
+
+                    <h1
+                        class="text-5xl sm:text-7xl xl:text-8xl font-black font-unbounded leading-[0.9] tracking-tight text-gray-900 dark:text-white"
                     >
-                        {{ feature.title }}
-                    </h3>
+                        <div class="overflow-hidden">
+                            <span class="hero-text-char inline-block"
+                                >JELAJAH</span
+                            >
+                        </div>
+                        <!-- Solid Red Emphasis -->
+                        <div class="overflow-hidden">
+                            <span
+                                class="hero-text-char inline-block text-rose-600"
+                                >TANPA BATAS</span
+                            >
+                        </div>
+                    </h1>
+
                     <p
-                        class="text-gray-500 dark:text-gray-400 leading-relaxed text-sm relative z-10"
+                        class="text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
                     >
-                        {{ feature.description }}
+                        Kombinasi sempurna antara kenyamanan mewah dan ketepatan
+                        waktu. Nikmati standar baru perjalanan antar kota
+                        bersama Tunggal Jaya.
                     </p>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Wave Divider 2 -->
-    <div class="relative z-10 -mt-1 bg-gray-50 dark:bg-gray-900">
-        <svg
-            class="fill-white dark:fill-gray-950 w-full h-24 transform scale-y-50 origin-top rotate-180"
-            viewBox="0 0 1440 320"
-        >
-            <path
-                fill-opacity="1"
-                d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-            ></path>
-        </svg>
-    </div>
-
-    <!-- Popular Routes Section -->
-    <section class="py-24 bg-white dark:bg-gray-950 relative">
-        <!-- Decorative elements -->
-        <div
-            class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-gray-50 to-transparent dark:from-gray-900 pointer-events-none"
-        ></div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div
-                class="flex flex-col md:flex-row justify-between items-end gap-6 mb-16"
-            >
-                <div>
-                    <span
-                        class="inline-block px-4 py-2 rounded-full bg-brand-red/10 text-brand-red text-xs font-bold tracking-[0.2em] mb-4 uppercase"
-                    >
-                        RUTE TERPOPULER
-                    </span>
-                    <h2
-                        class="text-3xl md:text-5xl font-black text-gray-800 dark:text-white font-serif"
-                    >
-                        Jelajahi Destinasi Favorit
-                    </h2>
-                </div>
-                <Link
-                    :href="route('frontend.routes.index')"
-                    class="group inline-flex items-center gap-2 text-brand-red font-bold hover:text-red-700 transition-colors bg-red-50 px-6 py-3 rounded-full hover:bg-red-100"
-                >
-                    Lihat Semua Rute
-                    <i
-                        class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"
-                    ></i>
-                </Link>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div
-                    v-for="(busRoute, index) in featuredRoutes"
-                    :key="busRoute.id"
-                    class="scroll-reveal bg-white dark:bg-gray-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group"
-                    :style="{ transitionDelay: `${index * 0.1}s` }"
-                >
                     <div
-                        class="flex items-center justify-between mb-8 relative"
+                        class="flex flex-wrap gap-4 justify-center lg:justify-start pt-6"
                     >
-                        <!-- Connecting Line -->
+                        <!-- Solid High-Contrast Button -->
+                        <Link
+                            :href="route('frontend.fleet.index')"
+                            class="group relative px-10 py-5 bg-rose-600 text-white font-unbounded font-bold rounded-full overflow-hidden transition-all hover:bg-rose-700 hover:scale-[1.02] shadow-xl shadow-rose-600/20 inline-flex items-center"
+                        >
+                            <span class="relative z-10 flex items-center gap-2">
+                                Lihat Armada
+                                <i
+                                    class="fas fa-arrow-right text-sm -rotate-45 group-hover:rotate-0 transition-transform"
+                                ></i>
+                            </span>
+                        </Link>
+                        <Link
+                            :href="route('frontend.routes.index')"
+                            class="px-10 py-5 bg-transparent border-2 border-gray-200 dark:border-white/20 text-gray-900 dark:text-white font-unbounded font-bold rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-all inline-flex items-center"
+                        >
+                            Rute Aktif
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- Travel Console (Clean Glass) -->
+                <div class="lg:col-span-5 hero-console">
+                    <div
+                        class="bg-white/80 dark:bg-[#111]/80 backdrop-blur-2xl border border-white/20 dark:border-white/10 p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 dark:shadow-black/50 relative overflow-hidden transition-colors duration-300"
+                    >
+                        <h3
+                            class="text-2xl font-unbounded font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3"
+                        >
+                            <span
+                                class="w-8 h-8 rounded-full bg-rose-600 flex items-center justify-center text-white text-sm"
+                            >
+                                <i class="fas fa-ticket-alt"></i>
+                            </span>
+                            Pesan Tiket
+                        </h3>
+
+                        <form
+                            :action="route('frontend.booking.index')"
+                            method="GET"
+                            class="space-y-6 relative z-10"
+                        >
+                            <!-- Origin -->
+                            <div class="relative origin-group">
+                                <label
+                                    class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block"
+                                    >Keberangkatan</label
+                                >
+                                <div class="relative group">
+                                    <div
+                                        class="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-rose-600 transition-colors pl-4"
+                                    >
+                                        <i
+                                            class="fas fa-map-marker-alt text-lg"
+                                        ></i>
+                                    </div>
+                                    <input
+                                        v-model="origin"
+                                        @input="filterOrigins"
+                                        @focus="showOriginDropdown = true"
+                                        type="text"
+                                        name="origin"
+                                        class="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-rose-600 rounded-2xl py-4 pl-12 pr-4 text-lg font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-black transition-all font-manrope"
+                                        placeholder="Dari mana?"
+                                        autocomplete="off"
+                                    />
+                                    <!-- Dropdown -->
+                                    <div
+                                        v-if="
+                                            showOriginDropdown &&
+                                            filteredOrigins.length
+                                        "
+                                        class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl shadow-xl z-50 max-h-60 overflow-y-auto p-2"
+                                    >
+                                        <div
+                                            v-for="city in filteredOrigins"
+                                            :key="city"
+                                            @click="selectOrigin(city)"
+                                            class="px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer text-gray-700 dark:text-gray-200 font-medium transition-colors"
+                                        >
+                                            {{ city }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Swap Button (Absolute to Origin, Centered in Gap) -->
+                                <div
+                                    class="absolute right-4 top-[calc(100%+12px)] -translate-y-1/2 z-30"
+                                >
+                                    <button
+                                        type="button"
+                                        @click="swapLocations"
+                                        class="w-10 h-10 rounded-full bg-white dark:bg-[#222] border-2 border-gray-100 dark:border-[#333] text-gray-400 hover:text-rose-600 hover:border-rose-600 transition-all flex items-center justify-center shadow-lg transform hover:rotate-180 duration-300"
+                                    >
+                                        <i
+                                            class="fas fa-exchange-alt text-sm"
+                                        ></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Destination -->
+                            <div class="relative destination-group">
+                                <label
+                                    class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block"
+                                    >Tujuan</label
+                                >
+                                <div class="relative group">
+                                    <div
+                                        class="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-rose-600 transition-colors pl-4"
+                                    >
+                                        <i
+                                            class="fas fa-location-dot text-lg"
+                                        ></i>
+                                    </div>
+                                    <input
+                                        v-model="destination"
+                                        @input="filterDestinations"
+                                        @focus="showDestinationDropdown = true"
+                                        type="text"
+                                        name="destination"
+                                        class="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-rose-600 rounded-2xl py-4 pl-12 pr-4 text-lg font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-black transition-all font-manrope"
+                                        placeholder="Mau kemana?"
+                                        autocomplete="off"
+                                    />
+                                    <!-- Dropdown -->
+                                    <div
+                                        v-if="
+                                            showDestinationDropdown &&
+                                            filteredDestinations.length
+                                        "
+                                        class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl shadow-xl z-50 max-h-60 overflow-y-auto p-2"
+                                    >
+                                        <div
+                                            v-for="city in filteredDestinations"
+                                            :key="city"
+                                            @click="selectDestination(city)"
+                                            class="px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer text-gray-700 dark:text-gray-200 font-medium transition-colors"
+                                        >
+                                            {{ city }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-6">
+                                <!-- Date -->
+                                <div class="relative">
+                                    <label
+                                        class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block"
+                                        >Tanggal</label
+                                    >
+                                    <input
+                                        v-model="date"
+                                        name="date"
+                                        type="date"
+                                        :min="today"
+                                        class="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-rose-600 rounded-2xl py-4 pl-4 pr-2 text-gray-900 dark:text-white font-bold focus:outline-none focus:bg-white dark:focus:bg-black transition-all font-manrope [color-scheme:light] dark:[color-scheme:dark]"
+                                    />
+                                </div>
+
+                                <!-- Class -->
+                                <div class="relative">
+                                    <label
+                                        class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block"
+                                        >Kelas</label
+                                    >
+                                    <select
+                                        v-model="busType"
+                                        name="class"
+                                        class="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-rose-600 rounded-2xl py-4 pl-4 pr-8 text-gray-900 dark:text-white font-bold focus:outline-none focus:bg-white dark:focus:bg-black transition-all font-manrope appearance-none cursor-pointer"
+                                    >
+                                        <option
+                                            v-for="t in busTypes"
+                                            :key="t.id"
+                                            :value="t.id"
+                                            class="bg-white dark:bg-[#222]"
+                                        >
+                                            {{ t.name }}
+                                        </option>
+                                    </select>
+                                    <i
+                                        class="fas fa-chevron-down absolute right-4 top-[3.2rem] text-gray-400 text-xs pointer-events-none"
+                                    ></i>
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="w-full py-5 bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl font-unbounded font-bold mt-4 shadow-lg hover:scale-[1.01] hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
+                            >
+                                <span>Cari Jadwal</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BENTO FEATURES (Solid & Clean) -->
+        <section class="py-24 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div
+                    class="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6"
+                >
+                    <div>
+                        <h2
+                            class="text-3xl md:text-5xl font-black font-unbounded text-gray-900 dark:text-white mb-4"
+                        >
+                            Standar <span class="text-rose-600">Premium</span>
+                        </h2>
+                        <p
+                            class="text-gray-500 dark:text-gray-400 max-w-xl text-lg font-medium"
+                        >
+                            Meningkatkan kenyamanan perjalanan Anda dengan
+                            fasilitas kelas satu dan kebersihan terjamin.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-[220px]"
+                >
+                    <!-- Stats Block (Solid Rose) -->
+                    <div
+                        class="bento-item col-span-1 md:col-span-2 row-span-2 bg-rose-600 rounded-[2.5rem] p-10 flex flex-col justify-between relative overflow-hidden group shadow-2xl shadow-rose-900/20"
+                    >
+                        <!-- Abstract Clean Shapes -->
                         <div
-                            class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 dark:bg-gray-800 -z-0"
+                            class="absolute -right-10 -top-10 w-64 h-64 bg-rose-500 rounded-full opacity-50 blur-3xl"
                         ></div>
+                        <i
+                            class="fas fa-bus text-[10rem] text-rose-800 opacity-20 absolute -bottom-8 -right-8 rotate-[-15deg] group-hover:rotate-0 transition-transform duration-700 ease-out"
+                        ></i>
 
-                        <div
-                            class="relative z-10 bg-white dark:bg-gray-900 pr-2"
-                        >
-                            <p
-                                class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1"
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-3 mb-6">
+                                <span
+                                    class="w-3 h-3 rounded-full bg-white animate-pulse"
+                                ></span>
+                                <span
+                                    class="text-rose-200 font-bold tracking-widest text-xs uppercase"
+                                    >Status Armada</span
+                                >
+                            </div>
+                            <div
+                                class="text-8xl font-black font-unbounded text-white tracking-tighter"
                             >
-                                Dari
-                            </p>
-                            <p
-                                class="font-bold text-gray-800 dark:text-white text-xl font-serif"
-                            >
-                                {{ busRoute.origin }}
-                            </p>
+                                {{ fleetCount
+                                }}<span class="text-4xl align-top">+</span>
+                            </div>
                         </div>
-
                         <div
-                            class="relative z-10 w-12 h-12 rounded-full bg-brand-red/5 flex items-center justify-center text-brand-red group-hover:bg-brand-red group-hover:text-white transition-all duration-300 shadow-sm"
+                            class="text-rose-100 font-medium text-xl max-w-xs relative z-10 leading-snug"
                         >
+                            Armada modern beroperasi setiap hari di rute
+                            Trans-Jawa.
+                        </div>
+                    </div>
+
+                    <!-- Feature Items (Clean Cards) -->
+                    <div
+                        v-for="(feat, i) in features"
+                        :key="i"
+                        class="bento-item rounded-[2.5rem] p-8 bg-white dark:bg-[#111] hover:bg-gray-50 dark:hover:bg-[#151515] transition-all border border-gray-100 dark:border-[#222] group shadow-sm hover:shadow-md flex flex-col justify-between"
+                        :class="feat.colSpan"
+                    >
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-[#222] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300"
+                        >
+                            <!-- Solid Colors for icons, no gradients -->
                             <i
-                                class="fas fa-arrow-right transform group-hover:rotate-45 transition-transform duration-300"
+                                :class="[feat.icon]"
+                                class="text-gray-900 dark:text-white"
                             ></i>
                         </div>
-
-                        <div
-                            class="relative z-10 bg-white dark:bg-gray-900 pl-2 text-right"
-                        >
-                            <p
-                                class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1"
+                        <div>
+                            <h3
+                                class="font-unbounded font-bold text-gray-900 dark:text-white text-xl mb-2"
                             >
-                                Ke
-                            </p>
+                                {{ feat.title }}
+                            </h3>
                             <p
-                                class="font-bold text-gray-800 dark:text-white text-xl font-serif"
+                                class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-relaxed"
                             >
-                                {{ busRoute.destination }}
+                                {{ feat.desc }}
                             </p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
 
-                    <div
-                        class="flex items-center gap-6 py-4 border-t border-gray-100 dark:border-gray-800 mb-6"
-                    >
-                        <div
-                            v-if="busRoute.distance"
-                            class="flex items-center gap-2 text-gray-500 dark:text-gray-400"
+        <!-- POPULAR ROUTES (Clean Tickets) -->
+        <section
+            class="py-24 border-t border-gray-100 dark:border-[#111] bg-white dark:bg-[#080808]"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-end justify-between mb-16">
+                    <div>
+                        <h2
+                            class="text-3xl font-black font-unbounded text-gray-900 dark:text-white"
                         >
-                            <i class="fas fa-road text-brand-red/70"></i>
-                            <span class="text-sm font-medium"
-                                >{{ busRoute.distance }} km</span
-                            >
-                        </div>
-                        <div
-                            v-if="busRoute.duration"
-                            class="flex items-center gap-2 text-gray-500 dark:text-gray-400"
+                            Rute Populer
+                        </h2>
+                        <p
+                            class="text-gray-500 dark:text-gray-400 mt-2 font-medium"
                         >
-                            <i class="fas fa-clock text-orange-500/70"></i>
-                            <span class="text-sm font-medium"
-                                >{{
-                                    Math.round(busRoute.duration / 60)
-                                }}
-                                jam</span
-                            >
-                        </div>
+                            Destinasi favorit pilihan pelanggan kami.
+                        </p>
                     </div>
-
                     <Link
-                        :href="
-                            route('frontend.booking.index', {
-                                origin: busRoute.origin,
-                                destination: busRoute.destination,
-                            })
-                        "
-                        class="block w-full text-center py-4 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold hover:bg-brand-red dark:hover:bg-brand-red hover:shadow-lg hover:shadow-brand-red/30 transition-all duration-300"
+                        :href="route('frontend.routes.index')"
+                        class="hidden md:inline-flex items-center gap-3 text-rose-600 font-bold hover:text-rose-700 transition-colors"
                     >
-                        Pesan Sekarang
+                        Lihat Semua <i class="fas fa-arrow-right"></i>
+                    </Link>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                >
+                    <div
+                        v-for="(busRoute, i) in featuredRoutes"
+                        :key="busRoute.id"
+                        class="group relative bg-white dark:bg-[#111] rounded-[2rem] border border-gray-100 dark:border-[#222] hover:border-rose-600 dark:hover:border-rose-600 transition-all duration-300 hover:-translate-y-2 overflow-hidden"
+                    >
+                        <div class="p-8 h-full flex flex-col">
+                            <div
+                                class="flex items-center justify-between mb-12 relative z-10"
+                            >
+                                <div class="text-left w-2/5">
+                                    <div
+                                        class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2"
+                                    >
+                                        DARI
+                                    </div>
+                                    <div
+                                        class="text-xl font-unbounded font-bold text-gray-900 dark:text-white leading-tight"
+                                    >
+                                        {{ busRoute.origin }}
+                                    </div>
+                                </div>
+                                <div class="w-1/5 flex justify-center">
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-gray-50 dark:bg-[#222] flex items-center justify-center text-gray-400 group-hover:text-rose-600 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-all"
+                                    >
+                                        <i
+                                            class="fas fa-arrow-right transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"
+                                        ></i>
+                                    </div>
+                                </div>
+                                <div class="text-right w-2/5">
+                                    <div
+                                        class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2"
+                                    >
+                                        KE
+                                    </div>
+                                    <div
+                                        class="text-xl font-unbounded font-bold text-gray-900 dark:text-white leading-tight"
+                                    >
+                                        {{ busRoute.destination }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <Link
+                                    :href="
+                                        route('frontend.booking.index', {
+                                            origin: busRoute.origin,
+                                            destination: busRoute.destination,
+                                        })
+                                    "
+                                    class="block w-full py-4 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-rose-600 hover:text-white text-center rounded-xl text-gray-900 dark:text-white font-bold transition-all duration-300"
+                                >
+                                    Cek Ketersediaan
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA / FOOTER PREVIEW (Modern Marquee) -->
+        <section
+            class="relative py-40 bg-rose-600 overflow-hidden flex items-center justify-center"
+        >
+            <!-- Background Marquee - More visible and layered -->
+            <div
+                class="absolute inset-0 flex flex-col justify-between pointer-events-none select-none opacity-20 text-rose-900 overflow-hidden py-10"
+            >
+                <div
+                    class="text-[10rem] font-black font-unbounded whitespace-nowrap animate-marquee leading-none"
+                >
+                    TUNGGAL JAYA TRANSPORT &bullet; KEAMANAN &bullet; KENYAMANAN
+                    &bullet;
+                </div>
+                <div
+                    class="text-[10rem] font-black font-unbounded whitespace-nowrap animate-marquee-reverse leading-none ml-20"
+                >
+                    &bullet; PREMIUM CLASS &bullet; EKSEKUTIF &bullet; WISATA
+                    &bullet;
+                </div>
+            </div>
+
+            <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+                <div
+                    class="inline-block mb-6 px-6 py-2 rounded-full border-2 border-white/30 bg-white/10 backdrop-blur-md text-white font-bold tracking-widest text-xs uppercase"
+                >
+                    Siap Berangkat?
+                </div>
+
+                <h2
+                    class="text-5xl md:text-8xl font-black font-unbounded text-white mb-8 leading-tight tracking-tight drop-shadow-lg"
+                >
+                    MULAI <br />
+                    PERJALANANMU
+                </h2>
+
+                <p
+                    class="text-xl text-rose-50 font-medium mb-12 max-w-2xl mx-auto leading-relaxed"
+                >
+                    Bergabunglah dengan ribuan penumpang yang telah merasakan
+                    kenyamanan maksimal. Pesan tiketmu sekarang, semudah satu
+                    klik.
+                </p>
+
+                <div
+                    class="flex flex-col sm:flex-row items-center justify-center gap-6"
+                >
+                    <Link
+                        :href="route('frontend.booking.index')"
+                        class="w-full sm:w-auto px-12 py-6 bg-white text-rose-600 rounded-full font-black font-unbounded text-lg hover:scale-105 transition-transform shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.4)] flex items-center justify-center gap-3"
+                    >
+                        PESAN SEKARANG <i class="fas fa-paper-plane"></i>
+                    </Link>
+                    <Link
+                        :href="route('frontend.fleet.index')"
+                        class="w-full sm:w-auto px-12 py-6 bg-rose-800/40 border-2 border-white/20 backdrop-blur-sm text-white rounded-full font-bold font-unbounded text-lg hover:bg-rose-800/60 transition-colors flex items-center justify-center gap-3"
+                    >
+                        Lihat Armada
                     </Link>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Stats Section (Redesigned) -->
-    <section
-        id="stats-section"
-        class="py-24 relative bg-gray-900 overflow-hidden"
-    >
-        <!-- Background Elements -->
-        <div class="absolute inset-0 bg-[#0B0F19]"></div>
-        <div
-            class="absolute top-0 left-1/4 w-96 h-96 bg-brand-red/10 rounded-full blur-[128px]"
-        ></div>
-        <div
-            class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[128px]"
-        ></div>
-
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Fleet Card -->
-                <div
-                    class="scroll-reveal group relative p-10 rounded-[2.5rem] bg-white/5 backdrop-blur-sm border border-white/5 overflow-hidden hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-red/10"
-                >
-                    <i
-                        class="fas fa-bus absolute -right-6 -bottom-6 text-[10rem] text-white/[0.03] group-hover:scale-110 group-hover:rotate-12 transition-transform duration-700 ease-out"
-                    ></i>
-                    <div class="relative z-10 text-center">
-                        <div
-                            class="text-6xl md:text-8xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-gray-500 tracking-tight"
-                        >
-                            {{ displayFleetCount }}+
-                        </div>
-                        <p
-                            class="text-sm font-bold tracking-[0.3em] uppercase text-brand-red"
-                        >
-                            Armada Bus
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Route Card -->
-                <div
-                    class="scroll-reveal group relative p-10 rounded-[2.5rem] bg-white/5 backdrop-blur-sm border border-white/5 overflow-hidden hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/10 delay-100"
-                >
-                    <i
-                        class="fas fa-map-marked-alt absolute -right-6 -bottom-6 text-[10rem] text-white/[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-700 ease-out"
-                    ></i>
-                    <div class="relative z-10 text-center">
-                        <div
-                            class="text-6xl md:text-8xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-gray-500 tracking-tight"
-                        >
-                            {{ displayRouteCount }}+
-                        </div>
-                        <p
-                            class="text-sm font-bold tracking-[0.3em] uppercase text-blue-400"
-                        >
-                            Rute Perjalanan
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Customer Card -->
-                <div
-                    class="scroll-reveal group relative p-10 rounded-[2.5rem] bg-white/5 backdrop-blur-sm border border-white/5 overflow-hidden hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/10 delay-200"
-                >
-                    <i
-                        class="fas fa-users absolute -right-6 -bottom-6 text-[10rem] text-white/[0.03] group-hover:scale-110 group-hover:rotate-6 transition-transform duration-700 ease-out"
-                    ></i>
-                    <div class="relative z-10 text-center">
-                        <div
-                            class="text-6xl md:text-8xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-gray-500 tracking-tight"
-                        >
-                            {{ formatNumber(displayCustomerCount) }}+
-                        </div>
-                        <p
-                            class="text-sm font-bold tracking-[0.3em] uppercase text-emerald-400"
-                        >
-                            Pelanggan Puas
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Fleet Section -->
-    <section class="py-24 bg-gray-50 dark:bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <span
-                    class="inline-block px-4 py-2 rounded-full bg-emerald-100/50 text-emerald-600 text-xs font-bold tracking-[0.2em] mb-4 uppercase"
-                >
-                    ARMADA KAMI
-                </span>
-                <h2
-                    class="text-3xl md:text-5xl font-black text-gray-800 dark:text-white mb-6 font-serif"
-                >
-                    Kenyamanan
-                    <span
-                        class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500"
-                        >Kelas Atas</span
-                    >
-                </h2>
-                <p
-                    class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg font-light"
-                >
-                    Armada bus terbaru dengan standar keamanan dan kenyamanan
-                    tertinggi.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div
-                    v-for="bus in fleet"
-                    :key="bus.id"
-                    class="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden group shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-                >
-                    <div
-                        class="h-64 bg-gray-200 dark:bg-gray-800 relative overflow-hidden"
-                    >
-                        <img
-                            v-if="bus.media && bus.media.length"
-                            :src="bus.media[0].original_url"
-                            :alt="bus.name"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        />
-                        <div
-                            v-else
-                            class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100 dark:bg-gray-800"
-                        >
-                            <i class="fas fa-bus text-5xl mb-4"></i>
-                            <span class="text-sm font-medium"
-                                >No Image Available</span
-                            >
-                        </div>
-
-                        <!-- Overlay gradient -->
-                        <div
-                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80"
-                        ></div>
-
-                        <!-- Type Badge -->
-                        <div class="absolute bottom-4 left-4">
-                            <span
-                                class="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold border border-white/20 uppercase tracking-wider"
-                            >
-                                {{ bus.bus_type }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="p-8">
-                        <h3
-                            class="text-2xl font-bold text-gray-800 dark:text-white mb-4 font-serif group-hover:text-brand-red transition-colors"
-                        >
-                            {{ bus.name }}
-                        </h3>
-
-                        <div class="flex flex-wrap gap-3 mb-8">
-                            <span
-                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 text-xs font-bold uppercase tracking-wide"
-                            >
-                                <img
-                                    src="/img/car-seat.png"
-                                    alt="seat"
-                                    class="w-4 h-4 opacity-70"
-                                />
-                                {{ bus.capacity }} Kursi
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 text-xs font-bold uppercase tracking-wide"
-                            >
-                                <i class="fas fa-id-card text-gray-400"></i>
-                                {{ bus.plate_number }}
-                            </span>
-                        </div>
-
-                        <div
-                            class="pt-6 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center"
-                        >
-                            <div
-                                class="flex items-center gap-4 text-gray-500 dark:text-gray-400"
-                            >
-                                <i
-                                    class="fas fa-snowflake hover:text-sky-400 transition-colors"
-                                    title="AC"
-                                ></i>
-                                <i
-                                    class="fas fa-wifi hover:text-primary-400 transition-colors"
-                                    title="WiFi"
-                                ></i>
-                                <i
-                                    class="fas fa-bolt hover:text-gold-400 transition-colors"
-                                    title="USB"
-                                ></i>
-                            </div>
-
-                            <Link
-                                :href="route('frontend.fleet.index')"
-                                class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-brand-red hover:text-white transition-all transform hover:rotate-45"
-                            >
-                                <i class="fas fa-arrow-right"></i>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center mt-16">
-                <Link
-                    :href="route('frontend.fleet.index')"
-                    class="inline-flex items-center px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-full shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-700 hover:border-brand-red transition-all"
-                >
-                    Lihat Seluruh Armada
-                    <i class="fas fa-arrow-right ml-2 text-brand-red"></i>
-                </Link>
-            </div>
-        </div>
-    </section>
-
-    <!-- Latest News -->
-    <section
-        v-if="latestNews && latestNews.length"
-        class="py-24 bg-white dark:bg-gray-950"
-    >
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div
-                class="flex flex-col md:flex-row justify-between items-end gap-6 mb-16"
-            >
-                <div>
-                    <span
-                        class="inline-block px-4 py-2 rounded-full bg-gold-100 dark:bg-gold-900/30 text-gold-600 dark:text-gold-400 text-sm font-bold mb-4 tracking-wide"
-                    >
-                        BERITA TERKINI
-                    </span>
-                    <h2
-                        class="text-3xl md:text-4xl font-extrabold text-gray-800 dark:text-white font-serif"
-                    >
-                        Info & Promo Terbaru
-                    </h2>
-                </div>
-                <Link
-                    :href="route('frontend.news.index')"
-                    class="group inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-bold hover:text-primary-700 transition-colors"
-                >
-                    Lihat Semua Berita
-                    <i
-                        class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"
-                    ></i>
-                </Link>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <article
-                    v-for="news in latestNews"
-                    :key="news.id"
-                    class="card-premium overflow-hidden group"
-                >
-                    <div
-                        class="h-56 bg-gray-200 dark:bg-gray-800 relative overflow-hidden"
-                    >
-                        <img
-                            v-if="news.media && news.media.length"
-                            :src="news.media[0].original_url"
-                            :alt="news.title"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        />
-                        <div
-                            v-else
-                            class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gold-400 to-primary-500"
-                        >
-                            <i
-                                class="fas fa-newspaper text-white/50 text-5xl"
-                            ></i>
-                        </div>
-
-                        <!-- Date Badge -->
-                        <div class="absolute top-4 left-4">
-                            <span
-                                class="px-3 py-1 rounded-lg bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold shadow-sm"
-                            >
-                                {{
-                                    new Date(
-                                        news.created_at
-                                    ).toLocaleDateString("id-ID", {
-                                        day: "numeric",
-                                        month: "short",
-                                    })
-                                }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="p-6">
-                        <h3
-                            class="text-lg font-bold text-gray-800 dark:text-white mb-3 line-clamp-2 group-hover:text-primary-600 transition-colors font-serif"
-                        >
-                            {{ news.title }}
-                        </h3>
-                        <p
-                            class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-4"
-                        >
-                            {{
-                                news.content ||
-                                "Klik untuk membaca selengkapnya..."
-                            }}
-                        </p>
-                        <Link
-                            :href="route('frontend.news.show', news.slug)"
-                            class="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-bold text-sm hover:gap-3 transition-all"
-                        >
-                            Baca Selengkapnya
-                            <i class="fas fa-arrow-right text-xs"></i>
-                        </Link>
-                    </div>
-                </article>
-            </div>
-        </div>
-    </section>
+        </section>
+    </div>
 </template>
+
+<style scoped>
+.font-unbounded {
+    font-family: "Unbounded", sans-serif;
+}
+.font-manrope {
+    font-family: "Manrope", sans-serif;
+}
+
+@keyframes subtle-zoom {
+    0% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1.15);
+    }
+}
+
+.animate-subtle-zoom {
+    animation: subtle-zoom 20s infinite alternate linear;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-marquee {
+    animation: marquee 30s linear infinite;
+}
+
+@keyframes marquee-reverse {
+    0% {
+        transform: translateX(-50%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.animate-marquee-reverse {
+    animation: marquee-reverse 35s linear infinite;
+}
+</style>

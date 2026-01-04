@@ -52,34 +52,24 @@ const isActive = (routeName) => {
 
 <template>
     <div
-        class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-300 font-sans"
+        class="min-h-screen flex flex-col bg-gray-50 dark:bg-[#050505] transition-colors duration-300 font-manrope"
     >
         <!-- Flash Messages -->
         <FlashMessages />
 
-        <!-- Header (Floating Pill) -->
+        <!-- Header (Floating Pill - Solid & Minimal) -->
         <header
             class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out px-4 sm:px-6 lg:px-8"
-            :class="isScrolled ? 'pt-4' : 'pt-2'"
+            :class="isScrolled ? 'pt-4' : 'pt-6'"
         >
             <nav
-                class="max-w-7xl mx-auto rounded-full transition-all duration-500 relative group/nav"
+                class="max-w-7xl mx-auto rounded-full transition-all duration-500 relative"
                 :class="
                     isScrolled
-                        ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl shadow-xl shadow-brand-red/5 py-2.5 px-6'
-                        : 'bg-transparent py-4 px-0'
+                        ? 'bg-white/90 dark:bg-black/80 backdrop-blur-xl shadow-lg shadow-gray-200/20 dark:shadow-black/20 py-3 px-6 border border-gray-100 dark:border-white/10'
+                        : 'bg-transparent py-2 px-0'
                 "
             >
-                <!-- Gradient Border Effect -->
-                <div
-                    class="absolute inset-0 rounded-full p-[1px] bg-gradient-to-r from-white/20 via-white/50 to-white/20 dark:from-gray-700/30 dark:via-gray-600/50 dark:to-gray-700/30 -z-10 opacity-0 transition-opacity duration-500"
-                    :class="{ 'opacity-100': isScrolled }"
-                >
-                    <div
-                        class="w-full h-full bg-white/90 dark:bg-gray-900/90 rounded-full"
-                    ></div>
-                </div>
-
                 <div class="flex items-center justify-between relative z-10">
                     <!-- Logo -->
                     <Link
@@ -87,32 +77,28 @@ const isActive = (routeName) => {
                         class="flex items-center space-x-3 group"
                     >
                         <div
-                            class="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center"
+                            class="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center"
                         >
-                            <!-- Saturn Rings -->
+                            <!-- Simple Glow (No Rings) -->
                             <div
-                                class="logo-ring absolute w-[160%] h-[160%] animate-ring-spin"
-                            ></div>
-                            <div
-                                class="logo-ring absolute w-[140%] h-[140%] animate-ring-spin"
-                                style="animation-duration: 15s"
+                                class="absolute inset-0 bg-rose-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity"
                             ></div>
 
                             <!-- Logo Image -->
                             <img
                                 src="/img/logoNoBg.png"
                                 alt="Logo"
-                                class="h-10 w-10 md:h-12 md:w-12 relative z-10 transition-transform duration-500 group-hover:scale-110 drop-shadow-lg"
+                                class="h-8 w-8 md:h-10 md:w-10 relative z-10 transition-transform duration-500 group-hover:scale-105"
                             />
                         </div>
                         <div class="flex flex-col">
                             <span
-                                class="text-2xl font-black tracking-tighter font-serif leading-none"
+                                class="text-xl font-black tracking-tighter font-unbounded leading-none text-gray-900 dark:text-white"
                             >
-                                <span class="text-brand-red">TUJAGO</span>
+                                TUJAGO
                             </span>
                             <span
-                                class="text-[0.65rem] font-bold text-gray-500 dark:text-gray-400 tracking-[0.2em] uppercase leading-none ml-0.5"
+                                class="text-[0.6rem] font-bold text-gray-400 dark:text-gray-500 tracking-[0.25em] uppercase leading-none ml-0.5 mt-0.5"
                             >
                                 Tunggal Jaya Go
                             </span>
@@ -125,19 +111,14 @@ const isActive = (routeName) => {
                             v-for="link in navLinks"
                             :key="link.href"
                             :href="route(link.href)"
-                            class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 relative group overflow-hidden"
+                            class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 relative group"
                             :class="
                                 isActive(link.href)
-                                    ? 'text-brand-red bg-brand-red/10 ring-1 ring-brand-red/20'
-                                    : 'text-gray-600 dark:text-gray-300 hover:text-brand-red dark:hover:text-brand-red hover:bg-brand-red/5'
+                                    ? 'text-white bg-rose-600 shadow-lg shadow-rose-600/20'
+                                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
                             "
                         >
-                            <span class="relative z-10">{{ link.name }}</span>
-                            <!-- Active Glow -->
-                            <div
-                                v-if="isActive(link.href)"
-                                class="absolute inset-0 bg-brand-red/5 blur-md"
-                            ></div>
+                            {{ link.name }}
                         </Link>
                     </div>
 
@@ -146,13 +127,11 @@ const isActive = (routeName) => {
                         <!-- Dark Mode Toggle -->
                         <button
                             @click="toggleDarkMode"
-                            class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 focus:outline-none hover:rotate-12"
+                            class="w-10 h-10 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-rose-600 transition-all duration-300 focus:outline-none"
                         >
                             <i
                                 :class="
-                                    isDarkMode
-                                        ? 'fas fa-sun text-yellow-400 text-lg'
-                                        : 'fas fa-moon text-indigo-600 text-lg'
+                                    isDarkMode ? 'fas fa-sun' : 'fas fa-moon'
                                 "
                             ></i>
                         </button>
@@ -161,13 +140,13 @@ const isActive = (routeName) => {
                         <template v-if="!page.props.auth.user">
                             <Link
                                 :href="route('login')"
-                                class="hidden sm:inline-flex px-5 py-2 text-sm font-bold text-gray-700 dark:text-gray-200 hover:text-brand-red dark:hover:text-brand-red transition-colors"
+                                class="hidden sm:inline-flex px-6 py-2.5 text-sm font-bold text-gray-900 dark:text-white hover:text-rose-600 transition-colors"
                             >
                                 Masuk
                             </Link>
                             <Link
                                 :href="route('register')"
-                                class="hidden sm:inline-flex px-6 py-2.5 bg-gradient-to-r from-brand-red to-red-700 text-white text-sm font-bold rounded-full shadow-lg shadow-brand-red/30 hover:shadow-brand-red/50 transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
+                                class="hidden sm:inline-flex px-6 py-2.5 bg-rose-600 text-white text-sm font-bold rounded-full shadow-lg shadow-rose-600/20 hover:bg-rose-700 hover:scale-105 transition-all duration-300"
                             >
                                 Daftar
                             </Link>
@@ -175,10 +154,10 @@ const isActive = (routeName) => {
                         <template v-else>
                             <div class="relative group">
                                 <button
-                                    class="flex items-center space-x-2 p-1.5 pr-4 rounded-full border border-gray-200 dark:border-gray-700 hover:border-brand-red dark:hover:border-brand-red transition-all duration-300 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm group-hover:shadow-lg group-hover:shadow-brand-red/10"
+                                    class="flex items-center space-x-2 p-1.5 pr-4 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-[#111] hover:border-rose-600 transition-all duration-300 shadow-sm"
                                 >
                                     <div
-                                        class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-red to-red-700 flex items-center justify-center text-white text-sm font-bold shadow-md"
+                                        class="w-8 h-8 rounded-full bg-rose-600 flex items-center justify-center text-white text-sm font-bold"
                                     >
                                         {{
                                             page.props.auth.user.name
@@ -187,7 +166,7 @@ const isActive = (routeName) => {
                                         }}
                                     </div>
                                     <span
-                                        class="hidden md:block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                                        class="hidden md:block text-sm font-bold text-gray-700 dark:text-gray-200"
                                     >
                                         {{
                                             page.props.auth.user.name.split(
@@ -196,23 +175,24 @@ const isActive = (routeName) => {
                                         }}
                                     </span>
                                     <i
-                                        class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-300 group-hover:rotate-180"
+                                        class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-rose-600 transition-colors"
                                     ></i>
                                 </button>
+
                                 <!-- Dropdown -->
                                 <div
-                                    class="absolute right-0 mt-4 w-60 py-2 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl shadow-brand-red/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100 dark:border-gray-700 transform origin-top-right scale-95 group-hover:scale-100 z-50"
+                                    class="absolute right-0 mt-4 w-64 py-2 bg-white dark:bg-[#111] rounded-2xl shadow-xl border border-gray-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right scale-95 group-hover:scale-100 z-50"
                                 >
                                     <div
-                                        class="px-4 py-4 border-b border-gray-100 dark:border-gray-700 mb-2 bg-gray-50/50 dark:bg-gray-800/50"
+                                        class="px-5 py-4 border-b border-gray-100 dark:border-white/10 mb-2"
                                     >
                                         <p
-                                            class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold mb-1"
+                                            class="text-xs text-gray-400 uppercase tracking-wider font-bold mb-1"
                                         >
-                                            Akun
+                                            Masuk sebagai
                                         </p>
                                         <p
-                                            class="text-sm font-bold text-gray-800 dark:text-white truncate"
+                                            class="text-sm font-bold text-gray-900 dark:text-white truncate"
                                         >
                                             {{ page.props.auth.user.email }}
                                         </p>
@@ -220,24 +200,20 @@ const isActive = (routeName) => {
 
                                     <Link
                                         :href="route('profile.edit')"
-                                        class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-brand-red dark:hover:text-brand-red transition-colors"
+                                        class="flex items-center px-5 py-3 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-rose-600 font-medium transition-colors"
                                     >
-                                        <div
-                                            class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center mr-3 text-brand-red"
-                                        >
-                                            <i class="fas fa-user"></i>
-                                        </div>
+                                        <i
+                                            class="fas fa-user w-5 mr-3 text-center"
+                                        ></i>
                                         Profil Saya
                                     </Link>
                                     <Link
                                         :href="route('booking-history.index')"
-                                        class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-brand-red dark:hover:text-brand-red transition-colors"
+                                        class="flex items-center px-5 py-3 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-rose-600 font-medium transition-colors"
                                     >
-                                        <div
-                                            class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center mr-3 text-brand-red"
-                                        >
-                                            <i class="fas fa-history"></i>
-                                        </div>
+                                        <i
+                                            class="fas fa-history w-5 mr-3 text-center"
+                                        ></i>
                                         Riwayat Booking
                                     </Link>
 
@@ -248,35 +224,31 @@ const isActive = (routeName) => {
                                         "
                                     >
                                         <div
-                                            class="my-2 border-t border-gray-100 dark:border-gray-700"
+                                            class="my-2 border-t border-gray-100 dark:border-white/10"
                                         ></div>
                                         <Link
                                             :href="route('admin.dashboard')"
-                                            class="flex items-center px-4 py-3 text-sm text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+                                            class="flex items-center px-5 py-3 text-sm text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors"
                                         >
-                                            <div
-                                                class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mr-3 text-indigo-600"
-                                            >
-                                                <i class="fas fa-cog"></i>
-                                            </div>
-                                            Admin Panel
+                                            <i
+                                                class="fas fa-cog w-5 mr-3 text-center"
+                                            ></i>
+                                            Panel Admin
                                         </Link>
                                     </template>
 
                                     <div
-                                        class="my-2 border-t border-gray-100 dark:border-gray-700"
+                                        class="my-2 border-t border-gray-100 dark:border-white/10"
                                     ></div>
                                     <Link
                                         :href="route('logout')"
                                         method="post"
                                         as="button"
-                                        class="w-full text-left flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                        class="w-full text-left flex items-center px-5 py-3 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/10 font-bold transition-colors"
                                     >
-                                        <div
-                                            class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center mr-3 text-red-600"
-                                        >
-                                            <i class="fas fa-sign-out-alt"></i>
-                                        </div>
+                                        <i
+                                            class="fas fa-sign-out-alt w-5 mr-3 text-center"
+                                        ></i>
                                         Keluar
                                     </Link>
                                 </div>
@@ -286,7 +258,7 @@ const isActive = (routeName) => {
                         <!-- Mobile Menu Button -->
                         <button
                             @click="toggleMobileMenu"
-                            class="lg:hidden w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-center"
+                            class="lg:hidden w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                         >
                             <i
                                 :class="
@@ -294,7 +266,7 @@ const isActive = (routeName) => {
                                         ? 'fas fa-times'
                                         : 'fas fa-bars'
                                 "
-                                class="text-lg text-gray-700 dark:text-gray-200"
+                                class="text-gray-900 dark:text-white"
                             ></i>
                         </button>
                     </div>
@@ -311,7 +283,7 @@ const isActive = (routeName) => {
                 >
                     <div
                         v-if="mobileMenuOpen"
-                        class="lg:hidden absolute left-0 right-0 top-full mt-4 mx-4 glass-white dark:glass-dark rounded-2xl shadow-2xl shadow-brand-red/10 border border-white/20 overflow-hidden"
+                        class="lg:hidden absolute left-0 right-0 top-full mt-4 mx-4 bg-white dark:bg-[#111] rounded-3xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-50"
                     >
                         <div class="p-4 space-y-2">
                             <Link
@@ -319,36 +291,36 @@ const isActive = (routeName) => {
                                 :key="link.href"
                                 :href="route(link.href)"
                                 @click="mobileMenuOpen = false"
-                                class="block px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200"
+                                class="block px-6 py-4 rounded-2xl text-base font-bold transition-all duration-200"
                                 :class="
                                     isActive(link.href)
-                                        ? 'bg-brand-red text-white shadow-lg shadow-brand-red/30'
-                                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-red'
+                                        ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20'
+                                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5'
                                 "
                             >
                                 <div class="flex items-center justify-between">
                                     {{ link.name }}
                                     <i
                                         v-if="isActive(link.href)"
-                                        class="fas fa-chevron-right text-xs"
+                                        class="fas fa-arrow-right text-sm"
                                     ></i>
                                 </div>
                             </Link>
 
                             <div
-                                class="border-t border-gray-100 dark:border-gray-700 my-2 pt-2"
+                                class="border-t border-gray-100 dark:border-white/10 my-2 pt-2"
                             ></div>
 
                             <template v-if="!page.props.auth.user">
                                 <Link
                                     :href="route('login')"
-                                    class="block px-4 py-3 text-sm font-semibold text-center text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl"
+                                    class="block w-full py-4 text-center font-bold text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl"
                                 >
                                     Masuk
                                 </Link>
                                 <Link
                                     :href="route('register')"
-                                    class="block px-4 py-3 mt-2 bg-gradient-to-r from-brand-red to-red-700 text-white text-sm font-bold rounded-xl text-center shadow-lg shadow-brand-red/30"
+                                    class="block w-full py-4 mt-2 bg-rose-600 text-white text-center font-bold rounded-2xl shadow-lg shadow-rose-600/20"
                                 >
                                     Daftar Sekarang
                                 </Link>
@@ -364,273 +336,225 @@ const isActive = (routeName) => {
             <slot />
         </main>
 
-        <!-- Footer -->
+        <!-- Footer (Solid & Clean) -->
         <footer
-            class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white relative overflow-hidden border-t border-gray-200 dark:border-white/10 transition-colors duration-300"
+            class="bg-white dark:bg-[#080808] text-gray-900 dark:text-white border-t border-gray-100 dark:border-[#111] transition-colors duration-300 relative overflow-hidden"
         >
-            <!-- Background Pattern (Subtle for both) -->
+            <!-- Background Subtle Elements -->
             <div
-                class="absolute inset-0 opacity-30 dark:opacity-10 pointer-events-none"
-            >
-                <div
-                    class="absolute -top-24 -left-24 w-96 h-96 bg-brand-red/10 dark:bg-brand-red/20 rounded-full blur-[100px]"
-                ></div>
-                <div
-                    class="absolute bottom-0 right-0 w-80 h-80 bg-blue-100 dark:bg-blue-600/20 rounded-full blur-[100px]"
-                ></div>
-            </div>
+                class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-rose-600 to-transparent opacity-50"
+            ></div>
+            <div
+                class="absolute -bottom-24 -right-24 w-96 h-96 bg-rose-50 dark:bg-rose-900/5 rounded-full blur-3xl opacity-50 pointer-events-none"
+            ></div>
 
             <div
-                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10"
+                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10"
             >
                 <div
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8"
                 >
-                    <!-- Company Info -->
-                    <div>
+                    <!-- Brand Column (Larger) -->
+                    <div class="lg:col-span-4">
                         <Link
                             :href="route('frontend.home')"
-                            class="flex items-center space-x-3 mb-6"
+                            class="flex items-center space-x-4 mb-8 group"
                         >
-                            <img
-                                src="/img/logoNoBg.png"
-                                alt="Logo"
-                                class="h-12 w-12 dark:brightness-200"
-                            />
+                            <div
+                                class="relative w-16 h-16 flex items-center justify-center bg-gray-50 dark:bg-[#151515] rounded-2xl border border-gray-100 dark:border-[#222] group-hover:border-rose-100 dark:group-hover:border-rose-900/20 transition-all duration-500 overflow-hidden"
+                            >
+                                <!-- Logo -->
+                                <img
+                                    src="/img/logoNoBg.png"
+                                    alt="TUJAGO Logo"
+                                    class="w-12 h-12 object-contain relative z-10 transition-transform duration-500 group-hover:scale-110 drop-shadow-sm"
+                                />
+                                <div
+                                    class="absolute inset-0 bg-rose-600/5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                ></div>
+                            </div>
                             <div class="flex flex-col">
                                 <span
-                                    class="text-2xl font-black tracking-tighter font-serif leading-none"
+                                    class="text-3xl font-black font-unbounded leading-none tracking-tight"
+                                    >TUJAGO</span
                                 >
-                                    <span class="text-brand-red">TUJAGO</span>
-                                </span>
                                 <span
-                                    class="text-[0.65rem] font-bold text-gray-500 dark:text-gray-400 tracking-[0.2em] uppercase leading-none ml-0.5"
+                                    class="text-[0.65rem] font-bold text-gray-400 dark:text-gray-500 tracking-[0.3em] uppercase mt-1"
+                                    >Tunggal Jaya Go</span
                                 >
-                                    Tunggal Jaya Go
-                                </span>
                             </div>
                         </Link>
                         <p
-                            class="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed font-light text-sm"
+                            class="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed text-base font-medium pr-6"
                         >
-                            Partner perjalanan terpercaya Anda dengan armada bus
-                            modern dan pelayanan premium. Kenyamanan dan
-                            keselamatan adalah prioritas utama kami sejak 1973.
+                            Menghubungkan kota, menyatukan cerita. Partner
+                            perjalanan premium Anda dengan standar keselamatan
+                            tertinggi dan kenyamanan tanpa kompromi sejak 1973.
                         </p>
                         <div class="flex space-x-3">
                             <a
+                                v-for="social in [
+                                    'facebook-f',
+                                    'twitter',
+                                    'instagram',
+                                    'linkedin-in',
+                                ]"
                                 href="#"
-                                class="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:scale-110 transition-all duration-300 group"
+                                class="w-12 h-12 rounded-full bg-gray-50 dark:bg-[#151515] border border-gray-100 dark:border-[#222] flex items-center justify-center text-gray-400 hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-rose-600/20"
                             >
-                                <i
-                                    class="fab fa-facebook-f group-hover:text-white text-gray-400 transition-colors text-sm"
-                                ></i>
-                            </a>
-                            <a
-                                href="#"
-                                class="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-sky-500 hover:border-sky-400 hover:scale-110 transition-all duration-300 group"
-                            >
-                                <i
-                                    class="fab fa-twitter group-hover:text-white text-gray-400 transition-colors text-sm"
-                                ></i>
-                            </a>
-                            <a
-                                href="#"
-                                class="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-pink-600 hover:border-pink-500 hover:scale-110 transition-all duration-300 group"
-                            >
-                                <i
-                                    class="fab fa-instagram group-hover:text-white text-gray-400 transition-colors text-sm"
-                                ></i>
-                            </a>
-                            <a
-                                href="#"
-                                class="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-blue-700 hover:border-blue-600 hover:scale-110 transition-all duration-300 group"
-                            >
-                                <i
-                                    class="fab fa-linkedin-in group-hover:text-white text-gray-400 transition-colors text-sm"
-                                ></i>
+                                <i :class="`fab fa-${social} text-lg`"></i>
                             </a>
                         </div>
                     </div>
 
                     <!-- Quick Links -->
-                    <div>
+                    <div class="lg:col-span-2">
                         <h3
-                            class="text-lg font-bold mb-6 text-gray-900 dark:text-white border-b-2 border-brand-red inline-block pb-2"
+                            class="text-lg font-bold font-unbounded mb-8 flex items-center gap-2"
                         >
+                            <span
+                                class="w-2 h-2 rounded-full bg-rose-600"
+                            ></span>
                             Link Cepat
                         </h3>
-                        <ul class="space-y-3 text-sm">
+                        <ul
+                            class="space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400"
+                        >
                             <li
-                                v-for="(item, index) in [
-                                    {
-                                        name: 'Tentang Kami',
-                                        route: 'frontend.about',
-                                    },
-                                    {
-                                        name: 'Rute Perjalanan',
-                                        route: 'frontend.routes.index',
-                                    },
-                                    {
-                                        name: 'Info Armada',
-                                        route: 'frontend.fleet.index',
-                                    },
-                                    {
-                                        name: 'Berita & Update',
-                                        route: 'frontend.news.index',
-                                    },
-                                    {
-                                        name: 'Hubungi Kami',
-                                        route: 'frontend.contact',
-                                    },
+                                v-for="item in [
+                                    'Tentang Kami',
+                                    'Rute',
+                                    'Info Armada',
+                                    'Berita',
+                                    'Kontak',
                                 ]"
-                                :key="index"
+                                :key="item"
                             >
-                                <Link
-                                    :href="route(item.route)"
-                                    class="text-gray-500 dark:text-gray-400 hover:text-brand-red transition-colors flex items-center group"
+                                <a
+                                    href="#"
+                                    class="hover:text-rose-600 dark:hover:text-rose-500 transition-colors flex items-center gap-2 group"
                                 >
-                                    <i
-                                        class="fas fa-chevron-right text-[10px] mr-2 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 text-brand-red"
-                                    ></i>
-                                    {{ item.name }}
-                                </Link>
+                                    <span
+                                        class="w-0 overflow-hidden transition-all duration-300 group-hover:w-3 text-rose-600"
+                                        ><i
+                                            class="fas fa-arrow-right text-[10px]"
+                                        ></i
+                                    ></span>
+                                    {{ item }}
+                                </a>
                             </li>
                         </ul>
                     </div>
 
-                    <!-- Services (From Blade) -->
-                    <div>
+                    <!-- Services -->
+                    <div class="lg:col-span-3">
                         <h3
-                            class="text-lg font-bold mb-6 text-gray-900 dark:text-white border-b-2 border-brand-red inline-block pb-2"
+                            class="text-lg font-bold font-unbounded mb-8 flex items-center gap-2"
                         >
+                            <span
+                                class="w-2 h-2 rounded-full bg-rose-600"
+                            ></span>
                             Layanan
                         </h3>
-                        <ul class="space-y-3 text-sm">
+                        <ul
+                            class="space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400"
+                        >
                             <li
-                                class="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                                v-for="item in [
+                                    'Antar Kota',
+                                    'Shuttle Bus',
+                                    'Transfer Bandara',
+                                    'Paket Wisata',
+                                    'Korporasi',
+                                ]"
+                                :key="item"
                             >
-                                <i class="fas fa-bus mr-3 text-brand-red"></i>
-                                Transportasi Kota
-                            </li>
-                            <li
-                                class="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                            >
-                                <i class="fas fa-route mr-3 text-brand-red"></i>
-                                Perjalanan Antar Kota
-                            </li>
-                            <li
-                                class="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                            >
-                                <i class="fas fa-plane mr-3 text-brand-red"></i>
-                                Antar Jemput Bandara
-                            </li>
-                            <li
-                                class="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                            >
-                                <i
-                                    class="fas fa-map-marked-alt mr-3 text-brand-red"
-                                ></i>
-                                Paket Wisata
-                            </li>
-                            <li
-                                class="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                            >
-                                <i
-                                    class="fas fa-building mr-3 text-brand-red"
-                                ></i>
-                                Perjalanan Bisnis
+                                <a
+                                    href="#"
+                                    class="hover:text-rose-600 dark:hover:text-rose-500 transition-colors flex items-center gap-2 group"
+                                >
+                                    <span
+                                        class="w-0 overflow-hidden transition-all duration-300 group-hover:w-3 text-rose-600"
+                                        ><i class="fas fa-check text-[10px]"></i
+                                    ></span>
+                                    {{ item }}
+                                </a>
                             </li>
                         </ul>
                     </div>
 
                     <!-- Contact -->
-                    <div>
+                    <div class="lg:col-span-3">
                         <h3
-                            class="text-lg font-bold mb-6 text-gray-900 dark:text-white border-b-2 border-brand-red inline-block pb-2"
+                            class="text-lg font-bold font-unbounded mb-8 flex items-center gap-2"
                         >
+                            <span
+                                class="w-2 h-2 rounded-full bg-rose-600"
+                            ></span>
                             Hubungi Kami
                         </h3>
                         <ul
-                            class="space-y-4 text-gray-500 dark:text-gray-400 text-sm"
+                            class="space-y-6 text-sm font-medium text-gray-500 dark:text-gray-400"
                         >
-                            <li class="flex items-start space-x-3 group">
-                                <div class="mt-1 flex-shrink-0">
+                            <li
+                                class="flex items-start gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-[#151515] border border-gray-100 dark:border-[#222]"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-full bg-white dark:bg-[#111] flex items-center justify-center text-rose-600 shadow-sm shrink-0"
+                                >
                                     <i
-                                        class="fas fa-map-marker-alt text-brand-red group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
+                                        class="fas fa-map-marker-alt text-xs"
                                     ></i>
                                 </div>
-                                <span
-                                    class="group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors leading-relaxed"
+                                <span class="leading-relaxed"
+                                    >Jl. Transportasi No. 123,<br />Jakarta
+                                    12345, Indonesia</span
                                 >
-                                    Jl. Transportation No. 123, Jakarta 12345
-                                </span>
                             </li>
-                            <li class="flex items-center space-x-3 group">
-                                <div class="flex-shrink-0">
-                                    <i
-                                        class="fas fa-phone-alt text-brand-red group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
-                                    ></i>
-                                </div>
-                                <span
-                                    class="group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors"
+                            <li class="flex items-center gap-4">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-gray-50 dark:bg-[#151515] flex items-center justify-center text-rose-600 border border-gray-100 dark:border-[#222]"
                                 >
-                                    +62 21 1234 5678
-                                </span>
+                                    <i class="fas fa-phone text-xs"></i>
+                                </div>
+                                <span>+62 21 1234 5678</span>
                             </li>
-                            <li class="flex items-center space-x-3 group">
-                                <div class="flex-shrink-0">
-                                    <i
-                                        class="fas fa-envelope text-brand-red group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
-                                    ></i>
-                                </div>
-                                <span
-                                    class="group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors"
+                            <li class="flex items-center gap-4">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-gray-50 dark:bg-[#151515] flex items-center justify-center text-rose-600 border border-gray-100 dark:border-[#222]"
                                 >
-                                    info@tujago.com
-                                </span>
-                            </li>
-                            <li class="flex items-center space-x-3 group">
-                                <div class="flex-shrink-0">
-                                    <i
-                                        class="fas fa-clock text-brand-red group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
-                                    ></i>
+                                    <i class="fas fa-envelope text-xs"></i>
                                 </div>
-                                <span
-                                    class="group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors"
-                                >
-                                    Senin - Jumat, 08:00 - 20:00
-                                </span>
+                                <span>tujago@email.com</span>
                             </li>
                         </ul>
                     </div>
                 </div>
 
                 <div
-                    class="border-t border-gray-200 dark:border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm"
+                    class="border-t border-gray-100 dark:border-white/5 mt-20 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm font-medium"
                 >
                     <p>
                         &copy; {{ new Date().getFullYear() }}
-                        <span
-                            class="text-gray-900 dark:text-white hover:text-brand-red cursor-pointer transition-colors"
-                            >TUJAGO (Tunggal Jaya Go)</span
-                        >. All rights reserved.
+                        <strong class="text-gray-900 dark:text-white"
+                            >TUJAGO</strong
+                        >. Hak Cipta Dilindungi.
                     </p>
-                    <div class="flex space-x-6 mt-4 md:mt-0">
+                    <div class="flex space-x-8 mt-4 md:mt-0">
                         <a
                             href="#"
-                            class="hover:text-brand-red transition-colors"
-                            >Privacy Policy</a
+                            class="hover:text-rose-600 transition-colors"
+                            >Privasi</a
                         >
                         <a
                             href="#"
-                            class="hover:text-brand-red transition-colors"
-                            >Terms of Service</a
+                            class="hover:text-rose-600 transition-colors"
+                            >Syarat & Ketentuan</a
                         >
                         <a
                             href="#"
-                            class="hover:text-brand-red transition-colors"
-                            >Cookie Policy</a
+                            class="hover:text-rose-600 transition-colors"
+                            >Cookie</a
                         >
                     </div>
                 </div>
