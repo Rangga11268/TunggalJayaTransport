@@ -141,10 +141,29 @@ class BookingController extends Controller
                 $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
                 if ($availableSeats <= 0) return false;
 
-                // Hide non-daily schedules that are in the past
+                // VALIDASI JADWAL NON-DAILY (Tanggal Spesifik)
                 if (!$schedule->is_daily) {
                     $departure = $schedule->departure_time instanceof Carbon ? $schedule->departure_time : Carbon::parse($schedule->departure_time);
+                    
+                    // 1. Cek apakah sudah lewat (relative to now)
                     if ($departure->isPast()) return false;
+
+                    // 2. Cek apakah tanggalnya SAMA dengan tanggal pencarian
+                    //    Misal user cari tgl 6, tapi jadwal tgl 5 -> Hide!
+                    if (!$departure->isSameDay($searchDate)) {
+                        return false;
+                    }
+                }
+
+                // FILTER HARI SPESIFIK: Cek apakah jadwal ini jalan di hari tsb
+                if ($schedule->is_daily && !empty($schedule->days_of_week)) {
+                     $dayName = $searchDate->format('l'); // Sunday, Monday, etc.
+                     // Decode JSON kalo belum (biasanya auto-cast di model)
+                     $allowedDays = is_string($schedule->days_of_week) ? json_decode($schedule->days_of_week, true) : $schedule->days_of_week;
+                     
+                     if (is_array($allowedDays) && !in_array($dayName, $allowedDays)) {
+                         return false;
+                     }
                 }
 
                 // Class Filter

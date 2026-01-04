@@ -16,12 +16,14 @@ class Schedule extends Model
         'price',
         'status',
         'is_daily', // New field for daily recurring schedules
+        'days_of_week', // ["Monday", "Friday"]
     ];
 
     protected $casts = [
         'departure_time' => 'datetime',
         'arrival_time' => 'datetime',
         'is_daily' => 'boolean',
+        'days_of_week' => 'array',
     ];
 
     /**
