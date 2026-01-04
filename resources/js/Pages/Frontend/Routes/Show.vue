@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
+import RouteMap from "@/Components/RouteMap.vue";
 
 defineOptions({ layout: FrontendLayout });
 
@@ -276,25 +277,12 @@ const formatTime = (dateString) => {
                         class="bg-white dark:bg-[#111] rounded-3xl p-2 border border-gray-100 dark:border-white/5 shadow-2xl shadow-gray-200 dark:shadow-none"
                     >
                         <div
-                            class="relative w-full h-64 bg-gray-200 dark:bg-[#1a1a1a] rounded-2xl flex items-center justify-center overflow-hidden group"
+                            class="relative w-full h-80 bg-gray-200 dark:bg-[#1a1a1a] rounded-2xl flex items-center justify-center overflow-hidden group shadow-inner"
                         >
-                            <!-- Stylized Map Background -->
-                            <div
-                                class="absolute inset-0 opacity-30 dark:opacity-20 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-cover bg-center grayscale group-hover:scale-110 transition-transform duration-700"
-                            ></div>
-
-                            <div class="relative z-10 text-center">
-                                <div
-                                    class="w-12 h-12 bg-white text-rose-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
-                                >
-                                    <i class="fas fa-map-marked-alt"></i>
-                                </div>
-                                <p
-                                    class="text-xs font-bold text-gray-500 uppercase tracking-widest font-unbounded"
-                                >
-                                    Peta Rute
-                                </p>
-                            </div>
+                            <RouteMap
+                                :origin="routeModel.origin"
+                                :destination="routeModel.destination"
+                            />
                         </div>
                     </div>
 

@@ -2,10 +2,43 @@
 import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import FlashMessages from "@/Components/FlashMessages.vue";
+import BrandedPreloader from "@/Components/BrandedPreloader.vue";
+import WhatsAppButton from "@/Components/WhatsAppButton.vue";
+import { useMagnetic } from "@/Composables/useMagnetic";
+import gsap from "gsap";
 
 const page = usePage();
+const pageKey = computed(() => page.url || Date.now());
 const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
+
+// Transitions
+const onBeforeEnter = (el) => {
+    gsap.set(el, {
+        opacity: 0,
+        y: 20,
+    });
+};
+
+const onEnter = (el, done) => {
+    gsap.to(el, {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: "power3.out",
+        onComplete: done,
+    });
+};
+
+const onLeave = (el, done) => {
+    gsap.to(el, {
+        opacity: 0,
+        y: -10,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: done,
+    });
+};
 
 const isDarkMode = ref(false);
 
@@ -75,6 +108,15 @@ const isCompanyActive = computed(() =>
     companyLinks.some((link) => isActive(link.href))
 );
 
+// Magnetic Refs
+const loginBtn = ref(null);
+const registerBtn = ref(null);
+const userBtn = ref(null);
+
+useMagnetic(loginBtn);
+useMagnetic(registerBtn);
+useMagnetic(userBtn);
+
 const handleScroll = () => {
     isScrolled.value = window.scrollY > 20;
 };
@@ -96,8 +138,17 @@ const isActive = (routeName) => {
 
 <template>
     <div
-        class="min-h-screen flex flex-col bg-gray-50 dark:bg-[#050505] transition-colors duration-300 font-manrope"
+        class="min-h-screen flex flex-col bg-white dark:bg-[#080808] transition-colors duration-500 font-manrope selection:bg-rose-500/30"
     >
+        <!-- Branded Preloader -->
+        <BrandedPreloader />
+
+        <!-- Noise Texture Overlay -->
+        <div class="noise-overlay"></div>
+
+        <!-- WhatsApp Floating Button -->
+        <WhatsAppButton />
+
         <!-- Flash Messages -->
         <FlashMessages />
 
@@ -362,12 +413,14 @@ const isActive = (routeName) => {
                             <!-- Auth Buttons -->
                             <template v-if="!page.props.auth.user">
                                 <Link
+                                    ref="loginBtn"
                                     :href="route('login')"
                                     class="px-5 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:text-rose-600 transition-colors"
                                 >
                                     Masuk
                                 </Link>
                                 <Link
+                                    ref="registerBtn"
                                     :href="route('register')"
                                     class="px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-black text-sm font-bold rounded-full shadow-lg hover:scale-105 transition-all duration-300"
                                 >
@@ -377,6 +430,7 @@ const isActive = (routeName) => {
                             <template v-else>
                                 <div class="relative group">
                                     <button
+                                        ref="userBtn"
                                         class="flex items-center space-x-2 p-1 rounded-full border border-gray-200 dark:border-white/10 hover:border-rose-600 transition-all duration-300"
                                     >
                                         <div
@@ -701,8 +755,18 @@ const isActive = (routeName) => {
         </header>
 
         <!-- Main Content -->
-        <main class="flex-grow pt-24">
-            <slot />
+        <main class="flex-grow relative">
+            <Transition
+                name="page-fade"
+                mode="out-in"
+                @before-enter="onBeforeEnter"
+                @enter="onEnter"
+                @leave="onLeave"
+            >
+                <div :key="pageKey">
+                    <slot />
+                </div>
+            </Transition>
         </main>
 
         <!-- Footer (Solid & Clean) -->

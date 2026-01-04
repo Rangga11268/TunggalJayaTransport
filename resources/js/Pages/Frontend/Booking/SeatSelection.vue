@@ -24,6 +24,31 @@ const facilities = [
 const selectedSeats = ref([]);
 const processing = ref(false);
 const error = ref(null);
+const activeFilter = ref(null); // 'window', 'front', 'aisle'
+
+const seatFilters = [
+    { id: "window", name: "Dekat Jendela", icon: "fas fa-window-maximize" },
+    { id: "front", name: "Baris Depan", icon: "fas fa-arrow-up" },
+    { id: "aisle", name: "Dekat Lorong", icon: "fas fa-walking" },
+];
+
+const isFilterMatch = (seatNum) => {
+    if (!activeFilter.value) return false;
+
+    const rowIdx = Math.floor((seatNum - 1) / 5);
+    const colIdx = (seatNum - 1) % 5;
+
+    if (activeFilter.value === "window") {
+        return colIdx === 0 || colIdx === 4;
+    }
+    if (activeFilter.value === "front") {
+        return rowIdx < 2;
+    }
+    if (activeFilter.value === "aisle") {
+        return colIdx === 1 || colIdx === 2;
+    }
+    return false;
+};
 // Initialize selected seats from booking if available
 onMounted(() => {
     if (props.booking.seat_numbers) {
@@ -268,22 +293,29 @@ const busType = computed(() => {
                     <div
                         class="flex flex-wrap gap-4 justify-center md:justify-start"
                     >
-                        <div
-                            v-for="(facility, idx) in facilities"
-                            :key="idx"
-                            class="flex items-center gap-3 px-4 py-2 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 group hover:border-rose-200 dark:hover:border-rose-900/50 transition-all"
+                        <button
+                            v-for="filter in seatFilters"
+                            :key="filter.id"
+                            @click="
+                                activeFilter =
+                                    activeFilter === filter.id
+                                        ? null
+                                        : filter.id
+                            "
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl border transition-all"
+                            :class="[
+                                activeFilter === filter.id
+                                    ? 'bg-rose-600 border-rose-600 text-white shadow-lg shadow-rose-600/20'
+                                    : 'bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/5 text-gray-600 dark:text-gray-300 hover:border-rose-200',
+                            ]"
                         >
-                            <div
-                                class="w-8 h-8 rounded-full bg-white dark:bg-white/10 flex items-center justify-center text-gray-400 group-hover:text-rose-600 transition-colors"
-                            >
-                                <i :class="[facility.icon, 'text-xs']"></i>
-                            </div>
+                            <i :class="[filter.icon, 'text-xs']"></i>
                             <span
-                                class="text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wide font-manrope group-hover:text-rose-600 transition-colors"
+                                class="text-[10px] font-bold uppercase tracking-wide font-manrope"
                             >
-                                {{ facility.name }}
+                                {{ filter.name }}
                             </span>
-                        </div>
+                        </button>
                     </div>
                 </div>
 
@@ -394,6 +426,13 @@ const busType = computed(() => {
                                                                       )
                                                                   )
                                                                 ? 'bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50'
+                                                                : isFilterMatch(
+                                                                      getSeatNumber(
+                                                                          r - 1,
+                                                                          c - 1
+                                                                      )
+                                                                  )
+                                                                ? 'bg-rose-50 dark:bg-rose-600/10 border-rose-300 dark:border-rose-600/50 scale-105 shadow-md'
                                                                 : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 hover:shadow-md border border-gray-100 dark:border-white/5',
                                                         ]"
                                                     >
@@ -515,6 +554,13 @@ const busType = computed(() => {
                                                                       )
                                                                   )
                                                                 ? 'bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50'
+                                                                : isFilterMatch(
+                                                                      getSeatNumber(
+                                                                          r - 1,
+                                                                          c + 1
+                                                                      )
+                                                                  )
+                                                                ? 'bg-rose-50 dark:bg-rose-600/10 border-rose-300 dark:border-rose-600/50 scale-105 shadow-md'
                                                                 : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 hover:shadow-md border border-gray-100 dark:border-white/5',
                                                         ]"
                                                     >

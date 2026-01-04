@@ -4,6 +4,7 @@ import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 import { onMounted, ref, computed } from "vue";
 import axios from "axios";
 import Swal from "sweetalert2";
+import html2canvas from "html2canvas";
 
 defineOptions({ layout: FrontendLayout });
 
@@ -41,6 +42,45 @@ const formatCurrency = (value) => {
 };
 
 const isChecking = ref(false);
+const ticketRef = ref(null);
+const isDownloading = ref(false);
+
+const downloadImage = async () => {
+    if (!ticketRef.value || isDownloading.value) return;
+
+    isDownloading.value = true;
+    try {
+        const canvas = await html2canvas(ticketRef.value, {
+            scale: 2,
+            backgroundColor: "#f3f4f6", // Match ticket outer bg
+            logging: false,
+            useCORS: true,
+        });
+
+        const image = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = `Tujago_Ticket_${props.booking.booking_code}.png`;
+        link.click();
+
+        Swal.fire({
+            icon: "success",
+            title: "Tiket Disimpan",
+            text: "Tiket telah berhasil disimpan ke galeri Anda.",
+            timer: 2000,
+            showConfirmButton: false,
+        });
+    } catch (error) {
+        console.error("Download failed", error);
+        Swal.fire({
+            icon: "error",
+            title: "Gagal Menyimpan",
+            text: "Terjadi kesalahan saat mencoba menyimpan tiket.",
+        });
+    } finally {
+        isDownloading.value = false;
+    }
+};
 
 const checkPaymentStatus = async (orderId) => {
     if (!orderId || isChecking.value) return;
@@ -210,6 +250,7 @@ const formatTime = (timeString) => {
         <div class="max-w-[1000px] w-full z-10">
             <!-- Main Ticket Container (mimicking PDF style) -->
             <div
+                ref="ticketRef"
                 class="relative w-full bg-[#f3f4f6] dark:bg-[#e5e5e5] rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[340px]"
             >
                 <!-- Left Stub (Blue Strip) -->
@@ -405,10 +446,25 @@ const formatTime = (timeString) => {
                         route('frontend.booking.download-ticket', booking.id)
                     "
                     target="_blank"
+                    class="btn-primary px-8 py-4 font-mono font-bold uppercase tracking-wider text-sm flex items-center justify-center bg-gray-900 dark:bg-black text-white rounded hover:bg-black/90 transition shadow-lg"
+                >
+                    <i class="fas fa-file-pdf mr-2"></i> PDF
+                </a>
+
+                <button
+                    @click="downloadImage"
+                    :disabled="isDownloading"
                     class="btn-primary px-8 py-4 font-mono font-bold uppercase tracking-wider text-sm flex items-center justify-center bg-rose-600 text-white rounded hover:bg-rose-700 transition shadow-lg"
                 >
-                    <i class="fas fa-download mr-2"></i> Download PDF
-                </a>
+                    <i
+                        :class="[
+                            isDownloading ? 'fa-spinner fa-spin' : 'fa-image',
+                            'fas',
+                            'mr-2',
+                        ]"
+                    ></i>
+                    {{ isDownloading ? "Saving..." : "Save to Image" }}
+                </button>
 
                 <button
                     v-if="

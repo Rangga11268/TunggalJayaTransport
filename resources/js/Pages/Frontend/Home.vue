@@ -4,6 +4,7 @@ import { Link, usePage } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useMagnetic } from "@/Composables/useMagnetic";
 
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
@@ -33,6 +34,19 @@ const showOriginDropdown = ref(false);
 const showDestinationDropdown = ref(false);
 const filteredOrigins = ref([]);
 const filteredDestinations = ref([]);
+
+// Magnetic Refs
+const heroBtn1 = ref(null);
+const heroBtn2 = ref(null);
+const searchBtn = ref(null);
+const ctaBtn1 = ref(null);
+const ctaBtn2 = ref(null);
+
+useMagnetic(heroBtn1);
+useMagnetic(heroBtn2);
+useMagnetic(searchBtn);
+useMagnetic(ctaBtn1);
+useMagnetic(ctaBtn2);
 
 // UI State
 const isScrolled = ref(false);
@@ -261,6 +275,7 @@ onMounted(() => {
                     >
                         <!-- Solid High-Contrast Button -->
                         <Link
+                            ref="heroBtn1"
                             :href="route('frontend.fleet.index')"
                             class="group relative px-10 py-5 bg-rose-600 text-white font-unbounded font-bold rounded-full overflow-hidden transition-all hover:bg-rose-700 hover:scale-[1.02] shadow-xl shadow-rose-600/20 inline-flex items-center"
                         >
@@ -272,6 +287,7 @@ onMounted(() => {
                             </span>
                         </Link>
                         <Link
+                            ref="heroBtn2"
                             :href="route('frontend.routes.index')"
                             class="px-10 py-5 bg-transparent border-2 border-gray-200 dark:border-white/20 text-gray-900 dark:text-white font-unbounded font-bold rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-all inline-flex items-center"
                         >
@@ -447,6 +463,7 @@ onMounted(() => {
                             </div>
 
                             <button
+                                ref="searchBtn"
                                 type="submit"
                                 class="w-full py-5 bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl font-unbounded font-bold mt-4 shadow-lg hover:scale-[1.01] hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
                             >
@@ -785,12 +802,14 @@ onMounted(() => {
                     class="flex flex-col sm:flex-row items-center justify-center gap-6"
                 >
                     <Link
+                        ref="ctaBtn1"
                         :href="route('frontend.booking.index')"
                         class="w-full sm:w-auto px-12 py-6 bg-white text-rose-600 rounded-full font-black font-unbounded text-lg hover:scale-105 transition-transform shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.4)] flex items-center justify-center gap-3"
                     >
                         PESAN SEKARANG <i class="fas fa-paper-plane"></i>
                     </Link>
                     <Link
+                        ref="ctaBtn2"
                         :href="route('frontend.fleet.index')"
                         class="w-full sm:w-auto px-12 py-6 bg-rose-800/40 border-2 border-white/20 backdrop-blur-sm text-white rounded-full font-bold font-unbounded text-lg hover:bg-rose-800/60 transition-colors flex items-center justify-center gap-3"
                     >
