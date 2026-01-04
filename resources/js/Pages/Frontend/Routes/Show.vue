@@ -95,7 +95,7 @@ const formatTime = (dateString) => {
                         >
                             <i class="fas fa-clock text-rose-500"></i>
                             <span class="font-bold text-white">{{
-                                routeModel.formatted_duration || "6 Jam"
+                                routeModel.formatted_duration || "6h"
                             }}</span>
                         </div>
                         <div

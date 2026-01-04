@@ -170,12 +170,11 @@ const formatTime = (dateString) => {
                                     <div
                                         class="text-sm text-gray-500 font-manrope"
                                     >
-                                        Durasi estimasi
+                                        Durasi estimasi:
                                         {{
-                                            booking.schedule?.route?.duration ||
-                                            "12"
+                                            booking.schedule?.route
+                                                ?.formatted_duration || "N/A"
                                         }}
-                                        Jam
                                     </div>
                                 </div>
                             </div>

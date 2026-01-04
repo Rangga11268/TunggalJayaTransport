@@ -24,6 +24,10 @@ class Route extends Model
         'waypoints' => 'array',
     ];
 
+    protected $appends = [
+        'formatted_duration',
+    ];
+
     public function schedules()
     {
         return $this->hasMany(Schedule::class);

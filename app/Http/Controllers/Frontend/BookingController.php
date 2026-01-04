@@ -335,7 +335,7 @@ class BookingController extends Controller
                 'price' => $schedule->price,
                 'departure_time' => $schedule->departure_time->format('H:i'),
                 'arrival_time' => $schedule->arrival_time->format('H:i'),
-                'duration' => $schedule->duration,
+                'duration' => $schedule->route->formatted_duration,
                 'is_daily' => $schedule->is_daily,
                 'bus' => [
                     'name' => $schedule->bus->name,
