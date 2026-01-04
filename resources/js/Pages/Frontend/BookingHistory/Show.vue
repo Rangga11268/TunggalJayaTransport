@@ -45,7 +45,7 @@ const formatTime = (dateString) => {
     <Head :title="`Detail Booking ${booking.booking_code}`" />
 
     <div
-        class="bg-gray-50 dark:bg-[#050505] min-h-screen font-sans selection:bg-rose-600 selection:text-white pt-32 pb-24 px-4 sm:px-6 lg:px-8"
+        class="bg-gray-50 dark:bg-[#050505] min-h-screen font-sans selection:bg-rose-600 selection:text-white pt-24 md:pt-32 pb-24 px-4 sm:px-6 lg:px-8"
     >
         <div class="max-w-4xl mx-auto">
             <!-- Back Button -->
@@ -62,7 +62,7 @@ const formatTime = (dateString) => {
             </div>
 
             <div
-                class="bg-white dark:bg-[#111] rounded-[3rem] p-8 md:p-16 border border-gray-100 dark:border-white/5 shadow-2xl animate-fade-in-up"
+                class="bg-white dark:bg-[#111] rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-16 border border-gray-100 dark:border-white/5 shadow-2xl animate-fade-in-up"
                 style="animation-delay: 0.1s"
             >
                 <!-- Status Badge Header -->
@@ -76,7 +76,7 @@ const formatTime = (dateString) => {
                             E-Ticket Perjalanan
                         </span>
                         <h1
-                            class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white font-unbounded"
+                            class="text-2xl sm:text-3xl md:text-5xl font-black text-gray-900 dark:text-white font-unbounded"
                         >
                             {{ booking.booking_code }}
                         </h1>
@@ -105,7 +105,7 @@ const formatTime = (dateString) => {
                 </div>
 
                 <!-- Main Details Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16">
                     <!-- Journey Details -->
                     <div class="space-y-10">
                         <div>
@@ -224,7 +224,7 @@ const formatTime = (dateString) => {
 
                     <!-- Passenger & Price -->
                     <div
-                        class="bg-gray-50 dark:bg-white/5 rounded-[2rem] p-8 md:p-10 space-y-10 h-fit border border-gray-100 dark:border-white/5"
+                        class="bg-gray-50 dark:bg-white/5 rounded-[2rem] p-6 md:p-10 space-y-10 h-fit border border-gray-100 dark:border-white/5"
                     >
                         <div>
                             <h3
@@ -255,7 +255,7 @@ const formatTime = (dateString) => {
                                             Nomor Kursi
                                         </div>
                                         <div
-                                            class="text-lg font-black text-rose-600 font-unbounded"
+                                            class="text-base md:text-lg font-black text-rose-600 font-unbounded"
                                         >
                                             {{ booking.seat_numbers }}
                                         </div>

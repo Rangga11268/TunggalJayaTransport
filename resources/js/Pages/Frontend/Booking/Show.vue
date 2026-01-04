@@ -75,7 +75,7 @@ const formatTime = (dateString) => {
 
     <!-- Clean Header (Matched with Booking Index) -->
     <div
-        class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative z-10"
+        class="pt-24 md:pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative z-10"
     >
         <h1
             class="font-unbounded font-black text-3xl md:text-5xl text-gray-900 dark:text-white mb-4 animate-fade-in-up leading-tight uppercase"
@@ -98,7 +98,7 @@ const formatTime = (dateString) => {
             <!-- Left Column: Trip Summary -->
             <div class="lg:col-span-1 space-y-6">
                 <div
-                    class="bg-white dark:bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-gray-100 dark:shadow-none border border-gray-100 dark:border-white/5 sticky top-24 transform transition-all hover:scale-[1.02] duration-300"
+                    class="bg-white dark:bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-gray-100 dark:shadow-none border border-gray-100 dark:border-white/5 lg:sticky top-24 transform transition-all hover:scale-[1.01] duration-300"
                 >
                     <h3
                         class="font-unbounded font-bold text-gray-900 dark:text-white mb-8 flex items-center text-lg uppercase tracking-wide"
@@ -409,7 +409,7 @@ const formatTime = (dateString) => {
                             <button
                                 type="submit"
                                 :disabled="form.processing"
-                                class="w-full h-[68px] bg-rose-600 hover:bg-rose-700 text-white rounded-2xl shadow-lg shadow-rose-600/30 transform transition-all hover:-translate-y-1 active:scale-[0.98] font-bold flex items-center justify-center space-x-3 group font-unbounded uppercase tracking-wider text-base"
+                                class="w-full h-16 md:h-[68px] bg-rose-600 hover:bg-rose-700 text-white rounded-2xl shadow-lg shadow-rose-600/30 transform transition-all hover:-translate-y-1 active:scale-[0.98] font-bold flex items-center justify-center space-x-3 group font-unbounded uppercase tracking-wider text-sm md:text-base"
                             >
                                 <span
                                     v-if="!form.processing"

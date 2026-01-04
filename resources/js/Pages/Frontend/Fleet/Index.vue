@@ -39,7 +39,9 @@ const filteredBuses = computed(() => {
         class="min-h-screen bg-gray-50 dark:bg-[#050505] font-sans selection:bg-rose-600 selection:text-white"
     >
         <!-- Hero Header -->
-        <div class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div
+            class="relative pt-24 md:pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden"
+        >
             <!-- Background Gradients -->
             <div
                 class="absolute top-0 right-0 w-[500px] h-[500px] bg-rose-600/5 rounded-full blur-[120px] -z-10"
@@ -55,7 +57,7 @@ const filteredBuses = computed(() => {
                     Modern & Nyaman
                 </span>
                 <h1
-                    class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded animate-fade-in-up"
+                    class="text-3xl sm:text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded animate-fade-in-up"
                     style="animation-delay: 0.1s"
                 >
                     Armada <span class="text-rose-600">Premium</span>
@@ -198,7 +200,7 @@ const filteredBuses = computed(() => {
                         <!-- Bottom Content (Over Image) -->
                         <div class="absolute bottom-6 left-6 right-6 z-10">
                             <h3
-                                class="text-2xl font-black font-unbounded text-white mb-1 group-hover:text-rose-500 transition-colors"
+                                class="text-xl sm:text-2xl font-black font-unbounded text-white mb-1 group-hover:text-rose-500 transition-colors"
                             >
                                 {{ bus.name }}
                             </h3>
@@ -211,7 +213,7 @@ const filteredBuses = computed(() => {
                     </div>
 
                     <!-- Details Body -->
-                    <div class="p-8 flex-grow flex flex-col">
+                    <div class="p-6 md:p-8 flex-grow flex flex-col">
                         <div class="flex items-center gap-4 mb-6">
                             <div
                                 class="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-3 py-2 rounded-lg border border-gray-100 dark:border-white/5"
@@ -277,7 +279,7 @@ const filteredBuses = computed(() => {
 
             <!-- Global Facilities Section -->
             <div
-                class="mt-32 relative bg-[#111] rounded-[3rem] p-12 md:p-24 overflow-hidden text-center animate-fade-in-up"
+                class="mt-32 relative bg-[#111] rounded-[3rem] p-8 md:p-24 overflow-hidden text-center animate-fade-in-up"
             >
                 <!-- Decorative Bg -->
                 <div
@@ -291,7 +293,7 @@ const filteredBuses = computed(() => {
                         Standar Pelayanan
                     </span>
                     <h2
-                        class="text-3xl md:text-5xl font-black text-white font-unbounded mb-6"
+                        class="text-2xl sm:text-3xl md:text-5xl font-black text-white font-unbounded mb-6"
                     >
                         Fasilitas <span class="text-rose-600">Premium</span>
                     </h2>

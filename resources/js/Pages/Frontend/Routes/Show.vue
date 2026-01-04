@@ -78,11 +78,11 @@ const formatTime = (dateString) => {
                         Detail Rute
                     </span>
                     <h1
-                        class="text-4xl md:text-6xl font-black text-white mb-2 font-unbounded leading-tight"
+                        class="text-3xl sm:text-4xl md:text-6xl font-black text-white mb-2 font-unbounded leading-tight"
                     >
                         {{ routeModel.origin }}
                         <span
-                            class="text-rose-600 mx-2 text-2xl md:text-4xl align-middle"
+                            class="text-rose-600 mx-2 text-xl sm:text-2xl md:text-4xl align-middle"
                             ><i class="fas fa-arrow-right"></i
                         ></span>
                         {{ routeModel.destination }}
@@ -131,7 +131,7 @@ const formatTime = (dateString) => {
                 <div class="lg:col-span-2 space-y-12">
                     <!-- Description -->
                     <div
-                        class="bg-white dark:bg-[#111] rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-2xl shadow-gray-200 dark:shadow-none"
+                        class="bg-white dark:bg-[#111] rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-white/5 shadow-2xl shadow-gray-200 dark:shadow-none"
                     >
                         <h3
                             class="text-xl font-black text-gray-900 dark:text-white mb-6 font-unbounded flex items-center"
@@ -153,7 +153,7 @@ const formatTime = (dateString) => {
 
                     <!-- Schedules -->
                     <div
-                        class="bg-white dark:bg-[#111] rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-2xl shadow-gray-200 dark:shadow-none"
+                        class="bg-white dark:bg-[#111] rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-white/5 shadow-2xl shadow-gray-200 dark:shadow-none"
                     >
                         <div class="flex items-center justify-between mb-8">
                             <h3

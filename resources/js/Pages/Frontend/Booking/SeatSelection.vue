@@ -230,7 +230,7 @@ const busType = computed(() => {
 
     <!-- Header (Consistent with Booking Index) -->
     <div
-        class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative z-10"
+        class="pt-24 md:pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative z-10"
     >
         <span
             class="inline-block px-4 py-2 rounded-full bg-rose-600 text-white text-[10px] font-bold tracking-[0.2em] mb-6 animate-fade-in uppercase font-unbounded shadow-lg shadow-rose-600/20"
@@ -637,7 +637,7 @@ const busType = computed(() => {
             <div class="lg:col-span-1 space-y-6">
                 <!-- Summary Card -->
                 <div
-                    class="bg-white dark:bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-gray-100 dark:shadow-none border border-gray-100 dark:border-white/5 sticky top-24"
+                    class="bg-white dark:bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-gray-100 dark:shadow-none border border-gray-100 dark:border-white/5 lg:sticky top-24 transform transition-all hover:scale-[1.01] duration-300"
                 >
                     <h3
                         class="font-unbounded font-bold text-lg text-gray-900 dark:text-white mb-6 flex items-center gap-3 uppercase"

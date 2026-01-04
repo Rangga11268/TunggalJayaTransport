@@ -64,7 +64,7 @@ const formatDate = (dateString) => {
                     </div>
 
                     <h1
-                        class="text-3xl sm:text-5xl md:text-6xl font-black text-white leading-tight mb-8 font-unbounded animate-fade-in-up"
+                        class="text-2xl sm:text-5xl md:text-6xl font-black text-white leading-tight mb-8 font-unbounded animate-fade-in-up"
                         style="animation-delay: 0.1s"
                     >
                         {{ article.title }}
@@ -107,7 +107,7 @@ const formatDate = (dateString) => {
                 <div class="lg:col-span-8">
                     <!-- Article Body -->
                     <div
-                        class="prose prose-lg prose-rose dark:prose-invert max-w-none font-manrope"
+                        class="prose prose-base md:prose-lg prose-rose dark:prose-invert max-w-none font-manrope"
                     >
                         <!-- We assume content is HTML from a WYSIWYG editor -->
                         <div v-html="article.content"></div>

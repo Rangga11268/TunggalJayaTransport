@@ -63,7 +63,9 @@ const toggleVideo = () => {
         class="bg-gray-50 dark:bg-[#050505] min-h-screen font-sans selection:bg-rose-600 selection:text-white"
     >
         <!-- Hero Section -->
-        <div class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div
+            class="relative pt-24 md:pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden"
+        >
             <!-- Abstract Background -->
             <div
                 class="absolute top-0 right-0 w-[600px] h-[600px] bg-rose-600/5 rounded-full blur-[120px] -z-10"
@@ -79,7 +81,7 @@ const toggleVideo = () => {
                     Sejak 1973
                 </span>
                 <h1
-                    class="text-4xl md:text-7xl font-black text-gray-900 dark:text-white mb-8 font-unbounded animate-fade-in-up"
+                    class="text-3xl sm:text-5xl md:text-7xl font-black text-gray-900 dark:text-white mb-8 font-unbounded animate-fade-in-up"
                     style="animation-delay: 0.1s"
                 >
                     Evolusi <span class="text-rose-600">Transportasi</span>
@@ -109,7 +111,7 @@ const toggleVideo = () => {
                 >
                     <div>
                         <h2
-                            class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white font-unbounded mb-8 leading-tight"
+                            class="text-2xl sm:text-3xl md:text-5xl font-black text-gray-900 dark:text-white font-unbounded mb-8 leading-tight"
                         >
                             Berawal dari <br /><span class="text-rose-600"
                                 >Tekad Kuat</span
@@ -211,7 +213,7 @@ const toggleVideo = () => {
                 >
                     <div v-for="stat in stats" :key="stat.label" class="group">
                         <div
-                            class="text-5xl md:text-6xl font-black text-white font-unbounded mb-2 group-hover:scale-110 transition-transform duration-300"
+                            class="text-3xl sm:text-4xl md:text-6xl font-black text-white font-unbounded mb-2 group-hover:scale-110 transition-transform duration-300"
                         >
                             {{ stat.value }}
                         </div>
@@ -231,7 +233,7 @@ const toggleVideo = () => {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
                     <!-- Vision -->
                     <div
-                        class="group bg-white dark:bg-[#111] p-10 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-white/5 hover:border-rose-600/30 transition-all duration-500 relative overflow-hidden"
+                        class="group bg-white dark:bg-[#111] p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-white/5 hover:border-rose-600/30 transition-all duration-500 relative overflow-hidden"
                     >
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-rose-600/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-rose-600/20"
@@ -255,7 +257,7 @@ const toggleVideo = () => {
 
                     <!-- Mission -->
                     <div
-                        class="group bg-white dark:bg-[#111] p-10 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-white/5 hover:border-rose-600/30 transition-all duration-500 relative overflow-hidden"
+                        class="group bg-white dark:bg-[#111] p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-white/5 hover:border-rose-600/30 transition-all duration-500 relative overflow-hidden"
                     >
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-blue-600/20"

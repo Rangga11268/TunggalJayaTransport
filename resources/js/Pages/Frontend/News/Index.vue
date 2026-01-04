@@ -31,7 +31,9 @@ const formatDate = (dateString) => {
         class="min-h-screen bg-gray-50 dark:bg-[#050505] font-sans selection:bg-rose-600 selection:text-white"
     >
         <!-- Hero Header -->
-        <div class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div
+            class="relative pt-24 md:pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden"
+        >
             <!-- Background Gradients -->
             <div
                 class="absolute top-0 right-0 w-[500px] h-[500px] bg-rose-600/5 rounded-full blur-[120px] -z-10"
@@ -47,7 +49,7 @@ const formatDate = (dateString) => {
                     Wawasan & Update
                 </span>
                 <h1
-                    class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded animate-fade-in-up"
+                    class="text-3xl sm:text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded animate-fade-in-up"
                     style="animation-delay: 0.1s"
                 >
                     Kabar <span class="text-rose-600">Tunggal Jaya</span>
@@ -130,7 +132,7 @@ const formatDate = (dateString) => {
                     </div>
 
                     <!-- Content -->
-                    <div class="p-8 flex-grow flex flex-col">
+                    <div class="p-6 md:p-8 flex-grow flex flex-col">
                         <div
                             class="flex items-center gap-3 text-xs text-gray-400 mb-4 font-manrope"
                         >

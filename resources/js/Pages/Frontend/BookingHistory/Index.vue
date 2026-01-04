@@ -49,7 +49,7 @@ const formatTime = (dateString) => {
     >
         <!-- Dashboard Header -->
         <div
-            class="relative pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden"
+            class="relative pt-24 md:pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden"
         >
             <!-- Abstract Decor -->
             <div
@@ -62,7 +62,7 @@ const formatTime = (dateString) => {
                 Dashboard Penumpang
             </span>
             <h1
-                class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded"
+                class="text-3xl sm:text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded"
             >
                 Riwayat <span class="text-rose-600">Perjalanan</span>
             </h1>
@@ -111,7 +111,7 @@ const formatTime = (dateString) => {
                 <div
                     v-for="booking in bookings.data"
                     :key="booking.id"
-                    class="group relative bg-white dark:bg-[#111] rounded-[2.5rem] p-8 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-rose-600/10 transition-all duration-500"
+                    class="group relative bg-white dark:bg-[#111] rounded-[2.5rem] p-6 md:p-8 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-rose-600/10 transition-all duration-500"
                 >
                     <div
                         class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8"
@@ -143,14 +143,16 @@ const formatTime = (dateString) => {
                                 </span>
                             </div>
 
-                            <div class="flex items-center gap-6 mb-6">
+                            <div
+                                class="flex items-center gap-4 md:gap-6 mb-6 overflow-hidden"
+                            >
                                 <div
-                                    class="text-2xl font-black text-gray-900 dark:text-white font-unbounded leading-none"
+                                    class="text-lg md:text-2xl font-black text-gray-900 dark:text-white font-unbounded leading-none truncate"
                                 >
                                     {{ booking.schedule?.route?.origin }}
                                 </div>
                                 <div
-                                    class="flex flex-col items-center justify-center flex-shrink-0 w-12"
+                                    class="flex flex-col items-center justify-center flex-shrink-0 w-8 md:w-12"
                                 >
                                     <div
                                         class="h-[2px] w-full bg-rose-600/20 relative"
@@ -161,7 +163,7 @@ const formatTime = (dateString) => {
                                     </div>
                                 </div>
                                 <div
-                                    class="text-2xl font-black text-gray-900 dark:text-white font-unbounded leading-none text-right"
+                                    class="text-lg md:text-2xl font-black text-gray-900 dark:text-white font-unbounded leading-none text-right truncate"
                                 >
                                     {{ booking.schedule?.route?.destination }}
                                 </div>
@@ -205,7 +207,7 @@ const formatTime = (dateString) => {
                                 Total Bayar
                             </div>
                             <div
-                                class="text-3xl font-black text-rose-600 font-unbounded mb-6"
+                                class="text-2xl md:text-3xl font-black text-rose-600 font-unbounded mb-6"
                             >
                                 {{ formatCurrency(booking.total_price) }}
                             </div>

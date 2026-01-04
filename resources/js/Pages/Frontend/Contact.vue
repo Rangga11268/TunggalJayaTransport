@@ -39,7 +39,7 @@ const submit = () => {
                 Bantuan & Dukungan
             </span>
             <h1
-                class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded animate-fade-in-up"
+                class="text-3xl sm:text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded animate-fade-in-up"
             >
                 Hubungi <span class="text-rose-600">Kami</span>
             </h1>
@@ -62,7 +62,7 @@ const submit = () => {
                     <!-- Info Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div
-                            class="bg-white dark:bg-[#111] p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-xl hover:translate-y-[-5px] transition-transform duration-300"
+                            class="bg-white dark:bg-[#111] p-6 md:p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-xl hover:translate-y-[-5px] transition-transform duration-300"
                         >
                             <div
                                 class="w-12 h-12 bg-rose-50 dark:bg-rose-900/10 rounded-2xl flex items-center justify-center text-rose-600 mb-6"
@@ -86,7 +86,7 @@ const submit = () => {
                         </div>
 
                         <div
-                            class="bg-white dark:bg-[#111] p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-xl hover:translate-y-[-5px] transition-transform duration-300"
+                            class="bg-white dark:bg-[#111] p-6 md:p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-xl hover:translate-y-[-5px] transition-transform duration-300"
                         >
                             <div
                                 class="w-12 h-12 bg-blue-50 dark:bg-blue-900/10 rounded-2xl flex items-center justify-center text-blue-600 mb-6"
@@ -153,7 +153,7 @@ const submit = () => {
 
                 <!-- Right Column: Form -->
                 <div
-                    class="bg-white dark:bg-[#111] p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 h-fit animate-fade-in-up"
+                    class="bg-white dark:bg-[#111] p-6 md:p-12 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 h-fit animate-fade-in-up"
                     style="animation-delay: 0.3s"
                 >
                     <h2

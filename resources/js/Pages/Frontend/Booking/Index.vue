@@ -81,7 +81,7 @@ watch(
     <Head title="Pesan Tiket" />
 
     <div
-        class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative z-10"
+        class="pt-24 md:pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative z-10"
     >
         <span
             class="inline-block px-4 py-2 rounded-full bg-rose-600 text-white text-[10px] font-bold tracking-[0.2em] mb-6 animate-fade-in uppercase font-unbounded shadow-lg shadow-rose-600/20"
@@ -89,7 +89,7 @@ watch(
             Reservasi Online
         </span>
         <h1
-            class="font-unbounded font-black text-4xl md:text-6xl text-gray-900 dark:text-white mb-6 animate-fade-in-up leading-tight uppercase"
+            class="font-unbounded font-black text-3xl sm:text-4xl md:text-6xl text-gray-900 dark:text-white mb-6 animate-fade-in-up leading-tight uppercase"
         >
             Pesan
             <span class="text-rose-600">Tiket Anda</span>
@@ -146,6 +146,21 @@ watch(
                                 <i
                                     class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"
                                 ></i>
+                            </div>
+
+                            <!-- Mobile Swap Button -->
+                            <div
+                                class="flex md:hidden justify-center -my-3 relative z-10"
+                            >
+                                <button
+                                    type="button"
+                                    @click="swapLocations"
+                                    class="w-10 h-10 rounded-full bg-white dark:bg-[#222] border-2 border-gray-100 dark:border-white/10 text-gray-400 hover:text-rose-600 hover:border-rose-600 transition-all flex items-center justify-center shadow-md transform active:rotate-180 duration-300"
+                                >
+                                    <i
+                                        class="fas fa-exchange-alt text-xs rotate-90"
+                                    ></i>
+                                </button>
                             </div>
                         </div>
 
@@ -503,7 +518,7 @@ watch(
                         >
                             <div class="flex flex-col md:flex-row">
                                 <!-- Left: Bus & Route Info -->
-                                <div class="p-8 flex-1 relative">
+                                <div class="p-6 md:p-8 flex-1 relative">
                                     <!-- Background watermark -->
                                     <div
                                         class="absolute right-0 bottom-0 opacity-[0.02] text-9xl text-gray-900 dark:text-white pointer-events-none select-none overflow-hidden"
@@ -682,7 +697,7 @@ watch(
 
                                 <!-- Right: Price & Action -->
                                 <div
-                                    class="p-8 md:w-72 bg-gray-50/50 dark:bg-white/5 flex flex-col justify-center items-center text-center space-y-5 shrink-0 relative"
+                                    class="p-6 md:p-8 md:w-72 bg-gray-50/50 dark:bg-white/5 flex flex-col justify-center items-center text-center space-y-5 shrink-0 relative"
                                 >
                                     <!-- Departed Overlay -->
                                     <div

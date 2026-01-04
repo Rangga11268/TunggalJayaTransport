@@ -232,7 +232,7 @@ onMounted(() => {
                     </div>
 
                     <h1
-                        class="text-5xl sm:text-7xl xl:text-8xl font-black font-unbounded leading-[0.9] tracking-tight text-gray-900 dark:text-white"
+                        class="text-4xl sm:text-7xl lg:text-8xl font-black font-unbounded leading-[0.9] tracking-tight text-gray-900 dark:text-white"
                     >
                         <div class="overflow-hidden">
                             <span class="hero-text-char inline-block"
@@ -404,7 +404,7 @@ onMounted(() => {
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <!-- Date -->
                                 <div class="relative">
                                     <label
@@ -506,10 +506,12 @@ onMounted(() => {
                                 >
                             </div>
                             <div
-                                class="text-8xl font-black font-unbounded text-white tracking-tighter"
+                                class="text-6xl md:text-8xl font-black font-unbounded text-white tracking-tighter"
                             >
                                 {{ fleetCount
-                                }}<span class="text-4xl align-top">+</span>
+                                }}<span class="text-3xl md:text-4xl align-top"
+                                    >+</span
+                                >
                             </div>
                         </div>
                         <div
@@ -744,13 +746,13 @@ onMounted(() => {
                 class="absolute inset-0 flex flex-col justify-between pointer-events-none select-none opacity-20 text-rose-900 overflow-hidden py-10"
             >
                 <div
-                    class="text-[10rem] font-black font-unbounded whitespace-nowrap animate-marquee leading-none"
+                    class="text-[5rem] md:text-[10rem] font-black font-unbounded whitespace-nowrap animate-marquee leading-none"
                 >
                     TUNGGAL JAYA TRANSPORT &bullet; KEAMANAN &bullet; KENYAMANAN
                     &bullet;
                 </div>
                 <div
-                    class="text-[10rem] font-black font-unbounded whitespace-nowrap animate-marquee-reverse leading-none ml-20"
+                    class="text-[5rem] md:text-[10rem] font-black font-unbounded whitespace-nowrap animate-marquee-reverse leading-none ml-20"
                 >
                     &bullet; PREMIUM CLASS &bullet; EKSEKUTIF &bullet; WISATA
                     &bullet;
@@ -765,7 +767,7 @@ onMounted(() => {
                 </div>
 
                 <h2
-                    class="text-5xl md:text-8xl font-black font-unbounded text-white mb-8 leading-tight tracking-tight drop-shadow-lg"
+                    class="text-4xl sm:text-6xl md:text-8xl font-black font-unbounded text-white mb-8 leading-tight tracking-tight drop-shadow-lg"
                 >
                     MULAI <br />
                     PERJALANANMU
