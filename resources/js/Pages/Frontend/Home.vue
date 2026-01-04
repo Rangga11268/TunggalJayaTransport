@@ -86,7 +86,10 @@ const features = [
 
 const formatDate = (dateString) => {
     if (!dateString) return "Tanggal Belum Tersedia";
-    return new Date(dateString).toLocaleDateString("id-ID", {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime()) || date.getFullYear() <= 1970)
+        return "Tanggal Belum Tersedia";
+    return date.toLocaleDateString("id-ID", {
         day: "numeric",
         month: "long",
         year: "numeric",

@@ -23,8 +23,11 @@ const search = () => {
 };
 
 const formatDate = (dateString) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleDateString("id-ID", {
+    if (!dateString) return "Tanggal Belum Tersedia";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime()) || date.getFullYear() <= 1970)
+        return "Tanggal Belum Tersedia";
+    return date.toLocaleDateString("id-ID", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -35,131 +38,124 @@ const formatDate = (dateString) => {
 <template>
     <Head :title="`Hasil Pencarian: ${query}`" />
 
-    <!-- Hero Header -->
-    <div class="relative bg-primary-950 py-24 overflow-hidden">
-        <div class="absolute inset-0">
-            <div class="absolute inset-0 hero-pattern opacity-10"></div>
-            <div
-                class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary-900/50 to-transparent"
-            ></div>
-        </div>
-
+    <div
+        class="bg-gray-50 dark:bg-[#050505] min-h-screen font-sans selection:bg-rose-600 selection:text-white"
+    >
+        <!-- Hero Header -->
         <div
-            class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+            class="relative pt-32 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden text-center"
         >
-            <h1
-                class="text-4xl md:text-5xl font-extrabold text-white mb-6 font-unbounded animate-fade-in-up"
+            <!-- Decor -->
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-rose-600/10 rounded-full blur-[120px] -z-10"
+            ></div>
+
+            <span
+                class="inline-block py-1 px-3 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-600 border border-rose-100 dark:border-rose-900/20 text-xs font-bold tracking-widest uppercase mb-6 font-unbounded"
             >
-                Hasil Pencarian
+                Ditemukan {{ totalResults }} Hasil
+            </span>
+            <h1
+                class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded"
+            >
+                Hasil <span class="text-rose-600">Pencarian</span>
             </h1>
             <p
-                class="text-lg text-slate-300 max-w-2xl mx-auto animate-fade-in-up stagger-1 leading-relaxed"
+                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope"
             >
                 Menampilkan hasil untuk kata kunci:
-                <span class="text-brand-red font-bold">"{{ query }}"</span>
+                <span class="text-rose-600 font-bold">"{{ query }}"</span>
             </p>
         </div>
-    </div>
 
-    <div
-        class="bg-gray-50 dark:bg-gray-900 min-h-screen py-12 -mt-10 relative z-20 rounded-t-[3rem]"
-    >
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Search Bar -->
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
+            <!-- Search Bar (Premium Sticky) -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-12 animate-fade-in-up stagger-2 border border-gray-100 dark:border-gray-700"
+                class="sticky top-24 z-30 bg-white/80 dark:bg-[#111]/80 backdrop-blur-2xl rounded-[1.5rem] p-4 mb-12 border border-gray-100 dark:border-white/5 shadow-2xl"
             >
-                <form
-                    @submit.prevent="search"
-                    class="flex flex-col sm:flex-row gap-4"
-                >
+                <form @submit.prevent="search" class="flex items-center gap-4">
                     <div class="relative flex-grow">
                         <i
-                            class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                            class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-rose-600"
                         ></i>
                         <input
                             type="text"
                             v-model="form.q"
                             placeholder="Cari berita atau rute..."
-                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all"
+                            class="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all font-manrope text-gray-900 dark:text-white"
                         />
                     </div>
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="px-8 py-3 bg-brand-red text-white font-bold rounded-xl shadow-lg shadow-brand-red/20 hover:bg-red-700 transition-all hover:-translate-y-0.5"
+                        class="px-8 py-4 bg-rose-600 text-white font-black font-unbounded text-sm rounded-xl shadow-lg shadow-rose-600/30 hover:bg-rose-700 transition-all active:scale-95"
                     >
-                        Cari Lagi
+                        Cari
                     </button>
                 </form>
             </div>
 
-            <!-- Results Count -->
-            <div
-                class="mb-6 flex items-center justify-between animate-fade-in-up stagger-3"
-            >
-                <p class="text-gray-600 dark:text-gray-400">
-                    Ditemukan
-                    <span class="font-bold text-gray-900 dark:text-white">{{
-                        totalResults
-                    }}</span>
-                    hasil
-                </p>
-            </div>
-
             <!-- Results List -->
-            <div
-                v-if="results.length > 0"
-                class="space-y-6 animate-fade-in-up stagger-4"
-            >
+            <div v-if="results.length > 0" class="space-y-6">
                 <div
                     v-for="(result, index) in results"
                     :key="index"
-                    class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 dark:border-gray-700 group"
+                    class="group bg-white dark:bg-[#111] rounded-[2rem] p-8 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-rose-600/10 transition-all duration-500"
                 >
-                    <Link :href="result.url" class="block">
-                        <div class="flex items-start justify-between">
-                            <div>
+                    <Link
+                        :href="result.url"
+                        class="flex flex-col md:flex-row gap-6 items-start"
+                    >
+                        <div class="flex-grow">
+                            <div class="flex items-center gap-4 mb-4">
                                 <span
                                     v-if="result.type === 'news'"
-                                    class="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs font-bold rounded-full mb-3 uppercase tracking-wider"
+                                    class="px-3 py-1 bg-blue-50 dark:bg-blue-900/10 text-blue-600 text-[10px] font-bold rounded-lg uppercase tracking-widest font-unbounded border border-blue-100 dark:border-blue-900/20"
                                 >
-                                    Berita
+                                    Berita & Artikel
                                 </span>
                                 <span
                                     v-else
-                                    class="inline-block px-3 py-1 bg-green-100 text-green-600 text-xs font-bold rounded-full mb-3 uppercase tracking-wider"
+                                    class="px-3 py-1 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600 text-[10px] font-bold rounded-lg uppercase tracking-widest font-unbounded border border-emerald-100 dark:border-emerald-900/20"
                                 >
-                                    Rute
+                                    Rute Perjalanan
                                 </span>
 
-                                <h3
-                                    class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-brand-red transition-colors"
+                                <span
+                                    v-if="
+                                        result.published_at || result.created_at
+                                    "
+                                    class="text-xs text-gray-400 font-manrope flex items-center gap-2"
                                 >
-                                    {{ result.title }}
-                                </h3>
-
-                                <p
-                                    class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2"
-                                >
-                                    {{ result.excerpt }}
-                                </p>
-
-                                <div
-                                    class="flex items-center text-sm text-gray-400"
-                                >
-                                    <template v-if="result.published_at">
-                                        <i class="far fa-calendar-alt mr-2"></i>
-                                        {{ formatDate(result.published_at) }}
-                                    </template>
-                                </div>
+                                    <i
+                                        class="far fa-calendar-alt text-rose-600"
+                                    ></i>
+                                    {{
+                                        formatDate(
+                                            result.published_at ||
+                                                result.created_at
+                                        )
+                                    }}
+                                </span>
                             </div>
 
-                            <div
-                                class="h-10 w-10 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center group-hover:bg-brand-red group-hover:text-white transition-colors ml-4 shrink-0"
+                            <h3
+                                class="text-xl md:text-2xl font-black text-gray-900 dark:text-white mb-3 group-hover:text-rose-600 transition-colors font-unbounded"
                             >
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
+                                {{ result.title }}
+                            </h3>
+
+                            <p
+                                class="text-gray-500 dark:text-gray-400 font-manrope line-clamp-2 leading-relaxed"
+                            >
+                                {{ result.excerpt }}
+                            </p>
+                        </div>
+
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-[#1a1a1a] flex items-center justify-center text-gray-400 group-hover:bg-rose-600 group-hover:text-white transition-all self-center md:self-center"
+                        >
+                            <i class="fas fa-arrow-right"></i>
                         </div>
                     </Link>
                 </div>
@@ -168,22 +164,38 @@ const formatDate = (dateString) => {
             <!-- Empty State -->
             <div
                 v-else
-                class="text-center py-16 bg-white dark:bg-gray-800 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700 animate-fade-in-up stagger-4"
+                class="text-center py-20 px-4 bg-white dark:bg-[#111] rounded-[2.5rem] border-2 border-dashed border-gray-200 dark:border-white/5"
             >
                 <div
-                    class="w-20 h-20 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400 text-3xl"
+                    class="w-20 h-20 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6"
                 >
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-search-minus text-3xl text-gray-300"></i>
                 </div>
                 <h3
-                    class="text-xl font-bold text-gray-900 dark:text-white mb-2"
+                    class="text-2xl font-black font-unbounded text-gray-900 dark:text-white mb-3"
                 >
-                    Tidak ada hasil ditemukan
+                    Tidak Ada Hasil
                 </h3>
-                <p class="text-gray-500 max-w-md mx-auto">
-                    Kami tidak dapat menemukan apa pun yang cocok dengan
-                    pencarian Anda. Silakan coba kata kunci lain.
+                <p
+                    class="text-gray-500 dark:text-gray-400 font-manrope max-w-sm mx-auto mb-8"
+                >
+                    Maaf, kami tidak menemukan hasil yang cocok untuk kata kunci
+                    tersebut. Coba gunakan kata kunci lain.
                 </p>
+                <div class="flex justify-center gap-4">
+                    <Link
+                        :href="route('frontend.news.index')"
+                        class="px-6 py-3 text-sm font-bold font-unbounded text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-xl transition-all"
+                    >
+                        Lihat Berita
+                    </Link>
+                    <Link
+                        :href="route('frontend.routes.index')"
+                        class="px-6 py-3 text-sm font-bold font-unbounded text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-xl transition-all"
+                    >
+                        Lihat Rute
+                    </Link>
+                </div>
             </div>
         </div>
     </div>

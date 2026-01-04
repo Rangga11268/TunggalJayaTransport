@@ -11,7 +11,12 @@ const props = defineProps({
 });
 
 const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("id-ID", {
+    if (!dateString) return "Tanggal Belum Tersedia";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime()) || date.getFullYear() <= 1970)
+        return "Tanggal Belum Tersedia";
+
+    return date.toLocaleDateString("id-ID", {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -133,7 +138,12 @@ const formatDate = (dateString) => {
                                 ><i
                                     class="far fa-calendar mr-1 text-rose-600"
                                 ></i>
-                                {{ formatDate(article.published_at) }}</span
+                                {{
+                                    formatDate(
+                                        article.published_at ||
+                                            article.created_at
+                                    )
+                                }}</span
                             >
                             <span
                                 class="w-1 h-1 rounded-full bg-gray-600"

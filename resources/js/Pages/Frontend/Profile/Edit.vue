@@ -20,39 +20,61 @@ defineProps({
 <template>
     <Head title="Profil Saya" />
 
-    <div class="py-12 bg-gray-50 dark:bg-gray-950 min-h-screen">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <h1
-                class="text-3xl font-black text-gray-900 dark:text-white mb-8 flex items-center"
-            >
-                <i class="fas fa-user-circle text-brand-red mr-4"></i>
-                Profil Saya
-            </h1>
+    <div
+        class="bg-gray-50 dark:bg-[#050505] min-h-screen font-sans selection:bg-rose-600 selection:text-white pb-32"
+    >
+        <!-- Profile Header -->
+        <div
+            class="relative pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden"
+        >
+            <!-- Abstract Decor -->
+            <div
+                class="absolute top-0 right-0 w-[400px] h-[400px] bg-rose-600/5 rounded-full blur-[100px] -z-10"
+            ></div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <span
+                class="inline-block py-1 px-3 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-600 border border-rose-100 dark:border-rose-900/20 text-xs font-bold tracking-widest uppercase mb-6 font-unbounded"
+            >
+                Akun Saya
+            </span>
+            <h1
+                class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded"
+            >
+                Pengaturan <span class="text-rose-600">Profil</span>
+            </h1>
+            <p
+                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope"
+            >
+                Kelola informasi pribadi, keamanan akun, dan preferensi profil
+                Anda.
+            </p>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <!-- Profile Information -->
                 <div
-                    class="p-4 sm:p-8 bg-white dark:bg-gray-900 shadow-xl shadow-black/5 sm:rounded-3xl border border-gray-100 dark:border-gray-800"
+                    class="p-8 md:p-12 bg-white dark:bg-[#111] rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-white/5 h-fit hover:shadow-2xl hover:shadow-rose-600/5 transition-all duration-500"
                 >
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
-                        class="max-w-xl"
+                        class="max-w-full"
                     />
                 </div>
 
                 <!-- Update Password -->
                 <div
-                    class="p-4 sm:p-8 bg-white dark:bg-gray-900 shadow-xl shadow-black/5 sm:rounded-3xl border border-gray-100 dark:border-gray-800"
+                    class="p-8 md:p-12 bg-white dark:bg-[#111] rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-white/5 h-fit hover:shadow-2xl hover:shadow-rose-600/5 transition-all duration-500"
                 >
-                    <UpdatePasswordForm class="max-w-xl" />
+                    <UpdatePasswordForm class="max-w-full" />
                 </div>
 
                 <!-- Delete Account -->
                 <div
-                    class="p-4 sm:p-8 bg-white dark:bg-gray-900 shadow-xl shadow-black/5 sm:rounded-3xl border border-gray-100 dark:border-gray-800 md:col-span-2"
+                    class="p-8 md:p-12 bg-rose-50/30 dark:bg-rose-900/5 rounded-[2.5rem] shadow-xl border border-rose-100 dark:border-rose-900/20 lg:col-span-2 group"
                 >
-                    <DeleteUserForm class="max-w-xl" />
+                    <DeleteUserForm class="max-w-full" />
                 </div>
             </div>
         </div>

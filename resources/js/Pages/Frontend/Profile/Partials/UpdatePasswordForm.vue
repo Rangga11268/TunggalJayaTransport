@@ -1,8 +1,5 @@
 <script setup>
 import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import TextInput from "@/Components/TextInput.vue";
 import { useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
 
@@ -35,33 +32,35 @@ const updatePassword = () => {
 
 <template>
     <section>
-        <header>
-            <h2 class="text-lg font-bold text-gray-900 dark:text-white">
-                Perbarui Kata Sandi
+        <header class="mb-8">
+            <h2
+                class="text-xl font-black text-gray-900 dark:text-white font-unbounded"
+            >
+                Keamanan Akun
             </h2>
-
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Pastikan akun Anda menggunakan kata sandi yang panjang dan acak
-                agar tetap aman.
+            <p
+                class="mt-2 text-sm text-gray-500 dark:text-gray-400 font-manrope"
+            >
+                Gunakan kata sandi yang kuat untuk menjaga keamanan akun TUJAGO
+                Anda.
             </p>
         </header>
 
-        <form @submit.prevent="updatePassword" class="mt-6 space-y-6">
+        <form @submit.prevent="updatePassword" class="space-y-6">
             <div>
-                <InputLabel
+                <label
                     for="current_password"
-                    value="Kata Sandi Saat Ini"
-                />
-
-                <TextInput
+                    class="block text-[10px] font-black text-gray-400 uppercase tracking-widest font-unbounded mb-2"
+                    >Kata Sandi Saat Ini</label
+                >
+                <input
                     id="current_password"
                     ref="currentPasswordInput"
                     v-model="form.current_password"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all font-manrope text-gray-900 dark:text-white"
                     autocomplete="current-password"
                 />
-
                 <InputError
                     :message="form.errors.current_password"
                     class="mt-2"
@@ -69,44 +68,49 @@ const updatePassword = () => {
             </div>
 
             <div>
-                <InputLabel for="password" value="Kata Sandi Baru" />
-
-                <TextInput
+                <label
+                    for="password"
+                    class="block text-[10px] font-black text-gray-400 uppercase tracking-widest font-unbounded mb-2"
+                    >Kata Sandi Baru</label
+                >
+                <input
                     id="password"
                     ref="passwordInput"
                     v-model="form.password"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all font-manrope text-gray-900 dark:text-white"
                     autocomplete="new-password"
                 />
-
                 <InputError :message="form.errors.password" class="mt-2" />
             </div>
 
             <div>
-                <InputLabel
+                <label
                     for="password_confirmation"
-                    value="Konfirmasi Kata Sandi"
-                />
-
-                <TextInput
+                    class="block text-[10px] font-black text-gray-400 uppercase tracking-widest font-unbounded mb-2"
+                    >Konfirmasi Kata Sandi Baru</label
+                >
+                <input
                     id="password_confirmation"
                     v-model="form.password_confirmation"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all font-manrope text-gray-900 dark:text-white"
                     autocomplete="new-password"
                 />
-
                 <InputError
                     :message="form.errors.password_confirmation"
                     class="mt-2"
                 />
             </div>
 
-            <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing"
-                    >Simpan Perubahan</PrimaryButton
+            <div class="flex items-center gap-6 pt-4">
+                <button
+                    type="submit"
+                    :disabled="form.processing"
+                    class="px-8 py-4 bg-rose-600 text-white font-black font-unbounded text-xs rounded-xl shadow-lg shadow-rose-600/30 hover:bg-rose-700 transition-all active:scale-95 disabled:opacity-50"
                 >
+                    Perbarui Kata Sandi
+                </button>
 
                 <Transition
                     enter-active-class="transition ease-in-out"
@@ -116,9 +120,9 @@ const updatePassword = () => {
                 >
                     <p
                         v-if="form.recentlySuccessful"
-                        class="text-sm text-green-600 dark:text-green-400 font-bold"
+                        class="text-xs text-emerald-600 dark:text-emerald-400 font-black font-unbounded uppercase tracking-widest"
                     >
-                        Tersimpan.
+                        Berhasil!
                     </p>
                 </Transition>
             </div>

@@ -27,9 +27,12 @@ const submit = () => {
 };
 
 const formattedDate = computed(() => {
-    const date = props.selectedDate
-        ? new Date(props.selectedDate)
-        : new Date(props.schedule.departure_time);
+    const rawDate = props.selectedDate || props.schedule.departure_time;
+    if (!rawDate) return "Tanggal Belum Tersedia";
+    const date = new Date(rawDate);
+    if (isNaN(date.getTime()) || date.getFullYear() <= 1970)
+        return "Tanggal Belum Tersedia";
+
     return date.toLocaleDateString("id-ID", {
         weekday: "long",
         year: "numeric",

@@ -47,14 +47,17 @@ const formatPrice = (price) => {
 };
 
 const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const options = {
+    if (!dateString) return "Tanggal Belum Tersedia";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime()) || date.getFullYear() <= 1970)
+        return "Tanggal Belum Tersedia";
+
+    return date.toLocaleDateString("id-ID", {
         weekday: "long",
         year: "numeric",
         month: "long",
         day: "numeric",
-    };
-    return new Date(dateString).toLocaleDateString("id-ID", options);
+    });
 };
 
 // Tuker kota asal sama tujuan

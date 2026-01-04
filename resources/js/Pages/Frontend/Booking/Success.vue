@@ -12,11 +12,12 @@ const props = defineProps({
 });
 
 const formatDate = (dateString, format = "long") => {
-    if (!dateString) return "-";
+    if (!dateString) return "Tanggal Belum Tersedia";
     const date = new Date(dateString);
+    if (isNaN(date.getTime()) || date.getFullYear() <= 1970)
+        return "Tanggal Belum Tersedia";
 
     if (format === "short") {
-        // Format 01.01.2000
         const d = date.getDate().toString().padStart(2, "0");
         const m = (date.getMonth() + 1).toString().padStart(2, "0");
         const y = date.getFullYear();
