@@ -524,7 +524,7 @@ class BookingController extends Controller
         $request->validate([
             'booking_id' => 'required|exists:bookings,id',
             'seat_numbers' => 'required|array|min:1',
-            'seat_numbers.*' => 'integer|min:1|max:40'
+            'seat_numbers.*' => 'integer|min:1|max:100' // Increased limit for larger buses
         ]);
 
         try {

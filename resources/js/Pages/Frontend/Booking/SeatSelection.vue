@@ -50,17 +50,16 @@ const toggleSeat = (seatNum) => {
         if (selectedSeats.value.length < props.booking.number_of_seats) {
             selectedSeats.value.push(seatNum);
         } else {
-            // Optional: Replace the last selection or warn user
-            // currently just strictly limiting to the number of booked seats
             alert(`Anda hanya memesan ${props.booking.number_of_seats} kursi.`);
         }
     }
 };
 
+// Helper to save seats returns success boolean
 const saveSeats = async () => {
     if (selectedSeats.value.length !== props.booking.number_of_seats) {
         alert(`Harap pilih ${props.booking.number_of_seats} kursi.`);
-        return;
+        return false;
     }
 
     processing.value = true;
@@ -68,18 +67,24 @@ const saveSeats = async () => {
         const response = await axios.post(
             route("frontend.booking.select-seats"),
             {
-                booking_id: props.booking.id,
-                seat_numbers: selectedSeats.value,
+                booking_id: props.booking.id, // Current booking ID
+                seat_numbers: selectedSeats.value, // Array [1, 5, etc]
             }
         );
 
         if (response.data.success) {
-            // Success feedback?
+            return true;
         } else {
-            alert(response.data.message);
+            alert(response.data.message || "Gagal menyimpan kursi.");
+            return false;
         }
     } catch (e) {
-        alert("Gagal menyimpan kursi.");
+        console.error("Save Seats Error:", e);
+        alert(
+            e.response?.data?.message ||
+                "Gagal menghubungi server untuk simpan kursi."
+        );
+        return false;
     } finally {
         processing.value = false;
     }
@@ -90,7 +95,7 @@ const paymentMethod = ref("");
 const ewalletType = ref(""); // gopay, shopeepay, dana
 
 const processPayment = async () => {
-    // 1. Ensure seats are saved locally first or strictly validate
+    // 1. Validation
     if (selectedSeats.value.length !== props.booking.number_of_seats) {
         alert("Mohon pilih kursi terlebih dahulu.");
         return;
@@ -104,13 +109,11 @@ const processPayment = async () => {
         return;
     }
 
-    // Auto-save seats if not explicitly saved?
-    // Current logic requires saving seats first in the backend logic, but let's try to do it in one flow or ensure they are saved.
-    // The controller checks if seat_numbers is empty.
-
-    // First, save seats explicitly to be safe
-    // Note: In a real app, we might chain these or having the saveSeats set the state in DB
-    await saveSeats();
+    // 2. Save Seats First
+    // We must ensure seats are saved in the DB before payment because invalid/unsaved seats
+    // will cause the backend payment controller to reject the request.
+    const saved = await saveSeats();
+    if (!saved) return; // Stop if saving failed
 
     processing.value = true;
     try {
@@ -225,326 +228,334 @@ const busType = computed(() => {
 <template>
     <Head title="Pilih Kursi & Pembayaran" />
 
+    <!-- Header (Consistent with Booking Index) -->
     <div
-        class="bg-gray-50 dark:bg-slate-900 min-h-screen py-12 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300"
+        class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative z-10"
     >
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-10">
-                <span
-                    class="inline-block px-4 py-2 rounded-full bg-cyan-100 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-400 text-xs font-bold tracking-[0.2em] mb-4 uppercase border border-cyan-200 dark:border-cyan-500/20 shadow-sm"
-                >
-                    TUNGGAL JAYA "{{ busName }}"
-                </span>
-                <h1
-                    class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight"
-                >
-                    SEAT 2-3 + {{ busType }}
-                </h1>
-                <p
-                    class="text-gray-500 dark:text-slate-400 font-medium tracking-wide text-sm uppercase"
-                >
-                    Melayani Rute:
-                    {{ routeDescription }}
-                </p>
-            </div>
+        <span
+            class="inline-block px-4 py-2 rounded-full bg-rose-600 text-white text-[10px] font-bold tracking-[0.2em] mb-6 animate-fade-in uppercase font-unbounded shadow-lg shadow-rose-600/20"
+        >
+            TUNGGAL JAYA "{{ busName }}"
+        </span>
+        <h1
+            class="font-unbounded font-black text-3xl md:text-5xl text-gray-900 dark:text-white mb-4 animate-fade-in-up leading-tight uppercase"
+        >
+            Pilih
+            <span class="text-rose-600">Kursi & Bayar</span>
+        </h1>
+        <p
+            class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-1 font-manrope font-medium"
+        >
+            Konfigurasi: Seat 2-3 | {{ busType }} | {{ routeDescription }}
+        </p>
+    </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left: Seat Map -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Facilities Bar -->
+    <div
+        class="bg-white dark:bg-[#050505] min-h-screen pb-24 px-4 sm:px-6 lg:px-8 relative z-20"
+    >
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left: Seat Map -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Facilities Bar -->
+                <div
+                    class="bg-white dark:bg-[#111] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden"
+                >
+                    <h3
+                        class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 font-manrope"
+                    >
+                        Fasilitas Armada
+                    </h3>
                     <div
-                        class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-gray-200 dark:border-cyan-500/30 shadow-lg dark:shadow-[0_0_20px_rgba(6,182,212,0.15)] relative overflow-hidden transition-colors duration-300"
+                        class="flex flex-wrap gap-4 justify-center md:justify-start"
                     >
                         <div
-                            class="relative z-10 flex flex-wrap justify-center gap-6 md:gap-8"
+                            v-for="(facility, idx) in facilities"
+                            :key="idx"
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 group hover:border-rose-200 dark:hover:border-rose-900/50 transition-all"
                         >
                             <div
-                                v-for="(facility, idx) in facilities"
-                                :key="idx"
-                                class="flex flex-col items-center group cursor-default"
+                                class="w-8 h-8 rounded-full bg-white dark:bg-white/10 flex items-center justify-center text-gray-400 group-hover:text-rose-600 transition-colors"
                             >
+                                <i :class="[facility.icon, 'text-xs']"></i>
+                            </div>
+                            <span
+                                class="text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wide font-manrope group-hover:text-rose-600 transition-colors"
+                            >
+                                {{ facility.name }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bus Container -->
+                <div
+                    class="bg-white dark:bg-[#111] rounded-[3rem] p-4 md:p-6 shadow-xl shadow-gray-200 dark:shadow-none border border-gray-100 dark:border-white/5"
+                >
+                    <!-- Bus Body -->
+                    <div
+                        class="bg-gray-50 dark:bg-[#080808] rounded-[2.5rem] p-6 relative min-h-[500px] overflow-hidden border border-gray-200 dark:border-white/5"
+                    >
+                        <!-- Front Area -->
+                        <div
+                            class="relative flex justify-between items-start mb-12 border-b-2 border-dashed border-gray-200 dark:border-white/10 pb-6"
+                        >
+                            <!-- Door -->
+                            <div class="flex flex-col items-center opacity-60">
                                 <div
-                                    class="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-700/50 flex items-center justify-center mb-2 group-hover:bg-cyan-500 group-hover:text-white transition-all duration-300 border border-gray-200 dark:border-slate-600 group-hover:border-cyan-400"
+                                    class="w-12 h-12 rounded-xl border-2 border-dashed border-gray-300 dark:border-white/20 flex items-center justify-center mb-2"
                                 >
                                     <i
-                                        :class="[
-                                            facility.icon,
-                                            'text-lg text-gray-500 dark:text-cyan-400 group-hover:text-white transition-colors',
-                                        ]"
+                                        class="fas fa-door-open text-gray-400"
                                     ></i>
                                 </div>
                                 <span
-                                    class="text-[0.65rem] font-bold text-gray-500 dark:text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-300 uppercase tracking-wider transition-colors text-center max-w-[60px] leading-tight"
-                                    >{{ facility.name }}</span
+                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-manrope"
+                                    >Pintu</span
+                                >
+                            </div>
+
+                            <!-- Driver -->
+                            <div class="flex flex-col items-center">
+                                <div
+                                    class="w-16 h-16 bg-gray-200 dark:bg-white/10 rounded-2xl flex items-center justify-center text-gray-400 dark:text-white/50 mb-2 shadow-inner"
+                                >
+                                    <i
+                                        class="fas fa-steering-wheel text-2xl"
+                                    ></i>
+                                </div>
+                                <span
+                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-manrope"
+                                    >Sopir</span
                                 >
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Bus Container -->
-                    <div
-                        class="relative rounded-[2.5rem] p-3 shadow-xl bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-cyan-500/50 transition-colors duration-300"
-                    >
-                        <!-- Bus Body -->
+                        <!-- Seat Grid -->
                         <div
-                            class="bg-gray-100 dark:bg-gray-800/50 rounded-[2rem] p-6 relative min-h-[500px] overflow-hidden border border-gray-200 dark:border-gray-700"
+                            class="relative z-10 px-0 md:px-8 overflow-x-auto pb-12"
                         >
-                            <!-- Bus Floor Texture/Pattern -->
                             <div
-                                class="absolute inset-0 opacity-30 dark:opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] dark:bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"
-                            ></div>
-
-                            <!-- Front Area -->
-                            <div
-                                class="relative flex justify-between items-start mb-12 border-b-2 border-dashed border-gray-300 dark:border-gray-600 pb-4"
+                                class="min-w-[300px] flex flex-col items-center"
                             >
-                                <!-- Door / Kernet (LEFT) -->
-                                <div class="flex flex-col items-center">
-                                    <div
-                                        class="w-14 h-14 bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center border-2 border-gray-300 dark:border-gray-600 border-dashed mb-2 opacity-70"
-                                    >
-                                        <i
-                                            class="fas fa-door-open text-2xl text-gray-400 dark:text-gray-500"
-                                        ></i>
-                                    </div>
-                                    <span
-                                        class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest"
-                                        >Pintu</span
-                                    >
-                                </div>
-
-                                <!-- Driver (RIGHT - RHD) -->
-                                <div class="flex flex-col items-center">
-                                    <div
-                                        class="w-16 h-16 bg-gray-200 dark:bg-gray-700/50 rounded-2xl flex items-center justify-center border-2 border-gray-300 dark:border-gray-600 mb-2 opacity-80"
-                                    >
-                                        <i
-                                            class="fas fa-steering-wheel text-3xl text-gray-400 dark:text-gray-500"
-                                        ></i>
-                                    </div>
-                                    <span
-                                        class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest"
-                                        >Sopir</span
-                                    >
-                                </div>
-                            </div>
-
-                            <!-- Seat Grid -->
-                            <div
-                                class="relative z-10 px-2 sm:px-8 overflow-x-auto"
-                            >
-                                <div class="min-w-[300px]">
-                                    <div
-                                        v-for="r in rows"
-                                        :key="r"
-                                        class="flex items-center justify-center mb-3"
-                                    >
-                                        <!-- Left Column (2 Seats) -->
-                                        <div class="flex gap-2">
-                                            <template
-                                                v-for="c in 2"
-                                                :key="`L-${r}-${c}`"
-                                            >
-                                                <div
-                                                    class="relative group"
-                                                    v-if="
-                                                        getSeatNumber(
-                                                            r - 1,
-                                                            c - 1
-                                                        ) <= totalSeats
-                                                    "
-                                                >
-                                                    <button
-                                                        @click="
-                                                            toggleSeat(
-                                                                getSeatNumber(
-                                                                    r - 1,
-                                                                    c - 1
-                                                                )
-                                                            )
-                                                        "
-                                                        :disabled="
-                                                            isSeatOccupied(
-                                                                getSeatNumber(
-                                                                    r - 1,
-                                                                    c - 1
-                                                                )
-                                                            )
-                                                        "
-                                                        class="relative w-12 md:w-14 transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none"
-                                                    >
-                                                        <!-- Seat Image -->
-                                                        <img
-                                                            src="/img/car-seat.png"
-                                                            class="w-full h-auto drop-shadow-md transition-all duration-300 dark:brightness-90"
-                                                            :class="[
-                                                                isSeatOccupied(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c - 1
-                                                                    )
-                                                                )
-                                                                    ? 'grayscale opacity-50 brightness-50'
-                                                                    : '',
-                                                                isSeatSelected(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c - 1
-                                                                    )
-                                                                )
-                                                                    ? 'sepia-[.5] hue-rotate-[320deg] saturate-[3] drop-shadow-[0_0_8px_rgba(255,0,0,0.6)]'
-                                                                    : 'hover:drop-shadow-[0_0_5px_rgba(0,0,0,0.3)]',
-                                                            ]"
-                                                            alt="Seat"
-                                                        />
-
-                                                        <!-- Seat Number Badge -->
-                                                        <div
-                                                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/3 text-[10px] md:text-xs font-bold text-gray-700 w-5 h-5 flex items-center justify-center"
-                                                            :class="
-                                                                isSeatSelected(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c - 1
-                                                                    )
-                                                                )
-                                                                    ? '!text-white'
-                                                                    : ''
-                                                            "
-                                                        >
-                                                            {{
-                                                                getSeatNumber(
-                                                                    r - 1,
-                                                                    c - 1
-                                                                )
-                                                            }}
-                                                        </div>
-
-                                                        <!-- Selection Indicator (Checkmark) -->
-                                                        <div
-                                                            v-if="
-                                                                isSeatSelected(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c - 1
-                                                                    )
-                                                                )
-                                                            "
-                                                            class="absolute -top-1 -right-1 w-5 h-5 bg-brand-red rounded-full flex items-center justify-center text-white text-[10px] shadow-sm animate-bounce-short"
-                                                        >
-                                                            <i
-                                                                class="fas fa-check"
-                                                            ></i>
-                                                        </div>
-
-                                                        <!-- Occupied Indicator (Cross) -->
-                                                        <div
-                                                            v-if="
-                                                                isSeatOccupied(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c - 1
-                                                                    )
-                                                                )
-                                                            "
-                                                            class="absolute inset-0 flex items-center justify-center"
-                                                        >
-                                                            <i
-                                                                class="fas fa-times text-red-600 text-2xl opacity-80"
-                                                            ></i>
-                                                        </div>
-                                                    </button>
-                                                </div>
-                                                <div
-                                                    v-else
-                                                    class="w-12 md:w-14"
-                                                ></div>
-                                                <!-- Empty Spacer -->
-                                            </template>
-                                        </div>
-
-                                        <!-- Aisle -->
-                                        <div
-                                            class="w-10 md:w-14 flex justify-center items-center"
+                                <div
+                                    v-for="r in rows"
+                                    :key="r"
+                                    class="flex items-center gap-4 md:gap-8 mb-4"
+                                >
+                                    <!-- Left Column (2 Seats) -->
+                                    <div class="flex gap-3">
+                                        <template
+                                            v-for="c in 2"
+                                            :key="`L-${r}-${c}`"
                                         >
-                                            <span
-                                                class="text-[10px] text-gray-400 dark:text-gray-500 font-mono rotate-90 opacity-0 md:opacity-100"
-                                                >{{ r }}</span
+                                            <div
+                                                class="relative group"
+                                                v-if="
+                                                    getSeatNumber(
+                                                        r - 1,
+                                                        c - 1
+                                                    ) <= totalSeats
+                                                "
                                             >
-                                        </div>
-
-                                        <!-- Right Column (3 Seats) -->
-                                        <div class="flex gap-2">
-                                            <template
-                                                v-for="c in 3"
-                                                :key="`R-${r}-${c}`"
-                                            >
-                                                <div
-                                                    class="relative group"
-                                                    v-if="
-                                                        getSeatNumber(
-                                                            r - 1,
-                                                            c + 1
-                                                        ) <= totalSeats
+                                                <button
+                                                    @click="
+                                                        toggleSeat(
+                                                            getSeatNumber(
+                                                                r - 1,
+                                                                c - 1
+                                                            )
+                                                        )
                                                     "
+                                                    :disabled="
+                                                        isSeatOccupied(
+                                                            getSeatNumber(
+                                                                r - 1,
+                                                                c - 1
+                                                            )
+                                                        )
+                                                    "
+                                                    class="relative w-12 md:w-14 transition-all duration-300 focus:outline-none"
                                                 >
-                                                    <button
-                                                        @click="
-                                                            toggleSeat(
+                                                    <!-- Seat Visual -->
+                                                    <div
+                                                        class="w-full aspect-square rounded-xl flex items-center justify-center relative transition-all duration-300 shadow-sm overflow-hidden p-1"
+                                                        :class="[
+                                                            isSeatSelected(
                                                                 getSeatNumber(
                                                                     r - 1,
-                                                                    c + 1
+                                                                    c - 1
                                                                 )
                                                             )
-                                                        "
-                                                        :disabled="
-                                                            isSeatOccupied(
-                                                                getSeatNumber(
-                                                                    r - 1,
-                                                                    c + 1
-                                                                )
-                                                            )
-                                                        "
-                                                        class="relative w-12 md:w-14 transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none"
+                                                                ? 'bg-rose-50 dark:bg-rose-900/10 shadow-lg shadow-rose-600/20 ring-2 ring-rose-600 -translate-y-1'
+                                                                : isSeatOccupied(
+                                                                      getSeatNumber(
+                                                                          r - 1,
+                                                                          c - 1
+                                                                      )
+                                                                  )
+                                                                ? 'bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50'
+                                                                : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 hover:shadow-md border border-gray-100 dark:border-white/5',
+                                                        ]"
                                                     >
-                                                        <!-- Seat Image -->
                                                         <img
                                                             src="/img/car-seat.png"
-                                                            class="w-full h-auto drop-shadow-md transition-all duration-300 dark:brightness-90"
+                                                            class="w-full h-auto object-contain transition-all duration-300"
                                                             :class="[
-                                                                isSeatOccupied(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c + 1
-                                                                    )
-                                                                )
-                                                                    ? 'grayscale opacity-50 brightness-50'
-                                                                    : '',
                                                                 isSeatSelected(
                                                                     getSeatNumber(
                                                                         r - 1,
-                                                                        c + 1
+                                                                        c - 1
                                                                     )
                                                                 )
-                                                                    ? 'sepia-[.5] hue-rotate-[320deg] saturate-[3] drop-shadow-[0_0_8px_rgba(255,0,0,0.6)]'
-                                                                    : 'hover:drop-shadow-[0_0_5px_rgba(0,0,0,0.3)]',
+                                                                    ? 'sepia-[1] hue-rotate-[300deg] saturate-[2.5]'
+                                                                    : isSeatOccupied(
+                                                                          getSeatNumber(
+                                                                              r -
+                                                                                  1,
+                                                                              c -
+                                                                                  1
+                                                                          )
+                                                                      )
+                                                                    ? 'grayscale'
+                                                                    : 'dark:brightness-90 hover:brightness-110',
                                                             ]"
                                                             alt="Seat"
                                                         />
 
-                                                        <!-- Seat Number Badge -->
-                                                        <div
-                                                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/3 text-[10px] md:text-xs font-bold text-gray-700 w-5 h-5 flex items-center justify-center"
-                                                            :class="
+                                                        <!-- Number Badge -->
+                                                        <span
+                                                            class="absolute -top-1 -right-1 text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm border font-manrope z-10"
+                                                            :class="[
+                                                                isSeatSelected(
+                                                                    getSeatNumber(
+                                                                        r - 1,
+                                                                        c - 1
+                                                                    )
+                                                                )
+                                                                    ? 'bg-rose-600 text-white border-rose-600'
+                                                                    : 'bg-gray-100 dark:bg-white/10 text-gray-500 border-gray-200 dark:border-white/10',
+                                                            ]"
+                                                        >
+                                                            {{
+                                                                getSeatNumber(
+                                                                    r - 1,
+                                                                    c - 1
+                                                                )
+                                                            }}
+                                                        </span>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                            <div
+                                                v-else
+                                                class="w-12 md:w-14"
+                                            ></div>
+                                        </template>
+                                    </div>
+
+                                    <!-- Aisle -->
+                                    <div
+                                        class="w-8 flex justify-center items-center"
+                                    >
+                                        <span
+                                            class="text-[10px] font-bold text-gray-300 dark:text-white/10 font-manrope"
+                                            >{{ r }}</span
+                                        >
+                                    </div>
+
+                                    <!-- Right Column (3 Seats) -->
+                                    <div class="flex gap-3">
+                                        <template
+                                            v-for="c in 3"
+                                            :key="`R-${r}-${c}`"
+                                        >
+                                            <div
+                                                class="relative group"
+                                                v-if="
+                                                    getSeatNumber(
+                                                        r - 1,
+                                                        c + 1
+                                                    ) <= totalSeats
+                                                "
+                                            >
+                                                <button
+                                                    @click="
+                                                        toggleSeat(
+                                                            getSeatNumber(
+                                                                r - 1,
+                                                                c + 1
+                                                            )
+                                                        )
+                                                    "
+                                                    :disabled="
+                                                        isSeatOccupied(
+                                                            getSeatNumber(
+                                                                r - 1,
+                                                                c + 1
+                                                            )
+                                                        )
+                                                    "
+                                                    class="relative w-12 md:w-14 transition-all duration-300 focus:outline-none"
+                                                >
+                                                    <!-- Seat Visual -->
+                                                    <div
+                                                        class="w-full aspect-square rounded-xl flex items-center justify-center relative transition-all duration-300 shadow-sm overflow-hidden p-1"
+                                                        :class="[
+                                                            isSeatSelected(
+                                                                getSeatNumber(
+                                                                    r - 1,
+                                                                    c + 1
+                                                                )
+                                                            )
+                                                                ? 'bg-rose-50 dark:bg-rose-900/10 shadow-lg shadow-rose-600/20 ring-2 ring-rose-600 -translate-y-1'
+                                                                : isSeatOccupied(
+                                                                      getSeatNumber(
+                                                                          r - 1,
+                                                                          c + 1
+                                                                      )
+                                                                  )
+                                                                ? 'bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50'
+                                                                : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 hover:shadow-md border border-gray-100 dark:border-white/5',
+                                                        ]"
+                                                    >
+                                                        <img
+                                                            src="/img/car-seat.png"
+                                                            class="w-full h-auto object-contain transition-all duration-300"
+                                                            :class="[
                                                                 isSeatSelected(
                                                                     getSeatNumber(
                                                                         r - 1,
                                                                         c + 1
                                                                     )
                                                                 )
-                                                                    ? '!text-white'
-                                                                    : ''
-                                                            "
+                                                                    ? 'sepia-[1] hue-rotate-[300deg] saturate-[2.5]'
+                                                                    : isSeatOccupied(
+                                                                          getSeatNumber(
+                                                                              r -
+                                                                                  1,
+                                                                              c +
+                                                                                  1
+                                                                          )
+                                                                      )
+                                                                    ? 'grayscale'
+                                                                    : 'dark:brightness-90 hover:brightness-110',
+                                                            ]"
+                                                            alt="Seat"
+                                                        />
+
+                                                        <!-- Number Badge -->
+                                                        <span
+                                                            class="absolute -top-1 -right-1 text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm border font-manrope z-10"
+                                                            :class="[
+                                                                isSeatSelected(
+                                                                    getSeatNumber(
+                                                                        r - 1,
+                                                                        c + 1
+                                                                    )
+                                                                )
+                                                                    ? 'bg-rose-600 text-white border-rose-600'
+                                                                    : 'bg-gray-100 dark:bg-white/10 text-gray-500 border-gray-200 dark:border-white/10',
+                                                            ]"
                                                         >
                                                             {{
                                                                 getSeatNumber(
@@ -552,318 +563,310 @@ const busType = computed(() => {
                                                                     c + 1
                                                                 )
                                                             }}
-                                                        </div>
-
-                                                        <!-- Selection Indicator (Checkmark) -->
-                                                        <div
-                                                            v-if="
-                                                                isSeatSelected(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c + 1
-                                                                    )
-                                                                )
-                                                            "
-                                                            class="absolute -top-1 -right-1 w-5 h-5 bg-brand-red rounded-full flex items-center justify-center text-white text-[10px] shadow-sm animate-bounce-short"
-                                                        >
-                                                            <i
-                                                                class="fas fa-check"
-                                                            ></i>
-                                                        </div>
-
-                                                        <!-- Occupied Indicator (Cross) -->
-                                                        <div
-                                                            v-if="
-                                                                isSeatOccupied(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c + 1
-                                                                    )
-                                                                )
-                                                            "
-                                                            class="absolute inset-0 flex items-center justify-center"
-                                                        >
-                                                            <i
-                                                                class="fas fa-times text-red-600 text-2xl opacity-80"
-                                                            ></i>
-                                                        </div>
-                                                    </button>
-                                                </div>
-                                                <div
-                                                    v-else
-                                                    class="w-12 md:w-14"
-                                                ></div>
-                                                <!-- Empty Spacer -->
-                                            </template>
-                                        </div>
+                                                        </span>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                            <div
+                                                v-else
+                                                class="w-12 md:w-14"
+                                            ></div>
+                                        </template>
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Rear Decoration -->
-                            <div
-                                class="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-gray-300 dark:from-gray-900 to-transparent"
-                            ></div>
                         </div>
+
+                        <!-- Rear Decoration -->
+                        <div
+                            class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-gray-200 dark:from-black to-transparent opacity-50"
+                        ></div>
                     </div>
 
                     <!-- Legend -->
                     <div
-                        class="flex justify-center gap-4 md:gap-8 flex-wrap pt-4"
+                        class="flex justify-center gap-6 flex-wrap mt-8 pt-8 border-t border-gray-100 dark:border-white/5"
                     >
-                        <div
-                            class="flex items-center gap-3 bg-white dark:bg-slate-800/50 px-4 py-2 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm"
-                        >
-                            <img
-                                src="/img/car-seat.png"
-                                class="w-8 h-auto grayscale opacity-50"
-                            />
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-gray-200 dark:bg-white/5 border border-gray-300 dark:border-white/10 flex items-center justify-center p-1"
+                            >
+                                <img
+                                    src="/img/car-seat.png"
+                                    class="w-full h-full object-contain grayscale opacity-50"
+                                />
+                            </div>
                             <span
-                                class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                class="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-manrope"
                                 >Terisi</span
                             >
                         </div>
-                        <div
-                            class="flex items-center gap-3 bg-white dark:bg-slate-800/50 px-4 py-2 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm"
-                        >
-                            <img src="/img/car-seat.png" class="w-8 h-auto" />
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 flex items-center justify-center p-1"
+                            >
+                                <img
+                                    src="/img/car-seat.png"
+                                    class="w-full h-full object-contain dark:brightness-90"
+                                />
+                            </div>
                             <span
-                                class="text-xs font-bold text-gray-900 dark:text-gray-200 uppercase tracking-wider"
+                                class="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-manrope"
                                 >Tersedia</span
                             >
                         </div>
-                        <div
-                            class="flex items-center gap-3 bg-white dark:bg-slate-800/50 px-4 py-2 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm"
-                        >
-                            <img
-                                src="/img/car-seat.png"
-                                class="w-8 h-auto sepia-[.5] hue-rotate-[320deg] saturate-[3]"
-                            />
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-900/10 border-2 border-rose-600 flex items-center justify-center p-1"
+                            >
+                                <img
+                                    src="/img/car-seat.png"
+                                    class="w-full h-full object-contain sepia-[1] hue-rotate-[300deg] saturate-[2.5]"
+                                />
+                            </div>
                             <span
-                                class="text-xs font-bold text-brand-red uppercase tracking-wider"
+                                class="text-[10px] font-bold text-rose-600 uppercase tracking-wider font-manrope"
                                 >Pilihanmu</span
                             >
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Right: Payment & Summary -->
-                <div class="lg:col-span-1 space-y-6">
-                    <!-- Card Utils -->
-                    <div
-                        class="bg-white dark:bg-slate-800/80 dark:backdrop-blur-md rounded-3xl p-6 shadow-xl border border-gray-200 dark:border-slate-700 sticky top-24 transition-colors duration-300"
+            <!-- Right: Payment & Summary -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Summary Card -->
+                <div
+                    class="bg-white dark:bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-gray-100 dark:shadow-none border border-gray-100 dark:border-white/5 sticky top-24"
+                >
+                    <h3
+                        class="font-unbounded font-bold text-lg text-gray-900 dark:text-white mb-6 flex items-center gap-3 uppercase"
                     >
-                        <h3
-                            class="font-black text-xl text-gray-900 dark:text-white mb-6 flex items-center gap-3"
-                        >
-                            <i
-                                class="fas fa-clipboard-list text-cyan-600 dark:text-cyan-400"
-                            ></i>
-                            Detail Pemesanan
-                        </h3>
+                        <i class="fas fa-clipboard-list text-rose-600"></i>
+                        Detail Bayar
+                    </h3>
 
-                        <div class="space-y-4 mb-6">
+                    <!-- Info Groups -->
+                    <div class="space-y-6 mb-8">
+                        <div>
+                            <span
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2 font-manrope"
+                                >Penumpang</span
+                            >
                             <div
-                                class="bg-gray-50 dark:bg-slate-700/50 p-4 rounded-xl border border-gray-200 dark:border-slate-600/50"
+                                class="p-3 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5"
                             >
                                 <span
-                                    class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider block mb-1"
-                                    >Penumpang</span
-                                >
-                                <span
-                                    class="font-bold text-gray-900 dark:text-white text-lg"
+                                    class="font-bold text-gray-900 dark:text-white font-manrope text-sm"
                                     >{{ booking.passenger_name }}</span
-                                >
-                            </div>
-
-                            <div
-                                class="bg-gray-50 dark:bg-slate-700/50 p-4 rounded-xl border border-gray-200 dark:border-slate-600/50"
-                            >
-                                <span
-                                    class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider block mb-1"
-                                    >Kursi Dipilih</span
-                                >
-                                <div
-                                    v-if="selectedSeats.length > 0"
-                                    class="flex flex-wrap gap-2"
-                                >
-                                    <span
-                                        v-for="seat in selectedSeats"
-                                        :key="seat"
-                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-brand-red text-white font-bold text-sm shadow-lg shadow-red-900/50"
-                                    >
-                                        {{ seat }}
-                                    </span>
-                                </div>
-                                <span
-                                    v-else
-                                    class="text-gray-400 dark:text-slate-500 italic text-sm"
-                                    >Belum ada kursi dipilih</span
-                                >
-                            </div>
-
-                            <div
-                                class="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/40 dark:to-blue-900/40 p-4 rounded-xl border border-cyan-200 dark:border-cyan-500/20"
-                            >
-                                <span
-                                    class="text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider block mb-1"
-                                    >Total Tagihan</span
-                                >
-                                <span
-                                    class="font-black text-3xl text-gray-900 dark:text-white tracking-tight"
-                                    >{{
-                                        formatCurrency(booking.total_price)
-                                    }}</span
                                 >
                             </div>
                         </div>
 
-                        <!-- Payment Methods -->
-                        <div class="space-y-4">
-                            <h4
-                                class="text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2"
+                        <div>
+                            <span
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2 font-manrope"
+                                >Kursi Dipilih</span
                             >
-                                Metode Pembayaran
-                            </h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    v-if="selectedSeats.length === 0"
+                                    class="text-sm text-gray-400 italic px-2 font-manrope"
+                                    >Belum ada kursi dipilih</span
+                                >
+                                <span
+                                    v-for="seat in selectedSeats"
+                                    :key="seat"
+                                    class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-rose-600 text-white font-black text-sm shadow-lg shadow-rose-600/20 font-unbounded transition-all hover:scale-110"
+                                >
+                                    {{ seat }}
+                                </span>
+                            </div>
+                        </div>
 
-                            <!-- Transfer -->
+                        <div
+                            class="pt-6 border-t border-dashed border-gray-200 dark:border-white/10"
+                        >
+                            <span
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1 font-manrope"
+                                >Total Tagihan</span
+                            >
+                            <span
+                                class="font-black text-3xl text-rose-600 tracking-tight font-unbounded"
+                                >{{ formatCurrency(booking.total_price) }}</span
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="space-y-4">
+                        <h4
+                            class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 font-manrope"
+                        >
+                            Metode Pembayaran
+                        </h4>
+
+                        <!-- Transfer -->
+                        <label
+                            class="group relative flex items-center p-4 border-2 rounded-2xl cursor-pointer transition-all duration-300"
+                            :class="[
+                                paymentMethod === 'bank_transfer'
+                                    ? 'border-rose-600 bg-rose-50 dark:bg-rose-900/10'
+                                    : 'border-gray-100 dark:border-white/10 bg-white dark:bg-[#111] hover:border-rose-300 dark:hover:border-rose-800',
+                            ]"
+                        >
+                            <input
+                                type="radio"
+                                value="bank_transfer"
+                                v-model="paymentMethod"
+                                class="peer sr-only"
+                            />
+                            <div
+                                class="w-10 h-10 rounded-full flex items-center justify-center mr-4 transition-colors"
+                                :class="[
+                                    paymentMethod === 'bank_transfer'
+                                        ? 'bg-rose-200 dark:bg-rose-800 text-rose-700 dark:text-rose-100'
+                                        : 'bg-gray-100 dark:bg-white/5 text-gray-400',
+                                ]"
+                            >
+                                <i class="fas fa-university text-lg"></i>
+                            </div>
+                            <span
+                                class="font-bold text-sm font-manrope"
+                                :class="[
+                                    paymentMethod === 'bank_transfer'
+                                        ? 'text-rose-900 dark:text-rose-100'
+                                        : 'text-gray-700 dark:text-gray-300',
+                                ]"
+                                >Transfer Bank</span
+                            >
+                            <div
+                                v-if="paymentMethod === 'bank_transfer'"
+                                class="absolute right-4 w-5 h-5 rounded-full bg-rose-600 flex items-center justify-center text-white text-xs shadow-md"
+                            >
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </label>
+
+                        <!-- E-Wallet -->
+                        <div
+                            class="border-2 rounded-2xl overflow-hidden transition-all duration-300"
+                            :class="[
+                                paymentMethod === 'e_wallet'
+                                    ? 'border-rose-600 bg-rose-50 dark:bg-rose-900/10'
+                                    : 'border-gray-100 dark:border-white/10 bg-white dark:bg-[#111]',
+                            ]"
+                        >
                             <label
-                                class="group relative flex items-center p-4 border border-gray-200 dark:border-slate-600 rounded-xl cursor-pointer bg-gray-50 dark:bg-slate-700/30 hover:bg-gray-100 dark:hover:bg-slate-700 hover:border-cyan-500 dark:hover:border-cyan-500 transition-all duration-300"
-                                :class="{
-                                    'ring-2 ring-cyan-500 bg-white dark:bg-slate-700 !border-cyan-500':
-                                        paymentMethod === 'bank_transfer',
-                                }"
+                                class="flex items-center p-4 cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/5 transition-colors"
                             >
                                 <input
                                     type="radio"
-                                    value="bank_transfer"
+                                    value="e_wallet"
                                     v-model="paymentMethod"
                                     class="peer sr-only"
                                 />
                                 <div
-                                    class="w-10 h-10 rounded-full bg-gray-200 dark:bg-slate-600 flex items-center justify-center mr-4 group-hover:bg-cyan-100 dark:group-hover:bg-cyan-500/20 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors"
+                                    class="w-10 h-10 rounded-full flex items-center justify-center mr-4 transition-colors"
+                                    :class="[
+                                        paymentMethod === 'e_wallet'
+                                            ? 'bg-rose-200 dark:bg-rose-800 text-rose-700 dark:text-rose-100'
+                                            : 'bg-gray-100 dark:bg-white/5 text-gray-400',
+                                    ]"
                                 >
-                                    <i class="fas fa-university text-lg"></i>
+                                    <i class="fas fa-wallet text-lg"></i>
                                 </div>
                                 <span
-                                    class="font-bold text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white"
-                                    >Transfer Bank</span
+                                    class="font-bold text-sm font-manrope"
+                                    :class="[
+                                        paymentMethod === 'e_wallet'
+                                            ? 'text-rose-900 dark:text-rose-100'
+                                            : 'text-gray-700 dark:text-gray-300',
+                                    ]"
+                                    >E-Wallet</span
                                 >
-                                <div
-                                    class="absolute right-4 w-4 h-4 rounded-full border-2 border-gray-400 dark:border-slate-500 peer-checked:border-cyan-500 peer-checked:bg-cyan-500 transition-all"
-                                ></div>
-                            </label>
-
-                            <!-- E-Wallet -->
-                            <div
-                                class="border border-gray-200 dark:border-slate-600 rounded-xl overflow-hidden bg-gray-50 dark:bg-slate-700/30"
-                                :class="{
-                                    'ring-2 ring-cyan-500 border-cyan-500':
-                                        paymentMethod === 'e_wallet',
-                                }"
-                            >
-                                <label
-                                    class="flex items-center p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-                                >
-                                    <input
-                                        type="radio"
-                                        value="e_wallet"
-                                        v-model="paymentMethod"
-                                        class="peer sr-only"
-                                    />
-                                    <div
-                                        class="w-10 h-10 rounded-full bg-gray-200 dark:bg-slate-600 flex items-center justify-center mr-4"
-                                    >
-                                        <i class="fas fa-wallet text-lg"></i>
-                                    </div>
-                                    <span
-                                        class="font-bold text-gray-700 dark:text-gray-200"
-                                        >E-Wallet</span
-                                    >
-                                    <div
-                                        class="ml-auto w-4 h-4 rounded-full border-2 border-gray-400 dark:border-slate-500 peer-checked:border-cyan-500 peer-checked:bg-cyan-500 transition-all"
-                                    ></div>
-                                </label>
-
                                 <div
                                     v-if="paymentMethod === 'e_wallet'"
-                                    class="bg-gray-100 dark:bg-slate-800/80 p-4 space-y-2 border-t border-gray-200 dark:border-slate-600 animate-slide-down"
+                                    class="ml-auto w-5 h-5 rounded-full bg-rose-600 flex items-center justify-center text-white text-xs shadow-md"
                                 >
-                                    <label
-                                        class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 cursor-pointer group"
-                                    >
-                                        <div class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                value="gopay"
-                                                v-model="ewalletType"
-                                                class="text-cyan-500 focus:ring-cyan-500 bg-gray-300 dark:bg-slate-600 border-gray-400 dark:border-slate-500"
-                                            />
-                                            <span
-                                                class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-black dark:group-hover:text-white"
-                                                >GoPay</span
-                                            >
-                                        </div>
-                                        <img
-                                            src="/img/payment-logos/gopay.png"
-                                            class="h-6 w-auto opacity-70 group-hover:opacity-100"
-                                            alt="GoPay"
-                                            onerror="this.style.display='none'"
-                                        />
-                                    </label>
-                                    <label
-                                        class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 cursor-pointer group"
-                                    >
-                                        <div class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                value="shopeepay"
-                                                v-model="ewalletType"
-                                                class="text-cyan-500 focus:ring-cyan-500 bg-gray-300 dark:bg-slate-600 border-gray-400 dark:border-slate-500"
-                                            />
-                                            <span
-                                                class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-black dark:group-hover:text-white"
-                                                >ShopeePay</span
-                                            >
-                                        </div>
-                                    </label>
-                                    <label
-                                        class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 cursor-pointer group"
-                                    >
-                                        <div class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                value="dana"
-                                                v-model="ewalletType"
-                                                class="text-cyan-500 focus:ring-cyan-500 bg-gray-300 dark:bg-slate-600 border-gray-400 dark:border-slate-500"
-                                            />
-                                            <span
-                                                class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-black dark:group-hover:text-white"
-                                                >DANA</span
-                                            >
-                                        </div>
-                                    </label>
+                                    <i class="fas fa-check"></i>
                                 </div>
+                            </label>
+
+                            <div
+                                v-if="paymentMethod === 'e_wallet'"
+                                class="bg-white/50 dark:bg-black/20 p-4 space-y-3 border-t border-rose-100 dark:border-rose-900/20 animate-fade-in"
+                            >
+                                <label
+                                    v-for="wallet in [
+                                        'gopay',
+                                        'shopeepay',
+                                        'dana',
+                                    ]"
+                                    :key="wallet"
+                                    class="flex items-center justify-between p-3 rounded-xl border cursor-pointer group transition-all"
+                                    :class="[
+                                        ewalletType === wallet
+                                            ? 'bg-white dark:bg-white/10 border-rose-600 shadow-md'
+                                            : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-gray-200 dark:hover:border-white/10',
+                                    ]"
+                                >
+                                    <div class="flex items-center">
+                                        <input
+                                            type="radio"
+                                            :value="wallet"
+                                            v-model="ewalletType"
+                                            class="sr-only"
+                                        />
+                                        <img
+                                            :src="`/img/${wallet}.png`"
+                                            :alt="wallet"
+                                            class="h-6 object-contain grayscale group-hover:grayscale-0 transition-all"
+                                            :class="{
+                                                '!grayscale-0':
+                                                    ewalletType === wallet,
+                                            }"
+                                        />
+                                        <span
+                                            class="ml-3 text-xs font-bold uppercase font-manrope"
+                                            :class="[
+                                                ewalletType === wallet
+                                                    ? 'text-rose-600'
+                                                    : 'text-gray-500',
+                                            ]"
+                                        >
+                                            {{ wallet }}
+                                        </span>
+                                    </div>
+                                    <div
+                                        v-if="ewalletType === wallet"
+                                        class="text-rose-600"
+                                    >
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                </label>
                             </div>
                         </div>
 
+                        <!-- Pay Button -->
                         <button
                             @click="processPayment"
-                            :disabled="
-                                processing ||
-                                selectedSeats.length !== booking.number_of_seats
-                            "
-                            class="w-full mt-8 py-4 bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-black text-lg shadow-lg shadow-brand-red/30 transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
+                            :disabled="processing"
+                            class="w-full h-[68px] bg-gray-900 dark:bg-white hover:bg-rose-600 dark:hover:bg-rose-600 text-white dark:text-gray-900 hover:text-white dark:hover:text-white rounded-2xl shadow-lg shadow-gray-200 dark:shadow-none transform transition-all hover:-translate-y-1 active:scale-[0.98] font-bold flex items-center justify-center space-x-3 group font-unbounded uppercase tracking-wider text-sm mt-6"
                         >
-                            <span v-if="!processing">BAYAR SEKARANG</span>
-                            <span v-else class="flex items-center gap-2">
-                                <i class="fas fa-circle-notch fa-spin"></i>
-                                MEMPROSES...
+                            <span v-if="!processing" class="flex items-center">
+                                <span>Bayar Sekarang</span>
+                                <i
+                                    class="fas fa-lock ml-3 group-hover:scale-110 transition-transform"
+                                ></i>
                             </span>
-                            <i
-                                v-if="!processing"
-                                class="fas fa-arrow-right"
-                            ></i>
+                            <span
+                                v-else
+                                class="flex items-center justify-center"
+                            >
+                                <i class="fas fa-circle-notch fa-spin mr-3"></i>
+                                Memproses...
+                            </span>
                         </button>
                     </div>
                 </div>
