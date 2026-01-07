@@ -23,8 +23,9 @@ const userDropdownOpen = ref(false);
 const notificationDropdownOpen = ref(false);
 
 const markAsRead = (id) => {
+    if (!id) return;
     router.post(
-        route("admin.notifications.markAsRead", id),
+        route("admin.notifications.markAsRead", id.toString()),
         {},
         {
             preserveScroll: true,
@@ -969,10 +970,14 @@ watch(
                                             </div>
                                         </div>
                                         <Link
+                                            v-if="
+                                                notification.data &&
+                                                notification.data.booking_id
+                                            "
                                             :href="
                                                 route(
                                                     'admin.bookings.show',
-                                                    notification.data.booking_id
+                                                    notification.data.booking_id.toString()
                                                 )
                                             "
                                             @click="markAsRead(notification.id)"

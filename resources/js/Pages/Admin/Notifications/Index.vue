@@ -82,10 +82,14 @@
                             </p>
                             <div class="flex items-center gap-4 mt-2">
                                 <Link
+                                    v-if="
+                                        notification.data &&
+                                        notification.data.booking_id
+                                    "
                                     :href="
                                         route(
                                             'admin.bookings.show',
-                                            notification.data.booking_id
+                                            notification.data.booking_id.toString()
                                         )
                                     "
                                     @click="markAsRead(notification.id)"
@@ -115,21 +119,27 @@
                     class="p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
                 >
                     <div class="flex justify-center gap-2">
-                        <Link
+                        <template
                             v-for="(link, index) in notifications.links"
                             :key="index"
-                            :href="link.url"
-                            v-html="link.label"
-                            class="px-4 py-2 text-sm rounded-lg transition-colors font-medium border"
-                            :class="[
-                                link.active
-                                    ? 'bg-brand-red text-white border-brand-red shadow-lg shadow-brand-red/30'
-                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white',
-                                !link.url
-                                    ? 'opacity-50 cursor-not-allowed hidden'
-                                    : '',
-                            ]"
-                        />
+                        >
+                            <Link
+                                v-if="link.url"
+                                :href="link.url"
+                                v-html="link.label"
+                                class="px-4 py-2 text-sm rounded-lg transition-colors font-medium border"
+                                :class="[
+                                    link.active
+                                        ? 'bg-brand-red text-white border-brand-red shadow-lg shadow-brand-red/30'
+                                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white',
+                                ]"
+                            />
+                            <span
+                                v-else
+                                v-html="link.label"
+                                class="px-4 py-2 text-sm rounded-lg border bg-gray-50 dark:bg-gray-800/50 text-gray-400 dark:text-gray-600 border-gray-100 dark:border-gray-700 cursor-not-allowed hidden md:inline-block"
+                            ></span>
+                        </template>
                     </div>
                 </div>
             </div>
