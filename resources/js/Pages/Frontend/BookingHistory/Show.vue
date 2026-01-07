@@ -8,13 +8,15 @@ const props = defineProps({
     booking: Object,
 });
 
-const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("id-ID", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
+const formatDate = (dateString, includeTime = false) => {
+    if (!dateString) return "-";
+    const options = {
         year: "numeric",
-    });
+        month: "long",
+        day: "numeric",
+        ...(includeTime && { hour: "2-digit", minute: "2-digit" }),
+    };
+    return new Date(dateString).toLocaleDateString("id-ID", options);
 };
 
 const formatCurrency = (value) => {
@@ -141,10 +143,10 @@ const formatTime = (dateString) => {
                                     <div
                                         class="text-sm text-gray-500 font-manrope"
                                     >
-                                        {{ formatDate(booking.booking_date) }} •
                                         {{
-                                            formatTime(
-                                                booking.schedule?.departure_time
+                                            formatDate(
+                                                booking.departure_time,
+                                                true
                                             )
                                         }}
                                         WIB
