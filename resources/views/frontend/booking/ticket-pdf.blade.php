@@ -84,8 +84,16 @@
             margin-bottom: 15px;
             display: inline-block;
             vertical-align: top;
-            width: 45%; /* Two columns */
-            margin-right: 15px;
+            width: 48%; /* Default for 2-col rows */
+            margin-right: 5px;
+        }
+
+        .info-group-3col {
+            margin-bottom: 15px;
+            display: inline-block;
+            vertical-align: top;
+            width: 31%; /* For 3-col rows */
+            margin-right: 5px;
         }
 
         .label {
@@ -213,32 +221,50 @@
 
             <div class="info-grid">
                 <!-- Row 1 -->
-                <div class="info-group">
+                <div class="info-group-3col">
                     <div class="label">PASSENGER</div>
                     <div class="value-box">
                         {{ Str::limit(strtoupper($booking->passenger_name), 16) }}
                     </div>
                 </div>
 
-                <div class="info-group">
+                <div class="info-group-3col">
                     <div class="label">BUS NAME</div>
                     <div class="value-box">
                         {{ strtoupper($booking->schedule->bus->name ?? '-') }}
                     </div>
                 </div>
 
-                <!-- Row 2 -->
-                <div class="info-group">
+                <div class="info-group-3col">
                     <div class="label">DATE • TIME</div>
                     <div class="value-box">
                         {{ $booking->departure_time ? $booking->departure_time->format('d.m.y • H:i') : '-' }}
                     </div>
                 </div>
-                
-                <div class="info-group">
-                    <div class="label">SEAT • CLASS</div>
+
+                <!-- Row 2 -->
+                <div class="info-group-3col">
+                    <div class="label">SEAT</div>
                     <div class="value-box">
-                        {{ $booking->seat_numbers }} • {{ strtoupper($booking->schedule->bus->bus_type ?? 'EXE') }}
+                        {{ $booking->seat_numbers }}
+                    </div>
+                </div>
+                
+                <div class="info-group-3col">
+                    <div class="label">CLASS</div>
+                    <div class="value-box">
+                        {{ strtoupper($booking->schedule->bus->bus_type ?? 'EXE') }}
+                    </div>
+                </div>
+
+                <div class="info-group-3col">
+                    <div class="label">STATUS</div>
+                    <div class="value-box">
+                        @if($booking->payment_status === 'paid')
+                            <span style="color: #16a34a;">PAID</span>
+                        @else
+                            <span style="color: #d97706;">PENDING</span>
+                        @endif
                     </div>
                 </div>
             </div>
