@@ -54,7 +54,7 @@ const formatDate = (dateString) => {
                 </div>
                 <div>
                     <h3
-                        class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1 font-serif"
+                        class="text-3xl font-black text-gray-900 dark:text-white mt-1 font-unbounded"
                     >
                         {{ totalBookings }}
                     </h3>
@@ -81,7 +81,7 @@ const formatDate = (dateString) => {
                 </div>
                 <div>
                     <h3
-                        class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1 tracking-tight font-serif"
+                        class="text-3xl font-black text-gray-900 dark:text-white mt-1 tracking-tight font-unbounded"
                     >
                         {{ formatCurrency(totalRevenue) }}
                     </h3>
@@ -106,7 +106,7 @@ const formatDate = (dateString) => {
                 </div>
                 <div>
                     <h3
-                        class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1 font-serif"
+                        class="text-3xl font-black text-gray-900 dark:text-white mt-1 font-unbounded"
                     >
                         {{ totalSchedules }}
                     </h3>
@@ -133,7 +133,7 @@ const formatDate = (dateString) => {
                 </div>
                 <div>
                     <h3
-                        class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1 font-serif"
+                        class="text-3xl font-black text-gray-900 dark:text-white mt-1 font-unbounded"
                     >
                         {{ totalUsers }}
                     </h3>
@@ -154,7 +154,7 @@ const formatDate = (dateString) => {
                 >
                     <div>
                         <h3
-                            class="text-lg font-bold text-gray-900 dark:text-white font-serif"
+                            class="text-lg font-black text-gray-900 dark:text-white font-unbounded"
                         >
                             Pemesanan Terbaru
                         </h3>
@@ -284,7 +284,7 @@ const formatDate = (dateString) => {
                 class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 h-fit"
             >
                 <h3
-                    class="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2 font-serif"
+                    class="text-lg font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2 font-unbounded"
                 >
                     <i class="fas fa-bolt text-yellow-400"></i> Aksi Cepat
                 </h3>

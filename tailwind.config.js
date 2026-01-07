@@ -14,8 +14,10 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ["Inter", ...defaultTheme.fontFamily.sans],
-                serif: ["Playfair Display", ...defaultTheme.fontFamily.serif],
+                manrope: ["Manrope", ...defaultTheme.fontFamily.sans],
+                unbounded: ["Unbounded", "cursive"],
+                sans: ["Manrope", ...defaultTheme.fontFamily.sans],
+                serif: ["Unbounded", ...defaultTheme.fontFamily.serif],
             },
             colors: {
                 primary: {

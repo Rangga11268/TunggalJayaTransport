@@ -213,7 +213,7 @@ const formatTime = (timeString) => {
     <Head title="Pemesanan Berhasil" />
 
     <div
-        class="bg-gray-100 dark:bg-[#050505] min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center relative overflow-hidden font-mono"
+        class="bg-gray-100 dark:bg-[#050505] min-h-screen pt-32 pb-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center relative overflow-hidden font-mono"
     >
         <!-- Success Header (Restored) -->
         <div class="text-center mb-10 z-10">

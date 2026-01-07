@@ -1,6 +1,8 @@
 <script setup>
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
+import { useMagnetic } from "@/Composables/useMagnetic";
+import { ref } from "vue";
 
 defineOptions({ layout: FrontendLayout });
 
@@ -12,6 +14,9 @@ defineProps({
         type: String,
     },
 });
+
+const submitBtn = ref(null);
+useMagnetic(submitBtn);
 
 const form = useForm({
     login: "",
@@ -29,82 +34,87 @@ const submit = () => {
 <template>
     <Head title="Masuk - TUJAGO (Tunggal Jaya Go)" />
 
-    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gray-950">
         <!-- Left Side: Visual -->
         <div
-            class="relative hidden lg:flex flex-col justify-center items-center bg-primary-950 overflow-hidden"
+            class="relative hidden lg:flex flex-col justify-center items-center bg-black overflow-hidden border-r border-white/5"
         >
             <div class="absolute inset-0">
-                <div class="absolute inset-0 hero-pattern opacity-10"></div>
-                <div class="stars absolute inset-0 opacity-40"></div>
                 <div
-                    class="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-primary-900/50 to-primary-950/90"
+                    class="absolute inset-0 bg-[url('/img/hero-bus.jpg')] bg-cover bg-center opacity-40 scale-110 animate-slow-zoom"
+                ></div>
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-black via-black/80 to-brand-red/20"
                 ></div>
             </div>
 
             <div class="relative z-10 text-center px-12">
-                <div class="mb-8 flex justify-center">
+                <div class="mb-12 flex justify-center">
                     <div
-                        class="w-32 h-32 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-2xl shadow-brand-red/20 animate-pulse-slow p-4"
+                        class="w-32 h-32 rounded-full bg-white/5 backdrop-blur-xl flex items-center justify-center border border-white/10 shadow-[0_0_50px_rgba(220,38,38,0.2)] p-4 group hover:scale-110 transition-transform duration-500"
                     >
                         <img
                             src="/img/logoNoBg.png"
                             alt="Logo TUJAGO"
-                            class="w-full h-full object-contain drop-shadow-lg"
+                            class="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"
                         />
                     </div>
                 </div>
-                <h2 class="text-4xl font-serif font-bold text-white mb-6">
-                    Selamat Datang Kembali
+                <h2
+                    class="text-5xl font-black text-white mb-6 font-unbounded tracking-tighter"
+                >
+                    SELAMAT <span class="text-brand-red">DATANG</span>
                 </h2>
                 <p
-                    class="text-lg text-gray-300 leading-relaxed max-w-md mx-auto"
+                    class="text-lg text-gray-400 leading-relaxed max-w-md mx-auto font-manrope font-medium"
                 >
-                    Akses akun Anda untuk mengelola pemesanan tiket, melihat
-                    riwayat perjalanan, dan nikmati layanan prioritas dari
-                    TUJAGO (Tunggal Jaya Go).
+                    Akses akun Anda untuk mengelola pemesanan tiket dan nikmati
+                    layanan prioritas dari TUJAGO.
                 </p>
             </div>
         </div>
 
         <!-- Right Side: Form -->
         <div
-            class="flex flex-col justify-center items-center bg-gray-50 dark:bg-gray-950 p-6 sm:p-12 relative"
+            class="flex flex-col justify-center items-center p-6 sm:p-12 pt-32 lg:pt-32 relative overflow-hidden"
         >
-            <div class="w-full max-w-md space-y-8">
-                <!-- Mobile Logo (Visible only on small screens) -->
-                <div class="lg:hidden text-center mb-8">
-                    <div
-                        class="inline-flex w-20 h-20 rounded-full bg-primary-900/10 items-center justify-center mb-4 p-3"
-                    >
-                        <img
-                            src="/img/logoNoBg.png"
-                            alt="Logo TUJAGO"
-                            class="w-full h-full object-contain"
-                        />
-                    </div>
+            <!-- Decorative Background Element -->
+            <div
+                class="absolute -top-24 -right-24 w-96 h-96 bg-brand-red/10 rounded-full blur-[100px]"
+            ></div>
+
+            <div class="w-full max-w-md space-y-8 relative z-10">
+                <!-- Mobile Header -->
+                <div class="lg:hidden text-center mb-12">
+                    <img
+                        src="/img/logoNoBg.png"
+                        alt="Logo TUJAGO"
+                        class="h-16 w-auto mx-auto mb-6"
+                    />
                     <h2
-                        class="text-2xl font-bold text-gray-900 dark:text-white"
+                        class="text-3xl font-black text-white font-unbounded tracking-tighter"
                     >
-                        Masuk ke Akun
+                        MASUK <span class="text-brand-red">AKUN</span>
                     </h2>
                 </div>
 
                 <div class="text-center lg:text-left">
                     <h2
-                        class="hidden lg:block text-3xl font-bold text-gray-900 dark:text-white mb-2"
+                        class="hidden lg:block text-4xl font-black text-white mb-3 font-unbounded tracking-tighter"
                     >
-                        Masuk ke Akun
+                        LOGIN <span class="text-brand-red">DI SINI</span>
                     </h2>
-                    <p class="text-gray-500 dark:text-gray-400">
-                        Silakan masukkan email dan kata sandi Anda.
+                    <p
+                        class="text-gray-400 font-manrope font-medium tracking-wide"
+                    >
+                        Silakan masukkan kredensial akun Anda.
                     </p>
                 </div>
 
                 <!-- Status Message -->
                 <div
                     v-if="status"
-                    class="mb-4 font-medium text-sm text-green-600"
+                    class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold font-manrope"
                 >
                     {{ status }}
                 </div>
@@ -113,13 +123,15 @@ const submit = () => {
                     <div>
                         <label
                             for="email"
-                            class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2"
-                            >Email</label
+                            class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
+                            >Alamat Email / Phone</label
                         >
-                        <div class="relative">
-                            <i
-                                class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                            ></i>
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
+                            >
+                                <i class="fas fa-envelope text-gray-500"></i>
+                            </div>
                             <input
                                 id="email"
                                 type="text"
@@ -127,12 +139,12 @@ const submit = () => {
                                 required
                                 autofocus
                                 autocomplete="username"
-                                class="input-premium pl-12 w-full bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus:border-brand-red focus:ring-brand-red"
-                                placeholder="name@example.com"
+                                class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
+                                placeholder="nama@email.com"
                             />
                         </div>
                         <p
-                            class="mt-2 text-sm text-red-600"
+                            class="mt-2 text-xs font-bold text-brand-red font-manrope"
                             v-if="form.errors.login"
                         >
                             {{ form.errors.login }}
@@ -140,36 +152,40 @@ const submit = () => {
                     </div>
 
                     <div>
-                        <div class="flex justify-between items-center mb-2">
+                        <div
+                            class="flex justify-between items-center mb-3 ml-1"
+                        >
                             <label
                                 for="password"
-                                class="block text-sm font-bold text-gray-700 dark:text-gray-300"
+                                class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded text-gray-500"
                                 >Kata Sandi</label
                             >
                             <Link
                                 v-if="canResetPassword"
                                 :href="route('password.request')"
-                                class="text-xs font-bold text-brand-red hover:underline tabindex='-1'"
+                                class="text-[10px] font-black text-brand-red uppercase tracking-wider hover:text-red-500 transition-colors font-unbounded"
                             >
-                                Lupa Kata Sandi?
+                                Lupa?
                             </Link>
                         </div>
-                        <div class="relative">
-                            <i
-                                class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                            ></i>
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
+                            >
+                                <i class="fas fa-lock text-gray-500"></i>
+                            </div>
                             <input
                                 id="password"
                                 type="password"
                                 v-model="form.password"
                                 required
                                 autocomplete="current-password"
-                                class="input-premium pl-12 w-full bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus:border-brand-red focus:ring-brand-red"
+                                class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
                                 placeholder="••••••••"
                             />
                         </div>
                         <p
-                            class="mt-2 text-sm text-red-600"
+                            class="mt-2 text-xs font-bold text-brand-red font-manrope"
                             v-if="form.errors.password"
                         >
                             {{ form.errors.password }}
@@ -177,103 +193,108 @@ const submit = () => {
                     </div>
 
                     <div class="flex items-center">
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative flex items-center">
-                                <input
-                                    type="checkbox"
-                                    v-model="form.remember"
-                                    class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-brand-red checked:bg-brand-red hover:border-brand-red"
-                                />
-                                <i
-                                    class="fas fa-check absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"
-                                ></i>
-                            </div>
+                        <label
+                            class="relative flex items-center cursor-pointer group"
+                        >
+                            <input
+                                type="checkbox"
+                                v-model="form.remember"
+                                class="peer sr-only"
+                            />
+                            <div
+                                class="h-5 w-5 rounded-md border-2 border-white/10 bg-white/5 transition-all peer-checked:bg-brand-red peer-checked:border-brand-red"
+                            ></div>
+                            <i
+                                class="fas fa-check absolute left-1 text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+                            ></i>
                             <span
-                                class="ml-2 text-sm text-gray-600 dark:text-gray-400 group-hover:text-brand-red transition-colors"
-                                >Ingat Saya</span
+                                class="ml-3 text-sm font-bold text-gray-400 group-hover:text-white transition-colors font-manrope"
+                                >Ingat Perangkat Ini</span
                             >
                         </label>
                     </div>
 
-                    <div>
+                    <div class="pt-2">
                         <button
+                            ref="submitBtn"
                             type="submit"
                             :disabled="form.processing"
-                            class="btn-premium w-full py-3.5 shadow-lg shadow-brand-red/30"
+                            class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
                         >
-                            <span v-if="!form.processing">Masuk Sekarang</span>
-                            <span v-else
-                                ><i
-                                    class="fas fa-circle-notch fa-spin mr-2"
-                                ></i>
-                                Memproses...</span
+                            <span v-if="!form.processing">MASUK SEKARANG</span>
+                            <span
+                                v-else
+                                class="flex items-center justify-center"
                             >
+                                <i class="fas fa-circle-notch fa-spin mr-3"></i>
+                                MEMPROSES...
+                            </span>
                         </button>
                     </div>
 
-                    <div class="text-center mt-6">
-                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <div class="text-center mt-10">
+                        <p
+                            class="text-sm text-gray-500 font-manrope font-medium"
+                        >
                             Belum punya akun?
                             <Link
                                 :href="route('register')"
-                                class="font-bold text-brand-red hover:underline"
+                                class="font-black text-brand-red hover:text-red-500 transition-colors font-unbounded ml-2 text-xs"
                             >
-                                Daftar Sekarang
+                                DAFTAR SEKARANG
                             </Link>
                         </p>
                     </div>
                 </form>
 
                 <!-- Divider -->
-                <div class="relative my-8">
+                <div class="relative my-10">
                     <div class="absolute inset-0 flex items-center">
-                        <div
-                            class="w-full border-t border-gray-200 dark:border-gray-800"
-                        ></div>
+                        <div class="w-full border-t border-white/5"></div>
                     </div>
-                    <div class="relative flex justify-center text-sm">
+                    <div class="relative flex justify-center text-[10px]">
                         <span
-                            class="px-2 bg-gray-50 dark:bg-gray-950 text-gray-500"
-                            >Atau masuk dengan</span
+                            class="px-4 bg-gray-950 text-gray-500 font-black font-unbounded uppercase tracking-widest"
+                            >ATAU MASUK DENGAN</span
                         >
                     </div>
                 </div>
 
-                <!-- Social Login Placeholders (Optional) -->
+                <!-- Social Login -->
                 <div class="grid grid-cols-2 gap-4">
                     <button
-                        class="flex items-center justify-center py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-white dark:hover:bg-gray-900 hover:shadow-md transition-all"
+                        class="flex items-center justify-center py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group"
                     >
                         <img
                             src="https://www.svgrepo.com/show/475656/google-color.svg"
-                            class="h-5 w-5 mr-2"
+                            class="h-5 w-5 mr-3 group-hover:scale-110 transition-transform"
                             alt="Google"
                         />
                         <span
-                            class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                            >Google</span
+                            class="text-xs font-black text-gray-300 font-unbounded uppercase tracking-wider"
+                            >GOOGLE</span
                         >
                     </button>
                     <button
-                        class="flex items-center justify-center py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-white dark:hover:bg-gray-900 hover:shadow-md transition-all"
+                        class="flex items-center justify-center py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group"
                     >
                         <i
-                            class="fab fa-facebook text-blue-600 text-lg mr-2"
+                            class="fab fa-facebook text-blue-500 text-lg mr-3 group-hover:scale-110 transition-transform"
                         ></i>
                         <span
-                            class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                            >Facebook</span
+                            class="text-xs font-black text-gray-300 font-unbounded uppercase tracking-wider"
+                            >FACEBOOK</span
                         >
                     </button>
                 </div>
             </div>
 
-            <!-- Footer Links -->
+            <!-- Footer -->
             <div
-                class="mt-8 lg:absolute lg:bottom-8 text-center text-xs text-gray-400"
+                class="mt-16 text-center text-[10px] text-gray-600 font-black font-unbounded uppercase tracking-[0.3em] pb-12"
             >
-                &copy; {{ new Date().getFullYear() }} TUJAGO (Tunggal Jaya Go).
-                All rights reserved.
+                &copy; {{ new Date().getFullYear() }} TUJAGO &bull; TUNGGAL JAYA
+                GO
             </div>
         </div>
     </div>

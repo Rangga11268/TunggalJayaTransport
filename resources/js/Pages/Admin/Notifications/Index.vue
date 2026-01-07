@@ -9,10 +9,14 @@
                 class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center"
             >
                 <div>
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+                    <h2
+                        class="text-lg font-black text-gray-900 dark:text-white font-unbounded"
+                    >
                         Riwayat Notifikasi
                     </h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p
+                        class="text-sm text-gray-500 dark:text-gray-400 font-manrope"
+                    >
                         Liputan lengkap aktivitas sistem
                     </p>
                 </div>
@@ -20,7 +24,7 @@
                     :href="route('admin.notifications.markAllRead')"
                     method="post"
                     as="button"
-                    class="px-4 py-2 bg-brand-red text-white text-sm font-bold rounded-xl shadow-lg shadow-brand-red/30 hover:bg-red-700 transition-all"
+                    class="px-5 py-2.5 bg-brand-red text-white text-xs font-black font-unbounded uppercase tracking-wider rounded-xl shadow-lg shadow-brand-red/30 hover:bg-red-700 transition-all active:scale-95"
                 >
                     <i class="fas fa-check-double mr-2"></i>
                     Tandai Semua Dibaca
@@ -49,7 +53,7 @@
                         <div class="flex-1 min-w-0 z-10">
                             <div class="flex justify-between items-start">
                                 <h3
-                                    class="text-base font-bold text-gray-900 dark:text-white mb-1"
+                                    class="text-base font-black text-gray-900 dark:text-white mb-1 font-unbounded"
                                 >
                                     {{ notification.data.message }}
                                 </h3>
@@ -67,7 +71,7 @@
                                 </span>
                             </div>
                             <p
-                                class="text-sm text-gray-600 dark:text-gray-300 mb-2"
+                                class="text-sm text-gray-600 dark:text-gray-300 mb-2 font-manrope"
                             >
                                 Rute: {{ notification.data.route }} | Total: Rp
                                 {{
@@ -93,7 +97,7 @@
                                 <button
                                     v-if="!notification.read_at"
                                     @click="markAsRead(notification.id)"
-                                    class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                                    class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 font-manrope font-bold"
                                 >
                                     Tandai dibaca
                                 </button>

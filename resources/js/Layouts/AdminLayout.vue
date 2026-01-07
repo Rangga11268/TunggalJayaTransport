@@ -927,7 +927,7 @@ watch(
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <p
-                                                    class="text-sm font-medium text-gray-900 dark:text-white truncate"
+                                                    class="text-sm font-black font-unbounded text-gray-900 dark:text-white truncate"
                                                 >
                                                     {{
                                                         notification.data
@@ -935,7 +935,7 @@ watch(
                                                     }}
                                                 </p>
                                                 <p
-                                                    class="text-xs text-gray-500 mt-0.5"
+                                                    class="text-xs text-gray-500 mt-0.5 font-manrope font-bold"
                                                 >
                                                     {{
                                                         notification.data.route

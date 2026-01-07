@@ -1,8 +1,13 @@
 <script setup>
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
+import { useMagnetic } from "@/Composables/useMagnetic";
+import { ref } from "vue";
 
 defineOptions({ layout: FrontendLayout });
+
+const submitBtn = ref(null);
+useMagnetic(submitBtn);
 
 const form = useForm({
     name: "",
@@ -23,67 +28,79 @@ const submit = () => {
 <template>
     <Head title="Daftar Akun - TUJAGO (Tunggal Jaya Go)" />
 
-    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gray-950">
         <!-- Left Side: Visual -->
         <div
-            class="relative hidden lg:flex flex-col justify-center items-center bg-primary-950 overflow-hidden"
+            class="relative hidden lg:flex flex-col justify-center items-center bg-black overflow-hidden border-r border-white/5"
         >
             <div class="absolute inset-0">
-                <div class="absolute inset-0 hero-pattern opacity-10"></div>
-                <div class="stars absolute inset-0 opacity-40"></div>
                 <div
-                    class="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-primary-900/50 to-primary-950/90"
+                    class="absolute inset-0 bg-[url('/img/hero-bus.jpg')] bg-cover bg-center opacity-40 scale-110 animate-slow-zoom"
+                ></div>
+                <div
+                    class="absolute inset-0 bg-gradient-to-bl from-black via-black/80 to-brand-red/20"
                 ></div>
             </div>
 
             <div class="relative z-10 text-center px-12">
-                <div class="mb-8 flex justify-center">
+                <div class="mb-12 flex justify-center">
                     <div
-                        class="w-32 h-32 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-2xl shadow-brand-red/20 animate-pulse-slow p-4"
+                        class="w-32 h-32 rounded-full bg-white/5 backdrop-blur-xl flex items-center justify-center border border-white/10 shadow-[0_0_50px_rgba(220,38,38,0.2)] p-4 group hover:scale-110 transition-transform duration-500"
                     >
                         <img
                             src="/img/logoNoBg.png"
                             alt="Logo TUJAGO"
-                            class="w-full h-full object-contain drop-shadow-lg"
+                            class="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"
                         />
                     </div>
                 </div>
-                <h2 class="text-4xl font-serif font-bold text-white mb-6">
-                    Bergabung Bersama Kami
+                <h2
+                    class="text-5xl font-black text-white mb-6 font-unbounded tracking-tighter"
+                >
+                    BERGABUNG <span class="text-brand-red">KAMI</span>
                 </h2>
                 <p
-                    class="text-lg text-gray-300 leading-relaxed max-w-md mx-auto"
+                    class="text-lg text-gray-400 leading-relaxed max-w-md mx-auto font-manrope font-medium"
                 >
-                    Buat akun baru untuk menikmati kemudahan pemesanan tiket
-                    bus, promo eksklusif, dan layanan pelanggan prioritas.
+                    Buat akun baru untuk menikmati kemudahan pemesanan tiket bus
+                    dan promo eksklusif dari TUJAGO.
                 </p>
             </div>
         </div>
 
         <!-- Right Side: Form -->
         <div
-            class="flex flex-col justify-center items-center bg-gray-50 dark:bg-gray-950 p-6 sm:p-12 relative"
+            class="flex flex-col justify-center items-center p-6 sm:p-12 pt-32 lg:pt-32 relative overflow-hidden"
         >
-            <div class="w-full max-w-md space-y-8">
-                <!-- Mobile Logo (Visible only on small screens) -->
-                <div class="lg:hidden text-center mb-8">
-                        class="inline-flex w-20 h-20 rounded-full bg-primary-900/10 items-center justify-center mb-4 p-3"
+            <!-- Decorative Background Element -->
+            <div
+                class="absolute -bottom-24 -left-24 w-96 h-96 bg-brand-red/10 rounded-full blur-[100px]"
+            ></div>
+
+            <div class="w-full max-w-md space-y-8 relative z-10">
+                <!-- Mobile Header -->
+                <div class="lg:hidden text-center mb-12">
+                    <img
+                        src="/img/logoNoBg.png"
+                        alt="Logo TUJAGO"
+                        class="h-16 w-auto mx-auto mb-6"
+                    />
+                    <h2
+                        class="text-3xl font-black text-white font-unbounded tracking-tighter"
                     >
-                        <img
-                            src="/img/logoNoBg.png"
-                            alt="Logo TUJAGO"
-                            class="w-full h-full object-contain"
-                        />
-                    </div>
+                        DAFTAR <span class="text-brand-red">BARU</span>
+                    </h2>
                 </div>
 
                 <div class="text-center lg:text-left">
                     <h2
-                        class="hidden lg:block text-3xl font-bold text-gray-900 dark:text-white mb-2"
+                        class="hidden lg:block text-4xl font-black text-white mb-3 font-unbounded tracking-tighter"
                     >
-                        Buat Akun Baru
+                        BUAT <span class="text-brand-red">AKUN</span>
                     </h2>
-                    <p class="text-gray-500 dark:text-gray-400">
+                    <p
+                        class="text-gray-400 font-manrope font-medium tracking-wide"
+                    >
                         Silakan lengkapi data diri Anda untuk mendaftar.
                     </p>
                 </div>
@@ -93,13 +110,15 @@ const submit = () => {
                     <div>
                         <label
                             for="name"
-                            class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2"
+                            class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
                             >Nama Lengkap</label
                         >
-                        <div class="relative">
-                            <i
-                                class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                            ></i>
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
+                            >
+                                <i class="fas fa-user text-gray-500"></i>
+                            </div>
                             <input
                                 id="name"
                                 type="text"
@@ -107,12 +126,12 @@ const submit = () => {
                                 required
                                 autofocus
                                 autocomplete="name"
-                                class="input-premium pl-12 w-full bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus:border-brand-red focus:ring-brand-red"
+                                class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
                                 placeholder="Jhon Doe"
                             />
                         </div>
                         <p
-                            class="mt-2 text-sm text-red-600"
+                            class="mt-2 text-xs font-bold text-brand-red font-manrope"
                             v-if="form.errors.name"
                         >
                             {{ form.errors.name }}
@@ -123,25 +142,27 @@ const submit = () => {
                     <div>
                         <label
                             for="email"
-                            class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2"
+                            class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
                             >Email</label
                         >
-                        <div class="relative">
-                            <i
-                                class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                            ></i>
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
+                            >
+                                <i class="fas fa-envelope text-gray-500"></i>
+                            </div>
                             <input
                                 id="email"
                                 type="email"
                                 v-model="form.email"
                                 required
                                 autocomplete="username"
-                                class="input-premium pl-12 w-full bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus:border-brand-red focus:ring-brand-red"
+                                class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
                                 placeholder="name@example.com"
                             />
                         </div>
                         <p
-                            class="mt-2 text-sm text-red-600"
+                            class="mt-2 text-xs font-bold text-brand-red font-manrope"
                             v-if="form.errors.email"
                         >
                             {{ form.errors.email }}
@@ -152,124 +173,142 @@ const submit = () => {
                     <div>
                         <label
                             for="phone"
-                            class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2"
+                            class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
                             >Nomor Telepon</label
                         >
-                        <div class="relative">
-                            <i
-                                class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                            ></i>
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
+                            >
+                                <i class="fas fa-phone text-gray-500"></i>
+                            </div>
                             <input
                                 id="phone"
                                 type="text"
                                 v-model="form.phone"
                                 required
-                                class="input-premium pl-12 w-full bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus:border-brand-red focus:ring-brand-red"
+                                class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
                                 placeholder="08xxxxxxxxxx"
                             />
                         </div>
                         <p
-                            class="mt-2 text-sm text-red-600"
+                            class="mt-2 text-xs font-bold text-brand-red font-manrope"
                             v-if="form.errors.phone"
                         >
                             {{ form.errors.phone }}
                         </p>
                     </div>
 
-                    <!-- Password -->
-                    <div>
-                        <label
-                            for="password"
-                            class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2"
-                            >Kata Sandi</label
-                        >
-                        <div class="relative">
-                            <i
-                                class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                            ></i>
-                            <input
-                                id="password"
-                                type="password"
-                                v-model="form.password"
-                                required
-                                autocomplete="new-password"
-                                class="input-premium pl-12 w-full bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus:border-brand-red focus:ring-brand-red"
-                                placeholder="••••••••"
-                            />
+                    <!-- Password Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Password -->
+                        <div>
+                            <label
+                                for="password"
+                                class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
+                                >Kata Sandi</label
+                            >
+                            <div class="relative group">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
+                                >
+                                    <i class="fas fa-lock text-gray-500"></i>
+                                </div>
+                                <input
+                                    id="password"
+                                    type="password"
+                                    v-model="form.password"
+                                    required
+                                    autocomplete="new-password"
+                                    class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
+                                    placeholder="••••••••"
+                                />
+                            </div>
                         </div>
+
+                        <!-- Confirm Password -->
+                        <div>
+                            <label
+                                for="password_confirmation"
+                                class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
+                                >Konfirmasi</label
+                            >
+                            <div class="relative group">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
+                                >
+                                    <i
+                                        class="fas fa-check-circle text-gray-500"
+                                    ></i>
+                                </div>
+                                <input
+                                    id="password_confirmation"
+                                    type="password"
+                                    v-model="form.password_confirmation"
+                                    required
+                                    autocomplete="new-password"
+                                    class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
+                                    placeholder="••••••••"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
                         <p
-                            class="mt-2 text-sm text-red-600"
+                            class="text-xs font-bold text-brand-red font-manrope"
                             v-if="form.errors.password"
                         >
                             {{ form.errors.password }}
                         </p>
-                    </div>
-
-                    <!-- Confirm Password -->
-                    <div>
-                        <label
-                            for="password_confirmation"
-                            class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2"
-                            >Konfirmasi Kata Sandi</label
-                        >
-                        <div class="relative">
-                            <i
-                                class="fas fa-check-circle absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                            ></i>
-                            <input
-                                id="password_confirmation"
-                                type="password"
-                                v-model="form.password_confirmation"
-                                required
-                                autocomplete="new-password"
-                                class="input-premium pl-12 w-full bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus:border-brand-red focus:ring-brand-red"
-                                placeholder="••••••••"
-                            />
-                        </div>
                         <p
-                            class="mt-2 text-sm text-red-600"
+                            class="text-xs font-bold text-brand-red font-manrope"
                             v-if="form.errors.password_confirmation"
                         >
                             {{ form.errors.password_confirmation }}
                         </p>
                     </div>
 
-                    <div class="py-2">
+                    <div class="pt-4">
                         <button
+                            ref="submitBtn"
                             type="submit"
                             :disabled="form.processing"
-                            class="btn-premium w-full py-3.5 shadow-lg shadow-brand-red/30"
+                            class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
                         >
-                            <span v-if="!form.processing">Daftar Sekarang</span>
-                            <span v-else
-                                ><i
-                                    class="fas fa-circle-notch fa-spin mr-2"
-                                ></i>
-                                Memproses...</span
+                            <span v-if="!form.processing">DAFTAR SEKARANG</span>
+                            <span
+                                v-else
+                                class="flex items-center justify-center"
                             >
+                                <i class="fas fa-circle-notch fa-spin mr-3"></i>
+                                MEMPROSES...
+                            </span>
                         </button>
                     </div>
 
-                    <div class="text-center mt-6">
-                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <div class="text-center mt-8">
+                        <p
+                            class="text-sm text-gray-500 font-manrope font-medium"
+                        >
                             Sudah punya akun?
                             <Link
                                 :href="route('login')"
-                                class="font-bold text-brand-red hover:underline"
+                                class="font-black text-brand-red hover:text-red-500 transition-colors font-unbounded ml-2 text-xs"
                             >
-                                Masuk Sekarang
+                                MASUK SEKARANG
                             </Link>
                         </p>
                     </div>
                 </form>
             </div>
 
-            <!-- Footer Links -->
+            <!-- Footer -->
             <div
-                class="mt-8 lg:absolute lg:bottom-8 text-center text-xs text-gray-400"
+                class="mt-16 text-center text-[10px] text-gray-600 font-black font-unbounded uppercase tracking-[0.3em] pb-12"
             >
-                &copy; {{ new Date().getFullYear() }} TUJAGO (Tunggal Jaya Go).
-                All rights reserved.
+                &copy; {{ new Date().getFullYear() }} TUJAGO &bull; TUNGGAL JAYA
+                GO
             </div>
         </div>
+    </div>
 </template>
