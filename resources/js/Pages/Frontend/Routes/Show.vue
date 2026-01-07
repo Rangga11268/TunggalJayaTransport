@@ -37,7 +37,7 @@ const formatTime = (dateString) => {
 
     <!-- Hero Header -->
     <div
-        class="relative bg-gray-950 min-h-[50vh] flex items-center justify-center overflow-hidden"
+        class="relative bg-gray-950 min-h-[50vh] pt-32 pb-20 flex items-center justify-center overflow-hidden"
     >
         <!-- Background Elements -->
         <div class="absolute inset-0">
