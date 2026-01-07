@@ -269,69 +269,51 @@ const formatTime = (timeString) => {
                     <!-- Title -->
                     <div class="mb-10">
                         <h1
-                            class="font-mono text-3xl font-bold text-black tracking-tight flex items-center gap-4"
+                            class="font-mono text-3xl font-bold text-black tracking-tight"
                         >
-                            <!-- Logo placeholder if desired, else text -->
                             Tunggal Jaya Transport
                         </h1>
                     </div>
 
                     <!-- Info Grid -->
-                    <div
-                        class="grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-4 mb-8"
-                    >
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <!-- Passenger -->
-                        <div class="col-span-1">
+                        <div>
                             <span
-                                class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-2"
+                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
                                 >PASSENGER</span
                             >
                             <div
-                                class="bg-[#e5e7eb] px-3 py-2 text-black font-bold font-mono text-lg shadow-sm inline-block min-w-[120px]"
+                                class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center"
                             >
-                                {{
-                                    booking.passenger_name
-                                        .toUpperCase()
-                                        .substring(0, 15)
-                                }}
+                                {{ booking.passenger_name.toUpperCase() }}
                             </div>
                         </div>
 
-                        <!-- Date -->
-                        <div class="col-span-1">
+                        <!-- Bus Name -->
+                        <div>
                             <span
-                                class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >DATE</span
+                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
+                                >BUS NAME</span
                             >
                             <div
-                                class="bg-[#e5e7eb] px-3 py-2 text-black font-bold font-mono text-lg shadow-sm inline-block min-w-[120px]"
+                                class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center"
+                            >
+                                {{ busName.toUpperCase() }}
+                            </div>
+                        </div>
+
+                        <!-- Date/Time -->
+                        <div>
+                            <span
+                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
+                                >DATE • TIME</span
+                            >
+                            <div
+                                class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center"
                             >
                                 {{ formatDate(booking.booking_date, "short") }}
-                            </div>
-                        </div>
-
-                        <!-- Seat -->
-                        <div class="col-span-1">
-                            <span
-                                class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >SEAT</span
-                            >
-                            <div
-                                class="bg-[#e5e7eb] px-3 py-2 text-black font-bold font-mono text-lg shadow-sm inline-block min-w-[80px]"
-                            >
-                                {{ booking.seat_numbers }}
-                            </div>
-                        </div>
-
-                        <!-- Time -->
-                        <div class="col-span-1">
-                            <span
-                                class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >TIME</span
-                            >
-                            <div
-                                class="bg-[#e5e7eb] px-3 py-2 text-black font-bold font-mono text-lg shadow-sm inline-block min-w-[80px]"
-                            >
+                                •
                                 {{
                                     formatTime(booking.schedule?.departure_time)
                                 }}
@@ -339,48 +321,66 @@ const formatTime = (timeString) => {
                         </div>
                     </div>
 
-                    <!-- Route Box -->
-                    <div class="mb-8">
-                        <span
-                            class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-2"
-                            >ROUTE</span
-                        >
-                        <div
-                            class="bg-[#e5e7eb] px-4 py-3 w-full md:w-[90%] text-black font-bold font-mono text-lg shadow-sm flex items-center gap-3"
-                        >
-                            {{ routeDescription }}
+                    <!-- Row 2 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div>
+                            <span
+                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
+                                >SEAT</span
+                            >
+                            <div
+                                class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center"
+                            >
+                                {{ booking.seat_numbers }}
+                            </div>
+                        </div>
+                        <div>
+                            <span
+                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
+                                >CLASS</span
+                            >
+                            <div
+                                class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center"
+                            >
+                                {{ busType.toUpperCase() }}
+                            </div>
+                        </div>
+                        <div>
+                            <span
+                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
+                                >STATUS</span
+                            >
+                            <div
+                                class="bg-[#e2e8f0] px-3 py-2 font-bold font-mono text-base min-h-[40px] flex items-center gap-2"
+                            >
+                                <span
+                                    v-if="booking.payment_status === 'paid'"
+                                    class="text-green-600 uppercase flex items-center gap-1"
+                                >
+                                    <i class="fas fa-check-circle text-xs"></i>
+                                    PAID
+                                </span>
+                                <span
+                                    v-else
+                                    class="text-yellow-600 uppercase flex items-center gap-1"
+                                >
+                                    <i class="fas fa-clock text-xs"></i>
+                                    PENDING
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Class & Status -->
-                    <div class="flex items-center gap-6">
-                        <div>
-                            <span
-                                class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >CLASS</span
-                            >
-                            <span class="font-bold text-black uppercase">{{
-                                busType
-                            }}</span>
-                        </div>
-                        <div class="h-8 w-[1px] bg-gray-300"></div>
-                        <div>
-                            <span
-                                class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >STATUS</span
-                            >
-                            <span
-                                v-if="booking.payment_status === 'paid'"
-                                class="text-green-600 font-bold uppercase flex items-center gap-1"
-                            >
-                                <i class="fas fa-check-circle"></i> PAID
-                            </span>
-                            <span
-                                v-else
-                                class="text-yellow-600 font-bold uppercase flex items-center gap-1"
-                            >
-                                <i class="fas fa-clock"></i> PENDING
-                            </span>
+                    <!-- Route Box -->
+                    <div class="mb-8">
+                        <span
+                            class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
+                            >ROUTE</span
+                        >
+                        <div
+                            class="bg-[#e2e8f0] px-4 py-3 w-full text-black font-bold font-mono text-lg flex items-center gap-3 border-l-4 border-rose-600"
+                        >
+                            {{ routeDescription.toUpperCase() }}
                         </div>
                     </div>
                 </div>
