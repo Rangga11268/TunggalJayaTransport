@@ -16,11 +16,15 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function markAsRead($id)
+    public function markAsRead(Request $request, $id)
     {
         $notification = auth()->user()->notifications()->where('id', $id)->first();
         if ($notification) {
             $notification->markAsRead();
+        }
+
+        if ($request->has('redirect_to')) {
+            return redirect($request->redirect_to);
         }
 
         return redirect()->back();

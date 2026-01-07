@@ -281,7 +281,10 @@ const translateStatus = (status) => {
                                 <p
                                     class="text-xl font-bold text-gray-900 dark:text-white"
                                 >
-                                    {{ booking.departure_time }} WIB
+                                    {{
+                                        formatDate(booking.departure_time, true)
+                                    }}
+                                    WIB
                                 </p>
                             </div>
                         </div>
@@ -309,9 +312,7 @@ const translateStatus = (status) => {
                                             {{ booking.schedule.bus.name }}
                                         </p>
                                         <p class="text-sm text-gray-500">
-                                            {{
-                                                booking.schedule.bus.bus_type
-                                            }}
+                                            {{ booking.schedule.bus.bus_type }}
                                             Class
                                         </p>
                                     </div>

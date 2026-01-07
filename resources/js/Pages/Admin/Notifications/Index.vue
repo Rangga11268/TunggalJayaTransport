@@ -88,11 +88,17 @@
                                     "
                                     :href="
                                         route(
-                                            'admin.bookings.show',
-                                            notification.data.booking_id.toString()
+                                            'admin.notifications.markAsRead',
+                                            notification.id
                                         )
                                     "
-                                    @click="markAsRead(notification.id)"
+                                    method="post"
+                                    :data="{
+                                        redirect_to: route(
+                                            'admin.bookings.show',
+                                            notification.data.booking_id.toString()
+                                        ),
+                                    }"
                                     class="text-sm font-bold text-brand-red hover:text-red-700 flex items-center gap-1"
                                 >
                                     Lihat Detail

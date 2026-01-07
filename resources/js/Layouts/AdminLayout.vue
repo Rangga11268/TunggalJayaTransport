@@ -976,11 +976,17 @@ watch(
                                             "
                                             :href="
                                                 route(
-                                                    'admin.bookings.show',
-                                                    notification.data.booking_id.toString()
+                                                    'admin.notifications.markAsRead',
+                                                    notification.id
                                                 )
                                             "
-                                            @click="markAsRead(notification.id)"
+                                            method="post"
+                                            :data="{
+                                                redirect_to: route(
+                                                    'admin.bookings.show',
+                                                    notification.data.booking_id.toString()
+                                                ),
+                                            }"
                                             class="absolute inset-0 z-10"
                                         ></Link>
                                     </div>
