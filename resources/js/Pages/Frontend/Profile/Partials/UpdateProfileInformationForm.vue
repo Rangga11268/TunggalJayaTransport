@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from "vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import { Link, useForm, usePage } from "@inertiajs/vue3";
@@ -12,11 +13,12 @@ defineProps({
     },
 });
 
-const user = usePage().props.auth.user;
+const page = usePage();
+const user = computed(() => page.props.auth?.user || { name: "", email: "" });
 
 const form = useForm({
-    name: user.name,
-    email: user.email,
+    name: user.value.name,
+    email: user.value.email,
 });
 </script>
 
