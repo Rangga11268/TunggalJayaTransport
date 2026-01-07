@@ -12,12 +12,12 @@
             font-family: 'Helvetica', 'Arial', sans-serif;
             background-color: #f0f2f5;
             margin: 0;
-            padding: 10px; /* Reduced for smaller paper */
+            padding: 5px; /* Tighter padding */
         }
 
         .printable {
             width: 100%;
-            height: 335px;
+            height: 310px; /* Reduced height */
             position: relative;
             background-color: #f3f4f6;
             margin: 0;
@@ -196,9 +196,9 @@
 
         .footer-note {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 5px;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 9px;
+            font-size: 8px;
             color: #94a3b8;
             width: 100%;
         }
