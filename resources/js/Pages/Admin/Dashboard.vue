@@ -81,7 +81,7 @@ const formatDate = (dateString) => {
                 </div>
                 <div>
                     <h3
-                        class="text-3xl font-black text-gray-900 dark:text-white mt-1 tracking-tight font-unbounded"
+                        class="text-xl lg:text-2xl xl:text-3xl font-black text-gray-900 dark:text-white mt-1 tracking-tight font-unbounded break-words"
                     >
                         {{ formatCurrency(totalRevenue) }}
                     </h3>
