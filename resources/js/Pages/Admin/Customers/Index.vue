@@ -74,7 +74,7 @@ const formatDate = (dateString) => {
 
         <!-- Customers Table -->
         <div
-            class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 overflow-hidden"
+            class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 overflow-hidden mx-4 sm:mx-0"
         >
             <div class="overflow-x-auto">
                 <table class="w-full">

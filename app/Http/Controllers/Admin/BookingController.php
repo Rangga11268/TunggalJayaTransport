@@ -49,20 +49,27 @@ class BookingController extends Controller
      */
     public function create()
     {
+        // Get all active schedules and filter by availability
+        $schedules = Schedule::with(['route', 'bus'])
+            ->where('status', 'active')
+            ->get()
+            ->filter(function ($schedule) {
+                // Only show schedules that are available for booking
+                return $schedule->isAvailableForBooking();
+            })
+            ->map(function ($schedule) {
+                return [
+                    'id' => $schedule->id,
+                    'name' => $schedule->route->origin . ' - ' . $schedule->route->destination . ' (' . $schedule->bus->name . ') - ' . $schedule->getActualDepartureTime()->format('d M Y H:i'),
+                    'price' => $schedule->price,
+                    'available_seats' => $schedule->getAvailableSeatsCount(),
+                    'bus_capacity' => $schedule->bus->capacity,
+                ];
+            })
+            ->values(); // Reindex array
+
         return Inertia::render('Admin/Bookings/Create', [
-            'schedules' => Schedule::with(['route', 'bus'])
-                ->where('departure_time', '>', now()) // Cuma jadwal masa depan
-                ->get()
-                ->map(function ($schedule) {
-                    return [
-                        'id' => $schedule->id,
-                        'name' => $schedule->route->origin . ' - ' . $schedule->route->destination . ' (' . $schedule->bus->name . ') - ' . $schedule->getActualDepartureTime()->format('d M Y H:i'),
-                        'price' => $schedule->price,
-                        'available_seats' => $schedule->getAvailableSeatsCount(),
-                        'bus_capacity' => $schedule->bus->capacity,
-                    ];
-                }),
-             // Bisa sih oper data user kalo mau, tapi sementara manual aja input teks biasa
+            'schedules' => $schedules,
         ]);
     }
 

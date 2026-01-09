@@ -125,21 +125,23 @@ const translateStatus = (status) => {
 
     <AdminLayout title="Manajemen Pemesanan">
         <div
-            class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 px-4 sm:px-0"
         >
             <div>
                 <h2
-                    class="text-2xl font-bold text-gray-900 dark:text-white font-serif"
+                    class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-serif"
                 >
                     Daftar Pemesanan
                 </h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p
+                    class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1"
+                >
                     Kelola data pemesanan tiket, verifikasi pembayaran, dan
                     status perjalanan.
                 </p>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-3">
+            <div class="flex flex-col sm:flex-row gap-3 px-4 sm:px-0">
                 <!-- Filters -->
                 <select
                     v-model="status"
@@ -179,16 +181,16 @@ const translateStatus = (status) => {
 
                 <Link
                     :href="route('admin.bookings.create')"
-                    class="px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 flex items-center gap-2 whitespace-nowrap justify-center"
+                    class="px-4 sm:px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap text-sm sm:text-base"
                 >
                     <i class="fas fa-plus"></i>
-                    <span class="hidden md:inline">Booking Manual</span>
+                    <span>Booking Manual</span>
                 </Link>
             </div>
         </div>
 
         <div
-            class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 overflow-hidden"
+            class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 overflow-hidden mx-4 sm:mx-0"
         >
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -369,14 +371,14 @@ const translateStatus = (status) => {
 
             <!-- Pagination -->
             <div
-                class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between"
+                class="px-4 sm:px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-3"
                 v-if="bookings.links.length > 3"
             >
-                <div class="text-xs text-gray-500">
+                <div class="text-xs text-gray-500 text-center sm:text-left">
                     Menampilkan {{ bookings.from }} - {{ bookings.to }} dari
                     {{ bookings.total }} data
                 </div>
-                <div class="flex gap-1">
+                <div class="flex flex-wrap gap-1 justify-center">
                     <template v-for="(link, k) in bookings.links" :key="k">
                         <Link
                             v-if="link.url"

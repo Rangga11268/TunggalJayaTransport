@@ -63,38 +63,42 @@ const translateStatus = (status) => {
     <Head :title="`Detail Pemesanan #${booking.booking_code}`" />
 
     <AdminLayout title="Detail Pemesanan">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
-            <div class="flex items-center justify-between mb-8">
+            <div
+                class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8"
+            >
                 <div>
                     <h2
-                        class="text-2xl font-bold text-gray-900 dark:text-white font-serif flex items-center gap-3"
+                        class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white font-serif flex flex-wrap items-center gap-2 sm:gap-3"
                     >
                         <span>#{{ booking.booking_code }}</span>
                         <span
                             :class="[
-                                'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide',
+                                'px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wide',
                                 getStatusBadgeClass(booking.booking_status),
                             ]"
                         >
                             {{ translateStatus(booking.booking_status) }}
                         </span>
                     </h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p
+                        class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1"
+                    >
                         Dibuat pada {{ formatDate(booking.created_at, true) }}
                     </p>
                 </div>
-                <div class="flex gap-3">
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <Link
                         :href="route('admin.bookings.index')"
-                        class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all duration-300 flex items-center gap-2"
+                        class="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
                     >
                         <i class="fas fa-arrow-left"></i>
                         <span>Kembali</span>
                     </Link>
                     <Link
                         :href="route('admin.bookings.edit', booking.id)"
-                        class="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all duration-300 flex items-center gap-2"
+                        class="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
                         v-if="booking.booking_status !== 'cancelled'"
                     >
                         <i class="fas fa-edit"></i>
@@ -346,10 +350,10 @@ const translateStatus = (status) => {
 
             <!-- Seat Map Visualization -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 mt-8"
+                class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 mt-6 sm:mt-8"
             >
                 <h3
-                    class="text-lg font-black text-gray-900 dark:text-white font-unbounded mb-6"
+                    class="text-base sm:text-lg font-black text-gray-900 dark:text-white font-unbounded mb-4 sm:mb-6"
                 >
                     Peta Kursi
                 </h3>

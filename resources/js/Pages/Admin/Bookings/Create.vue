@@ -64,37 +64,46 @@ const formatCurrency = (value) => {
     <Head title="Buat Pemesanan Baru" />
 
     <AdminLayout title="Buat Pemesanan Baru">
-        <div class="max-w-4xl mx-auto">
-            <div class="flex items-center justify-between mb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+                class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8"
+            >
                 <div>
                     <h2
-                        class="text-2xl font-bold text-gray-900 dark:text-white font-serif"
+                        class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-serif"
                     >
                         Buat Pemesanan Manual
                     </h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p
+                        class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1"
+                    >
                         Form untuk membuat pemesanan tiket secara manual
                         (offline/on-desk).
                     </p>
                 </div>
                 <Link
                     :href="route('admin.bookings.index')"
-                    class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all duration-300 flex items-center gap-2"
+                    class="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
                 >
                     <i class="fas fa-arrow-left"></i>
                     <span>Kembali</span>
                 </Link>
             </div>
 
-            <form @submit.prevent="submit" class="space-y-8">
+            <form
+                @submit.prevent="submit"
+                class="space-y-4 sm:space-y-6 lg:space-y-8"
+            >
                 <!-- Info Section -->
                 <div
-                    class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50"
+                    class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50"
                 >
                     <h3
-                        class="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2"
+                        class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center gap-2"
                     >
-                        <i class="fas fa-route text-brand-red"></i>
+                        <i
+                            class="fas fa-route text-brand-red text-sm sm:text-base"
+                        ></i>
                         Pilih Jadwal & Rute
                     </h3>
 
@@ -107,7 +116,7 @@ const formatCurrency = (value) => {
                             </label>
                             <select
                                 v-model="form.schedule_id"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red outline-none transition-all"
+                                class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red outline-none transition-all text-sm sm:text-base"
                                 :class="{
                                     'border-red-500 focus:ring-red-500/50':
                                         form.errors.schedule_id,
@@ -135,15 +144,19 @@ const formatCurrency = (value) => {
                 </div>
 
                 <!-- Passenger & Detail Section -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div
+                    class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8"
+                >
                     <!-- Passenger -->
                     <div
-                        class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50"
+                        class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50"
                     >
                         <h3
-                            class="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2"
+                            class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center gap-2"
                         >
-                            <i class="fas fa-user text-brand-red"></i>
+                            <i
+                                class="fas fa-user text-brand-red text-sm sm:text-base"
+                            ></i>
                             Data Penumpang
                         </h3>
                         <div class="space-y-4">
@@ -156,7 +169,7 @@ const formatCurrency = (value) => {
                                     v-model="form.passenger_name"
                                     type="text"
                                     placeholder="Nama Penumpang"
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red outline-none transition-all"
+                                    class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red outline-none transition-all text-sm sm:text-base"
                                     :class="{
                                         'border-red-500 focus:ring-red-500/50':
                                             form.errors.passenger_name,
@@ -336,17 +349,19 @@ const formatCurrency = (value) => {
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex justify-end gap-4">
+                <div
+                    class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4"
+                >
                     <Link
                         :href="route('admin.bookings.index')"
-                        class="px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                        class="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-center text-sm sm:text-base"
                     >
                         Batal
                     </Link>
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="px-8 py-3 rounded-xl bg-brand-red text-white font-bold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                        class="w-full sm:w-auto px-6 sm:px-8 py-3 rounded-xl bg-brand-red text-white font-bold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
                     >
                         <i
                             v-if="form.processing"

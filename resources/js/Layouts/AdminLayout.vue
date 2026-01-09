@@ -156,6 +156,13 @@ watch(
     <div
         class="flex min-h-screen bg-gray-50 dark:bg-gray-950 font-manrope text-gray-900 dark:text-gray-100"
     >
+        <!-- Sidebar Overlay (Mobile) -->
+        <div
+            v-if="isMobile && sidebarOpen"
+            @click="sidebarOpen = false"
+            class="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 transition-opacity duration-300"
+        ></div>
+
         <!-- Sidebar -->
         <aside
             :class="[

@@ -75,35 +75,35 @@ const getSeatClass = (seat) => {
     <div class="seat-map-container">
         <!-- Legend -->
         <div
-            class="flex flex-wrap gap-4 mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
+            class="flex flex-wrap gap-2 sm:gap-4 mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 justify-center sm:justify-start"
         >
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 sm:gap-2">
                 <div
-                    class="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700"
+                    class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700"
                 ></div>
                 <span
-                    class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                    class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300"
                     >Tersedia</span
                 >
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 sm:gap-2">
                 <div
-                    class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700"
+                    class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700"
                 ></div>
                 <span
-                    class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                    class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300"
                     >Terisi</span
                 >
             </div>
             <div
                 v-if="selectedSeats.length > 0"
-                class="flex items-center gap-2"
+                class="flex items-center gap-1.5 sm:gap-2"
             >
                 <div
-                    class="w-8 h-8 rounded-lg bg-blue-500 border-2 border-blue-600"
+                    class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-blue-500 border-2 border-blue-600"
                 ></div>
                 <span
-                    class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                    class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300"
                     >Dipilih</span
                 >
             </div>
@@ -125,27 +125,27 @@ const getSeatClass = (seat) => {
 
         <!-- Seat Grid (2-3 Layout) -->
         <div
-            class="bg-white dark:bg-gray-800 border-4 border-gray-300 dark:border-gray-600 rounded-3xl p-6 shadow-xl"
+            class="bg-white dark:bg-gray-800 border-4 border-gray-300 dark:border-gray-600 rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-xl overflow-x-auto"
         >
-            <div class="space-y-3">
+            <div class="space-y-2 sm:space-y-3 min-w-max">
                 <div
                     v-for="(row, rowIndex) in seatLayout"
                     :key="rowIndex"
-                    class="flex items-center justify-center gap-3"
+                    class="flex items-center justify-center gap-2 sm:gap-3"
                 >
                     <!-- Left seats (2 seats) -->
-                    <div class="flex gap-3">
+                    <div class="flex gap-2 sm:gap-3">
                         <div
                             v-for="seat in row.filter((s) => s.position < 2)"
                             :key="seat.number"
                             @click="handleSeatClick(seat)"
                             :class="[
-                                'seat relative flex flex-col items-center justify-center w-14 h-14 rounded-lg border-2 font-bold text-xs transition-all duration-200',
+                                'seat relative flex flex-col items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-lg border-2 font-bold text-[10px] sm:text-xs transition-all duration-200',
                                 getSeatClass(seat),
                             ]"
                         >
                             <i
-                                class="fas text-lg mb-1"
+                                class="fas text-sm sm:text-lg mb-0.5 sm:mb-1"
                                 :class="
                                     seat.isOccupied
                                         ? 'fa-user-slash'
@@ -159,25 +159,25 @@ const getSeatClass = (seat) => {
                     </div>
 
                     <!-- Aisle -->
-                    <div class="flex items-center justify-center px-4">
+                    <div class="flex items-center justify-center px-2 sm:px-4">
                         <div
-                            class="h-12 w-px bg-gray-300 dark:bg-gray-600"
+                            class="h-8 sm:h-12 w-px bg-gray-300 dark:bg-gray-600"
                         ></div>
                     </div>
 
                     <!-- Right seats (3 seats) -->
-                    <div class="flex gap-3">
+                    <div class="flex gap-2 sm:gap-3">
                         <div
                             v-for="seat in row.filter((s) => s.position >= 2)"
                             :key="seat.number"
                             @click="handleSeatClick(seat)"
                             :class="[
-                                'seat relative flex flex-col items-center justify-center w-14 h-14 rounded-lg border-2 font-bold text-xs transition-all duration-200',
+                                'seat relative flex flex-col items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-lg border-2 font-bold text-[10px] sm:text-xs transition-all duration-200',
                                 getSeatClass(seat),
                             ]"
                         >
                             <i
-                                class="fas text-lg mb-1"
+                                class="fas text-sm sm:text-lg mb-0.5 sm:mb-1"
                                 :class="
                                     seat.isOccupied
                                         ? 'fa-user-slash'
@@ -192,7 +192,7 @@ const getSeatClass = (seat) => {
 
                     <!-- Row number indicator -->
                     <div
-                        class="text-xs font-bold text-gray-400 ml-2 min-w-[60px]"
+                        class="text-[10px] sm:text-xs font-bold text-gray-400 ml-1 sm:ml-2 min-w-[40px] sm:min-w-[60px]"
                     >
                         Baris {{ rowIndex + 1 }}
                     </div>
