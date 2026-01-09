@@ -92,10 +92,10 @@ class Schedule extends Model
 
     public function getBookedSeatNumbers($forDate = null)
     {
-        // Ambil nomor kursi yang udah laku (confirmed & paid)
+        // Ambil nomor kursi yang udah laku atau lagi pending payment
+        // Pending harus dimasukkan biar ga double booking pas orang lagi bayar
         $query = $this->bookings()
-            ->where('booking_status', 'confirmed')
-            ->where('payment_status', 'paid')
+            ->whereIn('payment_status', ['paid', 'pending']) // Include pending!
             ->where('booking_status', '!=', 'cancelled') // Yang cancel gausah diajak
             ->whereNotNull('seat_numbers');
 
@@ -113,11 +113,13 @@ class Schedule extends Model
         foreach ($bookings as $seatString) {
             if ($seatString) {
                 $seats = explode(',', $seatString);
-                $seatNumbers = array_merge($seatNumbers, $seats);
+                foreach ($seats as $seat) {
+                    $seatNumbers[] = (int) trim($seat); // Convert to integer
+                }
             }
         }
 
-        return array_map('trim', $seatNumbers);
+        return array_values(array_unique($seatNumbers)); // Remove duplicates and reindex
     }
 
     /**

@@ -124,4 +124,23 @@ class Booking extends Model implements HasMedia
         $this->payment_started_at = Carbon::now();
         $this->save();
     }
+    
+    /**
+     * Get occupied seat numbers for a specific schedule and date
+     */
+    public static function getOccupiedSeatsForSchedule($scheduleId, $date)
+    {
+        return self::where('schedule_id', $scheduleId)
+            ->whereDate('booking_date', $date)
+            ->whereIn('payment_status', ['paid', 'pending']) // Include pending to prevent double booking
+            ->pluck('seat_numbers')
+            ->flatMap(function ($seatNumbers) {
+                // seat_numbers is stored as comma-separated string like "1,2,3"
+                return explode(',', $seatNumbers);
+            })
+            ->map(fn($seat) => (int) trim($seat))
+            ->unique()
+            ->values()
+            ->toArray();
+    }
 }

@@ -732,8 +732,8 @@ class BookingController extends Controller
                         'transaction_status' => $result['data']->transaction_status ?? 'unknown'
                     ]);
 
-                    // Reload booking to get updated status
-                    $booking->refresh();
+                    // Reload booking to get updated status WITH relationships
+                    $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
                 }
             } catch (\Exception $e) {
                 // Log error but don't fail - just show current status
@@ -752,8 +752,8 @@ class BookingController extends Controller
         }
 
         return \Inertia\Inertia::render('Frontend/Booking/Success', [
-        'booking' => $booking
-    ]);
+            'booking' => $booking->load('schedule.route', 'schedule.bus')
+        ]);
     }
 
     protected $paymentService;

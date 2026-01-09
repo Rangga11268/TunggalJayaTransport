@@ -132,8 +132,13 @@ class BookingController extends Controller
         // Format dulu buat tampilan
         $booking->departure_time = $booking->schedule->getActualDepartureTime()->format('d M Y H:i');
         
+        
+        // Get occupied seats for this schedule on the booking date
+        $occupiedSeats = $booking->schedule->getBookedSeatNumbers($booking->booking_date);
+        
         return Inertia::render('Admin/Bookings/Show', [
-            'booking' => $booking
+            'booking' => $booking,
+            'occupiedSeats' => $occupiedSeats,
         ]);
     }
 

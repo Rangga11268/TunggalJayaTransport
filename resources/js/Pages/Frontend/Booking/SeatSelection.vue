@@ -60,7 +60,13 @@ onMounted(() => {
 const totalSeats = props.booking.schedule.bus.capacity;
 const rows = Math.ceil(totalSeats / 5); // 2-3 Layout = 5 seats per row
 
-const isSeatOccupied = (seatNum) => props.occupiedSeats.includes(seatNum);
+// Ensure occupiedSeats are integers for comparison
+const occupiedSeatsInt = computed(() =>
+    props.occupiedSeats.map((s) => parseInt(s))
+);
+
+const isSeatOccupied = (seatNum) =>
+    occupiedSeatsInt.value.includes(parseInt(seatNum));
 const isSeatSelected = (seatNum) => selectedSeats.value.includes(seatNum);
 
 const toggleSeat = (seatNum) => {
@@ -546,7 +552,7 @@ const busType = computed(() => {
                                                                     c + 1
                                                                 )
                                                             )
-                                                                ? 'bg-rose-50 dark:bg-rose-900/10 shadow-lg shadow-rose-600/20 ring-2 ring-rose-600 -translate-y-1'
+                                                                ? 'bg-rose-600 dark:bg-rose-600 shadow-xl shadow-rose-600/40 ring-4 ring-rose-400 -translate-y-1 scale-110'
                                                                 : isSeatOccupied(
                                                                       getSeatNumber(
                                                                           r - 1,
@@ -574,7 +580,7 @@ const busType = computed(() => {
                                                                         c + 1
                                                                     )
                                                                 )
-                                                                    ? 'sepia-[1] hue-rotate-[300deg] saturate-[2.5]'
+                                                                    ? 'brightness-0 invert'
                                                                     : isSeatOccupied(
                                                                           getSeatNumber(
                                                                               r -
@@ -589,6 +595,19 @@ const busType = computed(() => {
                                                             alt="Seat"
                                                         />
 
+                                                        <!-- Checkmark for Selected -->
+                                                        <i
+                                                            v-if="
+                                                                isSeatSelected(
+                                                                    getSeatNumber(
+                                                                        r - 1,
+                                                                        c + 1
+                                                                    )
+                                                                )
+                                                            "
+                                                            class="fas fa-check-circle absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl drop-shadow-lg z-20"
+                                                        ></i>
+
                                                         <!-- Number Badge -->
                                                         <span
                                                             class="absolute -top-1 -right-1 text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm border font-manrope z-10"
@@ -599,7 +618,7 @@ const busType = computed(() => {
                                                                         c + 1
                                                                     )
                                                                 )
-                                                                    ? 'bg-rose-600 text-white border-rose-600'
+                                                                    ? 'bg-white text-rose-600 border-white'
                                                                     : 'bg-gray-100 dark:bg-white/10 text-gray-500 border-gray-200 dark:border-white/10',
                                                             ]"
                                                         >
@@ -663,12 +682,15 @@ const busType = computed(() => {
                         </div>
                         <div class="flex items-center gap-3">
                             <div
-                                class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-900/10 border-2 border-rose-600 flex items-center justify-center p-1"
+                                class="w-8 h-8 rounded-lg bg-rose-600 dark:bg-rose-600 ring-2 ring-rose-400 flex items-center justify-center p-1 relative"
                             >
                                 <img
                                     src="/img/car-seat.png"
-                                    class="w-full h-full object-contain sepia-[1] hue-rotate-[300deg] saturate-[2.5]"
+                                    class="w-full h-full object-contain brightness-0 invert"
                                 />
+                                <i
+                                    class="fas fa-check-circle absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs"
+                                ></i>
                             </div>
                             <span
                                 class="text-[10px] font-bold text-rose-600 uppercase tracking-wider font-manrope"

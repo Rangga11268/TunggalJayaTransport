@@ -1,9 +1,11 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
+import SeatMap from "@/Components/SeatMap.vue";
 
 const props = defineProps({
     booking: Object,
+    occupiedSeats: Array,
 });
 
 const formatCurrency = (value) => {
@@ -340,6 +342,27 @@ const translateStatus = (status) => {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Seat Map Visualization -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 mt-8"
+            >
+                <h3
+                    class="text-lg font-black text-gray-900 dark:text-white font-unbounded mb-6"
+                >
+                    Peta Kursi
+                </h3>
+                <SeatMap
+                    :bus-capacity="booking.schedule.bus.capacity"
+                    :occupied-seats="occupiedSeats"
+                    :selected-seats="
+                        booking.seat_numbers
+                            .split(',')
+                            .map((s) => parseInt(s.trim()))
+                    "
+                    mode="view"
+                />
             </div>
         </div>
     </AdminLayout>
