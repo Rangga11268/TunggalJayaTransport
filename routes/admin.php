@@ -63,6 +63,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:'.App\Models\U
     // Kelola User
     Route::resource('users', UserController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
 
+    // Kelola Pelanggan
+    Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('customers.index')->middleware('role:'.App\Models\User::ROLE_ADMIN);
+    Route::get('/customers/{email}', [App\Http\Controllers\Admin\CustomerController::class, 'show'])->name('customers.show')->middleware('role:'.App\Models\User::ROLE_ADMIN);
+
     // Data Supir
     Route::resource('drivers', DriverController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
 

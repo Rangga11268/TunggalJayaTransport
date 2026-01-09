@@ -637,6 +637,27 @@ watch(
                                 </span>
                             </Link>
                             <Link
+                                :href="route('admin.customers.index')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current('admin.customers.*')
+                                        ? 'text-brand-red dark:text-white font-bold'
+                                        : 'text-gray-500 dark:text-gray-500 hover:text-brand-red dark:hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current('admin.customers.*')
+                                                ? 'bg-brand-red'
+                                                : 'bg-slate-300 dark:bg-gray-700'
+                                        "
+                                    ></span>
+                                    Pelanggan
+                                </span>
+                            </Link>
+                            <Link
                                 :href="route('admin.drivers.index')"
                                 :class="[
                                     'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
