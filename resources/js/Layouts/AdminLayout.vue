@@ -897,7 +897,7 @@ watch(
                         <!-- Notification Dropdown -->
                         <div
                             v-if="notificationDropdownOpen"
-                            class="absolute right-0 mt-4 w-80 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-black/50 border border-gray-100 dark:border-gray-800 py-2 z-50 transform origin-top-right transition-all animate-fade-in-up"
+                            class="fixed inset-x-4 top-20 sm:absolute sm:right-0 sm:top-auto sm:inset-x-auto sm:mt-4 w-auto sm:w-96 bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-black/50 border border-gray-100 dark:border-gray-800 py-2 z-50 transform origin-top sm:origin-top-right transition-all animate-fade-in-up"
                         >
                             <div
                                 class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
@@ -1047,7 +1047,7 @@ watch(
                         <!-- Click Outside -->
                         <div
                             v-if="notificationDropdownOpen"
-                            class="fixed inset-0 z-40"
+                            class="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none"
                             @click="notificationDropdownOpen = false"
                         ></div>
                     </div>
