@@ -371,6 +371,28 @@ const formatTime = (timeString) => {
                         </div>
                     </div>
 
+                    <!-- Row 3: Price -->
+                    <div class="mb-8">
+                        <span
+                            class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
+                            >TOTAL PAYMENT</span
+                        >
+                        <div
+                            class="bg-[#e2e8f0] px-3 py-2 text-rose-600 font-black font-mono text-xl min-h-[40px] flex items-center justify-between"
+                        >
+                            <span>{{
+                                formatCurrency(booking.total_price)
+                            }}</span>
+                            <span
+                                v-if="booking.discount_amount > 0"
+                                class="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded border border-green-200"
+                            >
+                                HEMAT
+                                {{ formatCurrency(booking.discount_amount) }}
+                            </span>
+                        </div>
+                    </div>
+
                     <!-- Route Box -->
                     <div class="mb-8">
                         <span

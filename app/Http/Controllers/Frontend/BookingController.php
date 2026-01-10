@@ -683,10 +683,12 @@ class BookingController extends Controller
                     $booking->promo_code_id = $promoCode->id;
                     $booking->save();
                     
-                    // Increment usage count (Soft reservation, strictly should be on success but typically ok here for simple systems)
-                    // Or ideally in webhook. For now, we just validate availability.
+                    // Increment usage count
+                    $promoCode->increment('usage_count');
+
                     if ($promoCode->isLimitReached()) {
-                         return response()->json(['success' => false, 'message' => 'Kuota kode promo sudah habis.']);
+                         // Note: We don't block here because the current user just claimed the last one.
+                         // Future checks will block it.
                     }
 
                 } else {

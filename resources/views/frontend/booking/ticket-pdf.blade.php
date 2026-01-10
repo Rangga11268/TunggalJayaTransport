@@ -17,7 +17,7 @@
 
         .printable {
             width: 100%;
-            height: 310px; /* Reduced height */
+            height: 410px; /* Increased height for content */
             position: relative;
             background-color: #f3f4f6;
             margin: 0;
@@ -264,6 +264,19 @@
                             <span style="color: #16a34a;">PAID</span>
                         @else
                             <span style="color: #d97706;">PENDING</span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Row 3: Total Payment -->
+                <div class="info-group" style="width: 98%;">
+                    <div class="label">TOTAL PAYMENT</div>
+                    <div class="value-box" style="color: #be123c; font-size: 18px;">
+                        Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+                        @if($booking->discount_amount > 0)
+                            <span style="font-size: 12px; color: #16a34a; margin-left: 10px;">
+                                (Hemat Rp {{ number_format($booking->discount_amount, 0, ',', '.') }})
+                            </span>
                         @endif
                     </div>
                 </div>

@@ -33,7 +33,7 @@ class TicketPdfService
 
         // Generate PDF ticket using the view
         $pdf = Pdf::loadView('frontend.booking.ticket-pdf', compact('booking', 'settings'))
-            ->setPaper([0, 0, 800, 340]) // Adjusted for tighter ticket fit
+            ->setPaper([0, 0, 800, 450]) // Adjusted for tighter ticket fit
             ->setWarnings(false);
 
         return $pdf;
