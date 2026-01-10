@@ -71,6 +71,11 @@ Route::middleware(['auth', 'phone.verified'])->group(function () {
 // Payment webhook route (must be accessible without auth)
 Route::post('/payment/webhook', [App\Http\Controllers\PaymentController::class, 'webhook'])->name('payment.webhook');
 
+// API Routes (Manual definition since api.php might not be standard)
+Route::prefix('api')->name('api.')->group(function () {
+    Route::post('/validate-promo', [App\Http\Controllers\API\PromoCodeController::class, 'validateCode'])->name('promo.validate');
+});
+
 // Admin Routes
 require __DIR__ . '/admin.php';
 

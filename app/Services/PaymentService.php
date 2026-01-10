@@ -52,7 +52,7 @@ class PaymentService
             ],
             'customer_details' => [
                 'first_name' => substr($booking->passenger_name, 0, 50), // Safe limit
-                'email' => $booking->passenger_email,
+                'email' => trim($booking->passenger_email), // Ensure no trailing spaces
                 'phone' => $phone,
             ],
             'item_details' => [

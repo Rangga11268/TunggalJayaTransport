@@ -414,7 +414,7 @@ class BookingController extends Controller
         $request->validate([
             'schedule_id' => 'required|exists:schedules,id',
             'passenger_name' => 'required|string|max:255',
-            'passenger_email' => 'required|email|max:255',
+            'passenger_email' => ['required', 'string', 'email', 'max:255', 'regex:/^.+@.+\..+$/i'],
             'passenger_phone' => 'required|string|max:20',
             'number_of_seats' => 'required|integer|min:1|max:5',
             'terms' => 'required|accepted',
@@ -658,6 +658,51 @@ class BookingController extends Controller
             // Check if seat selection has been completed
             if (empty($booking->seat_numbers)) {
                 return response()->json(['success' => false, 'message' => 'Please select and save your seats before proceeding to payment.']);
+            }
+
+            // HANDLE PROMO CODE
+            if ($request->filled('promo_code_id')) {
+                $promoCode = \App\Models\PromoCode::find($request->promo_code_id);
+                
+                // Base price determination (handle re-attempts)
+                $basePrice = $booking->original_total_price ?? $booking->total_price;
+
+                if ($promoCode && $promoCode->isValid()) {
+                    // Check minimum purchase
+                    if ($basePrice < $promoCode->min_purchase_amount) {
+                         return response()->json(['success' => false, 'message' => 'Minimal pembelian tidak terpenuhi untuk kode promo ini.']);
+                    }
+
+                    // Calculate discount
+                    $discount = $promoCode->calculateDiscount($basePrice);
+                    
+                    // Update Booking
+                    $booking->original_total_price = $basePrice;
+                    $booking->discount_amount = $discount;
+                    $booking->total_price = max(0, $basePrice - $discount);
+                    $booking->promo_code_id = $promoCode->id;
+                    $booking->save();
+                    
+                    // Increment usage count (Soft reservation, strictly should be on success but typically ok here for simple systems)
+                    // Or ideally in webhook. For now, we just validate availability.
+                    if ($promoCode->isLimitReached()) {
+                         return response()->json(['success' => false, 'message' => 'Kuota kode promo sudah habis.']);
+                    }
+
+                } else {
+                     return response()->json(['success' => false, 'message' => 'Kode promo tidak valid atau kadaluarsa.']);
+                }
+            } else {
+                // If no promo code sent but booking has one (user removed it?), reset price
+                if ($booking->promo_code_id) {
+                    $booking->total_price = $booking->original_total_price ?? $booking->total_price;
+                    $booking->discount_amount = 0;
+                    $booking->promo_code_id = null;
+                    // Keep original_total_price for record or reset? Let's keep it clean.
+                    // If we reset total_price to original, we can clear original.
+                    $booking->original_total_price = null; 
+                    $booking->save();
+                }
             }
 
             // Use PaymentService to process payment with Midtrans

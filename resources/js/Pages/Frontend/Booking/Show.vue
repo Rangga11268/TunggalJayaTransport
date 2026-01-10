@@ -282,6 +282,13 @@ const formatTime = (dateString) => {
                                         v-model="form.passenger_email"
                                         type="email"
                                         required
+                                        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                        @blur="
+                                            form.passenger_email =
+                                                form.passenger_email
+                                                    .trim()
+                                                    .toLowerCase()
+                                        "
                                         placeholder="contoh@email.com"
                                         class="block w-full pl-14 pr-4 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all text-gray-900 dark:text-white placeholder-gray-400 font-manrope focus:bg-white dark:focus:bg-black"
                                     />
@@ -312,6 +319,14 @@ const formatTime = (dateString) => {
                                         v-model="form.passenger_phone"
                                         type="tel"
                                         required
+                                        pattern="[0-9]{10,13}"
+                                        @input="
+                                            form.passenger_phone =
+                                                form.passenger_phone.replace(
+                                                    /[^0-9]/g,
+                                                    ''
+                                                )
+                                        "
                                         placeholder="08xxxxxxxxxx"
                                         class="block w-full pl-14 pr-4 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all text-gray-900 dark:text-white placeholder-gray-400 font-manrope focus:bg-white dark:focus:bg-black"
                                     />

@@ -278,9 +278,12 @@ const translateStatus = (status) => {
                                 </div>
                                 <div class="text-xs text-gray-500">
                                     {{
-                                        (booking.seat_numbers || "")
-                                            .split(",")
-                                            .filter(Boolean).length
+                                        (Array.isArray(booking.seat_numbers)
+                                            ? booking.seat_numbers
+                                            : (
+                                                  booking.seat_numbers || ""
+                                              ).split(",")
+                                        ).filter(Boolean).length
                                     }}
                                     Kursi
                                 </div>

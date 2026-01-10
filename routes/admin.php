@@ -55,6 +55,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:'.App\Models\U
     // Fitur Berita
     Route::resource('news', NewsController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
 
+    // Kode Promo
+    Route::resource('promo-codes', App\Http\Controllers\Admin\PromoCodeController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
+
     // Kategori
     Route::resource('categories', CategoryController::class)->middleware('role:'.App\Models\User::ROLE_ADMIN);
 

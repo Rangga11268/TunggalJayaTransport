@@ -125,6 +125,54 @@ const saveSeats = async () => {
 const paymentMethod = ref("");
 const ewalletType = ref(""); // gopay, shopeepay, dana
 
+// Promo Code Logic
+const promoCode = ref("");
+const promoCodeId = ref(null);
+const discountAmount = ref(0);
+const promoMessage = ref("");
+const promoValid = ref(false);
+const promoLoading = ref(false);
+
+const finalPrice = computed(() => {
+    return Math.max(0, props.booking.total_price - discountAmount.value);
+});
+
+const validatePromo = async () => {
+    if (!promoCode.value) return;
+    promoLoading.value = true;
+    promoMessage.value = "";
+
+    try {
+        const response = await axios.post(route("api.promo.validate"), {
+            code: promoCode.value,
+            total_amount: props.booking.total_price,
+        });
+
+        if (response.data.valid) {
+            promoValid.value = true;
+            discountAmount.value = response.data.discount_amount;
+            promoCodeId.value = response.data.promo_code_id;
+            promoMessage.value = response.data.message;
+        }
+    } catch (e) {
+        promoValid.value = false;
+        discountAmount.value = 0;
+        promoCodeId.value = null;
+        promoMessage.value =
+            e.response?.data?.message || "Kode promo tidak valid.";
+    } finally {
+        promoLoading.value = false;
+    }
+};
+
+const resetPromo = () => {
+    promoCode.value = "";
+    promoCodeId.value = null;
+    discountAmount.value = 0;
+    promoValid.value = false;
+    promoMessage.value = "";
+};
+
 const processPayment = async () => {
     // 1. Validation
     if (selectedSeats.value.length !== props.booking.number_of_seats) {
@@ -139,6 +187,9 @@ const processPayment = async () => {
         alert("Pilih jenis E-Wallet.");
         return;
     }
+
+    // Check if promo code was entered but not validated? (Optional, maybe just ignore or warn)
+    // For now we assume if they didn't click "Use", it's ignored.
 
     // 2. Save Seats First
     // We must ensure seats are saved in the DB before payment because invalid/unsaved seats
@@ -155,6 +206,7 @@ const processPayment = async () => {
                 paymentMethod.value === "e_wallet"
                     ? ewalletType.value
                     : paymentMethod.value,
+            promo_code_id: promoCodeId.value,
         };
 
         const response = await axios.post(
@@ -756,13 +808,90 @@ const busType = computed(() => {
                             class="pt-6 border-t border-dashed border-gray-200 dark:border-white/10"
                         >
                             <span
-                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1 font-manrope"
-                                >Total Tagihan</span
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2 font-manrope"
+                                >Kode Promo</span
                             >
-                            <span
-                                class="font-black text-3xl text-rose-600 tracking-tight font-unbounded"
-                                >{{ formatCurrency(booking.total_price) }}</span
+                            <div class="flex gap-2">
+                                <input
+                                    v-model="promoCode"
+                                    type="text"
+                                    placeholder="Masukkan kode"
+                                    class="flex-1 px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-white/5 focus:ring-2 focus:ring-rose-500 outline-none uppercase font-mono transition-all disabled:opacity-50"
+                                    :disabled="promoValid"
+                                />
+                                <button
+                                    @click="validatePromo"
+                                    :disabled="
+                                        !promoCode || promoLoading || promoValid
+                                    "
+                                    class="px-3 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold rounded-xl hover:bg-rose-600 dark:hover:bg-rose-600 dark:hover:text-white transition-colors disabled:opacity-50 min-w-[80px]"
+                                >
+                                    <i
+                                        v-if="promoLoading"
+                                        class="fas fa-spinner fa-spin"
+                                    ></i>
+                                    <span v-else>{{
+                                        promoValid ? "Digunakan" : "Gunakan"
+                                    }}</span>
+                                </button>
+                            </div>
+                            <p
+                                v-if="promoMessage"
+                                class="text-xs mt-2 font-bold"
+                                :class="
+                                    promoValid
+                                        ? 'text-green-500'
+                                        : 'text-rose-500'
+                                "
                             >
+                                {{ promoMessage }}
+                                <button
+                                    v-if="promoValid"
+                                    @click="resetPromo"
+                                    class="ml-1 underline text-gray-500"
+                                >
+                                    Hapus
+                                </button>
+                            </p>
+                        </div>
+
+                        <div
+                            class="pt-6 border-t border-dashed border-gray-200 dark:border-white/10 space-y-2"
+                        >
+                            <div class="flex justify-between items-center">
+                                <span
+                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-manrope"
+                                    >Subtotal</span
+                                >
+                                <span
+                                    class="font-bold text-gray-900 dark:text-white font-manrope"
+                                    >{{
+                                        formatCurrency(booking.total_price)
+                                    }}</span
+                                >
+                            </div>
+                            <div
+                                v-if="discountAmount > 0"
+                                class="flex justify-between items-center text-green-500"
+                            >
+                                <span
+                                    class="text-[10px] font-bold uppercase tracking-widest font-manrope"
+                                    >Diskon</span
+                                >
+                                <span class="font-bold font-manrope"
+                                    >-{{ formatCurrency(discountAmount) }}</span
+                                >
+                            </div>
+                            <div class="flex justify-between items-end pt-2">
+                                <span
+                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-manrope"
+                                    >Total Tagihan</span
+                                >
+                                <span
+                                    class="font-black text-3xl text-rose-600 tracking-tight font-unbounded"
+                                    >{{ formatCurrency(finalPrice) }}</span
+                                >
+                            </div>
                         </div>
                     </div>
 

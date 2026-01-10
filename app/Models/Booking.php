@@ -25,12 +25,23 @@ class Booking extends Model implements HasMedia
         'payment_status',
         'booking_status',
         'payment_started_at',
+        'snap_token',
         'midtrans_transaction_id',
+        'check_in_time',
+        'promo_code_id',
+        'discount_amount',
+        'original_total_price',
     ];
 
     protected $casts = [
-        'booking_date' => 'date',
+        'booking_date' => 'date', // Renamed to departure_date in snippet, but original is booking_date. Keeping booking_date as per original.
+        'departure_date' => 'date', // Added from snippet
         'payment_started_at' => 'datetime',
+        'total_price' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'original_total_price' => 'decimal:2',
+        // 'seat_numbers' => 'array', // Removed as it conflicts with CSV storage
+        'check_in_time' => 'datetime',
     ];
 
     protected $appends = ['departure_time'];

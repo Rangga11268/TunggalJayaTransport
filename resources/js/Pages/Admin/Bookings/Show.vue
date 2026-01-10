@@ -333,9 +333,13 @@ const translateStatus = (status) => {
                                 </p>
                                 <div class="flex flex-wrap gap-2">
                                     <span
-                                        v-for="seat in booking.seat_numbers.split(
-                                            ','
-                                        )"
+                                        v-for="seat in Array.isArray(
+                                            booking.seat_numbers
+                                        )
+                                            ? booking.seat_numbers
+                                            : (
+                                                  booking.seat_numbers || ''
+                                              ).split(',')"
                                         :key="seat"
                                         class="w-10 h-10 rounded-lg bg-brand-red text-white font-bold flex items-center justify-center shadow-md shadow-brand-red/20"
                                     >
@@ -361,9 +365,10 @@ const translateStatus = (status) => {
                     :bus-capacity="booking.schedule.bus.capacity"
                     :occupied-seats="occupiedSeats"
                     :selected-seats="
-                        booking.seat_numbers
-                            .split(',')
-                            .map((s) => parseInt(s.trim()))
+                        (Array.isArray(booking.seat_numbers)
+                            ? booking.seat_numbers
+                            : (booking.seat_numbers || '').split(',')
+                        ).map((s) => parseInt(String(s).trim()))
                     "
                     mode="view"
                 />

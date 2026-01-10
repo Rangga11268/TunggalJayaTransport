@@ -524,6 +524,51 @@ watch(
                     </div>
                 </div>
 
+                <!-- Promo & Discounts -->
+                <Link
+                    :href="route('admin.promo-codes.index')"
+                    :class="[
+                        'flex items-center px-4 py-3.5 rounded-xl transition-all duration-300 group relative mb-1',
+                        route().current('admin.promo-codes.*')
+                            ? 'bg-gradient-to-r from-brand-red to-red-800 text-white shadow-lg shadow-brand-red/25'
+                            : 'text-gray-600 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-brand-red dark:hover:text-white',
+                    ]"
+                >
+                    <div
+                        class="absolute left-0 w-1 h-8 bg-brand-red dark:bg-white rounded-r-full opacity-0 transition-all duration-300"
+                        :class="
+                            route().current('admin.promo-codes.*')
+                                ? 'opacity-100'
+                                : ''
+                        "
+                    ></div>
+                    <i
+                        class="fas fa-tags text-lg w-6 text-center z-10 transition-transform group-hover:scale-110 duration-300"
+                        :class="
+                            route().current('admin.promo-codes.*')
+                                ? 'text-white'
+                                : 'text-gray-400 dark:text-gray-500 group-hover:text-brand-red dark:group-hover:text-white'
+                        "
+                    ></i>
+                    <span
+                        :class="[
+                            'ml-3 font-medium whitespace-nowrap transition-all duration-300 z-10',
+                            !sidebarOpen && !isMobile
+                                ? 'opacity-0 hidden'
+                                : 'opacity-100',
+                        ]"
+                        >Promo & Diskon</span
+                    >
+
+                    <!-- Tooltip for collapsed -->
+                    <div
+                        v-show="!sidebarOpen && !isMobile"
+                        class="absolute left-full top-1/2 -translate-y-1/2 ml-2 bg-white dark:bg-[#1a1a1a] text-gray-800 dark:text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-xl border border-gray-200 dark:border-white/10"
+                    >
+                        Promo & Diskon
+                    </div>
+                </Link>
+
                 <!-- Bookings -->
                 <Link
                     :href="route('admin.bookings.index')"
