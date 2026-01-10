@@ -74,21 +74,25 @@ const translateStatus = (status) => {
 
         <!-- Customer Profile Header -->
         <div
-            class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 mb-8"
+            class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 mb-6 sm:mb-8"
         >
-            <div class="flex items-start gap-6">
+            <div
+                class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left"
+            >
                 <div
-                    class="h-20 w-20 rounded-full bg-gradient-to-br from-brand-red to-red-800 flex items-center justify-center text-white font-black text-3xl shadow-lg shadow-brand-red/20"
+                    class="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-br from-brand-red to-red-800 flex items-center justify-center text-white font-black text-2xl sm:text-3xl shadow-lg shadow-brand-red/20 flex-shrink-0"
                 >
                     {{ customer.passenger_name.charAt(0).toUpperCase() }}
                 </div>
-                <div class="flex-1">
+                <div class="flex-1 w-full">
                     <h2
-                        class="text-2xl font-black text-gray-900 dark:text-white font-unbounded"
+                        class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-unbounded"
                     >
                         {{ customer.passenger_name }}
                     </h2>
-                    <div class="flex flex-wrap gap-4 mt-3 text-sm">
+                    <div
+                        class="flex flex-wrap justify-center sm:justify-start gap-3 sm:gap-4 mt-3 text-xs sm:text-sm"
+                    >
                         <div
                             class="flex items-center gap-2 text-gray-600 dark:text-gray-300"
                         >
@@ -101,56 +105,72 @@ const translateStatus = (status) => {
                             <i class="fas fa-phone"></i>
                             {{ customer.passenger_phone }}
                         </div>
+                        <div
+                            class="flex items-center gap-2 text-gray-600 dark:text-gray-300"
+                        >
+                            <i class="fas fa-calendar"></i>
+                            Member sejak {{ formatDate(customer.created_at) }}
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Stats Grid -->
             <div
-                class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700"
+                class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-200 dark:border-gray-700"
             >
-                <div class="text-center">
+                <div
+                    class="text-center p-3 sm:p-4 rounded-xl bg-gray-50 dark:bg-gray-700/30"
+                >
                     <p
-                        class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
+                        class="text-[10px] sm:text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
                     >
                         Total Booking
                     </p>
                     <p
-                        class="text-2xl font-black text-gray-900 dark:text-white font-unbounded"
+                        class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-unbounded"
                     >
                         {{ customer.total_bookings }}
                     </p>
                 </div>
-                <div class="text-center">
+                <div
+                    class="text-center p-3 sm:p-4 rounded-xl bg-gray-50 dark:bg-gray-700/30"
+                >
                     <p
-                        class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
+                        class="text-[10px] sm:text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
                     >
                         Total Pengeluaran
                     </p>
-                    <p class="text-lg font-black text-brand-red font-unbounded">
+                    <p
+                        class="text-base sm:text-lg font-black text-brand-red font-unbounded break-all"
+                    >
                         {{ formatCurrency(customer.total_spent) }}
                     </p>
                 </div>
-                <div class="text-center">
+                <div
+                    class="text-center p-3 sm:p-4 rounded-xl bg-gray-50 dark:bg-gray-700/30"
+                >
                     <p
-                        class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
+                        class="text-[10px] sm:text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
                     >
                         Lunas
                     </p>
                     <p
-                        class="text-2xl font-black text-green-600 dark:text-green-400 font-unbounded"
+                        class="text-xl sm:text-2xl font-black text-green-600 dark:text-green-400 font-unbounded"
                     >
                         {{ customer.paid_bookings }}
                     </p>
                 </div>
-                <div class="text-center">
+                <div
+                    class="text-center p-3 sm:p-4 rounded-xl bg-gray-50 dark:bg-gray-700/30"
+                >
                     <p
-                        class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
+                        class="text-[10px] sm:text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
                     >
-                        Pending/Dibatalkan
+                        Pending/Batal
                     </p>
                     <p
-                        class="text-2xl font-black text-gray-500 dark:text-gray-400 font-unbounded"
+                        class="text-xl sm:text-2xl font-black text-gray-500 dark:text-gray-400 font-unbounded"
                     >
                         {{
                             customer.pending_bookings +
@@ -162,25 +182,29 @@ const translateStatus = (status) => {
 
             <!-- Timeline -->
             <div
-                class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700"
+                class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700"
             >
                 <div>
                     <p
-                        class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
+                        class="text-[10px] sm:text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
                     >
                         Pelanggan Sejak
                     </p>
-                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                    <p
+                        class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium"
+                    >
                         {{ formatDate(customer.first_booking_at) }}
                     </p>
                 </div>
-                <div>
+                <div class="sm:text-right">
                     <p
-                        class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
+                        class="text-[10px] sm:text-xs text-gray-500 uppercase font-bold tracking-wider mb-1"
                     >
                         Terakhir Booking
                     </p>
-                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                    <p
+                        class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium"
+                    >
                         {{ formatDate(customer.last_booking_at) }}
                     </p>
                 </div>
@@ -192,7 +216,7 @@ const translateStatus = (status) => {
                 class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700"
             >
                 <h3
-                    class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3"
+                    class="text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3"
                 >
                     Rute Favorit
                 </h3>
@@ -200,11 +224,11 @@ const translateStatus = (status) => {
                     <span
                         v-for="route in routePreferences"
                         :key="route.route_name"
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-red/10 text-brand-red font-semibold text-sm"
+                        class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-brand-red/10 text-brand-red font-semibold text-xs sm:text-sm"
                     >
                         <i class="fas fa-route"></i>
                         {{ route.route_name }}
-                        <span class="text-xs opacity-75"
+                        <span class="text-[10px] sm:text-xs opacity-75"
                             >({{ route.booking_count }}x)</span
                         >
                     </span>
@@ -214,13 +238,13 @@ const translateStatus = (status) => {
 
         <!-- Booking History -->
         <div
-            class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 overflow-hidden"
+            class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 overflow-hidden"
         >
             <div
-                class="px-8 py-6 border-b border-gray-200 dark:border-gray-700"
+                class="px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-200 dark:border-gray-700"
             >
                 <h3
-                    class="text-lg font-black text-gray-900 dark:text-white font-unbounded"
+                    class="text-base sm:text-lg font-black text-gray-900 dark:text-white font-unbounded"
                 >
                     Riwayat Pemesanan
                 </h3>
@@ -231,7 +255,7 @@ const translateStatus = (status) => {
                     <thead class="bg-gray-50 dark:bg-gray-900/50">
                         <tr>
                             <th
-                                class="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                             >
                                 Kode Booking
                             </th>

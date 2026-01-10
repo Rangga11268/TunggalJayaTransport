@@ -35,11 +35,11 @@ const formatDate = (dateString) => {
     <Head title="Dasbor Admin" />
 
     <AdminLayout title="Ringkasan Dasbor">
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <!-- Total Bookings -->
+        <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-10"
+        >
             <div
-                class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 group hover:-translate-y-1 transition-transform duration-300"
+                class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 group hover:-translate-y-1 transition-transform duration-300"
             >
                 <div class="flex items-center justify-between mb-4">
                     <div
@@ -54,7 +54,7 @@ const formatDate = (dateString) => {
                 </div>
                 <div>
                     <h3
-                        class="text-3xl font-black text-gray-900 dark:text-white mt-1 font-unbounded"
+                        class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white mt-1 font-unbounded"
                     >
                         {{ totalBookings }}
                     </h3>
@@ -81,7 +81,7 @@ const formatDate = (dateString) => {
                 </div>
                 <div>
                     <h3
-                        class="text-xl lg:text-2xl xl:text-3xl font-black text-gray-900 dark:text-white mt-1 tracking-tight font-unbounded break-words"
+                        class="text-xl sm:text-2xl xl:text-3xl font-black text-gray-900 dark:text-white mt-1 tracking-tight font-unbounded break-words"
                     >
                         {{ formatCurrency(totalRevenue) }}
                     </h3>
@@ -91,7 +91,7 @@ const formatDate = (dateString) => {
 
             <!-- Active Routes -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 group hover:-translate-y-1 transition-transform duration-300"
+                class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 group hover:-translate-y-1 transition-transform duration-300"
             >
                 <div class="flex items-center justify-between mb-4">
                     <div
@@ -106,19 +106,19 @@ const formatDate = (dateString) => {
                 </div>
                 <div>
                     <h3
-                        class="text-3xl font-black text-gray-900 dark:text-white mt-1 font-unbounded"
+                        class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white mt-1 font-unbounded"
                     >
                         {{ totalSchedules }}
                     </h3>
                     <p class="text-sm text-gray-500 mt-1">
-                        Jadwal keberangkatan aktif
+                        Jadwal tersedia saat ini
                     </p>
                 </div>
             </div>
 
-            <!-- Users -->
+            <!-- Total Users -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 group hover:-translate-y-1 transition-transform duration-300"
+                class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 group hover:-translate-y-1 transition-transform duration-300"
             >
                 <div class="flex items-center justify-between mb-4">
                     <div
@@ -133,7 +133,7 @@ const formatDate = (dateString) => {
                 </div>
                 <div>
                     <h3
-                        class="text-3xl font-black text-gray-900 dark:text-white mt-1 font-unbounded"
+                        class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white mt-1 font-unbounded"
                     >
                         {{ totalUsers }}
                     </h3>
@@ -144,10 +144,11 @@ const formatDate = (dateString) => {
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Top 3 Routes & Recent Bookings Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10">
             <!-- Recent Activity -->
             <div
-                class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 overflow-hidden flex flex-col"
+                class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 overflow-hidden flex flex-col"
             >
                 <div
                     class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50"
@@ -281,17 +282,17 @@ const formatDate = (dateString) => {
 
             <!-- Quick Actions -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 h-fit"
+                class="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50 h-fit"
             >
                 <h3
                     class="text-lg font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2 font-unbounded"
                 >
                     <i class="fas fa-bolt text-yellow-400"></i> Aksi Cepat
                 </h3>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3 sm:gap-4">
                     <Link
                         :href="route('admin.bookings.create')"
-                        class="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/50 hover:bg-blue-50 hover:dark:bg-blue-900/20 border border-transparent hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-300 group flex flex-col items-center text-center gap-2"
+                        class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gray-50 dark:bg-gray-700/50 hover:bg-blue-50 hover:dark:bg-blue-900/20 border border-transparent hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-300 group flex flex-col items-center text-center gap-2"
                     >
                         <div
                             class="h-10 w-10 full rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform"
@@ -306,7 +307,7 @@ const formatDate = (dateString) => {
 
                     <Link
                         :href="route('admin.news.create')"
-                        class="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/50 hover:bg-emerald-50 hover:dark:bg-emerald-900/20 border border-transparent hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-300 group flex flex-col items-center text-center gap-2"
+                        class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gray-50 dark:bg-gray-700/50 hover:bg-emerald-50 hover:dark:bg-emerald-900/20 border border-transparent hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-300 group flex flex-col items-center text-center gap-2"
                     >
                         <div
                             class="h-10 w-10 full rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform"
@@ -321,7 +322,7 @@ const formatDate = (dateString) => {
 
                     <Link
                         :href="route('admin.schedules.index')"
-                        class="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/50 hover:bg-amber-50 hover:dark:bg-amber-900/20 border border-transparent hover:border-amber-200 dark:hover:border-amber-800 transition-all duration-300 group flex flex-col items-center text-center gap-2"
+                        class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gray-50 dark:bg-gray-700/50 hover:bg-amber-50 hover:dark:bg-amber-900/20 border border-transparent hover:border-amber-200 dark:hover:border-amber-800 transition-all duration-300 group flex flex-col items-center text-center gap-2"
                     >
                         <div
                             class="h-10 w-10 full rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform"
@@ -336,7 +337,7 @@ const formatDate = (dateString) => {
 
                     <Link
                         :href="route('admin.reports.index')"
-                        class="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/50 hover:bg-purple-50 hover:dark:bg-purple-900/20 border border-transparent hover:border-purple-200 dark:hover:border-purple-800 transition-all duration-300 group flex flex-col items-center text-center gap-2"
+                        class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gray-50 dark:bg-gray-700/50 hover:bg-purple-50 hover:dark:bg-purple-900/20 border border-transparent hover:border-purple-200 dark:hover:border-purple-800 transition-all duration-300 group flex flex-col items-center text-center gap-2"
                     >
                         <div
                             class="h-10 w-10 full rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform"
