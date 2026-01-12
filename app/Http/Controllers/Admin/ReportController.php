@@ -65,43 +65,67 @@ class ReportController extends Controller
     
     public function occupancy()
     {
-        // Get occupancy data by fetching schedules with their bookings
-        $schedules = Schedule::with(['bus', 'route', 'bookings' => function($query) {
-            $query->where('booking_status', 'confirmed')
-                  ->where('payment_status', 'paid');
-        }])
-        ->whereHas('bus') // Ensure bus exists
-        ->whereHas('route') // Ensure route exists
-        ->latest()
-        ->take(50) // Limit to recent 50 schedules for performance
-        ->get();
+        // Get occupancy data by fetching BOOKINGS grouped by schedule + booking_date
+        // This gives us accurate per-departure-date occupancy instead of all-time cumulative
+        $bookingsByScheduleDate = Booking::with(['schedule.bus', 'schedule.route'])
+            ->where('booking_status', 'confirmed')
+            ->where('payment_status', 'paid')
+            ->whereHas('schedule.bus')
+            ->whereHas('schedule.route')
+            ->whereDate('booking_date', '>=', now()->subDays(30)) // Last 30 days
+            ->orderBy('booking_date', 'desc')
+            ->get()
+            ->groupBy(function ($booking) {
+                // Group by schedule_id + booking_date combo
+                return $booking->schedule_id . '_' . $booking->booking_date->format('Y-m-d');
+            });
         
-        // Calculate occupancy for each schedule
         $occupancyData = [];
-        foreach ($schedules as $schedule) {
+        
+        foreach ($bookingsByScheduleDate as $key => $bookings) {
+            $firstBooking = $bookings->first();
+            $schedule = $firstBooking->schedule;
+            
+            if (!$schedule || !$schedule->bus || !$schedule->route) {
+                continue;
+            }
+            
+            $bookingDate = $firstBooking->booking_date;
             $totalCapacity = $schedule->bus->capacity;
-            $bookedSeats = $schedule->bookings->sum('number_of_seats');
+            $bookedSeats = $bookings->sum('number_of_seats');
             $occupancyRate = $totalCapacity > 0 ? ($bookedSeats / $totalCapacity) * 100 : 0;
             
+            // Format date properly: use booking_date for daily schedules
+            $displayDate = $bookingDate->format('d M Y');
+            $displayTime = $schedule->departure_time->format('H:i');
+            
             $occupancyData[] = [
-                'id' => $schedule->id,
-                'date' => Carbon::parse($schedule->departure_time)->format('d M Y H:i'),
+                'id' => $schedule->id . '_' . $bookingDate->format('Ymd'),
+                'date' => $displayDate . ' • ' . $displayTime,
                 'bus_name' => $schedule->bus->name,
                 'plate_number' => $schedule->bus->plate_number,
                 'route' => $schedule->route->origin . ' - ' . $schedule->route->destination,
                 'capacity' => (int) $totalCapacity,
                 'booked_seats' => (int) $bookedSeats,
-                'occupancy_rate' => round($occupancyRate, 2)
+                'occupancy_rate' => round($occupancyRate, 2),
+                'is_daily' => $schedule->is_daily,
             ];
         }
         
-        // Sort by occupancy rate descending
+        // Sort by date descending (most recent first), then by occupancy rate
         usort($occupancyData, function($a, $b) {
+            // First sort by date (descending)
+            $dateA = Carbon::parse(explode(' • ', $a['date'])[0]);
+            $dateB = Carbon::parse(explode(' • ', $b['date'])[0]);
+            if (!$dateA->equalTo($dateB)) {
+                return $dateB <=> $dateA;
+            }
+            // Then by occupancy rate descending
             return $b['occupancy_rate'] <=> $a['occupancy_rate'];
         });
         
         return Inertia::render('Admin/Reports/Occupancy', [
-            'occupancyData' => $occupancyData
+            'occupancyData' => array_slice($occupancyData, 0, 50) // Limit to 50 entries
         ]);
     }
     
