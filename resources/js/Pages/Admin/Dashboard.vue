@@ -1,6 +1,8 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
+import { computed } from "vue";
+import VueApexCharts from "vue3-apexcharts";
 
 const props = defineProps({
     totalBookings: Number,
@@ -8,6 +10,15 @@ const props = defineProps({
     totalSchedules: Number,
     totalUsers: Number,
     recentBookings: Array,
+    // Analytics Data
+    revenueTrend: Array,
+    popularRoutes: Array,
+    peakHours: Array,
+    thisWeekRevenue: Number,
+    lastWeekRevenue: Number,
+    revenueGrowth: Number,
+    todayBookings: Number,
+    todayRevenue: Number,
 });
 
 // Format currency
@@ -29,6 +40,129 @@ const formatDate = (dateString) => {
         minute: "2-digit",
     });
 };
+
+// Revenue Trend Chart Options
+const revenueTrendOptions = computed(() => ({
+    chart: {
+        type: "area",
+        height: 300,
+        toolbar: { show: false },
+        zoom: { enabled: false },
+        fontFamily: "Manrope, sans-serif",
+    },
+    colors: ["#e11d48"],
+    fill: {
+        type: "gradient",
+        gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.4,
+            opacityTo: 0.05,
+            stops: [0, 100],
+        },
+    },
+    stroke: { curve: "smooth", width: 3 },
+    dataLabels: { enabled: false },
+    xaxis: {
+        categories: props.revenueTrend?.map((item) => item.date) || [],
+        labels: { style: { colors: "#9ca3af", fontSize: "11px" } },
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+    },
+    yaxis: {
+        labels: {
+            style: { colors: "#9ca3af", fontSize: "11px" },
+            formatter: (val) => formatCurrency(val),
+        },
+    },
+    grid: { borderColor: "#1f2937", strokeDashArray: 4 },
+    tooltip: {
+        theme: "dark",
+        y: { formatter: (val) => formatCurrency(val) },
+    },
+}));
+
+const revenueTrendSeries = computed(() => [
+    {
+        name: "Pendapatan",
+        data: props.revenueTrend?.map((item) => item.revenue) || [],
+    },
+]);
+
+// Popular Routes Chart Options
+const popularRoutesOptions = computed(() => ({
+    chart: {
+        type: "bar",
+        height: 250,
+        toolbar: { show: false },
+        fontFamily: "Manrope, sans-serif",
+    },
+    plotOptions: {
+        bar: { horizontal: true, borderRadius: 6, barHeight: "60%" },
+    },
+    colors: ["#3b82f6"],
+    dataLabels: { enabled: false },
+    xaxis: {
+        categories: props.popularRoutes?.map((item) => item.route) || [],
+        labels: { style: { colors: "#9ca3af", fontSize: "11px" } },
+    },
+    yaxis: {
+        labels: { style: { colors: "#9ca3af", fontSize: "11px" } },
+    },
+    grid: { borderColor: "#1f2937", strokeDashArray: 4 },
+    tooltip: {
+        theme: "dark",
+        y: {
+            formatter: (val, { dataPointIndex }) => {
+                const route = props.popularRoutes?.[dataPointIndex];
+                return `${val} Booking • ${formatCurrency(
+                    route?.revenue || 0
+                )}`;
+            },
+        },
+    },
+}));
+
+const popularRoutesSeries = computed(() => [
+    {
+        name: "Booking",
+        data: props.popularRoutes?.map((item) => item.bookings) || [],
+    },
+]);
+
+// Peak Hours Chart Options
+const peakHoursOptions = computed(() => ({
+    chart: {
+        type: "bar",
+        height: 200,
+        toolbar: { show: false },
+        fontFamily: "Manrope, sans-serif",
+    },
+    plotOptions: {
+        bar: { borderRadius: 4, columnWidth: "70%" },
+    },
+    colors: ["#10b981"],
+    dataLabels: { enabled: false },
+    xaxis: {
+        categories: props.peakHours?.map((item) => item.hour) || [],
+        labels: {
+            style: { colors: "#9ca3af", fontSize: "10px" },
+            rotate: -45,
+            rotateAlways: true,
+        },
+    },
+    yaxis: {
+        labels: { style: { colors: "#9ca3af", fontSize: "11px" } },
+    },
+    grid: { borderColor: "#1f2937", strokeDashArray: 4 },
+    tooltip: { theme: "dark" },
+}));
+
+const peakHoursSeries = computed(() => [
+    {
+        name: "Booking",
+        data: props.peakHours?.map((item) => item.count) || [],
+    },
+]);
 </script>
 
 <template>
@@ -140,6 +274,171 @@ const formatDate = (dateString) => {
                     <p class="text-sm text-gray-500 mt-1">
                         Pelanggan terdaftar
                     </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+            <!-- Revenue Trend Chart -->
+            <div
+                class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50"
+            >
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3
+                            class="text-lg font-black text-gray-900 dark:text-white font-unbounded"
+                        >
+                            Trend Pendapatan
+                        </h3>
+                        <p class="text-xs text-gray-500">30 hari terakhir</p>
+                    </div>
+                    <div
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold"
+                        :class="
+                            revenueGrowth >= 0
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'
+                        "
+                    >
+                        <i
+                            :class="
+                                revenueGrowth >= 0
+                                    ? 'fas fa-arrow-up'
+                                    : 'fas fa-arrow-down'
+                            "
+                        ></i>
+                        {{ Math.abs(revenueGrowth) }}% vs minggu lalu
+                    </div>
+                </div>
+                <VueApexCharts
+                    v-if="revenueTrend?.length"
+                    type="area"
+                    height="300"
+                    :options="revenueTrendOptions"
+                    :series="revenueTrendSeries"
+                />
+                <div
+                    v-else
+                    class="h-[300px] flex items-center justify-center text-gray-400"
+                >
+                    <div class="text-center">
+                        <i
+                            class="fas fa-chart-line text-4xl mb-2 opacity-30"
+                        ></i>
+                        <p class="text-sm">Belum ada data pendapatan</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Stats Card -->
+            <div
+                class="bg-gradient-to-br from-rose-600 to-rose-700 rounded-3xl p-6 shadow-xl shadow-rose-600/20 text-white"
+            >
+                <div class="flex items-center gap-3 mb-6">
+                    <div
+                        class="h-12 w-12 rounded-2xl bg-white/20 flex items-center justify-center"
+                    >
+                        <i class="fas fa-calendar-day text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black font-unbounded">Hari Ini</h3>
+                        <p class="text-xs text-rose-200">
+                            {{
+                                new Date().toLocaleDateString("id-ID", {
+                                    weekday: "long",
+                                    day: "numeric",
+                                    month: "long",
+                                })
+                            }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                        <p class="text-xs text-rose-200 mb-1">
+                            Booking Hari Ini
+                        </p>
+                        <p class="text-3xl font-black font-unbounded">
+                            {{ todayBookings }}
+                        </p>
+                    </div>
+                    <div class="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                        <p class="text-xs text-rose-200 mb-1">
+                            Pendapatan Hari Ini
+                        </p>
+                        <p class="text-2xl font-black font-unbounded">
+                            {{ formatCurrency(todayRevenue) }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Row: Popular Routes & Peak Hours -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            <!-- Popular Routes Chart -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50"
+            >
+                <div class="mb-6">
+                    <h3
+                        class="text-lg font-black text-gray-900 dark:text-white font-unbounded"
+                    >
+                        Rute Populer
+                    </h3>
+                    <p class="text-xs text-gray-500">
+                        Top 5 rute berdasarkan jumlah booking
+                    </p>
+                </div>
+                <VueApexCharts
+                    v-if="popularRoutes?.length"
+                    type="bar"
+                    height="250"
+                    :options="popularRoutesOptions"
+                    :series="popularRoutesSeries"
+                />
+                <div
+                    v-else
+                    class="h-[250px] flex items-center justify-center text-gray-400"
+                >
+                    <div class="text-center">
+                        <i class="fas fa-route text-4xl mb-2 opacity-30"></i>
+                        <p class="text-sm">Belum ada data rute</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Peak Hours Chart -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50"
+            >
+                <div class="mb-6">
+                    <h3
+                        class="text-lg font-black text-gray-900 dark:text-white font-unbounded"
+                    >
+                        Jam Sibuk
+                    </h3>
+                    <p class="text-xs text-gray-500">
+                        Distribusi booking berdasarkan jam
+                    </p>
+                </div>
+                <VueApexCharts
+                    v-if="peakHours?.length"
+                    type="bar"
+                    height="200"
+                    :options="peakHoursOptions"
+                    :series="peakHoursSeries"
+                />
+                <div
+                    v-else
+                    class="h-[200px] flex items-center justify-center text-gray-400"
+                >
+                    <div class="text-center">
+                        <i class="fas fa-clock text-4xl mb-2 opacity-30"></i>
+                        <p class="text-sm">Belum ada data jam sibuk</p>
+                    </div>
                 </div>
             </div>
         </div>
