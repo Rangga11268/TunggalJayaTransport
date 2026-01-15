@@ -6,6 +6,7 @@ use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Transaction;
 use App\Models\PaymentHistory;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Support\Facades\Log;
 
 class MidtransService
@@ -130,6 +131,14 @@ class MidtransService
                         'booking_status' => 'confirmed', // Ensure booking is confirmed
                         'midtrans_transaction_id' => $orderId
                     ]);
+                    
+                    // Kirim notifikasi WhatsApp e-ticket
+                    try {
+                        $waService = app(WhatsAppNotificationService::class);
+                        $waService->sendBookingConfirmation($booking);
+                    } catch (\Exception $e) {
+                        Log::error('Failed to send WA notification: ' . $e->getMessage());
+                    }
                 } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire' || $transactionStatus === 'deny') {
                     // Pembayaran gagal atau kadaluarsa
                     $booking->update([
@@ -205,8 +214,17 @@ class MidtransService
             // Pembayaran sukses
             $booking->update([
                 'payment_status' => 'paid',
+                'booking_status' => 'confirmed',
                 'midtrans_transaction_id' => $orderId
             ]);
+            
+            // Kirim notifikasi WhatsApp e-ticket
+            try {
+                $waService = app(WhatsAppNotificationService::class);
+                $waService->sendBookingConfirmation($booking);
+            } catch (\Exception $e) {
+                Log::error('Failed to send WA notification: ' . $e->getMessage());
+            }
         } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire') {
             // Pembayaran gagal/kadaluarsa
             $booking->update([
