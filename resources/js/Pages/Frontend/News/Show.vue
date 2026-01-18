@@ -92,7 +92,7 @@ const formatDate = (dateString) => {
                             ></i>
                             <span class="font-bold text-sm font-manrope">{{
                                 formatDate(
-                                    article.published_at || article.created_at
+                                    article.published_at || article.created_at,
                                 )
                             }}</span>
                         </div>
@@ -107,7 +107,7 @@ const formatDate = (dateString) => {
                 <div class="lg:col-span-8">
                     <!-- Article Body -->
                     <div
-                        class="prose prose-base md:prose-lg prose-rose dark:prose-invert max-w-none font-manrope"
+                        class="prose prose-base md:prose-lg prose-rose dark:prose-invert max-w-none font-manrope text-gray-800 dark:text-gray-200"
                     >
                         <!-- We assume content is HTML from a WYSIWYG editor -->
                         <div v-html="article.content"></div>
@@ -170,7 +170,7 @@ const formatDate = (dateString) => {
                                     :href="
                                         route(
                                             'frontend.news.show',
-                                            related.slug
+                                            related.slug,
                                         )
                                     "
                                     class="flex group items-start gap-4"
@@ -199,7 +199,7 @@ const formatDate = (dateString) => {
                                             >{{
                                                 formatDate(
                                                     related.published_at ||
-                                                        related.created_at
+                                                        related.created_at,
                                                 )
                                             }}</span
                                         >

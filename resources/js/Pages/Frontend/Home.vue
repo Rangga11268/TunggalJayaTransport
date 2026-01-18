@@ -119,7 +119,7 @@ const filterOrigins = () => {
         filteredOrigins.value = props.origins || [];
     } else {
         filteredOrigins.value = (props.origins || []).filter((o) =>
-            o.toLowerCase().includes(origin.value.toLowerCase())
+            o.toLowerCase().includes(origin.value.toLowerCase()),
         );
     }
     showOriginDropdown.value = true;
@@ -130,7 +130,7 @@ const filterDestinations = () => {
         filteredDestinations.value = props.destinations || [];
     } else {
         filteredDestinations.value = (props.destinations || []).filter((d) =>
-            d.toLowerCase().includes(destination.value.toLowerCase())
+            d.toLowerCase().includes(destination.value.toLowerCase()),
         );
     }
     showDestinationDropdown.value = true;
@@ -463,12 +463,14 @@ onMounted(() => {
                             </div>
 
                             <button
-                                ref="searchBtn"
                                 type="submit"
-                                class="w-full py-5 bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl font-unbounded font-bold mt-4 shadow-lg hover:scale-[1.01] hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
+                                ref="searchBtn"
+                                class="w-full py-5 bg-rose-600 text-white font-unbounded font-bold rounded-2xl shadow-xl shadow-rose-600/30 hover:bg-rose-700 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 group"
                             >
-                                <span>Cari Jadwal</span>
-                                <i class="fas fa-arrow-right"></i>
+                                <i
+                                    class="fas fa-search group-hover:rotate-90 transition-transform duration-300"
+                                ></i>
+                                <span>Cari Jadwal Perjalanan</span>
                             </button>
                         </form>
                     </div>
@@ -723,7 +725,7 @@ onMounted(() => {
                                 <i class="far fa-calendar text-rose-600"></i>
                                 <span>{{
                                     formatDate(
-                                        news.published_at || news.created_at
+                                        news.published_at || news.created_at,
                                     )
                                 }}</span>
                             </div>

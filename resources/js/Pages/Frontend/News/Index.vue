@@ -143,7 +143,7 @@ const formatDate = (dateString) => {
                                 {{
                                     formatDate(
                                         article.published_at ||
-                                            article.created_at
+                                            article.created_at,
                                     )
                                 }}</span
                             >
@@ -221,8 +221,8 @@ const formatDate = (dateString) => {
                             link.active
                                 ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30'
                                 : !link.url
-                                ? 'text-gray-400 cursor-not-allowed bg-gray-100 dark:bg-white/5'
-                                : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-white/10 hover:border-rose-600 dark:hover:border-rose-600 hover:text-rose-600'
+                                  ? 'text-gray-400 cursor-not-allowed bg-gray-100 dark:bg-white/5'
+                                  : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-white/10 hover:border-rose-600 dark:hover:border-rose-600 hover:text-rose-600'
                         "
                     />
                 </div>
