@@ -10,9 +10,7 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index(Request $request)
     {
         $users = User::whereHas('roles', function($query) {
@@ -35,9 +33,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    
     public function create()
     {
         $roles = Role::whereIn('name', ['admin', 'schedule_manager'])->get();
@@ -46,9 +42,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -74,21 +68,13 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dibuat.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id)
     {
-        // We typically don't need a separate show page for users in this context, 
-        // usually edit is enough. But if needed, we can implement it.
-        // For now, redirect to edit or implementing a read-only view. 
-        // The Blade version had a show view. Let's redirect to Edit for simplicity or standard.
          return redirect()->route('admin.users.edit', $id);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(string $id)
     {
         $user = User::whereHas('roles', function($query) {
@@ -105,9 +91,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, string $id)
     {
         $user = User::whereHas('roles', function($query) {
@@ -136,17 +120,13 @@ class UserController extends Controller
             $roleIds = array_map('intval', $request->roles);
             $user->syncRoles($roleIds);
         } else {
-            // Be careful, this removes all roles if not sent. 
-            // In our Edit form we will ensure roles are sent.
             $user->syncRoles([]);
         }
 
         return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    
     public function destroy(string $id)
     {
         $user = User::whereHas('roles', function($query) {

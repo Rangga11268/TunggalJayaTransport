@@ -1,15 +1,7 @@
 <?php
 
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | Midtrans Configuration
-    |--------------------------------------------------------------------------
-    |
-    | This file is for storing the Midtrans payment gateway configuration values.
-    | You can get these values from your Midtrans dashboard.
-    |
-    */
+    
 
     'server_key' => env('MIDTRANS_SERVER_KEY', ''),
     'client_key' => env('MIDTRANS_CLIENT_KEY', ''),

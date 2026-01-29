@@ -9,9 +9,7 @@ use Inertia\Inertia;
 
 class RouteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index(Request $request)
     {
         $routes = BusRoute::when($request->search, function ($query, $search) {
@@ -29,17 +27,13 @@ class RouteController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    
     public function create()
     {
         return Inertia::render('Admin/Routes/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -56,27 +50,21 @@ class RouteController extends Controller
         return redirect()->route('admin.routes.index')->with('success', 'Rute berhasil dibuat.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id)
     {
         // For now, redirect to edit as we don't have a dedicated show page yet
         return redirect()->route('admin.routes.edit', $id);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(string $id)
     {
         $busRoute = BusRoute::findOrFail($id);
         return Inertia::render('Admin/Routes/Edit', compact('busRoute'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, string $id)
     {
         $route = BusRoute::findOrFail($id);
@@ -95,9 +83,7 @@ class RouteController extends Controller
         return redirect()->route('admin.routes.index')->with('success', 'Rute berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    
     public function destroy(string $id)
     {
         $route = BusRoute::findOrFail($id);

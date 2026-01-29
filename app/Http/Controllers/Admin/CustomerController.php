@@ -10,9 +10,7 @@ use Inertia\Inertia;
 
 class CustomerController extends Controller
 {
-    /**
-     * Display a listing of customers with their stats.
-     */
+    
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -50,9 +48,7 @@ class CustomerController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified customer with full booking history.
-     */
+    
     public function show($email)
     {
         // Get customer stats

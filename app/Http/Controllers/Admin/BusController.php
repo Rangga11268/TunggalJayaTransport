@@ -12,9 +12,7 @@ use Inertia\Inertia;
 
 class BusController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index(Request $request)
     {
         $buses = Bus::with(['drivers', 'conductors'])
@@ -39,9 +37,7 @@ class BusController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    
     public function create()
     {
         $drivers = Driver::where('status', 'active')->get();
@@ -52,9 +48,7 @@ class BusController extends Controller
         return Inertia::render('Admin/Buses/Create', compact('drivers', 'conductors', 'assignedDrivers', 'assignedConductors'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -122,18 +116,14 @@ class BusController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id)
     {
         // For now, redirect to edit as we don't have a dedicated show page yet
         return redirect()->route('admin.buses.edit', $id);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(string $id)
     {
         $bus = Bus::with(['drivers', 'conductors'])->findOrFail($id);
@@ -153,9 +143,7 @@ class BusController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, string $id)
     {
         $bus = Bus::findOrFail($id);
@@ -227,9 +215,7 @@ class BusController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    
     public function destroy(string $id)
     {
         $bus = Bus::findOrFail($id);
@@ -238,9 +224,7 @@ class BusController extends Controller
         return redirect()->route('admin.buses.index')->with('success', 'Bus berhasil dihapus.');
     }
 
-    /**
-     * Get list of driver IDs that are already assigned to buses
-     */
+    
     private function getAssignedDrivers($excludeBusId = null)
     {
         $query = Bus::with('drivers');
@@ -261,9 +245,7 @@ class BusController extends Controller
         return array_unique($assignedDriverIds);
     }
 
-    /**
-     * Get list of conductor IDs that are already assigned to buses
-     */
+    
     private function getAssignedConductors($excludeBusId = null)
     {
         $query = Bus::with('conductors');

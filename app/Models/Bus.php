@@ -25,8 +25,6 @@ class Bus extends Model implements HasMedia
         return $this->hasMany(Schedule::class);
     }
 
-
-
     public function drivers()
     {
         return $this->belongsToMany(Driver::class)->withTimestamps();

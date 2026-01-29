@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class BookingHistoryController extends Controller
 {
-    /**
-     * Display a listing of the user's booking history.
-     */
+    
     public function index()
     {
         $user = Auth::user();
@@ -30,9 +28,7 @@ class BookingHistoryController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified booking details.
-     */
+    
     public function show($id)
     {
         $user = Auth::user();

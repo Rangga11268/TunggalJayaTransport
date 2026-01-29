@@ -9,23 +9,13 @@ use Illuminate\Support\Facades\Log;
 
 class UpdateBookingStatusesCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    
     protected $signature = 'bookings:update-statuses {--dry-run : Show what would be updated without actually updating}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    
     protected $description = 'Update booking statuses based on schedule departure times';
 
-    /**
-     * Execute the console command.
-     */
+    
     public function handle()
     {
         $this->info('Updating booking statuses based on schedule departure times...');

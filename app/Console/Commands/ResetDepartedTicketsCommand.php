@@ -11,23 +11,13 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ResetDepartedTicketsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    
     protected $signature = 'tickets:reset-departed {--force : Force reset even if not departed yet} {--dry-run : Show what would be reset without actually resetting} {--date= : Specific date to check for departures (Y-m-d)}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    
     protected $description = 'Automatically reset bookings for schedules that have departed, freeing up seats for future bookings';
 
-    /**
-     * Execute the console command.
-     */
+    
     public function handle()
     {
         try {
@@ -123,9 +113,7 @@ class ResetDepartedTicketsCommand extends Command
         }
     }
     
-    /**
-     * Process a single schedule for ticket reset
-     */
+    
     private function processSchedule(Schedule $schedule, &$totalBookingsCancelled)
     {
         $this->info("Processing schedule ID {$schedule->id}: {$schedule->route->origin} → {$schedule->route->destination}");
@@ -138,8 +126,6 @@ class ResetDepartedTicketsCommand extends Command
         
         // For daily recurring schedules, check if it's the correct day
         if ($schedule->is_daily) {
-            // For daily recurring schedules, we check if the current time has passed the departure time today
-            // Only reset if the schedule has actually departed today
             $today = Carbon::today('Asia/Jakarta');
             $todayDeparture = $today->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
             $now = Carbon::now('Asia/Jakarta');
@@ -154,11 +140,7 @@ class ResetDepartedTicketsCommand extends Command
         }
         
         try {
-            // For daily recurring schedules, cancel ALL bookings that are not yet cancelled
-            // For regular schedules, only cancel pending payments
             if ($schedule->is_daily) {
-                // For daily recurring schedules, cancel ALL non-cancelled bookings
-                // since the seats need to be available again the next day
                 $bookingsToCancel = $schedule->bookings()
                     ->where('booking_status', '!=', 'cancelled') // Not already cancelled
                     ->get();
@@ -227,9 +209,7 @@ class ResetDepartedTicketsCommand extends Command
         }
     }
     
-    /**
-     * Process a single schedule for ticket reset (dry run)
-     */
+    
     private function processScheduleDryRun(Schedule $schedule, &$totalBookingsCancelled)
     {
         $this->info("Processing schedule ID {$schedule->id}: {$schedule->route->origin} → {$schedule->route->destination}");
@@ -242,8 +222,6 @@ class ResetDepartedTicketsCommand extends Command
         
         // For daily recurring schedules, check if it's the correct day
         if ($schedule->is_daily) {
-            // For daily recurring schedules, we check if the current time has passed the departure time today
-            // Only reset if the schedule has actually departed today
             $today = Carbon::today('Asia/Jakarta');
             $todayDeparture = $today->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
             $now = Carbon::now('Asia/Jakarta');
@@ -258,11 +236,7 @@ class ResetDepartedTicketsCommand extends Command
         }
         
         try {
-            // For daily recurring schedules, we would cancel ALL bookings that are not yet cancelled
-            // For regular schedules, only cancel pending payments
             if ($schedule->is_daily) {
-                // For daily recurring schedules, cancel ALL non-cancelled bookings
-                // since the seats need to be available again the next day
                 $bookingsToCancel = $schedule->bookings()
                     ->where('booking_status', '!=', 'cancelled') // Not already cancelled
                     ->get();

@@ -10,23 +10,13 @@ use Illuminate\Support\Facades\Log;
 
 class CleanupInvalidBookingsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    
     protected $signature = 'bookings:cleanup-invalid {--dry-run : Show what would be cleaned without actually cleaning} {--date= : Specific date to check for departures (Y-m-d)}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    
     protected $description = 'Clean up invalid bookings such as those for departed schedules or with invalid statuses';
 
-    /**
-     * Execute the console command.
-     */
+    
     public function handle()
     {
         $this->info('Starting cleanup of invalid bookings...');
@@ -38,8 +28,6 @@ class CleanupInvalidBookingsCommand extends Command
             'timestamp' => Carbon::now()
         ]);
         
-        // Get all bookings that are potentially invalid
-        // We focus on bookings that are not paid yet but confirmed for departed schedules
         $query = Booking::where('booking_status', 'confirmed')
             ->where('payment_status', 'pending');
             

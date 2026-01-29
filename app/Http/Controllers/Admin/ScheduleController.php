@@ -12,9 +12,7 @@ use Carbon\Carbon;
 
 class ScheduleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index(Request $request)
     {
         $query = Schedule::with(['bus', 'route'])
@@ -73,9 +71,7 @@ class ScheduleController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    
     public function create()
     {
         $buses = Bus::where('status', 'active')->select('id', 'name', 'plate_number', 'bus_type', 'capacity')->get();
@@ -84,9 +80,7 @@ class ScheduleController extends Controller
         return Inertia::render('Admin/Schedules/Create', compact('buses', 'routes'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
         // Validasi dasar
@@ -143,18 +137,14 @@ class ScheduleController extends Controller
         return redirect()->route('admin.schedules.index')->with('success', 'Jadwal berhasil dibuat.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id)
     {
         // For now, redirect to edit
         return redirect()->route('admin.schedules.edit', $id);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(string $id)
     {
         $schedule = Schedule::findOrFail($id);
@@ -184,9 +174,7 @@ class ScheduleController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, string $id)
     {
         $schedule = Schedule::findOrFail($id);
@@ -234,9 +222,7 @@ class ScheduleController extends Controller
         return redirect()->route('admin.schedules.index')->with('success', 'Jadwal berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    
     public function destroy(string $id)
     {
         $schedule = Schedule::findOrFail($id);

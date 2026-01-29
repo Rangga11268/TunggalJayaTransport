@@ -11,9 +11,7 @@ use Carbon\Carbon;
 
 class ScheduleManagementController extends Controller
 {
-    /**
-     * Display a comprehensive schedule management table
-     */
+    
     public function index(Request $request)
     {
         // Get all schedules with their relations
@@ -56,9 +54,7 @@ class ScheduleManagementController extends Controller
         return view('admin.schedule-management.index', compact('schedules', 'buses', 'routes'));
     }
     
-    /**
-     * Get detailed information about a specific schedule
-     */
+    
     public function show($id)
     {
         $schedule = Schedule::with(['bus', 'route', 'bookings.user'])->findOrFail($id);

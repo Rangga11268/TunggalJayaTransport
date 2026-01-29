@@ -11,17 +11,13 @@ use Illuminate\View\View;
 
 class DevelopmentPasswordResetController extends Controller
 {
-    /**
-     * Display the password reset link request view.
-     */
+    
     public function create(): View
     {
         return view('auth.forgot-password');
     }
 
-    /**
-     * Handle an incoming password reset link request for development.
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -58,9 +54,7 @@ class DevelopmentPasswordResetController extends Controller
         return redirect()->back()->with('status', 'Password reset link generated successfully for development. Check the flashed message for the link.');
     }
 
-    /**
-     * Display the password reset view for development.
-     */
+    
     public function showResetForm($token)
     {
         $email = request()->query('email');

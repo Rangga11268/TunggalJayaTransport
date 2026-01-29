@@ -10,23 +10,13 @@ use Illuminate\Support\Facades\Storage;
 
 class GenerateDepartedBookingsReportCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    
     protected $signature = 'reports:departed-bookings {--days=7 : Number of days to look back} {--format=table : Output format (table, csv, json)}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    
     protected $description = 'Generate a report of bookings for departed schedules';
 
-    /**
-     * Execute the console command.
-     */
+    
     public function handle()
     {
         $days = $this->option('days');
@@ -67,9 +57,7 @@ class GenerateDepartedBookingsReportCommand extends Command
         return 0;
     }
     
-    /**
-     * Generate a table report
-     */
+    
     private function generateTableReport($bookings)
     {
         $this->table(
@@ -88,9 +76,7 @@ class GenerateDepartedBookingsReportCommand extends Command
         );
     }
     
-    /**
-     * Generate a CSV report
-     */
+    
     private function generateCsvReport($bookings, $days)
     {
         $filename = 'departed_bookings_report_' . Carbon::now()->format('Y-m-d') . '.csv';
@@ -119,9 +105,7 @@ class GenerateDepartedBookingsReportCommand extends Command
         $this->info("CSV report generated: storage/app/{$filename}");
     }
     
-    /**
-     * Generate a JSON report
-     */
+    
     private function generateJsonReport($bookings, $days)
     {
         $filename = 'departed_bookings_report_' . Carbon::now()->format('Y-m-d') . '.json';

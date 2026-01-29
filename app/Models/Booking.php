@@ -114,9 +114,7 @@ class Booking extends Model implements HasMedia
         $this->attributes['number_of_seats'] = $value;
     }
     
-    /**
-     * Cek apa pembayarannya udah expired
-     */
+    
     public function isPaymentExpired()
     {
         // Expired 30 menit kalo masih pending, kelamaan nunggu keburu diambil orang
@@ -127,18 +125,14 @@ class Booking extends Model implements HasMedia
         return false;
     }
     
-    /**
-     * Start payment process
-     */
+    
     public function startPayment()
     {
         $this->payment_started_at = Carbon::now();
         $this->save();
     }
     
-    /**
-     * Get occupied seat numbers for a specific schedule and date
-     */
+    
     public static function getOccupiedSeatsForSchedule($scheduleId, $date)
     {
         return self::where('schedule_id', $scheduleId)

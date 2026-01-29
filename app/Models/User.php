@@ -10,7 +10,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    
     use HasFactory, Notifiable, HasRoles;
 
     // Role Constants
@@ -20,11 +20,7 @@ class User extends Authenticatable
     const ROLE_DRIVER = 'driver';
     const ROLE_CONDUCTOR = 'conductor';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    
     protected $fillable = [
         'name',
         'email',
@@ -34,21 +30,13 @@ class User extends Authenticatable
         'is_verified',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    
     protected function casts(): array
     {
         return [
@@ -79,9 +67,7 @@ class User extends Authenticatable
         return $this->hasVerifiedEmail() && $this->hasPhoneVerified() && $this->is_verified;
     }
 
-    /**
-     * Get the user's role name.
-     */
+    
     public function getRoleAttribute()
     {
         return $this->getRoleNames()->first();

@@ -11,9 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 class DriverController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index(Request $request)
     {
         $drivers = Driver::when($request->search, function ($query, $search) {
@@ -33,17 +31,13 @@ class DriverController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    
     public function create()
     {
         return Inertia::render('Admin/Drivers/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
         try {
@@ -76,18 +70,14 @@ class DriverController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id)
     {
         // Redirect to edit as we likely don't need a standalone show page currently
         return redirect()->route('admin.drivers.edit', $id);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(string $id)
     {
         $driver = Driver::findOrFail($id);
@@ -96,9 +86,7 @@ class DriverController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, string $id)
     {
         $driver = Driver::findOrFail($id);
@@ -134,9 +122,7 @@ class DriverController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    
     public function destroy(string $id)
     {
         try {

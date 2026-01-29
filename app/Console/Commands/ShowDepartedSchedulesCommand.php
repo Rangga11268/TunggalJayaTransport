@@ -9,23 +9,13 @@ use Carbon\Carbon;
 
 class ShowDepartedSchedulesCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    
     protected $signature = 'schedules:show-departed {--days=7 : Number of days to look back}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    
     protected $description = 'Show departed schedules and their booking status';
 
-    /**
-     * Execute the console command.
-     */
+    
     public function handle()
     {
         $days = $this->option('days');

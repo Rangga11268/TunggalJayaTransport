@@ -158,9 +158,6 @@ const routeDescription = computed(() => {
 
     if (!r) return "Info Rute Tidak Tersedia";
 
-    // Explicit format as shown in design "City ? City"
-    // Though design shows "?" instead of arrow, I assume it's an encoding issue in the PDF preview user sent.
-    // I will use ">>" or "->" for clarity, or just standard dash.
     if (r.origin && r.destination) return `${r.origin} >> ${r.destination}`;
 
     if (r.description && r.description.trim() !== "" && r.description !== "-")
@@ -180,8 +177,6 @@ const busType = computed(() => {
 const formatTime = (timeString) => {
     if (!timeString) return "-";
     try {
-        // Handle "2000-01-01T14:00:00.000000Z WIB" or standard ISO
-        // First, check if it contains a T and Z or time offsets
         let cleanTime = timeString;
 
         // Remove " WIB" or other suffixes if manual string
@@ -517,5 +512,5 @@ const formatTime = (timeString) => {
 </template>
 
 <style scoped>
-/* Font import for Monospace look if needed, but Tailwind 'font-mono' usually suffices (Courier/Consolas) */
+
 </style>

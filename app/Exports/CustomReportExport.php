@@ -66,18 +66,7 @@ class CustomReportExport implements FromCollection, WithHeadings, WithMapping, W
         // $row is specific to how the collection was structured
         switch ($this->reportType) {
             case 'bookings':
-                 // $row is the value from daily_bookings array, indexed by date. 
-                 // Wait, calling collect() on an assoc array keyed by date might behave differently.
-                 // Let's adjust the collection method to be explicit about rows.
                  return [
-                     // Since we didn't include the date in the value itself in controller (it was the key), 
-                     // We need to fix the collection structure above or handle it here if possible. 
-                     // The FromCollection interface expects a collection of rows.
-                     // The previous controller code: $dailyBookings = ...->get()->keyBy('date');
-                     // The key is the date. The value is an object { date: ... count: ... seats: ... }
-                     // So we can access $row->date if the SQL query selected it.
-                     // Controller select: selectRaw('DATE(created_at) as date, ...')
-                     // So $row should have 'date'.
                      $row->date,
                      $row->count,
                      $row->seats

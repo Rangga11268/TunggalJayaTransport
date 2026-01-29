@@ -26,9 +26,7 @@ class Schedule extends Model
         'days_of_week' => 'array',
     ];
 
-    /**
-     * Booting model-nya.
-     */
+    
     protected static function boot()
     {
         parent::boot();
@@ -70,8 +68,6 @@ class Schedule extends Model
         if ($forDate) {
             $query->whereDate('booking_date', $forDate);
         } else {
-            // Buat jadwal harian, kalo ga ada tanggal spesifik, itung yang kedepannya aja
-            // Biar logicnya tetep jalan kaya biasanya
             if ($this->is_daily) {
                 // Untuk jadwal recurring, itung bookingan masa depan aja
                 $query->whereDate('booking_date', '>=', Carbon::today());
@@ -92,8 +88,6 @@ class Schedule extends Model
 
     public function getBookedSeatNumbers($forDate = null)
     {
-        // Ambil nomor kursi yang udah laku atau lagi pending payment
-        // Pending harus dimasukkan biar ga double booking pas orang lagi bayar
         $query = $this->bookings()
             ->whereIn('payment_status', ['paid', 'pending']) // Include pending!
             ->where('booking_status', '!=', 'cancelled') // Yang cancel gausah diajak
@@ -122,12 +116,7 @@ class Schedule extends Model
         return array_values(array_unique($seatNumbers)); // Remove duplicates and reindex
     }
 
-    /**
-     * Ambil jam berangkat asli buat display/booking.
-     * Kalo jadwal harian, itung kapan next trip-nya.
-     * Kalo jadwal biasa, ya balikin aja datetime yang kesimpen.
-     * Balikin format WIB biar user lokal ga bingung.
-     */
+    
     public function getActualDepartureTime($forDate = null)
     {
         $departureTime = null;
@@ -159,10 +148,7 @@ class Schedule extends Model
         return $departureTime->setTimezone('Asia/Jakarta');
     }
 
-    /**
-     * Sama kayak getActualDepartureTime tapi versi Arrival.
-     * Logic-nya miriplah, males jelasin ulang wkwk.
-     */
+    
     public function getActualArrivalTime($forDate = null)
     {
         $arrivalTime = null;
@@ -189,11 +175,7 @@ class Schedule extends Model
         return $arrivalTime->setTimezone('Asia/Jakarta');
     }
 
-    /**
-     * Cek apa busnya udah cabut.
-     * Kalo recurring, cek trip hari ini udah lewat apa belum.
-     * Note: Semua pake WIB (Asia/Jakarta)
-     */
+    
     public function hasDeparted($forDate = null)
     {
         // Pake WIB dong pastinya
@@ -221,9 +203,7 @@ class Schedule extends Model
         }
     }
 
-    /**
-     * Ambil jam berangkat sesuai zona waktu target
-     */
+    
     public function getDepartureTimeInTimezone($timezone = null)
     {
         if ($timezone === null) {
@@ -235,29 +215,21 @@ class Schedule extends Model
         return $departureTime->setTimezone($timezone);
     }
 
-    /*-------------------------------------------------------------------------
-     * WIB Time Conversion Methods
-     *-------------------------------------------------------------------------*/
+    
 
-    /**
-     * Get departure time in WIB timezone for display purposes
-     */
+    
     public function getDepartureTimeWIB()
     {
         return $this->getActualDepartureTime()->setTimezone('Asia/Jakarta');
     }
 
-    /**
-     * Get arrival time in WIB timezone for display purposes
-     */
+    
     public function getArrivalTimeWIB()
     {
         return $this->getActualArrivalTime()->setTimezone('Asia/Jakarta');
     }
 
-    /**
-     * Cek jadwalnya masih bisa dibooking ga
-     */
+    
     public function isAvailableForBooking($forDate = null)
     {
         // Aktif ga nih?
@@ -276,9 +248,7 @@ class Schedule extends Model
 
     
 
-    /**
-     * Ambil tanggal-tanggal berangkat kedepannya (range date)
-     */
+    
     public function getUpcomingDates($startDate = null, $endDate = null, $limit = 10)
     {
         // Buat jadwal harian, balikin range tanggal
@@ -304,13 +274,9 @@ class Schedule extends Model
         return collect();
     }
 
-    /**
-     * Ambil bookingan yang harus dicancel kalo busnya berangkat
-     */
+    
     public function getBookingsToCancel()
     {
-        // Kalo daily, balikin SEMUA yang belom cancel
-        // soalnya kursinya harus kosong lagi besoknya
         if ($this->is_daily) {
             return $this->bookings()
                 ->where('booking_status', '!=', 'cancelled') // Yang belom dicancel
@@ -324,9 +290,7 @@ class Schedule extends Model
         }
     }
 
-    /**
-     * Scope buat jadwal yang 'available' aja
-     */
+    
     public function scopeAvailable($query)
     {
         return $query->where('status', 'active')
@@ -336,25 +300,19 @@ class Schedule extends Model
 
     
 
-    /**
-     * Scope for daily schedules
-     */
+    
     public function scopeDaily($query)
     {
         return $query->where('is_daily', false);
     }
 
-    /**
-     * Scope for daily recurring schedules
-     */
+    
     public function scopeDailyRecurring($query)
     {
         return $query->where('is_daily', true);
     }
 
-    /**
-     * Get formatted schedule information for display
-     */
+    
     public function getDisplayInfo()
     {
         $departure = $this->getActualDepartureTime();

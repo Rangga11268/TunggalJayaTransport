@@ -9,23 +9,13 @@ use Illuminate\Support\Facades\Log;
 
 class CleanupExpiredPaymentsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    
     protected $signature = 'bookings:cleanup-expired {--dry-run : Show what would be cleaned without actually cleaning}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    
     protected $description = 'Clean up bookings with expired payments';
 
-    /**
-     * Execute the console command.
-     */
+    
     public function handle()
     {
         $this->info('Starting cleanup of bookings with expired payments...');

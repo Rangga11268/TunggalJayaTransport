@@ -33,10 +33,7 @@ class Route extends Model
         return $this->hasMany(Schedule::class);
     }
 
-    /**
-     * Convert duration from minutes to hours format
-     * @return string
-     */
+    
     public function getFormattedDurationAttribute()
     {
         if (!$this->duration) {
@@ -56,10 +53,7 @@ class Route extends Model
         }
     }
 
-    /**
-     * Get all coordinates for the route including origin, waypoints, and destination
-     * @return array
-     */
+    
     public function getAllCoordinatesAttribute()
     {
         $coordinates = [];

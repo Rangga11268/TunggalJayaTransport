@@ -14,19 +14,13 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
+    
     public function create(): \Inertia\Response
     {
         return \Inertia\Inertia::render('Auth/Register');
     }
 
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
+    
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -47,8 +41,6 @@ class RegisteredUserController extends Controller
         try {
             $user->assignRole('user');
         } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
-            // Jika role 'user' tidak ditemukan, lewati assign role
-            // Role seharusnya sudah dibuat di seeder
         }
 
         event(new Registered($user));

@@ -188,12 +188,6 @@ const processPayment = async () => {
         return;
     }
 
-    // Check if promo code was entered but not validated? (Optional, maybe just ignore or warn)
-    // For now we assume if they didn't click "Use", it's ignored.
-
-    // 2. Save Seats First
-    // We must ensure seats are saved in the DB before payment because invalid/unsaved seats
-    // will cause the backend payment controller to reject the request.
     const saved = await saveSeats();
     if (!saved) return; // Stop if saving failed
 
@@ -261,19 +255,11 @@ const formatCurrency = (value) => {
 
 // Layout Utils
 const getSeatNumber = (rowIdx, colIdx) => {
-    // 2 seats on left, aisle, 3 seats on right
-    // Layout: [0, 1] | AISLE | [2, 3, 4]
-    // Row 0: 1, 2 | 3, 4, 5
-    // Row 1: 6, 7 | 8, 9, 10
 
     // colIdx: 0, 1 (Left) -- 2, 3, 4 (Right)
     const base = rowIdx * 5;
     if (colIdx < 2) return base + colIdx + 1; // 1-based
     const aisleOffset = colIdx >= 2 ? 0 : 0;
-    // Wait, the previous logic was:
-    // if colIdx < 2 (0,1) -> base + colIdx + 1
-    // if colIdx >= 2 (2,3,4) -> base + colIdx + 1
-    // It's the same formula. It just skips visual column index.
     return base + colIdx + 1;
 };
 // Helper to safely get route description

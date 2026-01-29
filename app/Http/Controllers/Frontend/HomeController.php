@@ -32,8 +32,6 @@ class HomeController extends Controller
         // Get route count
         $routeCount = BusRoute::count();
         
-        // For customer count, we'll use a placeholder value
-        // In a real application, you might count bookings or users
         $customerCount = 10000;
         
         // Get unique origins and destinations for auto-complete
@@ -88,8 +86,6 @@ class HomeController extends Controller
     
     private function getRecommendedRoutes()
     {
-        // For now, return popular routes based on booking count
-        // In the future, this could be enhanced with location-based recommendations
         return BusRoute::join('schedules', 'routes.id', '=', 'schedules.route_id')
             ->join('bookings', 'schedules.id', '=', 'bookings.schedule_id')
             ->select('routes.*')
@@ -99,9 +95,7 @@ class HomeController extends Controller
             ->get();
     }
     
-    /**
-     * Get personalized recommendations based on user's booking history
-     */
+    
     private function getPersonalizedRecommendations()
     {
         $userId = auth()->id();
@@ -180,9 +174,7 @@ class HomeController extends Controller
         return $personalizedRecommendations;
     }
     
-    /**
-     * Calculate recommendation score based on multiple factors
-     */
+    
     private function calculateRecommendationScore($route, $schedule, $origin = null)
     {
         $score = 0;
@@ -230,9 +222,7 @@ class HomeController extends Controller
         return $score;
     }
     
-    /**
-     * Get collaborative recommendations based on similar users
-     */
+    
     private function getCollaborativeRecommendations($origin)
     {
         $recommendations = collect();
@@ -295,9 +285,7 @@ class HomeController extends Controller
         return $recommendations;
     }
     
-    /**
-     * Find users with similar booking patterns
-     */
+    
     private function findSimilarUsers($origin)
     {
         // This is a simplified version - in a real implementation you'd use more sophisticated similarity algorithms
@@ -335,9 +323,7 @@ class HomeController extends Controller
         return $similarUsers->sortByDesc('similarity');
     }
     
-    /**
-     * Get popular recommendations for users with no history
-     */
+    
     private function getPopularRecommendations()
     {
         $recommendations = collect();
@@ -369,9 +355,7 @@ class HomeController extends Controller
         return $recommendations;
     }
     
-    /**
-     * Get recommendations for users with no booking history
-     */
+    
     private function getRecommendationsForNewUsers()
     {
         $recommendations = collect();
@@ -395,9 +379,7 @@ class HomeController extends Controller
         return $recommendations->sortByDesc('score')->take(3);
     }
 
-    /**
-     * Get seasonal recommendations based on current time
-     */
+    
     private function getSeasonalRecommendations()
     {
         $recommendations = collect();
@@ -434,9 +416,7 @@ class HomeController extends Controller
         return $recommendations;
     }
 
-    /**
-     * Get trending recommendations (routes with increasing bookings)
-     */
+    
     private function getTrendingRecommendations()
     {
         $recommendations = collect();
@@ -468,9 +448,7 @@ class HomeController extends Controller
         return $recommendations;
     }
 
-    /**
-     * Get diverse popular recommendations to avoid showing the same routes repeatedly
-     */
+    
     private function getDiversePopularRecommendations()
     {
         $recommendations = collect();

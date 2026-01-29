@@ -9,9 +9,7 @@ use Inertia\Inertia;
 
 class NewsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index(Request $request)
     {
         $articles = NewsArticle::with('category')
@@ -29,18 +27,14 @@ class NewsController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    
     public function create()
     {
         $categories = \App\Models\Category::all();
         return Inertia::render('Admin/News/Create', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -69,16 +63,9 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'Artikel berita berhasil dibuat.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id)
     {
-        // Typically admin doesn't need a separate show page if not implemented in Vue yet, 
-        // but we can reuse Edit or just redirect. Let's redirect to edit for now or leave as is if we want a preview.
-        // For simplicity in this migration, I'll redirect to Edit or render a Show page if we build it.
-        // Given the plan, I'll skip Show for now or make it render the frontend show? 
-        // Let's just return the Edit view for now as 'Show' is often redundant in Admin unless it's a preview.
          $article = NewsArticle::with('category')->findOrFail($id);
          return Inertia::render('Admin/News/Edit', [
             'article' => $article,
@@ -87,9 +74,7 @@ class NewsController extends Controller
          ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(string $id)
     {
         $article = NewsArticle::with('media')->findOrFail($id);
@@ -100,9 +85,7 @@ class NewsController extends Controller
         return Inertia::render('Admin/News/Edit', compact('article', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -136,9 +119,7 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'Artikel berita berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    
     public function destroy(string $id)
     {
         $article = NewsArticle::findOrFail($id);
@@ -147,9 +128,7 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'Artikel berita berhasil dihapus.');
     }
 
-    /**
-     * Create a unique slug for the article.
-     */
+    
     private function createUniqueSlug($title, $excludeId = null)
     {
         $slug = \Str::slug($title);

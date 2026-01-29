@@ -17,8 +17,6 @@ class ContactController extends Controller
             'message' => 'required|string',
         ]);
         
-        // Here you would typically send an email or store the message in the database
-        // For now, we'll just return a success response
         
         return back()->with('success', 'Thank you for your message. We will get back to you soon.');
     }

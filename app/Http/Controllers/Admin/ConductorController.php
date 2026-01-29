@@ -10,9 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class ConductorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index(Request $request)
     {
         $conductors = Conductor::when($request->search, function ($query, $search) {
@@ -31,17 +29,13 @@ class ConductorController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    
     public function create()
     {
         return Inertia::render('Admin/Conductors/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
         try {
@@ -72,18 +66,14 @@ class ConductorController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id)
     {
         // Redirect to edit
         return redirect()->route('admin.conductors.edit', $id);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(string $id)
     {
         $conductor = Conductor::findOrFail($id);
@@ -92,9 +82,7 @@ class ConductorController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, string $id)
     {
         $conductor = Conductor::findOrFail($id);
@@ -128,9 +116,7 @@ class ConductorController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    
     public function destroy(string $id)
     {
         try {

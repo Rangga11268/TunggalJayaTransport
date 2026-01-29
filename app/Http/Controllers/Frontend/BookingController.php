@@ -51,8 +51,6 @@ class BookingController extends Controller
                 // Ambil ID rutenya
                 $routeIds = $validRoutes->pluck('id');
 
-                // Query jadwal, sekalian load relasi biar ga lemot (N+1 issue)
-                // Itung sekalian yang udah booking biar gak query ulang di loop
                 $query = Schedule::whereIn('route_id', $routeIds)
                         ->with('route', 'bus')
                         ->withSum(['bookings as booked_seats_count' => function ($q) use ($searchDate) {
@@ -85,10 +83,6 @@ class BookingController extends Controller
                     if ($searchDate) {
                         if (!$schedule->is_daily) {
                             $dateMatch = $schedule->departure_time->toDateString() === $searchDate->toDateString();
-                            // For specific date search:
-                            // We SHOW departed schedules so users know they missed it (with visual cue),
-                            // BUT we might want to hide them if they are from previous days (which is handled by dateMatch).
-                            // If it's today and departed, show it.
                             
                             if (!$dateMatch) return false;
                         } 
@@ -148,8 +142,6 @@ class BookingController extends Controller
                     // 1. Cek apakah sudah lewat (relative to now)
                     if ($departure->isPast()) return false;
 
-                    // 2. Cek apakah tanggalnya SAMA dengan tanggal pencarian
-                    //    Misal user cari tgl 6, tapi jadwal tgl 5 -> Hide!
                     if (!$departure->isSameDay($searchDate)) {
                         return false;
                     }
@@ -244,7 +236,6 @@ class BookingController extends Controller
         $destination = $request->get('destination');
         $date = $request->get('date');
 
-
         // Validate request parameters
         $request->validate([
             'origin' => 'nullable|string|max:255',
@@ -285,8 +276,6 @@ class BookingController extends Controller
 
                 // For daily recurring schedules, they are available every day
                 if ($schedule->is_daily) {
-                    // Daily recurring schedules are always available regardless of the search date
-                    // We just need to ensure the time hasn't passed yet on the search date
                     return $schedule->isAvailableForBooking($searchDate);
                 }
 
@@ -325,8 +314,6 @@ class BookingController extends Controller
 
         // Filter by date (if provided, otherwise show defaults)
         if ($request->has('date') && $request->date != '') {
-            // Note: In a real app, you might want to filter schedules that run on this specific date
-            // For now, we'll just pass it through as per existing logic or enhance if needed
         }
 
         $schedules = $query->get()->map(function ($schedule) {
@@ -687,8 +674,6 @@ class BookingController extends Controller
                     $promoCode->increment('usage_count');
 
                     if ($promoCode->isLimitReached()) {
-                         // Note: We don't block here because the current user just claimed the last one.
-                         // Future checks will block it.
                     }
 
                 } else {
@@ -700,8 +685,6 @@ class BookingController extends Controller
                     $booking->total_price = $booking->original_total_price ?? $booking->total_price;
                     $booking->discount_amount = 0;
                     $booking->promo_code_id = null;
-                    // Keep original_total_price for record or reset? Let's keep it clean.
-                    // If we reset total_price to original, we can clear original.
                     $booking->original_total_price = null; 
                     $booking->save();
                 }
@@ -752,22 +735,15 @@ class BookingController extends Controller
             abort(403, 'You do not have permission to access this booking.');
         }
 
-        // Ensure the booking is valid for success page
-        // Allow both 'confirmed' and 'pending' booking status
-        // 'pending' is set by PaymentService when payment is initiated
         if (!in_array($booking->booking_status, ['confirmed', 'pending'])) {
             abort(404, 'Invalid booking');
         }
 
-        // Allow access for both 'paid' and 'pending' payment statuses
-        // The webhook will update the status to 'paid' once payment is confirmed
         if (!in_array($booking->payment_status, ['paid', 'pending'])) {
             return redirect()->route('frontend.booking.confirmation', ['booking' => $booking->id])
                 ->withErrors(['payment' => 'Payment has not been initiated yet.']);
         }
 
-        // Auto-check payment status from Midtrans if still pending
-        // This is crucial for localhost development where webhooks don't work
         if ($booking->payment_status === 'pending' && $booking->midtrans_transaction_id) {
             try {
                 // Query Midtrans for the latest transaction status
@@ -829,8 +805,6 @@ class BookingController extends Controller
             abort(404, 'Ticket not available. The schedule has already departed.');
         }
 
-        // Check if the booking is valid
-        // Allow both 'confirmed' and 'pending' status as payment might still be processing
         $validBookingStatuses = ['confirmed', 'pending'];
         $validPaymentStatuses = ['paid', 'pending'];
 
@@ -846,8 +820,6 @@ class BookingController extends Controller
 
         return $pdf->download('ticket-' . $booking->booking_code . '.pdf');
     }
-
-
 
     public function checkAvailability(Request $request)
     {
@@ -906,8 +878,6 @@ class BookingController extends Controller
 
             // For daily recurring schedules, they are available every day
             if ($schedule->is_daily) {
-                // Daily recurring schedules are always available regardless of the search date
-                // We just need to ensure the time hasn't passed yet on the search date
                 return $schedule->isAvailableForBooking($searchDate);
             }
 

@@ -11,23 +11,13 @@ use Illuminate\Support\Facades\Log;
 
 class SendDepartureRemindersCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    
     protected $signature = 'notifications:departure-reminders {--hours=24 : Hours before departure to send reminder} {--dry-run : Show what notifications would be sent without actually sending}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    
     protected $description = 'Send departure reminders to passengers';
 
-    /**
-     * Execute the console command.
-     */
+    
     public function handle()
     {
         $hours = $this->option('hours');
@@ -71,9 +61,6 @@ class SendDepartureRemindersCommand extends Command
                     $this->info("  Would send reminder to {$booking->passenger_name} <{$booking->passenger_email}> for booking {$booking->booking_code}");
                     $sentCount++;
                 } else {
-                    // Send email notification
-                    // In a real implementation, you would use Laravel's Mail facade
-                    // Mail::to($booking->passenger_email)->send(new DepartureReminder($booking));
                     
                     // For now, we'll just log that we would send the email
                     Log::info("Departure reminder sent", [

@@ -65,8 +65,6 @@ class ReportController extends Controller
     
     public function occupancy()
     {
-        // Get occupancy data by fetching BOOKINGS grouped by schedule + booking_date
-        // This gives us accurate per-departure-date occupancy instead of all-time cumulative
         $bookingsByScheduleDate = Booking::with(['schedule.bus', 'schedule.route'])
             ->where('booking_status', 'confirmed')
             ->where('payment_status', 'paid')

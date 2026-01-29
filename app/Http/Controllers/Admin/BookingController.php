@@ -11,9 +11,7 @@ use Inertia\Inertia;
 
 class BookingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index(Request $request)
     {
         $bookings = Booking::with(['user', 'schedule.route', 'schedule.bus'])
@@ -44,9 +42,7 @@ class BookingController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    
     public function create()
     {
         // Get all active schedules and filter by availability
@@ -73,9 +69,7 @@ class BookingController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -100,8 +94,6 @@ class BookingController extends Controller
              return redirect()->back()->withErrors(['schedule_id' => 'Cannot create booking for a schedule that has already departed.']);
         }
         
-        // Cek ketersediaan (cek simpel aja)
-        // Model udah pinter method isAvailableForBooking, tapi kita perlu cek jumlah kursi juga
         
         // Bikin Kode Booking biar keren
         $bookingCode = 'BK' . time() . rand(100, 999);
@@ -129,9 +121,7 @@ class BookingController extends Controller
         return redirect()->route('admin.bookings.index')->with('success', 'Booking created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id)
     {
         $booking = Booking::with(['user', 'schedule.route', 'schedule.bus', 'paymentHistories'])->findOrFail($id);
@@ -149,9 +139,7 @@ class BookingController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(string $id)
     {
         $booking = Booking::with('schedule')->findOrFail($id);
@@ -175,9 +163,7 @@ class BookingController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, string $id)
     {
         $booking = Booking::findOrFail($id);
@@ -216,9 +202,7 @@ class BookingController extends Controller
         return redirect()->route('admin.bookings.index')->with('success', 'Booking updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    
     public function destroy(string $id)
     {
         $booking = Booking::findOrFail($id);

@@ -19,12 +19,7 @@ class PaymentController extends Controller
         $this->midtransService = $midtransService;
     }
 
-    /**
-     * Process payment for a booking
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+    
     public function process(Request $request)
     {
         $request->validate([
@@ -52,12 +47,7 @@ class PaymentController extends Controller
         ], 400);
     }
 
-    /**
-     * Get payment status
-     * 
-     * @param string $orderId
-     * @return \Illuminate\Http\JsonResponse
-     */
+    
     public function status($orderId)
     {
         $paymentHistory = PaymentHistory::where('transaction_id', $orderId)->first();
@@ -90,10 +80,6 @@ class PaymentController extends Controller
             ]);
         }
 
-        // 2. Smart Recovery: Kalo ID ini belom dibayar (pending/not_found), 
-        // coba cek ID lain siapa tau user iseng bikin banyak tapi bayar yang lama.
-        // Ini buat jaga-jaga kalo user klik "Bayar" berkali-kali (bikin ID baru) tapi bayar pake Snap token yang lama.
-        
         if ($booking) {
             // Ambil semua ID transaksi buat booking ini dari history
             $allTransactions = PaymentHistory::where('booking_id', $booking->id)
@@ -108,8 +94,6 @@ class PaymentController extends Controller
                 if ($recoveryResult['status'] === 'success' && 
                    ($recoveryResult['transaction_status'] == 'settlement' || $recoveryResult['transaction_status'] == 'capture')) {
                     
-                    // Nah ketemu yang udah LUNAS!
-                    // Pake ID yang ini aja, update bookingnya biar bener
                     $booking->update([
                         'payment_status' => 'paid',
                         'midtrans_transaction_id' => $history->transaction_id
@@ -148,12 +132,7 @@ class PaymentController extends Controller
         ], 500);
     }
 
-    /**
-     * Handle Midtrans webhook
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+    
     public function webhook(Request $request)
     {
         // Validasi payload dulu

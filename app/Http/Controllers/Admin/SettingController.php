@@ -31,9 +31,6 @@ class SettingController extends Controller
             'contact_phone' => 'required|string|max:20',
         ]);
         
-        // In a real application, you would save these settings to the database
-        // For now, we'll just return a success message
-        // You might want to update the .env file or a settings table here
         
         return redirect()->route('admin.settings.index')->with('success', 'Pengaturan berhasil diperbarui (Simulasi).');
     }

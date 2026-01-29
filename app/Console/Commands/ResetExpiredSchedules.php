@@ -8,23 +8,13 @@ use Carbon\Carbon;
 
 class ResetExpiredSchedules extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    
     protected $signature = 'schedules:reset-expired';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    
     protected $description = 'Reset expired schedules and prepare them for next day';
 
-    /**
-     * Execute the console command.
-     */
+    
     public function handle()
     {
         $this->info('Resetting expired schedules...');
@@ -59,8 +49,6 @@ class ResetExpiredSchedules extends Command
         $dailyRecurringSchedules = Schedule::dailyRecurring()->get();
         $this->info("Found {$dailyRecurringSchedules->count()} daily recurring schedules.");
 
-        // For daily recurring schedules, we don't need to reset them as they are available every day
-        // But we can log that we've processed them
         foreach ($dailyRecurringSchedules as $schedule) {
             $this->info("Processed daily recurring schedule ID {$schedule->id} - available every day");
         }
