@@ -28,39 +28,41 @@ const submit = () => {
 <template>
     <Head title="Daftar Akun - TUJAGO (Tunggal Jaya Go)" />
 
-    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gray-950">
+    <div
+        class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white dark:bg-gray-950 transition-colors duration-500"
+    >
         <!-- Left Side: Visual -->
         <div
-            class="relative hidden lg:flex flex-col justify-center items-center bg-black overflow-hidden border-r border-white/5"
+            class="relative hidden lg:flex flex-col justify-center items-center bg-gray-100 dark:bg-black overflow-hidden border-r border-gray-200 dark:border-white/5 transition-colors duration-500"
         >
             <div class="absolute inset-0">
                 <div
-                    class="absolute inset-0 bg-[url('/img/hero-bus.jpg')] bg-cover bg-center opacity-40 scale-110 animate-slow-zoom"
+                    class="absolute inset-0 bg-[url('/img/hero-bus.jpg')] bg-cover bg-center opacity-70 dark:opacity-40 scale-110 animate-slow-zoom transition-opacity duration-500"
                 ></div>
                 <div
-                    class="absolute inset-0 bg-gradient-to-bl from-black via-black/80 to-brand-red/20"
+                    class="absolute inset-0 bg-gradient-to-bl from-white/90 via-white/50 to-brand-red/10 dark:from-black dark:via-black/80 dark:to-brand-red/20 transition-colors duration-500"
                 ></div>
             </div>
 
             <div class="relative z-10 text-center px-12">
                 <div class="mb-12 flex justify-center">
                     <div
-                        class="w-32 h-32 rounded-full bg-white/5 backdrop-blur-xl flex items-center justify-center border border-white/10 shadow-[0_0_50px_rgba(220,38,38,0.2)] p-4 group hover:scale-110 transition-transform duration-500"
+                        class="w-32 h-32 rounded-full bg-white/20 dark:bg-white/5 backdrop-blur-xl flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-[0_0_50px_rgba(220,38,38,0.1)] dark:shadow-[0_0_50px_rgba(220,38,38,0.2)] p-4 group hover:scale-110 transition-transform duration-500"
                     >
                         <img
                             src="/img/logoNoBg.png"
                             alt="Logo TUJAGO"
-                            class="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+                            class="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.4)] dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"
                         />
                     </div>
                 </div>
                 <h2
-                    class="text-5xl font-black text-white mb-6 font-unbounded tracking-tighter"
+                    class="text-5xl font-black text-gray-900 dark:text-white mb-6 font-unbounded tracking-tighter transition-colors duration-500"
                 >
                     BERGABUNG <span class="text-brand-red">KAMI</span>
                 </h2>
                 <p
-                    class="text-lg text-gray-400 leading-relaxed max-w-md mx-auto font-manrope font-medium"
+                    class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-md mx-auto font-manrope font-medium transition-colors duration-500"
                 >
                     Buat akun baru untuk menikmati kemudahan pemesanan tiket bus
                     dan promo eksklusif dari TUJAGO.
@@ -70,7 +72,7 @@ const submit = () => {
 
         <!-- Right Side: Form -->
         <div
-            class="flex flex-col justify-center items-center p-6 sm:p-12 pt-32 lg:pt-32 relative overflow-hidden"
+            class="flex flex-col justify-center items-center p-6 sm:p-12 pt-32 lg:pt-32 relative overflow-hidden bg-gray-50 dark:bg-transparent"
         >
             <!-- Decorative Background Element -->
             <div
@@ -86,7 +88,7 @@ const submit = () => {
                         class="h-16 w-auto mx-auto mb-6"
                     />
                     <h2
-                        class="text-3xl font-black text-white font-unbounded tracking-tighter"
+                        class="text-3xl font-black text-gray-900 dark:text-white font-unbounded tracking-tighter"
                     >
                         DAFTAR <span class="text-brand-red">BARU</span>
                     </h2>
@@ -94,12 +96,12 @@ const submit = () => {
 
                 <div class="text-center lg:text-left">
                     <h2
-                        class="hidden lg:block text-4xl font-black text-white mb-3 font-unbounded tracking-tighter"
+                        class="hidden lg:block text-4xl font-black text-gray-900 dark:text-white mb-3 font-unbounded tracking-tighter"
                     >
                         BUAT <span class="text-brand-red">AKUN</span>
                     </h2>
                     <p
-                        class="text-gray-400 font-manrope font-medium tracking-wide"
+                        class="text-gray-500 dark:text-gray-400 font-manrope font-medium tracking-wide"
                     >
                         Silakan lengkapi data diri Anda untuk mendaftar.
                     </p>
@@ -110,14 +112,16 @@ const submit = () => {
                     <div>
                         <label
                             for="name"
-                            class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
+                            class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
                             >Nama Lengkap</label
                         >
                         <div class="relative group">
                             <div
                                 class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
                             >
-                                <i class="fas fa-user text-gray-500"></i>
+                                <i
+                                    class="fas fa-user text-gray-400 dark:text-gray-500"
+                                ></i>
                             </div>
                             <input
                                 id="name"
@@ -126,7 +130,7 @@ const submit = () => {
                                 required
                                 autofocus
                                 autocomplete="name"
-                                class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
+                                class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-5 text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
                                 placeholder="Jhon Doe"
                             />
                         </div>
@@ -142,14 +146,16 @@ const submit = () => {
                     <div>
                         <label
                             for="email"
-                            class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
+                            class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
                             >Email</label
                         >
                         <div class="relative group">
                             <div
                                 class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
                             >
-                                <i class="fas fa-envelope text-gray-500"></i>
+                                <i
+                                    class="fas fa-envelope text-gray-400 dark:text-gray-500"
+                                ></i>
                             </div>
                             <input
                                 id="email"
@@ -157,7 +163,7 @@ const submit = () => {
                                 v-model="form.email"
                                 required
                                 autocomplete="username"
-                                class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
+                                class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-5 text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
                                 placeholder="name@example.com"
                             />
                         </div>
@@ -173,21 +179,23 @@ const submit = () => {
                     <div>
                         <label
                             for="phone"
-                            class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
+                            class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
                             >Nomor Telepon</label
                         >
                         <div class="relative group">
                             <div
                                 class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
                             >
-                                <i class="fas fa-phone text-gray-500"></i>
+                                <i
+                                    class="fas fa-phone text-gray-400 dark:text-gray-500"
+                                ></i>
                             </div>
                             <input
                                 id="phone"
                                 type="text"
                                 v-model="form.phone"
                                 required
-                                class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
+                                class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-5 text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
                                 placeholder="08xxxxxxxxxx"
                             />
                         </div>
@@ -205,14 +213,16 @@ const submit = () => {
                         <div>
                             <label
                                 for="password"
-                                class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
+                                class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
                                 >Kata Sandi</label
                             >
                             <div class="relative group">
                                 <div
                                     class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
                                 >
-                                    <i class="fas fa-lock text-gray-500"></i>
+                                    <i
+                                        class="fas fa-lock text-gray-400 dark:text-gray-500"
+                                    ></i>
                                 </div>
                                 <input
                                     id="password"
@@ -220,7 +230,7 @@ const submit = () => {
                                     v-model="form.password"
                                     required
                                     autocomplete="new-password"
-                                    class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
+                                    class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-5 text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -230,7 +240,7 @@ const submit = () => {
                         <div>
                             <label
                                 for="password_confirmation"
-                                class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
+                                class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
                                 >Konfirmasi</label
                             >
                             <div class="relative group">
@@ -238,7 +248,7 @@ const submit = () => {
                                     class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
                                 >
                                     <i
-                                        class="fas fa-check-circle text-gray-500"
+                                        class="fas fa-check-circle text-gray-400 dark:text-gray-500"
                                     ></i>
                                 </div>
                                 <input
@@ -247,7 +257,7 @@ const submit = () => {
                                     v-model="form.password_confirmation"
                                     required
                                     autocomplete="new-password"
-                                    class="w-full bg-white/5 border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-600"
+                                    class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-5 text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
                                     placeholder="••••••••"
                                 />
                             </div>
