@@ -5,18 +5,12 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Booking;
 use App\Policies\BookingPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * The policies that are available to the application.
-     */
-    protected $policies = [
-        Booking::class => BookingPolicy::class,
-    ];
-
     /**
      * Register any application services.
      */
@@ -32,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::defaultView('vendor.pagination.tailwind');
         Paginator::defaultSimpleView('vendor.pagination.simple-tailwind');
+
+        // Register policies
+        Gate::policy(Booking::class, BookingPolicy::class);
 
         // Add setTimeFromTimeString method as a Carbon macro
         Carbon::macro('setTimeFromTimeString', function ($timeString) {

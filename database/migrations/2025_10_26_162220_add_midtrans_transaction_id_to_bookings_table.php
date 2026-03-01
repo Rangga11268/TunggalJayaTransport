@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->string('midtrans_transaction_id')->nullable()->after('payment_status');
+            // Only add column if it doesn't already exist (for fresh migrations where base migration already has it)
+            if (!Schema::hasColumn('bookings', 'midtrans_transaction_id')) {
+                $table->string('midtrans_transaction_id')->nullable()->after('payment_status');
+            }
         });
     }
 

@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
 class Schedule extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'bus_id',
         'route_id',
@@ -59,9 +61,8 @@ class Schedule extends Model
     public function getBookedSeatsCount($forDate = null)
     {
         $query = $this->bookings()
-            ->where('booking_status', 'confirmed')
-            ->where('payment_status', 'paid')
-            ->where('booking_status', '!=', 'cancelled');
+            ->where('booking_status', '!=', 'cancelled') // Exclude cancelled bookings
+            ->whereNotNull('seat_numbers'); // Only count those with selected seats (paid or pending)
 
         // Kalo ngecek tanggal tertentu, filter pake booking_date
         if ($forDate) {

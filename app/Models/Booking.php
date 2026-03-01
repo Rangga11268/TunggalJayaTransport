@@ -2,14 +2,39 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Carbon\Carbon;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $schedule_id
+ * @property Carbon|string|null $booking_date
+ * @property string $booking_code
+ * @property string $passenger_name
+ * @property string $passenger_phone
+ * @property string $passenger_email
+ * @property string|null $seat_numbers
+ * @property int $number_of_seats
+ * @property float|string|int $total_price
+ * @property string $payment_status
+ * @property string $booking_status
+ * @property Carbon|null $payment_started_at
+ * @property string|null $snap_token
+ * @property string|null $midtrans_transaction_id
+ * @property Carbon|null $check_in_time
+ * @property int|null $promo_code_id
+ * @property float|string|int $discount_amount
+ * @property float|string|int $original_total_price
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
 class Booking extends Model implements HasMedia
 {
-    use InteractsWithMedia;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'user_id',
@@ -53,7 +78,7 @@ class Booking extends Model implements HasMedia
         }
 
         $timeString = $this->schedule->departure_time->format('H:i:s');
-        
+
         // Kalo ada booking_date, gabungin sama jam jadwal
         if ($this->booking_date) {
             return $this->booking_date->setTimeFromTimeString($timeString);
@@ -72,17 +97,17 @@ class Booking extends Model implements HasMedia
     {
         return $this->belongsTo(Schedule::class);
     }
-    
+
     public function paymentHistories()
     {
         return $this->hasMany(PaymentHistory::class);
     }
-    
+
     public function latestPaymentHistory()
     {
         return $this->hasOne(PaymentHistory::class)->latestOfMany();
     }
-    
+
     public function getBookedSeatNumbersAttribute()
     {
         if ($this->seat_numbers) {
@@ -90,7 +115,7 @@ class Booking extends Model implements HasMedia
         }
         return [];
     }
-    
+
     public function setSeatNumbersAttribute($value)
     {
         // Validasi jumlah kursi, jangan sampe lebih dari yg di-booking
@@ -100,39 +125,39 @@ class Booking extends Model implements HasMedia
                 throw new \InvalidArgumentException('Kebanyakan milih kursi woy, jatahnya cuma ' . $this->number_of_seats);
             }
         }
-        
+
         $this->attributes['seat_numbers'] = $value;
     }
-    
+
     public function setNumberOfSeatsAttribute($value)
     {
         // Validasi lagi, jangan maruk melebihi kapasitas bus
         if ($this->schedule && $value > $this->schedule->bus->capacity) {
             throw new \InvalidArgumentException('Busnya ga muat bos');
         }
-        
+
         $this->attributes['number_of_seats'] = $value;
     }
-    
-    
+
+
     public function isPaymentExpired()
     {
         // Expired 30 menit kalo masih pending, kelamaan nunggu keburu diambil orang
         if ($this->payment_status === 'pending' && $this->payment_started_at) {
             return $this->payment_started_at->addMinutes(30)->isPast();
         }
-        
+
         return false;
     }
-    
-    
+
+
     public function startPayment()
     {
         $this->payment_started_at = Carbon::now();
         $this->save();
     }
-    
-    
+
+
     public static function getOccupiedSeatsForSchedule($scheduleId, $date)
     {
         return self::where('schedule_id', $scheduleId)

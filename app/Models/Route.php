@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Route extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'name',
         'origin',
@@ -33,7 +35,7 @@ class Route extends Model
         return $this->hasMany(Schedule::class);
     }
 
-    
+
     public function getFormattedDurationAttribute()
     {
         if (!$this->duration) {
@@ -53,11 +55,11 @@ class Route extends Model
         }
     }
 
-    
+
     public function getAllCoordinatesAttribute()
     {
         $coordinates = [];
-        
+
         // Add origin
         if ($this->origin_lat && $this->origin_lng) {
             $coordinates[] = [
@@ -65,7 +67,7 @@ class Route extends Model
                 'lng' => (float) $this->origin_lng
             ];
         }
-        
+
         // Add waypoints
         if ($this->waypoints && is_array($this->waypoints)) {
             foreach ($this->waypoints as $waypoint) {
@@ -77,7 +79,7 @@ class Route extends Model
                 }
             }
         }
-        
+
         // Add destination
         if ($this->destination_lat && $this->destination_lng) {
             $coordinates[] = [
@@ -85,7 +87,7 @@ class Route extends Model
                 'lng' => (float) $this->destination_lng
             ];
         }
-        
+
         return $coordinates;
     }
 }

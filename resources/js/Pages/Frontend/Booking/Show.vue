@@ -282,7 +282,7 @@ const formatTime = (dateString) => {
                                         v-model="form.passenger_email"
                                         type="email"
                                         required
-                                        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                        pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
                                         @blur="
                                             form.passenger_email =
                                                 form.passenger_email
@@ -324,7 +324,7 @@ const formatTime = (dateString) => {
                                             form.passenger_phone =
                                                 form.passenger_phone.replace(
                                                     /[^0-9]/g,
-                                                    ''
+                                                    '',
                                                 )
                                         "
                                         placeholder="08xxxxxxxxxx"

@@ -33,11 +33,26 @@ class UserFactory extends Factory
     }
 
     /**
+     * Indicate that the model should be an admin user.
+     */
+    public function admin(): static
+    {
+        return $this->afterCreating(function ($user) {
+            // Ensure admin role exists
+            $adminRole = \Spatie\Permission\Models\Role::where('name', 'admin')->first();
+            if (!$adminRole) {
+                $adminRole = \Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => 'web']);
+            }
+            $user->assignRole('admin');
+        });
+    }
+
+    /**
      * Indicate that the model's email address should be unverified.
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

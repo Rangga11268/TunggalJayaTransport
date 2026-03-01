@@ -224,151 +224,91 @@ class BookingController extends Controller
 
     public function schedules(Request $request)
     {
-        // Get all unique origins and destinations for the dropdowns
-        $origins = \Illuminate\Support\Facades\Cache::remember('route_origins', 60, function () {
-            return BusRoute::pluck('origin')->unique()->values();
-        });
-        $destinations = \Illuminate\Support\Facades\Cache::remember('route_destinations', 60, function () {
-            return BusRoute::pluck('destination')->unique()->values();
-        });
-
-        $origin = $request->get('origin');
-        $destination = $request->get('destination');
-        $date = $request->get('date');
-
         // Validate request parameters
         $request->validate([
             'origin' => 'nullable|string|max:255',
             'destination' => 'nullable|string|max:255',
             'date' => 'nullable|date',
+            'class' => 'nullable|string',
+            'time' => 'nullable|string',
         ]);
 
-        // For date-specific searches, we need to handle weekly schedules specially
-        if ($date) {
-            $searchDate = Carbon::parse($date);
-
-            // Get all active schedules
-            $query = Schedule::with('route', 'bus')->available();
-
-            // Apply filters if provided
-            if ($origin) {
-                $query->whereHas('route', function ($q) use ($origin) {
-                    $q->where('origin', $origin);
-                });
-            }
-
-            if ($destination) {
-                $query->whereHas('route', function ($q) use ($destination) {
-                    $q->where('destination', $destination);
-                });
-            }
-
-            // Get all schedules first
-            $allSchedules = $query->get();
-
-            // Filter schedules based on the search date
-            $filteredSchedules = $allSchedules->filter(function ($schedule) use ($searchDate) {
-                // For daily schedules, check if the date matches
-                if (!$schedule->is_daily) {
-                    return $schedule->departure_time->toDateString() === $searchDate->toDateString()
-                        && $schedule->isAvailableForBooking($searchDate);
-                }
-
-                // For daily recurring schedules, they are available every day
-                if ($schedule->is_daily) {
-                    return $schedule->isAvailableForBooking($searchDate);
-                }
-
-                return false;
-            });
-
-            // Create a paginator manually
-            $perPage = 10;
-            $currentPage = LengthAwarePaginator::resolveCurrentPage();
-            $currentPageItems = $filteredSchedules->slice(($currentPage - 1) * $perPage, $perPage)->values();
-
-            $schedules = new LengthAwarePaginator(
-                $currentPageItems,
-                $filteredSchedules->count(),
-                $perPage,
-                $currentPage,
-            );
-        }
-
-        $query = Schedule::with(['bus', 'route'])
-            ->where('is_active', true);
-
-        // Filter by origin
-        if ($request->has('origin') && $request->origin != '') {
-            $query->whereHas('route', function ($q) use ($request) {
-                $q->where('origin', $request->origin);
-            });
-        }
-
-        // Filter by destination
-        if ($request->has('destination') && $request->destination != '') {
-            $query->whereHas('route', function ($q) use ($request) {
-                $q->where('destination', $request->destination);
-            });
-        }
-
-        // Filter by date (if provided, otherwise show defaults)
-        if ($request->has('date') && $request->date != '') {
-            $searchDate = Carbon::parse($request->date);
-            $query->where(function ($q) use ($searchDate) {
-                // For non-daily schedules, match the exact departure date
-                $q->where(function ($sub) use ($searchDate) {
-                    $sub->where('is_daily', false)
-                        ->whereDate('departure_time', $searchDate->toDateString());
-                })
-                    // For daily schedules, we rely on in-memory filtering later or day_of_week column
-                    ->orWhere('is_daily', true);
-            });
-        }
-
-        $allShedules = $query->get();
-
-        // Wrap the common filtering logic into a helper or reuse the collection filter
-        $searchDate = $request->date ? Carbon::parse($request->date) : Carbon::today();
+        // Get filter parameters
+        $origin = $request->get('origin');
+        $destination = $request->get('destination');
+        $dateParam = $request->get('date');
+        $searchDate = $dateParam ? Carbon::parse($dateParam) : Carbon::today();
         $classes = $request->get('class') ? explode(',', $request->get('class')) : [];
         $times = $request->get('time') ? explode(',', $request->get('time')) : [];
 
-        $schedules = $allShedules->filter(function ($schedule) use ($searchDate, $classes, $times) {
-            // 1. Availability/Status Check
-            if ($schedule->status !== 'active' && !isset($schedule->is_active)) { // handle both column names if exist
-                // check if is_active or status is used
-            }
+        // Build single query pipeline with eager loading to prevent N+1
+        $query = Schedule::with(['bus', 'route'])
+            ->available()
+            ->withSum(['bookings as booked_seats_count' => function ($q) use ($searchDate) {
+                $q->where('booking_status', 'confirmed')
+                    ->where('payment_status', 'paid')
+                    ->whereDate('booking_date', $searchDate);
+            }], 'number_of_seats');
 
-            // 2. Date/Daily Logic
-            if ($schedule->is_daily) {
-                // If has specific days_of_week
-                if (!empty($schedule->days_of_week)) {
-                    $dayName = $searchDate->format('l');
-                    $allowedDays = is_string($schedule->days_of_week) ? json_decode($schedule->days_of_week, true) : $schedule->days_of_week;
-                    if (is_array($allowedDays) && !in_array($dayName, $allowedDays)) {
-                        return false;
-                    }
-                }
-            } else {
-                // Already filtered in query for exact date, but double check
-                if ($schedule->departure_time->toDateString() !== $searchDate->toDateString()) {
-                    return false;
-                }
-            }
+        // Apply origin filter
+        if ($origin) {
+            $query->whereHas('route', function ($q) use ($origin) {
+                $q->where('origin', $origin);
+            });
+        }
 
-            // 3. Past Departure Check
+        // Apply destination filter
+        if ($destination) {
+            $query->whereHas('route', function ($q) use ($destination) {
+                $q->where('destination', $destination);
+            });
+        }
+
+        // Apply date filter (handles both daily and non-daily)
+        if ($dateParam) {
+            $query->where(function ($q) use ($searchDate) {
+                $q->where(function ($sub) use ($searchDate) {
+                    // Non-daily schedules: match exact departure date
+                    $sub->where('is_daily', false)
+                        ->whereDate('departure_time', $searchDate->toDateString());
+                })
+                    ->orWhere('is_daily', true); // Daily schedules: available every day
+            });
+        }
+
+        // Get all matching schedules
+        $allSchedules = $query->get();
+
+        // Apply collection filters (in-memory for complex logic like days_of_week, time ranges)
+        $filteredSchedules = $allSchedules->filter(function ($schedule) use ($searchDate, $classes, $times) {
+            // 1. Check if schedule has departed
             if ($schedule->hasDeparted($searchDate)) {
                 return false;
             }
 
-            // 4. Class Filter
-            if (!empty($classes)) {
-                if (!in_array($schedule->bus->bus_type, $classes)) {
+            // 2. Check availability for booking
+            if (!$schedule->isAvailableForBooking($searchDate)) {
+                return false;
+            }
+
+            // 3. For daily schedules with specific days_of_week, check if today is allowed
+            if ($schedule->is_daily && !empty($schedule->days_of_week)) {
+                $dayName = $searchDate->format('l');
+                $allowedDays = is_string($schedule->days_of_week)
+                    ? json_decode($schedule->days_of_week, true)
+                    : $schedule->days_of_week;
+
+                if (is_array($allowedDays) && !in_array($dayName, $allowedDays)) {
                     return false;
                 }
             }
 
-            // 5. Time Filter
+            // 4. Apply class/bus type filter
+            if (!empty($classes) && !in_array($schedule->bus->bus_type, $classes)) {
+                return false;
+            }
+
+            // 5. Apply time range filter
             if (!empty($times)) {
                 $departureTime = $schedule->getActualDepartureTime($searchDate);
                 $hour = $departureTime->hour;
@@ -379,11 +319,18 @@ class BookingController extends Controller
                     if ($time === 'afternoon' && $hour >= 12 && $hour < 18) $timeMatch = true;
                     if ($time === 'evening' && $hour >= 18 && $hour <= 23) $timeMatch = true;
                 }
+
                 if (!$timeMatch) return false;
             }
 
             return true;
-        })->map(function ($schedule) use ($searchDate) {
+        });
+
+        // Transform filtered schedules for response
+        $transformedSchedules = $filteredSchedules->map(function ($schedule) use ($searchDate) {
+            $bookedSeats = $schedule->booked_seats_count ?? 0;
+            $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
+
             return [
                 'id' => $schedule->id,
                 'price' => $schedule->price,
@@ -391,9 +338,10 @@ class BookingController extends Controller
                 'arrival_time' => $schedule->getActualArrivalTime($searchDate)->format('H:i'),
                 'duration' => $schedule->route->formatted_duration,
                 'is_daily' => $schedule->is_daily,
+                'available_seats' => $availableSeats,
                 'bus' => [
                     'name' => $schedule->bus->name,
-                    'type' => $schedule->bus->type,
+                    'type' => $schedule->bus->bus_type,
                     'capacity' => $schedule->bus->capacity,
                     'plate_number' => $schedule->bus->plate_number,
                     'bus_type' => $schedule->bus->bus_type,
@@ -402,27 +350,38 @@ class BookingController extends Controller
                     'origin' => $schedule->route->origin,
                     'destination' => $schedule->route->destination,
                 ],
-                'available_seats' => $schedule->getAvailableSeatsCount($searchDate),
             ];
-        });
+        })->values();
 
+        // Manual pagination
+        $perPage = 10;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $paginatedSchedules = new LengthAwarePaginator(
+            $transformedSchedules->slice(($currentPage - 1) * $perPage, $perPage)->values(),
+            $transformedSchedules->count(),
+            $perPage,
+            $currentPage,
+            ['path' => route('frontend.booking.schedules')]
+        );
+
+        // Get distinct origins and destinations
         $origins = \App\Models\Route::distinct()->pluck('origin');
         $destinations = \App\Models\Route::distinct()->pluck('destination');
 
-        // Check if origin and destination pair is valid
+        // Validate origin-destination pair
         $validPair = true;
-        if ($request->has('origin') && $request->has('destination') && $request->origin && $request->destination) {
-            $validPair = \App\Models\Route::where('origin', $request->origin)
-                ->where('destination', $request->destination)
+        if ($origin && $destination) {
+            $validPair = \App\Models\Route::where('origin', $origin)
+                ->where('destination', $destination)
                 ->exists();
         }
 
         return \Inertia\Inertia::render('Frontend/Booking/Index', [
-            'schedules' => $schedules,
+            'schedules' => $paginatedSchedules,
             'origins' => $origins,
             'destinations' => $destinations,
             'validPair' => $validPair,
-            'filters' => $request->only(['origin', 'destination', 'date']),
+            'filters' => $request->only(['origin', 'destination', 'date', 'class', 'time']),
         ]);
     }
 
@@ -537,16 +496,16 @@ class BookingController extends Controller
         $booking = new Booking();
         $booking->user_id = \Illuminate\Support\Facades\Auth::id(); // User is guaranteed to be authenticated at this point
         $booking->schedule_id = $schedule->id;
-        $booking->booking_date = $bookingDate; // Set the specific booking date
+        $booking->booking_date = \Carbon\Carbon::createFromFormat('Y-m-d', $bookingDate);
         $booking->passenger_name = $request->passenger_name;
         $booking->passenger_email = $request->passenger_email;
         $booking->passenger_phone = $request->passenger_phone;
         $booking->seat_numbers = null; // Will be set later during seat selection
         $booking->number_of_seats = $request->number_of_seats;
-        $booking->total_price = $schedule->price * $request->number_of_seats;
+        $booking->total_price = (float) ($schedule->price * $request->number_of_seats);
         $booking->booking_code = 'BK' . strtoupper(uniqid());
         $booking->payment_status = 'pending';
-        $booking->booking_status = 'confirmed'; // For immediate confirmation
+        $booking->booking_status = 'pending'; // Start as pending, confirm after payment succeeds
         $booking->startPayment(); // Start payment timer
         $booking->save();
 
@@ -728,9 +687,9 @@ class BookingController extends Controller
                     $discount = $promoCode->calculateDiscount($basePrice);
 
                     // Update Booking
-                    $booking->original_total_price = $basePrice;
-                    $booking->discount_amount = $discount;
-                    $booking->total_price = max(0, $basePrice - $discount);
+                    $booking->original_total_price = (float) $basePrice;
+                    $booking->discount_amount = (float) $discount;
+                    $booking->total_price = (float) max(0, $basePrice - $discount);
                     $booking->promo_code_id = $promoCode->id;
                     $booking->save();
 
