@@ -26,14 +26,23 @@ class NewsArticle extends Model implements HasMedia
         'published_at' => 'datetime',
     ];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'safe_content'];
 
     public function getImageUrlAttribute()
     {
-        return $this->getFirstMediaUrl('cover') 
-            ?: $this->getFirstMediaUrl('featured_images') 
-            ?: $this->getFirstMediaUrl('default') 
-            ?: 'https://placehold.co/800x600?text=No+Image'; 
+        return $this->getFirstMediaUrl('cover')
+            ?: $this->getFirstMediaUrl('featured_images')
+            ?: $this->getFirstMediaUrl('default')
+            ?: 'https://placehold.co/800x600?text=No+Image';
+    }
+
+    /**
+     * Get sanitized content safe for v-html rendering
+     * Applies allowlist of safe HTML tags
+     */
+    public function getSafeContentAttribute()
+    {
+        return strip_tags($this->content, '<p><br><b><i><u><strong><em><ul><ol><li><a><img>');
     }
 
     public function category()

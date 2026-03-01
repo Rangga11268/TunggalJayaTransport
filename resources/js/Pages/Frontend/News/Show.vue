@@ -109,8 +109,8 @@ const formatDate = (dateString) => {
                     <div
                         class="prose prose-base md:prose-lg prose-rose dark:prose-invert max-w-none font-manrope text-gray-800 dark:text-gray-200"
                     >
-                        <!-- We assume content is HTML from a WYSIWYG editor -->
-                        <div v-html="article.content"></div>
+                        <!-- Content is sanitized server-side with allowlist of safe tags -->
+                        <div v-html="article.safe_content"></div>
                     </div>
 
                     <!-- Share & Tags -->

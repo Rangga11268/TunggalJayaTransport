@@ -17,6 +17,8 @@ class OtpService
 
     public function generate(string $identifier, string $method = 'whatsapp'): string
     {
+        $clientIp = $this->getClientIp();
+
         // Rate limiting: Max 1 request per 2 minutes per identifier
         $throttleKey = "otp_throttle:{$identifier}";
         if (Cache::has($throttleKey)) {
@@ -25,6 +27,16 @@ class OtpService
                 throw new \Exception("Tunggu sebentar ya. Anda bisa minta OTP lagi dalam " . ceil($secondsRemaining / 60) . " menit.");
             }
         }
+
+        // IP-based burst prevention: Max 5 OTP requests per IP per 15 minutes
+        $ipThrottleKey = "otp_ip_throttle:{$clientIp}";
+        $ipAttempts = Cache::get($ipThrottleKey, 0);
+        if ($ipAttempts >= 5) {
+            throw new \Exception("Terlalu banyak percobaan dari IP ini. Silakan coba lagi dalam 15 menit.");
+        }
+
+        // Increment IP-based counter
+        Cache::put($ipThrottleKey, $ipAttempts + 1, now()->addMinutes(15));
 
         // Bikin kode OTP baru yang fresh
         $otp = $this->createOtpString();
@@ -132,5 +144,16 @@ class OtpService
     private function createOtpString(): string
     {
         return str_pad(random_int(0, pow(10, self::OTP_LENGTH) - 1), self::OTP_LENGTH, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Get client IP address from request, accounting for proxies
+     */
+    private function getClientIp(): string
+    {
+        if (app()->has('request')) {
+            return request()->ip();
+        }
+        return '127.0.0.1';
     }
 }

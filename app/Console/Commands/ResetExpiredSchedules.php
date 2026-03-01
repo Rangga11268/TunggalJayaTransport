@@ -8,19 +8,19 @@ use Carbon\Carbon;
 
 class ResetExpiredSchedules extends Command
 {
-    
+
     protected $signature = 'schedules:reset-expired';
 
-    
+
     protected $description = 'Reset expired schedules and prepare them for next day';
 
-    
+
     public function handle()
     {
         $this->info('Resetting expired schedules...');
 
-        // Get all daily schedules that have already departed today
-        $expiredDailySchedules = Schedule::daily()
+        // Get all non-recurring schedules that have already departed today
+        $expiredDailySchedules = Schedule::nonRecurring()
             ->where('departure_time', '<', Carbon::now())
             ->get();
 
@@ -53,7 +53,7 @@ class ResetExpiredSchedules extends Command
             $this->info("Processed daily recurring schedule ID {$schedule->id} - available every day");
         }
 
-        
+
 
         $this->info("Schedule reset process completed. Reset {$dailyResetCount} daily schedules and processed {$dailyRecurringSchedules->count()} daily recurring schedules.");
     }

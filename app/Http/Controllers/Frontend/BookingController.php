@@ -6,11 +6,11 @@ use Carbon\Carbon;
 use App\Models\Booking;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Route as BusRoute;
 use App\Services\TicketPdfService;
 use App\Services\PaymentService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -564,7 +564,8 @@ class BookingController extends Controller
             ->where('user_id', \Illuminate\Support\Facades\Auth::id())
             ->findOrFail($id);
 
-        // Check if the schedule has already departed
+        // Authorization check: Pastikan user punya akses ke booking ini
+        Gate::authorize('view', $booking);
         if ($booking->schedule->hasDeparted()) {
             return redirect()->route('frontend.booking.index')
                 ->withErrors(['schedule' => 'The schedule for this booking has already departed.'])
@@ -603,6 +604,9 @@ class BookingController extends Controller
                 $booking = Booking::lockForUpdate()
                     ->where('user_id', \Illuminate\Support\Facades\Auth::id())
                     ->findOrFail($request->booking_id);
+
+                // Authorization check: Pastikan user punya akses ke booking ini
+                Gate::authorize('update', $booking);
 
                 // Kunci juga jadwalnya, ini paling penting biar ga overbooking
                 $schedule = Schedule::lockForUpdate()->with('bus')->find($booking->schedule_id);
@@ -675,22 +679,17 @@ class BookingController extends Controller
     public function processPayment(Request $request)
     {
         try {
-            // Log request details (simplified for security)
-            Log::info('Payment processing request', [
-                'booking_id' => $request->booking_id,
-                'user_id' => \Illuminate\Support\Facades\Auth::id()
-            ]);
-
             // Validate the request
             $validatedData = $request->validate([
                 'booking_id' => 'required|exists:bookings,id',
                 'payment_method' => 'required|string|in:gopay,shopeepay,qris,dana,linkaja,credit_card,bank_transfer,echannel'
             ]);
 
-            Log::info('Validation passed', ['validated_data' => $validatedData]);
-
             $booking = Booking::where('user_id', \Illuminate\Support\Facades\Auth::id())
                 ->findOrFail($validatedData['booking_id']);
+
+            // Authorization check: Pastikan user bisa bayar booking ini
+            Gate::authorize('pay', $booking);
 
             // Check if payment has expired
             if ($booking->isPaymentExpired()) {

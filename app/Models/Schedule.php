@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
-use Carbon\CarbonTimeZone;
 
 class Schedule extends Model
 {
@@ -26,7 +25,7 @@ class Schedule extends Model
         'days_of_week' => 'array',
     ];
 
-    
+
     protected static function boot()
     {
         parent::boot();
@@ -116,7 +115,7 @@ class Schedule extends Model
         return array_values(array_unique($seatNumbers)); // Remove duplicates and reindex
     }
 
-    
+
     public function getActualDepartureTime($forDate = null)
     {
         $departureTime = null;
@@ -148,7 +147,7 @@ class Schedule extends Model
         return $departureTime->setTimezone('Asia/Jakarta');
     }
 
-    
+
     public function getActualArrivalTime($forDate = null)
     {
         $arrivalTime = null;
@@ -175,7 +174,7 @@ class Schedule extends Model
         return $arrivalTime->setTimezone('Asia/Jakarta');
     }
 
-    
+
     public function hasDeparted($forDate = null)
     {
         // Pake WIB dong pastinya
@@ -203,7 +202,7 @@ class Schedule extends Model
         }
     }
 
-    
+
     public function getDepartureTimeInTimezone($timezone = null)
     {
         if ($timezone === null) {
@@ -215,21 +214,21 @@ class Schedule extends Model
         return $departureTime->setTimezone($timezone);
     }
 
-    
 
-    
+
+
     public function getDepartureTimeWIB()
     {
         return $this->getActualDepartureTime()->setTimezone('Asia/Jakarta');
     }
 
-    
+
     public function getArrivalTimeWIB()
     {
         return $this->getActualArrivalTime()->setTimezone('Asia/Jakarta');
     }
 
-    
+
     public function isAvailableForBooking($forDate = null)
     {
         // Aktif ga nih?
@@ -246,9 +245,9 @@ class Schedule extends Model
         return $this->getAvailableSeatsCount($forDate) > 0;
     }
 
-    
 
-    
+
+
     public function getUpcomingDates($startDate = null, $endDate = null, $limit = 10)
     {
         // Buat jadwal harian, balikin range tanggal
@@ -274,7 +273,7 @@ class Schedule extends Model
         return collect();
     }
 
-    
+
     public function getBookingsToCancel()
     {
         if ($this->is_daily) {
@@ -290,7 +289,7 @@ class Schedule extends Model
         }
     }
 
-    
+
     public function scopeAvailable($query)
     {
         return $query->where('status', 'active')
@@ -298,21 +297,23 @@ class Schedule extends Model
             ->whereHas('route');
     }
 
-    
 
-    
-    public function scopeDaily($query)
+
+    /**
+     * Scope untuk jadwal non-recurring (single trip/date)
+     */
+    public function scopeNonRecurring($query)
     {
         return $query->where('is_daily', false);
     }
 
-    
+
     public function scopeDailyRecurring($query)
     {
         return $query->where('is_daily', true);
     }
 
-    
+
     public function getDisplayInfo()
     {
         $departure = $this->getActualDepartureTime();
