@@ -7,6 +7,7 @@ use App\Services\PaymentService;
 use App\Services\MidtransService;
 use App\Models\Booking;
 use App\Models\PaymentHistory;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -19,7 +20,7 @@ class PaymentController extends Controller
         $this->midtransService = $midtransService;
     }
 
-    
+
     public function process(Request $request)
     {
         $request->validate([
@@ -27,8 +28,13 @@ class PaymentController extends Controller
             'payment_method' => 'required|string|in:gopay,shopeepay,qris,dana,linkaja,credit_card,bank_transfer,echannel'
         ]);
 
+        Log::info('Validation passed', ['validated_data' => $request->all()]);
+
+        $booking = Booking::where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->findOrFail($request->booking_id);
+
         $result = $this->paymentService->processPayment(
-            $request->booking_id,
+            $booking->id,
             $request->payment_method
         );
 
@@ -47,20 +53,26 @@ class PaymentController extends Controller
         ], 400);
     }
 
-    
+
     public function status($orderId)
     {
-        $paymentHistory = PaymentHistory::where('transaction_id', $orderId)->first();
+        $paymentHistory = PaymentHistory::where('transaction_id', $orderId)
+            ->whereHas('booking', function ($query) {
+                $query->where('user_id', \Illuminate\Support\Facades\Auth::id());
+            })
+            ->first();
         $booking = null;
 
         // Coba cek di tabel Booking kalo history ga ketemu, kali aja nyelip
         if (!$paymentHistory) {
-            $booking = Booking::where('midtrans_transaction_id', $orderId)->first();
-            
+            $booking = Booking::where('midtrans_transaction_id', $orderId)
+                ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+                ->first();
+
             if (!$booking) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Transaction not found'
+                    'message' => 'Transaction not found or unauthorized'
                 ], 404);
             }
         } else {
@@ -71,8 +83,10 @@ class PaymentController extends Controller
         $result = $this->midtransService->getTransactionStatus($orderId);
 
         // Kalo sukses yaudah balikin aja langsung
-        if ($result['status'] === 'success' && 
-           ($result['transaction_status'] == 'settlement' || $result['transaction_status'] == 'capture')) {
+        if (
+            $result['status'] === 'success' &&
+            ($result['transaction_status'] == 'settlement' || $result['transaction_status'] == 'capture')
+        ) {
             return response()->json([
                 'status' => 'success',
                 'data' => $result['data'],
@@ -90,10 +104,12 @@ class PaymentController extends Controller
             foreach ($allTransactions as $history) {
                 // Cekin satu-satu statusnya
                 $recoveryResult = $this->midtransService->getTransactionStatus($history->transaction_id);
-                
-                if ($recoveryResult['status'] === 'success' && 
-                   ($recoveryResult['transaction_status'] == 'settlement' || $recoveryResult['transaction_status'] == 'capture')) {
-                    
+
+                if (
+                    $recoveryResult['status'] === 'success' &&
+                    ($recoveryResult['transaction_status'] == 'settlement' || $recoveryResult['transaction_status'] == 'capture')
+                ) {
+
                     $booking->update([
                         'payment_status' => 'paid',
                         'midtrans_transaction_id' => $history->transaction_id
@@ -108,18 +124,18 @@ class PaymentController extends Controller
                 }
             }
         }
-        
+
         // Kalo ga ketemu alias not_found, yaudah bilang aja nunggu pembayaran
         if ($result['status'] === 'not_found') {
-             return response()->json([
+            return response()->json([
                 'status' => 'success', // Tetep success biar frontend ga panik
-                'transaction_status' => 'not_found', 
+                'transaction_status' => 'not_found',
                 'message' => $result['message']
             ]);
         }
 
         if ($result['status'] === 'success') {
-             return response()->json([
+            return response()->json([
                 'status' => 'success',
                 'data' => $result['data'],
                 'transaction_status' => $result['transaction_status'] ?? 'unknown'
@@ -132,15 +148,15 @@ class PaymentController extends Controller
         ], 500);
     }
 
-    
+
     public function webhook(Request $request)
     {
         // Validasi payload dulu
         $payload = $request->all();
-        
+
         // Validasi notifikasinya beneran dari Midtrans ga
         $isValid = $this->midtransService->validateNotification($payload);
-        
+
         if (!$isValid) {
             return response()->json([
                 'status' => 'error',

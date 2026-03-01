@@ -21,14 +21,16 @@ Route::prefix('')->name('frontend.')->group(function () {
         Route::post('/process-payment', [App\Http\Controllers\Frontend\BookingController::class, 'processPayment'])->middleware(['auth', 'phone.verified'])->name('booking.process-payment');
         Route::post('/check-availability', [App\Http\Controllers\Frontend\BookingController::class, 'checkAvailability'])->name('check-availability');
 
-        Route::get('/confirmation/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'confirmation'])->name('booking.confirmation');
-        Route::get('/success/{id}', [App\Http\Controllers\Frontend\BookingController::class, 'success'])->name('booking.success');
-        Route::get('/ticket/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'downloadTicket'])->name('booking.download-ticket');
-        
-        // Payment Routes
-        Route::prefix('payment')->name('payment.')->group(function () {
-            Route::post('/process', [App\Http\Controllers\PaymentController::class, 'process'])->name('process');
-            Route::get('/status/{orderId}', [App\Http\Controllers\PaymentController::class, 'status'])->name('status');
+        Route::middleware(['auth', 'phone.verified'])->group(function () {
+            Route::get('/confirmation/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'confirmation'])->name('booking.confirmation');
+            Route::get('/success/{id}', [App\Http\Controllers\Frontend\BookingController::class, 'success'])->name('booking.success');
+            Route::get('/ticket/{booking}', [App\Http\Controllers\Frontend\BookingController::class, 'downloadTicket'])->name('booking.download-ticket');
+
+            // Payment Routes
+            Route::prefix('payment')->name('payment.')->group(function () {
+                Route::post('/process', [App\Http\Controllers\PaymentController::class, 'process'])->name('process');
+                Route::get('/status/{orderId}', [App\Http\Controllers\PaymentController::class, 'status'])->name('status');
+            });
         });
     });
 
@@ -65,7 +67,6 @@ Route::middleware(['auth', 'phone.verified'])->group(function () {
         Route::get('/', [App\Http\Controllers\BookingHistoryController::class, 'index'])->name('index');
         Route::get('/{id}', [App\Http\Controllers\BookingHistoryController::class, 'show'])->name('show');
     });
-    
 });
 
 // Payment webhook route (must be accessible without auth)

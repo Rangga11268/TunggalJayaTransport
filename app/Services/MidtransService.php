@@ -43,7 +43,7 @@ class MidtransService
                 $callbackUrl = route('frontend.booking.success', ['id' => $bookingId]);
 
                 // Log URL callback buat debug nanti
-                \Log::info('Midtrans callback URL generated', [
+                \Illuminate\Support\Facades\Log::info('Midtrans callback URL generated', [
                     'booking_id' => $bookingId,
                     'callback_url' => $callbackUrl
                 ]);
@@ -110,7 +110,7 @@ class MidtransService
                 $parts = explode('_', $orderId);
                 $bookingCode = $parts[0];
                 $booking = \App\Models\Booking::where('booking_code', $bookingCode)->first();
-                
+
                 if ($booking) {
                     Log::warning('PaymentHistory not found for order ' . $orderId . ', but Booking found: ' . $booking->id);
                     // Create missing PaymentHistory? Optional, but at least update Booking.
@@ -122,16 +122,16 @@ class MidtransService
                     ];
                 }
             }
-            
+
             if ($booking) {
-                 if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
+                if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
                     // Pembayaran sukses mantap
                     $booking->update([
                         'payment_status' => 'paid',
                         'booking_status' => 'confirmed', // Ensure booking is confirmed
                         'midtrans_transaction_id' => $orderId
                     ]);
-                    
+
                     // Kirim notifikasi WhatsApp e-ticket
                     try {
                         $waService = app(WhatsAppNotificationService::class);
@@ -162,7 +162,7 @@ class MidtransService
         } catch (\Exception $e) {
             // Cek kalo 404 (Transaksi ga ada)
             if (strpos($e->getMessage(), '404') !== false || $e->getCode() == 404) {
-                 return [
+                return [
                     'status' => 'not_found',
                     'message' => 'Transaction has not been created yet (waiting for payment)'
                 ];
@@ -217,7 +217,7 @@ class MidtransService
                 'booking_status' => 'confirmed',
                 'midtrans_transaction_id' => $orderId
             ]);
-            
+
             // Kirim notifikasi WhatsApp e-ticket
             try {
                 $waService = app(WhatsAppNotificationService::class);
@@ -246,7 +246,7 @@ class MidtransService
     }
 
     /**
-     * Validate notification from Midtrans
+     * Validate notification from Midtrans using SHA512 signature verification
      * 
      * @param array $notification
      * @return bool
@@ -254,15 +254,40 @@ class MidtransService
     public function validateNotification($notification)
     {
         try {
+            // SHA512 signature verification logic
+            // signature_key = hash("sha512", order_id + status_code + gross_amount + server_key)
             $orderId = $notification['order_id'];
-            $result = Transaction::status($orderId);
+            $statusCode = $notification['status_code'];
+            $grossAmount = $notification['gross_amount'];
+            $serverKey = config('midtrans.server_key');
+            $signatureKey = $notification['signature_key'];
 
-            // Verify the status matches
+            $calculatedSignature = hash("sha512", $orderId . $statusCode . $grossAmount . $serverKey);
+
+            if ($signatureKey !== $calculatedSignature) {
+                \Illuminate\Support\Facades\Log::error('Midtrans signature key mismatch!', [
+                    'order_id' => $orderId,
+                    'provided_signature' => $signatureKey,
+                    'calculated_signature' => $calculatedSignature
+                ]);
+                return false;
+            }
+
+            // Optional: Backup verification via Midtrans Transaction Status API
+            // to ensure the status hasn't been tampered with
+            $result = (object) Transaction::status($orderId);
+
             if ($result->transaction_status === $notification['transaction_status']) {
                 return true;
             }
+
+            \Illuminate\Support\Facades\Log::error('Midtrans status mismatch between payload and API query', [
+                'order_id' => $orderId,
+                'payload_status' => $notification['transaction_status'],
+                'api_status' => $result->transaction_status
+            ]);
         } catch (\Exception $e) {
-            \Log::error('Midtrans validation error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Midtrans validation error: ' . $e->getMessage());
         }
 
         return false;

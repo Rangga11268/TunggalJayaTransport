@@ -52,26 +52,26 @@ class BookingController extends Controller
                 $routeIds = $validRoutes->pluck('id');
 
                 $query = Schedule::whereIn('route_id', $routeIds)
-                        ->with('route', 'bus')
-                        ->withSum(['bookings as booked_seats_count' => function ($q) use ($searchDate) {
-                            $q->where('booking_status', 'confirmed')
-                              ->where('payment_status', 'paid');
-                            
-                            if ($searchDate) {
-                                $q->whereDate('booking_date', $searchDate);
-                            } else {
-                                // Kalo ga pilih tanggal, anggep buat hari ini kedepan
-                                $q->whereDate('booking_date', '>=', Carbon::today());
-                            }
-                        }], 'number_of_seats')
-                        ->available();
+                    ->with('route', 'bus')
+                    ->withSum(['bookings as booked_seats_count' => function ($q) use ($searchDate) {
+                        $q->where('booking_status', 'confirmed')
+                            ->where('payment_status', 'paid');
+
+                        if ($searchDate) {
+                            $q->whereDate('booking_date', $searchDate);
+                        } else {
+                            // Kalo ga pilih tanggal, anggep buat hari ini kedepan
+                            $q->whereDate('booking_date', '>=', Carbon::today());
+                        }
+                    }], 'number_of_seats')
+                    ->available();
 
                 $allSchedules = $query->get();
 
                 // Filter schedules
                 $schedules = $allSchedules->filter(function ($schedule) use ($searchDate, $classes, $times) {
                     // 1. Availability Check
-                    
+
                     // Use the eager loaded count instead of querying DB
                     $bookedSeats = $schedule->booked_seats_count ?? 0;
                     $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
@@ -83,9 +83,9 @@ class BookingController extends Controller
                     if ($searchDate) {
                         if (!$schedule->is_daily) {
                             $dateMatch = $schedule->departure_time->toDateString() === $searchDate->toDateString();
-                            
+
                             if (!$dateMatch) return false;
-                        } 
+                        }
                         // For daily, it matches every day.
                     }
 
@@ -118,15 +118,15 @@ class BookingController extends Controller
             // Default: Fetch all available schedules if no specific search
             $validPair = true;
             // For default view, still eager load to prevent N+1
-             $query = Schedule::with('route', 'bus')
+            $query = Schedule::with('route', 'bus')
                 ->withSum(['bookings as booked_seats_count' => function ($q) {
-                        $q->where('booking_status', 'confirmed')
-                          ->where('payment_status', 'paid')
-                          ->whereDate('booking_date', '>=', Carbon::today());
+                    $q->where('booking_status', 'confirmed')
+                        ->where('payment_status', 'paid')
+                        ->whereDate('booking_date', '>=', Carbon::today());
                 }], 'number_of_seats')
                 ->available()
                 ->orderBy('departure_time');
-            
+
             $allSchedules = $query->get();
 
             $schedules = $allSchedules->filter(function ($schedule) use ($classes, $times, $searchDate) {
@@ -138,7 +138,7 @@ class BookingController extends Controller
                 // VALIDASI JADWAL NON-DAILY (Tanggal Spesifik)
                 if (!$schedule->is_daily) {
                     $departure = $schedule->departure_time instanceof Carbon ? $schedule->departure_time : Carbon::parse($schedule->departure_time);
-                    
+
                     // 1. Cek apakah sudah lewat (relative to now)
                     if ($departure->isPast()) return false;
 
@@ -149,13 +149,13 @@ class BookingController extends Controller
 
                 // FILTER HARI SPESIFIK: Cek apakah jadwal ini jalan di hari tsb
                 if ($schedule->is_daily && !empty($schedule->days_of_week)) {
-                     $dayName = $searchDate->format('l'); // Sunday, Monday, etc.
-                     // Decode JSON kalo belum (biasanya auto-cast di model)
-                     $allowedDays = is_string($schedule->days_of_week) ? json_decode($schedule->days_of_week, true) : $schedule->days_of_week;
-                     
-                     if (is_array($allowedDays) && !in_array($dayName, $allowedDays)) {
-                         return false;
-                     }
+                    $dayName = $searchDate->format('l'); // Sunday, Monday, etc.
+                    // Decode JSON kalo belum (biasanya auto-cast di model)
+                    $allowedDays = is_string($schedule->days_of_week) ? json_decode($schedule->days_of_week, true) : $schedule->days_of_week;
+
+                    if (is_array($allowedDays) && !in_array($dayName, $allowedDays)) {
+                        return false;
+                    }
                 }
 
                 // Class Filter
@@ -167,7 +167,7 @@ class BookingController extends Controller
 
                 // Time Filter
                 if (!empty($times)) {
-                    $departureTime = $schedule->getActualDepartureTime(); 
+                    $departureTime = $schedule->getActualDepartureTime();
                     $hour = $departureTime->hour;
                     $timeMatch = false;
 
@@ -187,11 +187,11 @@ class BookingController extends Controller
         // Transform schedules for frontend
         $schedules = $schedules->map(function ($schedule) use ($date) {
             $checkDate = $date ? Carbon::parse($date) : null;
-            
+
             // Calculate available seats using the eager loaded value
             $bookedSeats = $schedule->booked_seats_count ?? 0;
             $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
-            
+
             // Check departure status
             $hasDeparted = $schedule->hasDeparted($checkDate);
 
@@ -297,7 +297,7 @@ class BookingController extends Controller
 
         $query = Schedule::with(['bus', 'route'])
             ->where('is_active', true);
-        
+
         // Filter by origin
         if ($request->has('origin') && $request->origin != '') {
             $query->whereHas('route', function ($q) use ($request) {
@@ -314,14 +314,81 @@ class BookingController extends Controller
 
         // Filter by date (if provided, otherwise show defaults)
         if ($request->has('date') && $request->date != '') {
+            $searchDate = Carbon::parse($request->date);
+            $query->where(function ($q) use ($searchDate) {
+                // For non-daily schedules, match the exact departure date
+                $q->where(function ($sub) use ($searchDate) {
+                    $sub->where('is_daily', false)
+                        ->whereDate('departure_time', $searchDate->toDateString());
+                })
+                    // For daily schedules, we rely on in-memory filtering later or day_of_week column
+                    ->orWhere('is_daily', true);
+            });
         }
 
-        $schedules = $query->get()->map(function ($schedule) {
+        $allShedules = $query->get();
+
+        // Wrap the common filtering logic into a helper or reuse the collection filter
+        $searchDate = $request->date ? Carbon::parse($request->date) : Carbon::today();
+        $classes = $request->get('class') ? explode(',', $request->get('class')) : [];
+        $times = $request->get('time') ? explode(',', $request->get('time')) : [];
+
+        $schedules = $allShedules->filter(function ($schedule) use ($searchDate, $classes, $times) {
+            // 1. Availability/Status Check
+            if ($schedule->status !== 'active' && !isset($schedule->is_active)) { // handle both column names if exist
+                // check if is_active or status is used
+            }
+
+            // 2. Date/Daily Logic
+            if ($schedule->is_daily) {
+                // If has specific days_of_week
+                if (!empty($schedule->days_of_week)) {
+                    $dayName = $searchDate->format('l');
+                    $allowedDays = is_string($schedule->days_of_week) ? json_decode($schedule->days_of_week, true) : $schedule->days_of_week;
+                    if (is_array($allowedDays) && !in_array($dayName, $allowedDays)) {
+                        return false;
+                    }
+                }
+            } else {
+                // Already filtered in query for exact date, but double check
+                if ($schedule->departure_time->toDateString() !== $searchDate->toDateString()) {
+                    return false;
+                }
+            }
+
+            // 3. Past Departure Check
+            if ($schedule->hasDeparted($searchDate)) {
+                return false;
+            }
+
+            // 4. Class Filter
+            if (!empty($classes)) {
+                if (!in_array($schedule->bus->bus_type, $classes)) {
+                    return false;
+                }
+            }
+
+            // 5. Time Filter
+            if (!empty($times)) {
+                $departureTime = $schedule->getActualDepartureTime($searchDate);
+                $hour = $departureTime->hour;
+                $timeMatch = false;
+
+                foreach ($times as $time) {
+                    if ($time === 'morning' && $hour >= 0 && $hour < 12) $timeMatch = true;
+                    if ($time === 'afternoon' && $hour >= 12 && $hour < 18) $timeMatch = true;
+                    if ($time === 'evening' && $hour >= 18 && $hour <= 23) $timeMatch = true;
+                }
+                if (!$timeMatch) return false;
+            }
+
+            return true;
+        })->map(function ($schedule) use ($searchDate) {
             return [
                 'id' => $schedule->id,
                 'price' => $schedule->price,
-                'departure_time' => $schedule->departure_time->format('H:i'),
-                'arrival_time' => $schedule->arrival_time->format('H:i'),
+                'departure_time' => $schedule->getActualDepartureTime($searchDate)->format('H:i'),
+                'arrival_time' => $schedule->getActualArrivalTime($searchDate)->format('H:i'),
                 'duration' => $schedule->route->formatted_duration,
                 'is_daily' => $schedule->is_daily,
                 'bus' => [
@@ -329,13 +396,13 @@ class BookingController extends Controller
                     'type' => $schedule->bus->type,
                     'capacity' => $schedule->bus->capacity,
                     'plate_number' => $schedule->bus->plate_number,
-                    'bus_type' => $schedule->bus->bus_type, 
+                    'bus_type' => $schedule->bus->bus_type,
                 ],
                 'route' => [
                     'origin' => $schedule->route->origin,
                     'destination' => $schedule->route->destination,
                 ],
-                'available_seats' => $schedule->getAvailableSeatsCount(),
+                'available_seats' => $schedule->getAvailableSeatsCount($searchDate),
             ];
         });
 
@@ -394,7 +461,7 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         // Ensure user is authenticated before creating a booking
-        if (!auth()->check()) {
+        if (!\Illuminate\Support\Facades\Auth::check()) {
             return redirect()->route('login')->with('error', 'You must be logged in to make a booking.');
         }
 
@@ -462,13 +529,13 @@ class BookingController extends Controller
         if ($bookingDate instanceof Carbon) {
             $bookingDate = $bookingDate->format('Y-m-d');
         } else {
-             // Ensure it's a valid date string even if it came as string
-             $bookingDate = Carbon::parse($bookingDate)->format('Y-m-d');
+            // Ensure it's a valid date string even if it came as string
+            $bookingDate = Carbon::parse($bookingDate)->format('Y-m-d');
         }
 
         // Create booking
         $booking = new Booking();
-        $booking->user_id = auth()->id(); // User is guaranteed to be authenticated at this point
+        $booking->user_id = \Illuminate\Support\Facades\Auth::id(); // User is guaranteed to be authenticated at this point
         $booking->schedule_id = $schedule->id;
         $booking->booking_date = $bookingDate; // Set the specific booking date
         $booking->passenger_name = $request->passenger_name;
@@ -493,12 +560,9 @@ class BookingController extends Controller
 
     public function confirmation($id)
     {
-        $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
-
-        // Check if the current user owns this booking or is authenticated
-        if (auth()->check() && $booking->user_id !== auth()->id()) {
-            abort(403, 'You do not have permission to access this booking.');
-        }
+        $booking = Booking::with('schedule.route', 'schedule.bus')
+            ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->findOrFail($id);
 
         // Check if the schedule has already departed
         if ($booking->schedule->hasDeparted()) {
@@ -536,13 +600,15 @@ class BookingController extends Controller
             // Pake transaction biar aman, ga ada drama kursi ganda pas rame
             return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
                 // Kunci datanya biar user lain ngantri bentar
-                $booking = Booking::lockForUpdate()->findOrFail($request->booking_id);
-                
+                $booking = Booking::lockForUpdate()
+                    ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+                    ->findOrFail($request->booking_id);
+
                 // Kunci juga jadwalnya, ini paling penting biar ga overbooking
                 $schedule = Schedule::lockForUpdate()->with('bus')->find($booking->schedule_id);
 
                 if (!$schedule) {
-                     return response()->json(['success' => false, 'message' => 'Jadwal ga ketemu entah kemana.']);
+                    return response()->json(['success' => false, 'message' => 'Jadwal ga ketemu entah kemana.']);
                 }
 
                 // VALIDASI DINAMIS: Cek kapasitas bus
@@ -550,7 +616,7 @@ class BookingController extends Controller
                 foreach ($request->seat_numbers as $seat) {
                     if ($seat > $busCapacity) {
                         return response()->json([
-                            'success' => false, 
+                            'success' => false,
                             'message' => "Kursi nomor {$seat} ga valid bos. Kapasitas bus cuma {$busCapacity} kursi."
                         ]);
                     }
@@ -573,7 +639,7 @@ class BookingController extends Controller
 
                 // Hitung sisa kursi real-time
                 $availableSeats = $schedule->getAvailableSeatsCount($booking->booking_date);
-                
+
                 if (count($request->seat_numbers) > $availableSeats) {
                     return response()->json(['success' => false, 'message' => "Sisa kursi cuma {$availableSeats} nih untuk tanggal segitu."]);
                 }
@@ -609,12 +675,10 @@ class BookingController extends Controller
     public function processPayment(Request $request)
     {
         try {
-            // Log request details for debugging
+            // Log request details (simplified for security)
             Log::info('Payment processing request', [
-                'all_request_data' => $request->all(),
-                'headers' => $request->headers->all(),
-                'content_type' => $request->header('Content-Type'),
-                'user_id' => auth()->id()
+                'booking_id' => $request->booking_id,
+                'user_id' => \Illuminate\Support\Facades\Auth::id()
             ]);
 
             // Validate the request
@@ -625,7 +689,8 @@ class BookingController extends Controller
 
             Log::info('Validation passed', ['validated_data' => $validatedData]);
 
-            $booking = Booking::findOrFail($validatedData['booking_id']);
+            $booking = Booking::where('user_id', \Illuminate\Support\Facades\Auth::id())
+                ->findOrFail($validatedData['booking_id']);
 
             // Check if payment has expired
             if ($booking->isPaymentExpired()) {
@@ -650,34 +715,33 @@ class BookingController extends Controller
             // HANDLE PROMO CODE
             if ($request->filled('promo_code_id')) {
                 $promoCode = \App\Models\PromoCode::find($request->promo_code_id);
-                
+
                 // Base price determination (handle re-attempts)
                 $basePrice = $booking->original_total_price ?? $booking->total_price;
 
                 if ($promoCode && $promoCode->isValid()) {
                     // Check minimum purchase
                     if ($basePrice < $promoCode->min_purchase_amount) {
-                         return response()->json(['success' => false, 'message' => 'Minimal pembelian tidak terpenuhi untuk kode promo ini.']);
+                        return response()->json(['success' => false, 'message' => 'Minimal pembelian tidak terpenuhi untuk kode promo ini.']);
                     }
 
                     // Calculate discount
                     $discount = $promoCode->calculateDiscount($basePrice);
-                    
+
                     // Update Booking
                     $booking->original_total_price = $basePrice;
                     $booking->discount_amount = $discount;
                     $booking->total_price = max(0, $basePrice - $discount);
                     $booking->promo_code_id = $promoCode->id;
                     $booking->save();
-                    
+
                     // Increment usage count
                     $promoCode->increment('usage_count');
 
                     if ($promoCode->isLimitReached()) {
                     }
-
                 } else {
-                     return response()->json(['success' => false, 'message' => 'Kode promo tidak valid atau kadaluarsa.']);
+                    return response()->json(['success' => false, 'message' => 'Kode promo tidak valid atau kadaluarsa.']);
                 }
             } else {
                 // If no promo code sent but booking has one (user removed it?), reset price
@@ -685,7 +749,7 @@ class BookingController extends Controller
                     $booking->total_price = $booking->original_total_price ?? $booking->total_price;
                     $booking->discount_amount = 0;
                     $booking->promo_code_id = null;
-                    $booking->original_total_price = null; 
+                    $booking->original_total_price = null;
                     $booking->save();
                 }
             }
@@ -710,30 +774,26 @@ class BookingController extends Controller
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Payment validation error', [
-                'errors' => $e->errors(),
-                'request_data' => $request->all()
+                'booking_id' => $request->booking_id,
+                'errors' => $e->errors()
             ]);
 
-            return response()->json(['success' => false, 'message' => 'Validation failed: ' . json_encode($e->errors())]);
+            return response()->json(['success' => false, 'message' => 'Validation failed.']);
         } catch (\Exception $e) {
             Log::error('Payment processing error', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+                'booking_id' => $request->booking_id,
+                'error' => $e->getMessage()
             ]);
 
-            return response()->json(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'An error occurred.']);
         }
     }
 
     public function success($id)
     {
-        $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
-
-        // Check if the current user owns this booking or is authenticated
-        if (auth()->check() && $booking->user_id !== auth()->id()) {
-            abort(403, 'You do not have permission to access this booking.');
-        }
+        $booking = Booking::with('schedule.route', 'schedule.bus')
+            ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->findOrFail($id);
 
         if (!in_array($booking->booking_status, ['confirmed', 'pending'])) {
             abort(404, 'Invalid booking');
@@ -788,12 +848,9 @@ class BookingController extends Controller
 
     public function downloadTicket($id, TicketPdfService $ticketPdfService)
     {
-        $booking = Booking::with('schedule.route', 'schedule.bus')->findOrFail($id);
-
-        // Check if the current user owns this booking or is authenticated
-        if (auth()->check() && $booking->user_id !== auth()->id()) {
-            abort(403, 'You do not have permission to access this booking.');
-        }
+        $booking = Booking::with('schedule.route', 'schedule.bus')
+            ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->findOrFail($id);
 
         // Ensure the booking has seat numbers
         if (empty($booking->seat_numbers)) {

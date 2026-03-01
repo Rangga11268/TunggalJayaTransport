@@ -6,16 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\NewsArticle;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class NewsController extends Controller
 {
-    
+
     public function index(Request $request)
     {
         $articles = NewsArticle::with('category')
             ->when($request->search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
-                      ->orWhere('content', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%");
             })
             ->latest()
             ->paginate(10)
@@ -27,14 +29,14 @@ class NewsController extends Controller
         ]);
     }
 
-    
+
     public function create()
     {
         $categories = \App\Models\Category::all();
         return Inertia::render('Admin/News/Create', compact('categories'));
     }
 
-    
+
     public function store(Request $request)
     {
         $request->validate([
@@ -48,11 +50,13 @@ class NewsController extends Controller
         $article = new NewsArticle();
         $article->title = $request->title;
         $article->slug = $this->createUniqueSlug($request->title);
-        $article->content = $request->content;
+
+        $article->content = strip_tags($request->input('content'), '<p><br><b><i><u><strong><em><ul><ol><li><a><img>');
+
         $article->excerpt = $request->excerpt;
         $article->category_id = $request->category_id;
         $article->is_published = $request->has('is_published');
-        $article->author_id = auth()->id();
+        $article->author_id = Auth::id();
         $article->save();
 
         // Handle image upload
@@ -63,29 +67,29 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'Artikel berita berhasil dibuat.');
     }
 
-    
+
     public function show(string $id)
     {
-         $article = NewsArticle::with('category')->findOrFail($id);
-         return Inertia::render('Admin/News/Edit', [
+        $article = NewsArticle::with('category')->findOrFail($id);
+        return Inertia::render('Admin/News/Edit', [
             'article' => $article,
             'categories' => \App\Models\Category::all(),
             'readonly' => true // Optional flag if we want to reuse Edit component
-         ]);
+        ]);
     }
 
-    
+
     public function edit(string $id)
     {
         $article = NewsArticle::with('media')->findOrFail($id);
         // Append image_url manually or rely on accessor if appended
-        $article->append('image_url'); 
-        
+        $article->append('image_url');
+
         $categories = \App\Models\Category::all();
         return Inertia::render('Admin/News/Edit', compact('article', 'categories'));
     }
 
-    
+
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -99,9 +103,11 @@ class NewsController extends Controller
         $article = NewsArticle::findOrFail($id);
         $article->title = $request->title;
         if ($article->title !== $request->title) {
-             $article->slug = $this->createUniqueSlug($request->title, $article->id);
+            $article->slug = $this->createUniqueSlug($request->title, $article->id);
         }
-        $article->content = $request->content;
+
+        $article->fill(['content' => strip_tags($request->input('content'), '<p><br><b><i><u><strong><em><ul><ol><li><a><img>')]);
+
         $article->excerpt = $request->excerpt;
         $article->category_id = $request->category_id;
         $article->is_published = $request->has('is_published');
@@ -110,8 +116,8 @@ class NewsController extends Controller
         // Handle image upload
         if ($request->hasFile('featured_image')) {
             // Delete existing featured image if it exists
-             $article->clearMediaCollection('featured_images');
-             $article->clearMediaCollection('cover'); // Clear old collection too just in case
+            $article->clearMediaCollection('featured_images');
+            $article->clearMediaCollection('cover'); // Clear old collection too just in case
             // Add new featured image
             $article->addMediaFromRequest('featured_image')->toMediaCollection('featured_images');
         }
@@ -119,7 +125,7 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'Artikel berita berhasil diperbarui.');
     }
 
-    
+
     public function destroy(string $id)
     {
         $article = NewsArticle::findOrFail($id);
@@ -128,21 +134,43 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'Artikel berita berhasil dihapus.');
     }
 
-    
+
     private function createUniqueSlug($title, $excludeId = null)
     {
-        $slug = \Str::slug($title);
+        $slug = Str::slug($title);
         $originalSlug = $slug;
         $count = 1;
 
         // Check if slug exists, and if so, append a number to make it unique
         while (NewsArticle::where('slug', $slug)
             ->where('id', '!=', $excludeId)
-            ->exists()) {
+            ->exists()
+        ) {
             $slug = $originalSlug . '-' . $count;
             $count++;
         }
 
         return $slug;
+    }
+
+    public function uploadImage(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            // Kita gunakan model temporary atau NewsArticle terakhir untuk menyimpan media sementara
+            // Di sini kita langsung simpan ke disk public/tinymce untuk kemudahan visual di editor
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('public/news_content', $filename);
+
+            return response()->json([
+                'location' => \Illuminate\Support\Facades\Storage::url($path)
+            ]);
+        }
+
+        return response()->json(['error' => 'No image uploaded'], 400);
     }
 }

@@ -17,17 +17,27 @@ class OtpService
 
     public function generate(string $identifier, string $method = 'whatsapp'): string
     {
-        // Cek limit request OTP, tapi disini hajar aja dulu (override)
-        
+        // Rate limiting: Max 1 request per 2 minutes per identifier
+        $throttleKey = "otp_throttle:{$identifier}";
+        if (Cache::has($throttleKey)) {
+            $secondsRemaining = Cache::get($throttleKey) - now()->timestamp;
+            if ($secondsRemaining > 0) {
+                throw new \Exception("Tunggu sebentar ya. Anda bisa minta OTP lagi dalam " . ceil($secondsRemaining / 60) . " menit.");
+            }
+        }
+
         // Bikin kode OTP baru yang fresh
         $otp = $this->createOtpString();
-        
+
         // Simpan di Cache biar cepet
         $cacheKey = "otp_verification:{$identifier}";
         Cache::put($cacheKey, [
             'otp' => $otp,
             'attempts' => 0
         ], now()->addMinutes(self::OTP_EXPIRY_MINUTES));
+
+        // Set cooldown: 2 minutes for next request
+        Cache::put($throttleKey, now()->addMinutes(2)->timestamp, now()->addMinutes(2));
 
         // Simpan OTP di session buat iseng-iseng testing dev
         if (app()->environment('local', 'development', 'testing')) {
@@ -41,7 +51,7 @@ class OtpService
             // Kirim via WA / SMS
             $this->sendViaWhatsapp($identifier, $otp);
         }
-        
+
         return $otp;
     }
 
@@ -51,7 +61,7 @@ class OtpService
         $data = Cache::get($cacheKey);
 
         if (!$data) {
-            return false; 
+            return false;
         }
 
         if ($data['otp'] !== $otp) {
@@ -67,7 +77,7 @@ class OtpService
 
         // Valid nih, bersihin cache-nya
         Cache::forget($cacheKey);
-        
+
         return true;
     }
 
@@ -84,7 +94,7 @@ class OtpService
     private function sendViaWhatsapp(string $phone, string $otp): void
     {
         $token = config('services.fonnte.token');
-        
+
         try {
             $response = Http::withHeaders([
                 'Authorization' => $token,
