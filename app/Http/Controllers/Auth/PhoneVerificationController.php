@@ -20,10 +20,10 @@ class PhoneVerificationController extends Controller
         $this->otpService = $otpService;
     }
 
-    public function show(): \Inertia\Response
+    public function show(): \Inertia\Response|RedirectResponse
     {
         $user = Auth::user();
-        
+
         // Kalo user udah verifikasi full, langsung lempar ke dashboard
         if ($user->isFullyVerified()) {
             return redirect()->intended(route('dashboard', absolute: false));
@@ -52,17 +52,17 @@ class PhoneVerificationController extends Controller
         if ($request->phone) {
             $user->update(['phone' => $request->phone]);
         }
-        
+
         $method = $request->method;
         $identifier = $method === 'email' ? $user->email : $user->phone;
 
         if (!$identifier) {
-             return redirect()->back()->withErrors(['phone' => 'Kontak tujuan tidak ditemukan.']);
+            return redirect()->back()->withErrors(['phone' => 'Kontak tujuan tidak ditemukan.']);
         }
 
         // Generate OTP dulu bos
         $this->otpService->generate($identifier, $method);
-        
+
         $destination = $method === 'email' ? 'email' : 'nomor WhatsApp';
         return redirect()->back()->with('status', "Kode OTP telah dikirim ke $destination anda.");
     }
@@ -74,7 +74,7 @@ class PhoneVerificationController extends Controller
         ]);
 
         $user = Auth::user();
-        
+
         // Coba verifikasi pake nomor HP
         $isValid = false;
         if ($user->phone && $this->otpService->verify($user->phone, $request->otp)) {
@@ -89,9 +89,9 @@ class PhoneVerificationController extends Controller
                 'phone_verified_at' => now(), // Still use this column for "verified status"
                 'is_verified' => true
             ]);
-            
+
             $this->otpService->clearDebugOtp(); // Hapus OTP debug biar bersih
-            
+
             // Cek role-nya, admin ke dashboard admin, user biasa ke home aja
             if ($user->hasRole('admin') || $user->hasRole('schedule_manager')) {
                 return redirect()->intended(route('admin.dashboard', absolute: false));
@@ -107,18 +107,18 @@ class PhoneVerificationController extends Controller
     public function resendOtp(Request $request): RedirectResponse
     {
         $user = Auth::user();
-        
+
         // Default ke HP kalo ga milih, atau ikutin request
         $method = $request->input('method', 'whatsapp');
-        
+
         $identifier = $method === 'email' ? $user->email : $user->phone;
 
         if (!$identifier) {
-             return redirect()->back()->withErrors(['phone' => 'Kontak tujuan tidak ditemukan.']);
+            return redirect()->back()->withErrors(['phone' => 'Kontak tujuan tidak ditemukan.']);
         }
-        
+
         $this->otpService->generate($identifier, $method);
-        
+
         $destination = $method === 'email' ? 'email' : 'nomor WhatsApp';
         return redirect()->back()->with('status', "Kode OTP baru telah dikirim ke $destination.");
     }
