@@ -2,7 +2,6 @@
 import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import FlashMessages from "@/Components/FlashMessages.vue";
-import BrandedPreloader from "@/Components/BrandedPreloader.vue";
 import WhatsAppButton from "@/Components/WhatsAppButton.vue";
 import { useMagnetic } from "@/Composables/useMagnetic";
 import gsap from "gsap";
@@ -102,10 +101,10 @@ onUnmounted(() => {
 });
 
 const isServicesActive = computed(() =>
-    serviceLinks.some((link) => isActive(link.href))
+    serviceLinks.some((link) => isActive(link.href)),
 );
 const isCompanyActive = computed(() =>
-    companyLinks.some((link) => isActive(link.href))
+    companyLinks.some((link) => isActive(link.href)),
 );
 
 // Magnetic Refs
@@ -140,9 +139,6 @@ const isActive = (routeName) => {
     <div
         class="min-h-screen flex flex-col bg-white dark:bg-[#080808] transition-colors duration-500 font-manrope selection:bg-rose-500/30"
     >
-        <!-- Branded Preloader -->
-        <BrandedPreloader />
-
         <!-- WhatsApp Floating Button -->
         <WhatsAppButton />
 
@@ -457,7 +453,7 @@ const isActive = (routeName) => {
                                             >
                                                 {{
                                                     page.props.auth.user.name.split(
-                                                        " "
+                                                        " ",
                                                     )[0]
                                                 }}
                                             </p>

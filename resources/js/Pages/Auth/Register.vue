@@ -9,6 +9,9 @@ defineOptions({ layout: FrontendLayout });
 const submitBtn = ref(null);
 useMagnetic(submitBtn);
 
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
+
 const form = useForm({
     name: "",
     email: "",
@@ -226,13 +229,27 @@ const submit = () => {
                                 </div>
                                 <input
                                     id="password"
-                                    type="password"
+                                    :type="showPassword ? 'text' : 'password'"
                                     v-model="form.password"
                                     required
                                     autocomplete="new-password"
-                                    class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-5 text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
+                                    class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-12 text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
                                     placeholder="••••••••"
                                 />
+                                <button
+                                    type="button"
+                                    @click="showPassword = !showPassword"
+                                    class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-brand-red transition-colors"
+                                >
+                                    <i
+                                        :class="[
+                                            'fas',
+                                            showPassword
+                                                ? 'fa-eye-slash'
+                                                : 'fa-eye',
+                                        ]"
+                                    ></i>
+                                </button>
                             </div>
                         </div>
 
@@ -253,13 +270,34 @@ const submit = () => {
                                 </div>
                                 <input
                                     id="password_confirmation"
-                                    type="password"
+                                    :type="
+                                        showConfirmPassword
+                                            ? 'text'
+                                            : 'password'
+                                    "
                                     v-model="form.password_confirmation"
                                     required
                                     autocomplete="new-password"
-                                    class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-5 text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
+                                    class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-12 text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
                                     placeholder="••••••••"
                                 />
+                                <button
+                                    type="button"
+                                    @click="
+                                        showConfirmPassword =
+                                            !showConfirmPassword
+                                    "
+                                    class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-brand-red transition-colors"
+                                >
+                                    <i
+                                        :class="[
+                                            'fas',
+                                            showConfirmPassword
+                                                ? 'fa-eye-slash'
+                                                : 'fa-eye',
+                                        ]"
+                                    ></i>
+                                </button>
                             </div>
                         </div>
                     </div>
