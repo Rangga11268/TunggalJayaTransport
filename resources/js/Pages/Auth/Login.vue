@@ -272,11 +272,13 @@ const submit = () => {
                 <!-- Divider -->
                 <div class="relative my-10">
                     <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-white/5"></div>
+                        <div
+                            class="w-full border-t border-gray-200 dark:border-white/5"
+                        ></div>
                     </div>
                     <div class="relative flex justify-center text-[10px]">
                         <span
-                            class="px-4 bg-gray-950 text-gray-500 font-black font-unbounded uppercase tracking-widest"
+                            class="px-4 bg-white dark:bg-gray-950 text-gray-500 dark:text-gray-500 font-black font-unbounded uppercase tracking-widest"
                             >ATAU MASUK DENGAN</span
                         >
                     </div>
@@ -284,8 +286,9 @@ const submit = () => {
 
                 <!-- Social Login -->
                 <div class="grid grid-cols-2 gap-4">
-                    <button
-                        class="flex items-center justify-center py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group"
+                    <a
+                        href="/auth/google"
+                        class="flex items-center justify-center py-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-gray-100 dark:hover:bg-white/10 transition-all group"
                     >
                         <img
                             src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -293,19 +296,20 @@ const submit = () => {
                             alt="Google"
                         />
                         <span
-                            class="text-xs font-black text-gray-300 font-unbounded uppercase tracking-wider"
+                            class="text-xs font-black text-gray-700 dark:text-gray-300 font-unbounded uppercase tracking-wider"
                             >GOOGLE</span
                         >
-                    </button>
+                    </a>
                     <button
-                        class="flex items-center justify-center py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group"
+                        disabled
+                        class="flex items-center justify-center py-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl opacity-50 cursor-not-allowed group"
                     >
                         <i
-                            class="fab fa-facebook text-blue-500 text-lg mr-3 group-hover:scale-110 transition-transform"
+                            class="fab fa-facebook text-blue-500 text-lg mr-3"
                         ></i>
                         <span
-                            class="text-xs font-black text-gray-300 font-unbounded uppercase tracking-wider"
-                            >FACEBOOK</span
+                            class="text-xs font-black text-gray-700 dark:text-gray-400 font-unbounded uppercase tracking-wider"
+                            >SEGERA</span
                         >
                     </button>
                 </div>
@@ -313,7 +317,7 @@ const submit = () => {
 
             <!-- Footer -->
             <div
-                class="mt-16 text-center text-[10px] text-gray-600 font-black font-unbounded uppercase tracking-[0.3em] pb-12"
+                class="mt-16 text-center text-[10px] text-gray-600 dark:text-gray-500 font-black font-unbounded uppercase tracking-[0.3em] pb-12"
             >
                 &copy; {{ new Date().getFullYear() }} TUJAGO &bull; TUNGGAL JAYA
                 GO

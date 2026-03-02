@@ -321,7 +321,7 @@ const submit = () => {
                             ref="submitBtn"
                             type="submit"
                             :disabled="form.processing"
-                            class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
+                            class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 dark:hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
                         >
                             <span v-if="!form.processing">DAFTAR SEKARANG</span>
                             <span
@@ -334,25 +334,57 @@ const submit = () => {
                         </button>
                     </div>
 
-                    <div class="text-center mt-8">
-                        <p
-                            class="text-sm text-gray-500 font-manrope font-medium"
-                        >
-                            Sudah punya akun?
-                            <Link
-                                :href="route('login')"
-                                class="font-black text-brand-red hover:text-red-500 transition-colors font-unbounded ml-2 text-xs"
+                    <!-- Divider -->
+                    <div class="relative my-8">
+                        <div class="absolute inset-0 flex items-center">
+                            <div
+                                class="w-full border-t border-gray-200 dark:border-white/5"
+                            ></div>
+                        </div>
+                        <div class="relative flex justify-center text-[10px]">
+                            <span
+                                class="px-4 bg-gray-50 dark:bg-black text-gray-500 dark:text-gray-500 font-black font-unbounded uppercase tracking-widest"
+                                >ATAU DAFTAR DENGAN</span
                             >
-                                MASUK SEKARANG
-                            </Link>
-                        </p>
+                        </div>
                     </div>
+
+                    <!-- Social Login -->
+                    <a
+                        href="/auth/google"
+                        class="flex items-center justify-center py-4 w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-gray-100 dark:hover:bg-white/10 transition-all group"
+                    >
+                        <img
+                            src="https://www.svgrepo.com/show/475656/google-color.svg"
+                            class="h-5 w-5 mr-3 group-hover:scale-110 transition-transform"
+                            alt="Google"
+                        />
+                        <span
+                            class="text-xs font-black text-gray-700 dark:text-gray-300 font-unbounded uppercase tracking-wider"
+                            >GOOGLE</span
+                        >
+                    </a>
                 </form>
+
+                <!-- Already have account? -->
+                <div class="text-center mt-8">
+                    <p
+                        class="text-sm text-gray-500 dark:text-gray-400 font-manrope font-medium"
+                    >
+                        Sudah punya akun?
+                        <Link
+                            :href="route('login')"
+                            class="font-black text-brand-red hover:text-red-500 dark:hover:text-red-400 transition-colors font-unbounded ml-2 text-xs"
+                        >
+                            MASUK SEKARANG
+                        </Link>
+                    </p>
+                </div>
             </div>
 
             <!-- Footer -->
             <div
-                class="mt-16 text-center text-[10px] text-gray-600 font-black font-unbounded uppercase tracking-[0.3em] pb-12"
+                class="mt-16 text-center text-[10px] text-gray-600 dark:text-gray-400 font-black font-unbounded uppercase tracking-[0.3em] pb-12"
             >
                 &copy; {{ new Date().getFullYear() }} TUJAGO &bull; TUNGGAL JAYA
                 GO

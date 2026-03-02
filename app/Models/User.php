@@ -10,7 +10,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    
+
     use HasFactory, Notifiable, HasRoles;
 
     // Role Constants
@@ -20,7 +20,7 @@ class User extends Authenticatable
     const ROLE_DRIVER = 'driver';
     const ROLE_CONDUCTOR = 'conductor';
 
-    
+
     protected $fillable = [
         'name',
         'email',
@@ -28,15 +28,17 @@ class User extends Authenticatable
         'password',
         'phone_verified_at',
         'is_verified',
+        'google_id',
+        'email_verified_at',
     ];
 
-    
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    
+
     protected function casts(): array
     {
         return [
@@ -67,7 +69,7 @@ class User extends Authenticatable
         return $this->hasVerifiedEmail() && $this->hasPhoneVerified() && $this->is_verified;
     }
 
-    
+
     public function getRoleAttribute()
     {
         return $this->getRoleNames()->first();

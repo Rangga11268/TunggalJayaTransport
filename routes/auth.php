@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\PhoneVerificationController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Auth\DebugGoogleAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -34,12 +36,17 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
-});
 
-Route::middleware('auth')->group(function () {
-    // Email verification routes
-    Route::get('verify-email', EmailVerificationPromptController::class)
-        ->name('verification.notice');
+    // Google OAuth routes
+    Route::get('auth/google', [GoogleAuthController::class, 'redirect'])
+        ->name('auth.google');
+
+    Route::get('auth/google/callback', [GoogleAuthController::class, 'callback'])
+        ->name('auth.google.callback');
+
+    // Debug route (REMOVE in production!)
+    Route::get('debug/google-auth', [DebugGoogleAuthController::class, 'debug'])
+        ->name('debug.google-auth');
 
     Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
@@ -52,13 +59,13 @@ Route::middleware('auth')->group(function () {
     // Phone verification routes
     Route::get('verify-phone', [PhoneVerificationController::class, 'show'])
         ->name('verification.phone.show');
-    
+
     Route::post('verify-phone/otp', [PhoneVerificationController::class, 'sendOtp'])
         ->name('verification.phone.send');
-    
+
     Route::post('verify-phone', [PhoneVerificationController::class, 'verifyOtp'])
         ->name('verification.phone.verify');
-        
+
     Route::post('verify-phone/resend', [PhoneVerificationController::class, 'resendOtp'])
         ->name('verification.phone.resend');
 
