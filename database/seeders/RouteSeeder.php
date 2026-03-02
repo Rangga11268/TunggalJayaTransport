@@ -31,15 +31,15 @@ class RouteSeeder extends Seeder
                 'description' => 'Scenic route through East Java',
             ],
             [
-                'name' => 'Yogyakarta - Solo',
-                'origin' => 'Yogyakarta',
-                'destination' => 'Solo',
-                'distance' => 60.8,
-                'duration' => 90,
-                'description' => 'Short journey between two cultural cities',
+                'name' => 'Kuningan - Rangkasbitung',
+                'origin' => 'Kuningan',
+                'destination' => 'Rangkasbitung',
+                'distance' => 245.7,
+                'duration' => 360,
+                'description' => 'Cross-province route from Kuningan, West Java to Rangkasbitung, Banten via Cipali toll road and Tanggerang bypass',
             ],
         ];
-        
+
         foreach ($routes as $route) {
             Route::create($route);
         }

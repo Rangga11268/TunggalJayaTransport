@@ -13,11 +13,34 @@ class RouteCoordinatesSeeder extends Seeder
      */
     public function run(): void
     {
+        // Kuningan - Rangkasbitung (Banten)
+        // Via Cipali Toll Road
+        $kuninganRangkasbitung = Route::where('origin', 'Kuningan')
+            ->where('destination', 'Rangkasbitung')
+            ->first();
+
+        if ($kuninganRangkasbitung) {
+            $kuninganRangkasbitung->update([
+                'origin_lat' => -6.9788,
+                'origin_lng' => 108.4846,
+                'destination_lat' => -6.3667,
+                'destination_lng' => 106.2167,
+                'waypoints' => json_encode([
+                    ['name' => 'Kuningan', 'lat' => -6.9788, 'lng' => 108.4846], // Kuningan
+                    ['name' => 'Cipali', 'lat' => -6.6833, 'lng' => 108.4167], // Cipali Toll
+                    ['name' => 'Cirebon', 'lat' => -6.732, 'lng' => 108.5523], // Cirebon
+                    ['name' => 'Cikarang', 'lat' => -6.3133, 'lng' => 107.1467], // Cikarang
+                    ['name' => 'Tanggerang Bypass', 'lat' => -6.3167, 'lng' => 106.5833], // Tanggerang area
+                    ['name' => 'Rangkasbitung', 'lat' => -6.3667, 'lng' => 106.2167], // Rangkasbitung
+                ])
+            ]);
+        }
+
         // Jakarta - Kuningan via Tol Trans Jawa
         $jakartaKuningan = Route::where('origin', 'Jakarta')
             ->where('destination', 'kuningan')
             ->first();
-            
+
         if ($jakartaKuningan) {
             $jakartaKuningan->update([
                 'origin_lat' => -6.200000,
@@ -32,12 +55,12 @@ class RouteCoordinatesSeeder extends Seeder
                 ])
             ]);
         }
-        
+
         // Jakarta via sindang laut - Kuningan
         $jakartaViaSindang = Route::where('origin', 'Jakarta via sindang laut')
             ->where('destination', 'kuningan')
             ->first();
-            
+
         if ($jakartaViaSindang) {
             $jakartaViaSindang->update([
                 'origin_lat' => -6.200000,
@@ -46,12 +69,12 @@ class RouteCoordinatesSeeder extends Seeder
                 'destination_lng' => 108.483333,
             ]);
         }
-        
+
         // Jakarta via X deres - Kuningan
         $jakartaViaXDeres = Route::where('origin', 'Jakarta via X deres')
             ->where('destination', 'kuningan')
             ->first();
-            
+
         if ($jakartaViaXDeres) {
             $jakartaViaXDeres->update([
                 'origin_lat' => -6.200000,
@@ -60,12 +83,12 @@ class RouteCoordinatesSeeder extends Seeder
                 'destination_lng' => 108.483333,
             ]);
         }
-        
+
         // Kuningan - Palembang
         $kuninganPalembang = Route::where('origin', 'kuningan')
             ->where('destination', 'palembang')
             ->first();
-            
+
         if ($kuninganPalembang) {
             $kuninganPalembang->update([
                 'origin_lat' => -6.973333,
@@ -87,12 +110,12 @@ class RouteCoordinatesSeeder extends Seeder
                 ])
             ]);
         }
-        
+
         // Kuningan - Jakarta
         $kuninganJakarta = Route::where('origin', 'kuningan')
             ->where('destination', 'Jakarta')
             ->first();
-            
+
         if ($kuninganJakarta) {
             $kuninganJakarta->update([
                 'origin_lat' => -6.973333,
@@ -107,7 +130,7 @@ class RouteCoordinatesSeeder extends Seeder
                 ])
             ]);
         }
-        
+
         echo "Route coordinates have been updated.\n";
     }
 }

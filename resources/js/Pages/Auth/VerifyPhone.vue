@@ -45,24 +45,26 @@ const resendOtp = () => {
 <template>
     <Head title="Verifikasi Telepon - TUJAGO (Tunggal Jaya Go)" />
 
-    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gray-950">
+    <div
+        class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gray-50 dark:bg-gray-950"
+    >
         <!-- Left Side: Visual -->
         <div
-            class="relative hidden lg:flex flex-col justify-center items-center bg-black overflow-hidden border-r border-white/5"
+            class="relative hidden lg:flex flex-col justify-center items-center bg-white dark:bg-black overflow-hidden border-r border-gray-200 dark:border-white/5"
         >
             <div class="absolute inset-0">
                 <div
                     class="absolute inset-0 bg-[url('/img/hero-bus.jpg')] bg-cover bg-center opacity-40 scale-110 animate-slow-zoom"
                 ></div>
                 <div
-                    class="absolute inset-0 bg-gradient-to-br from-black via-black/80 to-brand-red/20"
+                    class="absolute inset-0 bg-gradient-to-br from-white dark:from-black via-white/90 dark:via-black/80 to-brand-red/20"
                 ></div>
             </div>
 
             <div class="relative z-10 text-center px-12">
                 <div class="mb-12 flex justify-center">
                     <div
-                        class="w-32 h-32 rounded-full bg-white/5 backdrop-blur-xl flex items-center justify-center border border-white/10 shadow-[0_0_50px_rgba(220,38,38,0.2)]"
+                        class="w-32 h-32 rounded-full bg-gray-100 dark:bg-white/5 backdrop-blur-xl flex items-center justify-center border border-gray-300 dark:border-white/10 shadow-[0_0_50px_rgba(220,38,38,0.2)]"
                     >
                         <i
                             class="fas fa-shield-alt text-6xl text-brand-red drop-shadow-lg"
@@ -70,12 +72,12 @@ const resendOtp = () => {
                     </div>
                 </div>
                 <h2
-                    class="text-4xl font-black text-white mb-6 font-unbounded tracking-tighter uppercase"
+                    class="text-4xl font-black text-gray-900 dark:text-white mb-6 font-unbounded tracking-tighter uppercase"
                 >
                     AMANKAN <span class="text-brand-red">AKUN</span>
                 </h2>
                 <p
-                    class="text-lg text-gray-400 leading-relaxed max-w-md mx-auto font-manrope font-medium"
+                    class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-md mx-auto font-manrope font-medium"
                 >
                     Verifikasi nomor telepon atau email Anda untuk meningkatkan
                     keamanan akun dan akses layanan prioritas TUJAGO.
@@ -85,25 +87,25 @@ const resendOtp = () => {
 
         <!-- Right Side: Form -->
         <div
-            class="flex flex-col justify-center items-center p-6 sm:p-12 pt-32 lg:pt-32 relative overflow-hidden"
+            class="flex flex-col justify-center items-center p-6 sm:p-12 pt-32 lg:pt-32 relative overflow-hidden bg-white dark:bg-gray-950"
         >
             <!-- Decorative Background Element -->
             <div
-                class="absolute -top-24 -right-24 w-96 h-96 bg-brand-red/10 rounded-full blur-[100px]"
+                class="absolute -top-24 -right-24 w-96 h-96 bg-brand-red/5 dark:bg-brand-red/10 rounded-full blur-[100px]"
             ></div>
 
             <div class="w-full max-w-md space-y-8 relative z-10">
                 <!-- Mobile Header -->
                 <div class="lg:hidden text-center mb-12">
                     <div
-                        class="inline-flex w-20 h-20 rounded-full bg-white/5 items-center justify-center mb-6 border border-white/10 shadow-xl"
+                        class="inline-flex w-20 h-20 rounded-full bg-gray-100 dark:bg-white/5 items-center justify-center mb-6 border border-gray-300 dark:border-white/10 shadow-xl"
                     >
                         <i
                             class="fas fa-shield-alt text-3xl text-brand-red"
                         ></i>
                     </div>
                     <h2
-                        class="text-3xl font-black text-white font-unbounded tracking-tighter"
+                        class="text-3xl font-black text-gray-900 dark:text-white font-unbounded tracking-tighter"
                     >
                         VERIFIKASI <span class="text-brand-red">AKUN</span>
                     </h2>
@@ -111,12 +113,12 @@ const resendOtp = () => {
 
                 <div class="text-center lg:text-left">
                     <h2
-                        class="hidden lg:block text-4xl font-black text-white mb-3 font-unbounded tracking-tighter"
+                        class="hidden lg:block text-4xl font-black text-gray-900 dark:text-white mb-3 font-unbounded tracking-tighter"
                     >
                         VERIFIKASI <span class="text-brand-red">AKUN</span>
                     </h2>
                     <p
-                        class="text-gray-400 font-manrope font-medium tracking-wide"
+                        class="text-gray-600 dark:text-gray-400 font-manrope font-medium tracking-wide"
                     >
                         Pilih metode verifikasi untuk mengirimkan kode OTP.
                     </p>
@@ -124,7 +126,7 @@ const resendOtp = () => {
 
                 <!-- Method Selection Tabs -->
                 <div
-                    class="flex p-1 bg-white/5 border border-white/10 rounded-2xl mb-6"
+                    class="flex p-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl mb-6"
                 >
                     <button
                         @click="setMethod('whatsapp')"
@@ -132,7 +134,7 @@ const resendOtp = () => {
                         :class="
                             form.method === 'whatsapp'
                                 ? 'bg-brand-red text-white shadow-lg'
-                                : 'text-gray-500 hover:text-white'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                         "
                     >
                         <i class="fab fa-whatsapp mr-2"></i> WhatsApp
@@ -143,7 +145,7 @@ const resendOtp = () => {
                         :class="
                             form.method === 'email'
                                 ? 'bg-brand-red text-white shadow-lg'
-                                : 'text-gray-500 hover:text-white'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                         "
                     >
                         <i class="fas fa-envelope mr-2"></i> Email
@@ -153,7 +155,7 @@ const resendOtp = () => {
                 <!-- Status Message -->
                 <div
                     v-if="status"
-                    class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold font-manrope flex items-center"
+                    class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm font-bold font-manrope flex items-center"
                 >
                     <i class="fas fa-check-circle mr-3"></i>
                     <span>{{ status }}</span>
@@ -162,7 +164,7 @@ const resendOtp = () => {
                 <!-- Debug OTP Alert -->
                 <div
                     v-if="debugOtp"
-                    class="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm font-manrope"
+                    class="p-4 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-500/20 text-yellow-800 dark:text-yellow-400 text-sm font-manrope"
                 >
                     <div class="flex items-center mb-1">
                         <i class="fas fa-bug mr-2"></i>
@@ -173,7 +175,9 @@ const resendOtp = () => {
                     </div>
                     <p>
                         Kode OTP Anda adalah:
-                        <strong class="text-white">{{ debugOtp }}</strong>
+                        <strong class="text-yellow-900 dark:text-white">{{
+                            debugOtp
+                        }}</strong>
                     </p>
                 </div>
 
@@ -181,7 +185,7 @@ const resendOtp = () => {
                     <div>
                         <label
                             for="otp"
-                            class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
+                            class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
                             >Kode OTP (via
                             {{
                                 form.method === "email" ? "Email" : "WhatsApp"
@@ -189,10 +193,10 @@ const resendOtp = () => {
                         >
                         <div class="relative group">
                             <div
-                                class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors"
+                                class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-brand-red transition-colors"
                             >
                                 <i
-                                    class="fas text-gray-500"
+                                    class="fas"
                                     :class="
                                         form.method === 'email'
                                             ? 'fa-envelope-open-text'
@@ -207,8 +211,8 @@ const resendOtp = () => {
                                 required
                                 autofocus
                                 autocomplete="one-time-code"
-                                class="w-full bg-white/5 border-white/10 rounded-2xl py-5 pl-12 pr-5 text-white font-unbounded focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all tracking-[0.5em] text-center text-2xl font-black placeholder:text-gray-800 placeholder:tracking-normal"
-                                placeholder="******"
+                                class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-5 pl-12 pr-5 text-gray-900 dark:text-white font-unbounded focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all tracking-[0.5em] text-center text-2xl font-black placeholder:text-gray-400 dark:placeholder:text-gray-700 placeholder:tracking-normal"
+                                placeholder="······"
                                 maxlength="6"
                             />
                         </div>
@@ -225,7 +229,7 @@ const resendOtp = () => {
                             ref="submitBtn"
                             type="submit"
                             :disabled="form.processing"
-                            class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
+                            class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 dark:hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
                         >
                             <span v-if="!form.processing"
                                 >VERIFIKASI SEKARANG</span
@@ -244,7 +248,7 @@ const resendOtp = () => {
                                 type="button"
                                 @click="resendOtp"
                                 :disabled="form.processing"
-                                class="text-[10px] font-black text-gray-500 uppercase tracking-widest hover:text-brand-red transition-colors font-unbounded"
+                                class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest hover:text-brand-red dark:hover:text-brand-red transition-colors font-unbounded"
                             >
                                 <i class="fas fa-redo-alt mr-2"></i> Kirim Ulang
                                 OTP
@@ -259,7 +263,7 @@ const resendOtp = () => {
                         :href="route('logout')"
                         method="post"
                         as="button"
-                        class="text-[10px] font-black text-gray-600 uppercase tracking-widest hover:text-white transition-colors font-unbounded"
+                        class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest hover:text-gray-900 dark:hover:text-white transition-colors font-unbounded"
                     >
                         KELUAR AKUN
                     </Link>
@@ -268,7 +272,7 @@ const resendOtp = () => {
 
             <!-- Footer -->
             <div
-                class="mt-16 text-center text-[10px] text-gray-600 font-black font-unbounded uppercase tracking-[0.3em] pb-12"
+                class="mt-16 text-center text-[10px] text-gray-600 dark:text-gray-400 font-black font-unbounded uppercase tracking-[0.3em] pb-12"
             >
                 &copy; {{ new Date().getFullYear() }} TUJAGO &bull; TUNGGAL JAYA
                 GO

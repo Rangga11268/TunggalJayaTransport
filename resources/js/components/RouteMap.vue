@@ -6,6 +6,11 @@ import L from "leaflet";
 const props = defineProps({
     origin: String,
     destination: String,
+    originLat: Number,
+    originLng: Number,
+    destinationLat: Number,
+    destinationLng: Number,
+    waypoints: Array,
 });
 
 const mapContainer = ref(null);
@@ -31,13 +36,46 @@ const cityCoords = {
     Probolinggo: [-7.7569, 113.2161],
     Jember: [-8.1724, 113.6995],
     Banyuwangi: [-8.2192, 114.3691],
+    Kuningan: [-6.9788, 108.4846],
+    Cipali: [-6.6833, 108.4167],
+    Deresan: [-6.2274, 106.8231],
+    Rangkasbitung: [-6.3667, 106.2167],
+    Banten: [-6.1667, 106.1667],
 };
+
+function getCoordinates() {
+    const originCoord =
+        props.originLat && props.originLng
+            ? [props.originLat, props.originLng]
+            : cityCoords[props.origin] || [-6.2088, 106.8456];
+
+    const destCoord =
+        props.destinationLat && props.destinationLng
+            ? [props.destinationLat, props.destinationLng]
+            : cityCoords[props.destination] || [-7.2575, 112.7521];
+
+    // Build waypoint array
+    let routeCoordinates = [originCoord];
+
+    if (props.waypoints && Array.isArray(props.waypoints)) {
+        props.waypoints.forEach((waypoint) => {
+            if (waypoint.lat && waypoint.lng) {
+                routeCoordinates.push([waypoint.lat, waypoint.lng]);
+            } else if (waypoint.name && cityCoords[waypoint.name]) {
+                routeCoordinates.push(cityCoords[waypoint.name]);
+            }
+        });
+    }
+
+    routeCoordinates.push(destCoord);
+
+    return { originCoord, destCoord, routeCoordinates };
+}
 
 onMounted(() => {
     if (!mapContainer.value) return;
 
-    const originCoord = cityCoords[props.origin] || [-6.2088, 106.8456];
-    const destCoord = cityCoords[props.destination] || [-7.2575, 112.7521];
+    const { originCoord, destCoord, routeCoordinates } = getCoordinates();
 
     const map = L.map(mapContainer.value, {
         zoomControl: false,
@@ -49,39 +87,79 @@ onMounted(() => {
         "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
         {
             maxZoom: 19,
-        }
+        },
     ).addTo(map);
 
-    // Custom Icon
-    const dotIcon = L.divIcon({
-        className: "custom-div-icon",
-        html: `<div class="w-3 h-3 bg-rose-600 rounded-full border-2 border-white shadow-[0_0_10px_rgba(225,29,72,0.8)]"></div>`,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6],
+    // Origin Marker Icon (Green)
+    const originIcon = L.divIcon({
+        className: "custom-marker-icon",
+        html: `<div class="w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-[0_0_15px_rgba(34,197,94,0.8)]"></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
     });
 
-    // Markers
-    L.marker(originCoord, { icon: dotIcon })
-        .addTo(map)
-        .bindPopup(`<b>Origin:</b> ${props.origin}`)
-        .openPopup();
-    L.marker(destCoord, { icon: dotIcon })
-        .addTo(map)
-        .bindPopup(`<b>Destination:</b> ${props.destination}`);
+    // Waypoint Marker Icon (Yellow/Amber)
+    const waypointIcon = L.divIcon({
+        className: "custom-marker-icon",
+        html: `<div class="w-4 h-4 bg-amber-400 rounded-full border-2 border-white shadow-[0_0_12px_rgba(251,146,60,0.7)]"></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+    });
 
-    // Polyline (Route Line)
-    const polyline = L.polyline([originCoord, destCoord], {
+    // Destination Marker Icon (Red)
+    const destIcon = L.divIcon({
+        className: "custom-marker-icon",
+        html: `<div class="w-4 h-4 bg-rose-600 rounded-full border-2 border-white shadow-[0_0_15px_rgba(225,29,72,0.8)]"></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+    });
+
+    // Add Origin Marker
+    L.marker(originCoord, { icon: originIcon })
+        .addTo(map)
+        .bindPopup(
+            `<b style="color: #22c55e;">📍 ${props.origin}</b>
+                    <p style="margin: 4px 0; font-size: 12px;">Keberangkatan</p>`,
+        )
+        .openPopup();
+
+    // Add Waypoint Markers
+    if (props.waypoints && Array.isArray(props.waypoints)) {
+        props.waypoints.forEach((waypoint, idx) => {
+            let waypointCoord;
+            let waypointName = waypoint.name || `Perhentian ${idx + 1}`;
+
+            if (waypoint.lat && waypoint.lng) {
+                waypointCoord = [waypoint.lat, waypoint.lng];
+            } else if (waypoint.name && cityCoords[waypoint.name]) {
+                waypointCoord = cityCoords[waypoint.name];
+            } else {
+                return;
+            }
+
+            L.marker(waypointCoord, { icon: waypointIcon }).addTo(map)
+                .bindPopup(`<b style="color: #f59e0b;">🛑 ${waypointName}</b>
+                            <p style="margin: 4px 0; font-size: 12px;">Perhentian</p>`);
+        });
+    }
+
+    // Add Destination Marker
+    L.marker(destCoord, { icon: destIcon }).addTo(map)
+        .bindPopup(`<b style="color: #e11d48;">📍 ${props.destination}</b>
+                    <p style="margin: 4px 0; font-size: 12px;">Tujuan Akhir</p>`);
+
+    // Draw Polyline (Route Line)
+    const polyline = L.polyline(routeCoordinates, {
         color: "#e11d48",
         weight: 3,
         opacity: 0.8,
-        dashArray: "10, 10",
+        dashArray: "5, 10",
         lineCap: "round",
+        lineJoin: "round",
     }).addTo(map);
 
-    // Fit bounds
-    map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
-
-    // Animation Effect (subtle pulse on markers could be added via CSS)
+    // Fit bounds with padding
+    map.fitBounds(polyline.getBounds(), { padding: [60, 60] });
 });
 </script>
 

@@ -54,7 +54,6 @@ class DashboardController extends Controller
         // Cache 2 hours
         $popularRoutes = Cache::remember('dashboard:popular_routes', 7200, function () {
             return Booking::select(
-                'bookings.schedule_id',
                 DB::raw('COUNT(bookings.id) as booking_count'),
                 DB::raw('SUM(bookings.total_price) as total_revenue'),
                 DB::raw('SUM(bookings.number_of_seats) as total_passengers'),

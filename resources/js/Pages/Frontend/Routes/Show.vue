@@ -198,7 +198,7 @@ const formatTime = (dateString) => {
                                         >
                                             {{
                                                 formatTime(
-                                                    schedule.departure_time
+                                                    schedule.departure_time,
                                                 )
                                             }}
                                         </h4>
@@ -282,6 +282,11 @@ const formatTime = (dateString) => {
                             <RouteMap
                                 :origin="routeModel.origin"
                                 :destination="routeModel.destination"
+                                :origin-lat="routeModel.origin_lat"
+                                :origin-lng="routeModel.origin_lng"
+                                :destination-lat="routeModel.destination_lat"
+                                :destination-lng="routeModel.destination_lng"
+                                :waypoints="routeModel.waypoints"
                             />
                         </div>
                     </div>
