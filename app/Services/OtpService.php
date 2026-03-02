@@ -25,7 +25,10 @@ class OtpService
         if (Cache::has($throttleKey)) {
             $secondsRemaining = Cache::get($throttleKey) - now()->timestamp;
             if ($secondsRemaining > 0) {
-                throw new \Exception("Tunggu sebentar ya. Anda bisa minta OTP lagi dalam " . ceil($secondsRemaining / 60) . " menit.");
+                $wait = $secondsRemaining >= 60
+                    ? ceil($secondsRemaining / 60) . ' menit'
+                    : $secondsRemaining . ' detik';
+                throw new \Exception("Tunggu sebentar ya. Anda bisa minta OTP lagi dalam {$wait}.");
             }
         }
 
@@ -33,7 +36,7 @@ class OtpService
         $ipThrottleKey = "otp_ip_throttle:{$clientIp}";
         $ipAttempts = Cache::get($ipThrottleKey, 0);
         if ($ipAttempts >= 5) {
-            throw new \Exception("Terlalu banyak percobaan dari IP ini. Silakan coba lagi dalam 15 menit.");
+            throw new \Exception("Terlalu banyak percobaan dari perangkat ini. Silakan coba lagi dalam beberapa menit.");
         }
 
         // Increment IP-based counter

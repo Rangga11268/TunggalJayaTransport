@@ -75,7 +75,14 @@ class PhoneVerificationController extends Controller
             ]);
         }
 
-        $this->otpService->generate($identifier, $validated['method']);
+        try {
+            $this->otpService->generate($identifier, $validated['method']);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors([
+                'otp' => $e->getMessage(),
+            ]);
+        }
+
         $destination = $validated['method'] === 'email' ? 'email' : 'nomor WhatsApp';
 
         return redirect()->back()->with(
@@ -130,7 +137,14 @@ class PhoneVerificationController extends Controller
             ]);
         }
 
-        $this->otpService->generate($identifier, $method);
+        try {
+            $this->otpService->generate($identifier, $method);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors([
+                'otp' => $e->getMessage(),
+            ]);
+        }
+
         $destination = $method === 'email' ? 'email' : 'nomor WhatsApp';
 
         return redirect()->back()->with(

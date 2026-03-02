@@ -1,5 +1,5 @@
 <script setup>
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, usePage } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 import { computed } from "vue";
 
@@ -10,12 +10,15 @@ const props = defineProps({
     selectedDate: String,
 });
 
+// Pre-fill from logged-in user profile
+const authUser = usePage().props.auth?.user;
+
 const form = useForm({
     schedule_id: props.schedule.id,
     date: props.selectedDate || "",
-    passenger_name: "",
-    passenger_email: "",
-    passenger_phone: "",
+    passenger_name: authUser?.name || "",
+    passenger_email: authUser?.email || "",
+    passenger_phone: authUser?.phone || "",
     number_of_seats: 1,
     terms: false,
 });

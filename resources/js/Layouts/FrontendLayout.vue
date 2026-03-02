@@ -11,6 +11,21 @@ const pageKey = computed(() => page.url || Date.now());
 const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
 
+// Verification banner: dismissed per session via localStorage
+const verificationBannerDismissed = ref(
+    localStorage.getItem("verification_banner_dismissed") === "1",
+);
+const showVerificationBanner = computed(
+    () =>
+        page.props.auth?.user &&
+        !page.props.auth.user.phone_verified &&
+        !verificationBannerDismissed.value,
+);
+const dismissVerificationBanner = () => {
+    verificationBannerDismissed.value = true;
+    localStorage.setItem("verification_banner_dismissed", "1");
+};
+
 // Transitions
 const onBeforeEnter = (el) => {
     gsap.set(el, {
@@ -746,6 +761,88 @@ const isActive = (routeName) => {
                 </transition>
             </nav>
         </header>
+
+        <!-- Phone Verification Banner -->
+        <Transition
+            enter-active-class="transition duration-300 ease-out"
+            enter-from-class="opacity-0 -translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-200 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-2"
+        >
+            <div
+                v-if="showVerificationBanner"
+                class="relative z-40 overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 dark:from-amber-600 dark:via-orange-600 dark:to-amber-600 text-white shadow-lg shadow-amber-500/20"
+            >
+                <!-- Animated shimmer line at top -->
+                <div
+                    class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer"
+                ></div>
+
+                <!-- Subtle pattern overlay -->
+                <div
+                    class="absolute inset-0 opacity-5"
+                    style="
+                        background-image: url(&quot;data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='1.5'/%3E%3Ccircle cx='13' cy='13' r='1.5'/%3E%3C/g%3E%3C/svg%3E&quot;);
+                    "
+                ></div>
+
+                <div
+                    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4 relative"
+                >
+                    <!-- Left: Icon + Text -->
+                    <div class="flex items-center gap-4 min-w-0">
+                        <!-- Pulsing icon badge -->
+                        <div class="relative shrink-0">
+                            <div
+                                class="absolute inset-0 bg-white/30 rounded-full animate-ping"
+                            ></div>
+                            <div
+                                class="relative w-8 h-8 bg-white/20 rounded-full flex items-center justify-center border border-white/30"
+                            >
+                                <i
+                                    class="fas fa-shield-halved text-white text-sm"
+                                ></i>
+                            </div>
+                        </div>
+
+                        <!-- Text content -->
+                        <div class="min-w-0">
+                            <p
+                                class="text-xs font-black uppercase tracking-[0.15em] font-unbounded text-white/80 leading-none mb-0.5"
+                            >
+                                Verifikasi Diperlukan
+                            </p>
+                            <p
+                                class="text-sm font-semibold font-manrope text-white truncate"
+                            >
+                                Nomor HP Anda belum diverifikasi &mdash;
+                                selesaikan verifikasi untuk bisa memesan tiket.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right: CTA + Dismiss -->
+                    <div class="flex items-center gap-2 shrink-0">
+                        <Link
+                            :href="route('verification.phone.show')"
+                            class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest font-unbounded bg-white text-amber-600 hover:bg-amber-50 transition-all px-4 py-2 rounded-xl whitespace-nowrap shadow-sm hover:shadow-md active:scale-95"
+                        >
+                            <i class="fas fa-arrow-right text-[9px]"></i>
+                            Verifikasi
+                        </Link>
+                        <button
+                            @click="dismissVerificationBanner"
+                            class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/25 transition-all text-white/70 hover:text-white active:scale-95"
+                            aria-label="Tutup banner"
+                        >
+                            <i class="fas fa-xmark text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
 
         <!-- Main Content -->
         <main class="flex-grow relative">

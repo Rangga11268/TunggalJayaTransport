@@ -290,12 +290,25 @@ const resendOtp = () => {
                             MENGIRIM...
                         </span>
                     </button>
-                    <p
-                        v-if="sendForm.errors.method"
-                        class="text-xs font-bold text-brand-red font-manrope text-center"
+                    <div
+                        v-if="
+                            sendForm.errors.otp ||
+                            sendForm.errors.method ||
+                            sendForm.errors.phone
+                        "
+                        class="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm font-manrope flex items-start gap-3"
                     >
-                        {{ sendForm.errors.method }}
-                    </p>
+                        <i
+                            class="fas fa-exclamation-circle mt-0.5 shrink-0"
+                        ></i>
+                        <span class="font-semibold">
+                            {{
+                                sendForm.errors.otp ||
+                                sendForm.errors.method ||
+                                sendForm.errors.phone
+                            }}
+                        </span>
+                    </div>
                 </div>
 
                 <!-- STEP 2: Verify OTP -->
@@ -377,6 +390,13 @@ const resendOtp = () => {
                                 <i class="fas fa-redo-alt mr-2"></i> Kirim Ulang
                                 OTP
                             </button>
+                            <p
+                                v-if="sendForm.errors.otp"
+                                class="mt-2 text-xs font-semibold text-brand-red font-manrope"
+                            >
+                                <i class="fas fa-clock mr-1"></i>
+                                {{ sendForm.errors.otp }}
+                            </p>
                         </div>
                     </div>
                 </form>

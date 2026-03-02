@@ -1,15 +1,55 @@
 <script setup>
 import { Head, useForm, router } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import axios from "axios";
 
 defineOptions({ layout: FrontendLayout });
 
 const props = defineProps({
     booking: Object,
-    occupiedSeats: Array, // Array of seat numbers [1, 5, ...]
+    occupiedSeats: Array,
+    bookingExpiresAt: String, // ISO8601 expiry timestamp (created_at + 30 min)
 });
+
+// ---- Countdown Timer ----
+const countdown = ref({ minutes: 30, seconds: 0, expired: false });
+let countdownInterval = null;
+
+const updateCountdown = () => {
+    if (!props.bookingExpiresAt) return;
+    const diff = Math.floor(
+        (new Date(props.bookingExpiresAt) - Date.now()) / 1000,
+    );
+    if (diff <= 0) {
+        countdown.value = { minutes: 0, seconds: 0, expired: true };
+        clearInterval(countdownInterval);
+        return;
+    }
+    countdown.value = {
+        minutes: Math.floor(diff / 60),
+        seconds: diff % 60,
+        expired: false,
+    };
+};
+
+const countdownColor = computed(() => {
+    const total = countdown.value.minutes * 60 + countdown.value.seconds;
+    if (total <= 120) return "text-red-500 dark:text-red-400"; // ≤ 2 menit
+    if (total <= 300) return "text-amber-500 dark:text-amber-400"; // ≤ 5 menit
+    return "text-emerald-600 dark:text-emerald-400";
+});
+
+const countdownBg = computed(() => {
+    const total = countdown.value.minutes * 60 + countdown.value.seconds;
+    if (total <= 120)
+        return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-500/20";
+    if (total <= 300)
+        return "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-500/20";
+    return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-500/20";
+});
+
+const padZero = (n) => String(n).padStart(2, "0");
 
 // Facilities Data
 const facilities = [
@@ -54,6 +94,13 @@ onMounted(() => {
     if (props.booking.seat_numbers) {
         selectedSeats.value = props.booking.seat_numbers.split(",").map(Number);
     }
+    // Start countdown
+    updateCountdown();
+    countdownInterval = setInterval(updateCountdown, 1000);
+});
+
+onUnmounted(() => {
+    clearInterval(countdownInterval);
 });
 
 // Seat Map Configuration
@@ -62,7 +109,7 @@ const rows = Math.ceil(totalSeats / 5); // 2-3 Layout = 5 seats per row
 
 // Ensure occupiedSeats are integers for comparison
 const occupiedSeatsInt = computed(() =>
-    props.occupiedSeats.map((s) => parseInt(s))
+    props.occupiedSeats.map((s) => parseInt(s)),
 );
 
 const isSeatOccupied = (seatNum) =>
@@ -100,7 +147,7 @@ const saveSeats = async () => {
             {
                 booking_id: props.booking.id, // Current booking ID
                 seat_numbers: selectedSeats.value, // Array [1, 5, etc]
-            }
+            },
         );
 
         if (response.data.success) {
@@ -113,7 +160,7 @@ const saveSeats = async () => {
         console.error("Save Seats Error:", e);
         alert(
             e.response?.data?.message ||
-                "Gagal menghubungi server untuk simpan kursi."
+                "Gagal menghubungi server untuk simpan kursi.",
         );
         return false;
     } finally {
@@ -205,7 +252,7 @@ const processPayment = async () => {
 
         const response = await axios.post(
             route("frontend.booking.process-payment"),
-            payload
+            payload,
         );
 
         if (response.data.success) {
@@ -213,12 +260,12 @@ const processPayment = async () => {
                 window.snap.pay(response.data.snap_token, {
                     onSuccess: function (result) {
                         router.visit(
-                            route("frontend.booking.success", props.booking.id)
+                            route("frontend.booking.success", props.booking.id),
                         );
                     },
                     onPending: function (result) {
                         router.visit(
-                            route("frontend.booking.success", props.booking.id)
+                            route("frontend.booking.success", props.booking.id),
                         );
                     },
                     onError: function (result) {
@@ -238,7 +285,7 @@ const processPayment = async () => {
         console.error(e);
         alert(
             "Gagal memproses pembayaran: " +
-                (e.response?.data?.message || e.message)
+                (e.response?.data?.message || e.message),
         );
     } finally {
         processing.value = false;
@@ -255,7 +302,6 @@ const formatCurrency = (value) => {
 
 // Layout Utils
 const getSeatNumber = (rowIdx, colIdx) => {
-
     // colIdx: 0, 1 (Left) -- 2, 3, 4 (Right)
     const base = rowIdx * 5;
     if (colIdx < 2) return base + colIdx + 1; // 1-based
@@ -317,6 +363,27 @@ const busType = computed(() => {
         >
             Konfigurasi: Seat 2-3 | {{ busType }} | {{ routeDescription }}
         </p>
+
+        <!-- Booking Expiry Countdown -->
+        <div
+            v-if="bookingExpiresAt"
+            class="mt-6 inline-flex items-center gap-3 px-6 py-3 rounded-2xl border text-sm font-manrope font-semibold transition-colors duration-500"
+            :class="countdownBg"
+        >
+            <i class="fas fa-clock" :class="countdownColor"></i>
+            <span v-if="!countdown.expired" :class="countdownColor">
+                Selesaikan pembayaran dalam
+                <span class="font-black font-unbounded tracking-wider">
+                    {{ padZero(countdown.minutes) }}:{{
+                        padZero(countdown.seconds)
+                    }}
+                </span>
+            </span>
+            <span v-else class="text-red-500 dark:text-red-400 font-black">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                Waktu pemesanan habis — silakan buat pemesanan baru.
+            </span>
+        </div>
     </div>
 
     <div
@@ -429,7 +496,7 @@ const busType = computed(() => {
                                                 v-if="
                                                     getSeatNumber(
                                                         r - 1,
-                                                        c - 1
+                                                        c - 1,
                                                     ) <= totalSeats
                                                 "
                                             >
@@ -438,16 +505,16 @@ const busType = computed(() => {
                                                         toggleSeat(
                                                             getSeatNumber(
                                                                 r - 1,
-                                                                c - 1
-                                                            )
+                                                                c - 1,
+                                                            ),
                                                         )
                                                     "
                                                     :disabled="
                                                         isSeatOccupied(
                                                             getSeatNumber(
                                                                 r - 1,
-                                                                c - 1
-                                                            )
+                                                                c - 1,
+                                                            ),
                                                         )
                                                     "
                                                     class="relative w-12 md:w-14 transition-all duration-300 focus:outline-none"
@@ -459,25 +526,29 @@ const busType = computed(() => {
                                                             isSeatSelected(
                                                                 getSeatNumber(
                                                                     r - 1,
-                                                                    c - 1
-                                                                )
+                                                                    c - 1,
+                                                                ),
                                                             )
                                                                 ? 'bg-rose-50 dark:bg-rose-900/10 shadow-lg shadow-rose-600/20 ring-2 ring-rose-600 -translate-y-1'
                                                                 : isSeatOccupied(
-                                                                      getSeatNumber(
-                                                                          r - 1,
-                                                                          c - 1
+                                                                        getSeatNumber(
+                                                                            r -
+                                                                                1,
+                                                                            c -
+                                                                                1,
+                                                                        ),
+                                                                    )
+                                                                  ? 'bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50'
+                                                                  : isFilterMatch(
+                                                                          getSeatNumber(
+                                                                              r -
+                                                                                  1,
+                                                                              c -
+                                                                                  1,
+                                                                          ),
                                                                       )
-                                                                  )
-                                                                ? 'bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50'
-                                                                : isFilterMatch(
-                                                                      getSeatNumber(
-                                                                          r - 1,
-                                                                          c - 1
-                                                                      )
-                                                                  )
-                                                                ? 'bg-rose-50 dark:bg-rose-600/10 border-rose-300 dark:border-rose-600/50 scale-105 shadow-md'
-                                                                : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 hover:shadow-md border border-gray-100 dark:border-white/5',
+                                                                    ? 'bg-rose-50 dark:bg-rose-600/10 border-rose-300 dark:border-rose-600/50 scale-105 shadow-md'
+                                                                    : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 hover:shadow-md border border-gray-100 dark:border-white/5',
                                                         ]"
                                                     >
                                                         <img
@@ -487,20 +558,20 @@ const busType = computed(() => {
                                                                 isSeatSelected(
                                                                     getSeatNumber(
                                                                         r - 1,
-                                                                        c - 1
-                                                                    )
+                                                                        c - 1,
+                                                                    ),
                                                                 )
                                                                     ? 'sepia-[1] hue-rotate-[300deg] saturate-[2.5]'
                                                                     : isSeatOccupied(
-                                                                          getSeatNumber(
-                                                                              r -
-                                                                                  1,
-                                                                              c -
-                                                                                  1
-                                                                          )
-                                                                      )
-                                                                    ? 'grayscale'
-                                                                    : 'dark:brightness-90 hover:brightness-110',
+                                                                            getSeatNumber(
+                                                                                r -
+                                                                                    1,
+                                                                                c -
+                                                                                    1,
+                                                                            ),
+                                                                        )
+                                                                      ? 'grayscale'
+                                                                      : 'dark:brightness-90 hover:brightness-110',
                                                             ]"
                                                             alt="Seat"
                                                         />
@@ -512,8 +583,8 @@ const busType = computed(() => {
                                                                 isSeatSelected(
                                                                     getSeatNumber(
                                                                         r - 1,
-                                                                        c - 1
-                                                                    )
+                                                                        c - 1,
+                                                                    ),
                                                                 )
                                                                     ? 'bg-rose-600 text-white border-rose-600'
                                                                     : 'bg-gray-100 dark:bg-white/10 text-gray-500 border-gray-200 dark:border-white/10',
@@ -522,7 +593,7 @@ const busType = computed(() => {
                                                             {{
                                                                 getSeatNumber(
                                                                     r - 1,
-                                                                    c - 1
+                                                                    c - 1,
                                                                 )
                                                             }}
                                                         </span>
@@ -557,7 +628,7 @@ const busType = computed(() => {
                                                 v-if="
                                                     getSeatNumber(
                                                         r - 1,
-                                                        c + 1
+                                                        c + 1,
                                                     ) <= totalSeats
                                                 "
                                             >
@@ -566,16 +637,16 @@ const busType = computed(() => {
                                                         toggleSeat(
                                                             getSeatNumber(
                                                                 r - 1,
-                                                                c + 1
-                                                            )
+                                                                c + 1,
+                                                            ),
                                                         )
                                                     "
                                                     :disabled="
                                                         isSeatOccupied(
                                                             getSeatNumber(
                                                                 r - 1,
-                                                                c + 1
-                                                            )
+                                                                c + 1,
+                                                            ),
                                                         )
                                                     "
                                                     class="relative w-12 md:w-14 transition-all duration-300 focus:outline-none"
@@ -587,25 +658,29 @@ const busType = computed(() => {
                                                             isSeatSelected(
                                                                 getSeatNumber(
                                                                     r - 1,
-                                                                    c + 1
-                                                                )
+                                                                    c + 1,
+                                                                ),
                                                             )
                                                                 ? 'bg-rose-600 dark:bg-rose-600 shadow-xl shadow-rose-600/40 ring-4 ring-rose-400 -translate-y-1 scale-110'
                                                                 : isSeatOccupied(
-                                                                      getSeatNumber(
-                                                                          r - 1,
-                                                                          c + 1
+                                                                        getSeatNumber(
+                                                                            r -
+                                                                                1,
+                                                                            c +
+                                                                                1,
+                                                                        ),
+                                                                    )
+                                                                  ? 'bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50'
+                                                                  : isFilterMatch(
+                                                                          getSeatNumber(
+                                                                              r -
+                                                                                  1,
+                                                                              c +
+                                                                                  1,
+                                                                          ),
                                                                       )
-                                                                  )
-                                                                ? 'bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50'
-                                                                : isFilterMatch(
-                                                                      getSeatNumber(
-                                                                          r - 1,
-                                                                          c + 1
-                                                                      )
-                                                                  )
-                                                                ? 'bg-rose-50 dark:bg-rose-600/10 border-rose-300 dark:border-rose-600/50 scale-105 shadow-md'
-                                                                : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 hover:shadow-md border border-gray-100 dark:border-white/5',
+                                                                    ? 'bg-rose-50 dark:bg-rose-600/10 border-rose-300 dark:border-rose-600/50 scale-105 shadow-md'
+                                                                    : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 hover:shadow-md border border-gray-100 dark:border-white/5',
                                                         ]"
                                                     >
                                                         <img
@@ -615,20 +690,20 @@ const busType = computed(() => {
                                                                 isSeatSelected(
                                                                     getSeatNumber(
                                                                         r - 1,
-                                                                        c + 1
-                                                                    )
+                                                                        c + 1,
+                                                                    ),
                                                                 )
                                                                     ? 'brightness-0 invert'
                                                                     : isSeatOccupied(
-                                                                          getSeatNumber(
-                                                                              r -
-                                                                                  1,
-                                                                              c +
-                                                                                  1
-                                                                          )
-                                                                      )
-                                                                    ? 'grayscale'
-                                                                    : 'dark:brightness-90 hover:brightness-110',
+                                                                            getSeatNumber(
+                                                                                r -
+                                                                                    1,
+                                                                                c +
+                                                                                    1,
+                                                                            ),
+                                                                        )
+                                                                      ? 'grayscale'
+                                                                      : 'dark:brightness-90 hover:brightness-110',
                                                             ]"
                                                             alt="Seat"
                                                         />
@@ -639,8 +714,8 @@ const busType = computed(() => {
                                                                 isSeatSelected(
                                                                     getSeatNumber(
                                                                         r - 1,
-                                                                        c + 1
-                                                                    )
+                                                                        c + 1,
+                                                                    ),
                                                                 )
                                                             "
                                                             class="fas fa-check-circle absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl drop-shadow-lg z-20"
@@ -653,8 +728,8 @@ const busType = computed(() => {
                                                                 isSeatSelected(
                                                                     getSeatNumber(
                                                                         r - 1,
-                                                                        c + 1
-                                                                    )
+                                                                        c + 1,
+                                                                    ),
                                                                 )
                                                                     ? 'bg-white text-rose-600 border-white'
                                                                     : 'bg-gray-100 dark:bg-white/10 text-gray-500 border-gray-200 dark:border-white/10',
@@ -663,7 +738,7 @@ const busType = computed(() => {
                                                             {{
                                                                 getSeatNumber(
                                                                     r - 1,
-                                                                    c + 1
+                                                                    c + 1,
                                                                 )
                                                             }}
                                                         </span>
@@ -1032,7 +1107,26 @@ const busType = computed(() => {
                         </div>
 
                         <!-- Pay Button -->
+                        <div
+                            v-if="countdown.expired"
+                            class="mt-6 p-5 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/20 text-center"
+                        >
+                            <p
+                                class="text-red-600 dark:text-red-400 font-bold font-manrope text-sm mb-3"
+                            >
+                                <i class="fas fa-clock mr-2"></i>
+                                Waktu pemesanan Anda telah habis.
+                            </p>
+                            <a
+                                :href="route('frontend.booking.index')"
+                                class="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-unbounded font-black text-xs uppercase tracking-wider transition"
+                            >
+                                <i class="fas fa-search"></i>
+                                Cari Jadwal Baru
+                            </a>
+                        </div>
                         <button
+                            v-else
                             @click="processPayment"
                             :disabled="processing"
                             class="w-full h-[68px] bg-gray-900 dark:bg-white hover:bg-rose-600 dark:hover:bg-rose-600 text-white dark:text-gray-900 hover:text-white dark:hover:text-white rounded-2xl shadow-lg shadow-gray-200 dark:shadow-none transform transition-all hover:-translate-y-1 active:scale-[0.98] font-bold flex items-center justify-center space-x-3 group font-unbounded uppercase tracking-wider text-sm mt-6"

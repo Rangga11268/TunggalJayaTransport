@@ -7,16 +7,16 @@ use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    
+
     protected $rootView = 'app';
 
-    
+
     public function version(Request $request): ?string
     {
         return parent::version($request);
     }
 
-    
+
     public function share(Request $request): array
     {
         return [
@@ -26,20 +26,21 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
+                    'phone' => $request->user()->phone,
                     'role' => $request->user()->role,
-                    'avatar' => $request->user()->avatar, // Ensure avatar is shared if needed
+                    'avatar' => $request->user()->avatar,
+                    'phone_verified' => $request->user()->hasPhoneVerified(),
                 ] : null,
                 'notifications' => $request->user() ? $request->user()->notifications()->latest()->take(5)->get() : [],
                 'unread_notifications_count' => $request->user() ? $request->user()->unreadNotifications()->count() : 0,
             ],
             'flash' => [
-                'success' => fn () => $request->session()->get('success'),
-                'error' => fn () => $request->session()->get('error'),
-                'warning' => fn () => $request->session()->get('warning'),
-                'info' => fn () => $request->session()->get('info'),
+                'success' => fn() => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
+                'warning' => fn() => $request->session()->get('warning'),
+                'info' => fn() => $request->session()->get('info'),
             ],
             'appName' => config('app.name', 'Tunggal Jaya Transport'),
         ];
     }
 }
-

@@ -509,9 +509,15 @@ class BookingController extends Controller
         $booking->startPayment(); // Start payment timer
         $booking->save();
 
-        // Send notification to admins
-        $admins = \App\Models\User::role('admin')->get();
-        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewBookingNotification($booking));
+        // Send notification to admins (non-critical — catch mail errors)
+        try {
+            $admins = \App\Models\User::role('admin')->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewBookingNotification($booking));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Booking notification failed: ' . $e->getMessage(), [
+                'booking_id' => $booking->id,
+            ]);
+        }
 
         // Redirect to confirmation page with booking details
         return redirect()->route('frontend.booking.confirmation', ['booking' => $booking->id]);
@@ -544,6 +550,7 @@ class BookingController extends Controller
         return \Inertia\Inertia::render('Frontend/Booking/SeatSelection', [
             'booking' => $booking,
             'occupiedSeats' => $occupiedSeats,
+            'bookingExpiresAt' => $booking->created_at->addMinutes(30)->toIso8601String(),
         ]);
     }
 

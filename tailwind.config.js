@@ -80,11 +80,16 @@ export default {
                     "0%": { transform: "scale(1)" },
                     "100%": { transform: "scale(1.05)" },
                 },
+                shimmer: {
+                    "0%": { transform: "translateX(-100%)" },
+                    "100%": { transform: "translateX(100%)" },
+                },
             },
             animation: {
                 "fade-in": "fadeIn 1s ease-out forwards",
                 "fade-in-up": "fadeInUp 0.8s ease-out forwards",
                 "slow-zoom": "slowZoom 20s ease-in-out infinite alternate",
+                shimmer: "shimmer 2.5s ease-in-out infinite",
             },
         },
     },
