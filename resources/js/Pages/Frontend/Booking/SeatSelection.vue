@@ -436,7 +436,7 @@ const busType = computed(() => {
                 >
                     <!-- Bus Body -->
                     <div
-                        class="bg-gray-50 dark:bg-[#080808] rounded-[2.5rem] p-6 relative min-h-[500px] overflow-hidden border border-gray-200 dark:border-white/5"
+                        class="bg-gray-50 dark:bg-[#080808] rounded-[2.5rem] p-4 md:p-6 relative min-h-[500px] overflow-x-auto border border-gray-200 dark:border-white/5"
                     >
                         <!-- Front Area -->
                         <div
@@ -474,9 +474,7 @@ const busType = computed(() => {
                         </div>
 
                         <!-- Seat Grid -->
-                        <div
-                            class="relative z-10 px-0 md:px-8 overflow-x-auto pb-12"
-                        >
+                        <div class="relative z-10 px-2 md:px-8 pb-12">
                             <div
                                 class="min-w-[300px] flex flex-col items-center"
                             >
@@ -877,7 +875,7 @@ const busType = computed(() => {
                                     v-model="promoCode"
                                     type="text"
                                     placeholder="Masukkan kode"
-                                    class="flex-1 px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-white/5 focus:ring-2 focus:ring-rose-500 outline-none uppercase font-mono transition-all disabled:opacity-50"
+                                    class="flex-1 px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-rose-500 outline-none uppercase font-mono transition-all disabled:opacity-50"
                                     :disabled="promoValid"
                                 />
                                 <button
