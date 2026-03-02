@@ -14,6 +14,15 @@ const props = defineProps({
         type: [String, Number],
         default: null,
     },
+    debugIdentifier: {
+        type: String,
+        default: null,
+    },
+    // true when Google user has no phone number on record
+    needsPhone: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const submitBtn = ref(null);
@@ -25,7 +34,8 @@ const otpSent = ref(!!(props.status || props.debugOtp));
 const selectedMethod = ref("whatsapp");
 
 // Form for sending OTP (step 1)
-const sendForm = useForm({ method: "whatsapp" });
+// phone field used only when needsPhone === true && method === 'whatsapp'
+const sendForm = useForm({ method: "whatsapp", phone: "" });
 
 // Form for verifying OTP (step 2)
 const verifyForm = useForm({ otp: "", method: "whatsapp" });
@@ -185,36 +195,87 @@ const resendOtp = () => {
                     v-if="debugOtp"
                     class="p-4 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-500/20 text-yellow-800 dark:text-yellow-400 text-sm font-manrope"
                 >
-                    <div class="flex items-center mb-1">
+                    <div class="flex items-center mb-2">
                         <i class="fas fa-bug mr-2"></i>
                         <span
                             class="font-black uppercase text-[10px] tracking-widest font-unbounded"
-                            >DEBUG MODE</span
+                            >DEBUG MODE — OTP tidak dikirim ke perangkat
+                            nyata</span
                         >
                     </div>
-                    <p>
-                        Kode OTP Anda adalah:
-                        <strong class="text-yellow-900 dark:text-white">{{
-                            debugOtp
-                        }}</strong>
+                    <p class="mb-1">
+                        Kode OTP:
+                        <strong
+                            class="text-yellow-900 dark:text-white text-lg tracking-[0.3em] font-unbounded"
+                            >{{ debugOtp }}</strong
+                        >
+                    </p>
+                    <p
+                        v-if="debugIdentifier"
+                        class="text-xs text-yellow-700 dark:text-yellow-500"
+                    >
+                        Tujuan:
+                        <span class="font-semibold">{{ debugIdentifier }}</span>
                     </p>
                 </div>
 
                 <!-- STEP 1: Send OTP -->
                 <div v-if="!otpSent" class="mt-8 space-y-6">
+                    <!-- Phone number input: shown only for Google users (needsPhone) using WhatsApp method -->
+                    <div v-if="needsPhone && selectedMethod === 'whatsapp'">
+                        <label
+                            for="phone"
+                            class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
+                            >Nomor WhatsApp</label
+                        >
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-brand-red transition-colors"
+                            >
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <input
+                                id="phone"
+                                type="tel"
+                                v-model="sendForm.phone"
+                                autocomplete="tel"
+                                placeholder="Contoh: 08123456789"
+                                class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-5 pl-12 pr-5 text-gray-900 dark:text-white font-manrope font-semibold focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                            />
+                        </div>
+                        <p
+                            v-if="sendForm.errors.phone"
+                            class="mt-2 text-xs font-bold text-brand-red font-manrope"
+                        >
+                            {{ sendForm.errors.phone }}
+                        </p>
+                    </div>
+
+                    <!-- Info text -->
                     <p
                         class="text-sm text-gray-500 dark:text-gray-400 font-manrope text-center"
                     >
-                        Klik tombol di bawah untuk mengirim kode OTP ke
-                        <span class="font-bold text-gray-800 dark:text-white">
-                            {{
-                                selectedMethod === "whatsapp"
-                                    ? "WhatsApp"
-                                    : "Email"
-                            }}
+                        <span
+                            v-if="needsPhone && selectedMethod === 'whatsapp'"
+                        >
+                            Masukkan nomor WhatsApp Anda, lalu kami kirimkan
+                            kode OTP untuk verifikasi.
                         </span>
-                        Anda.
+                        <span v-else>
+                            Klik tombol di bawah untuk mengirim kode OTP ke
+                            <span
+                                class="font-bold text-gray-800 dark:text-white"
+                            >
+                                {{
+                                    selectedMethod === "whatsapp"
+                                        ? "WhatsApp"
+                                        : "Email"
+                                }}
+                            </span>
+                            Anda.
+                        </span>
                     </p>
+
                     <button
                         @click="sendOtp"
                         :disabled="sendForm.processing"

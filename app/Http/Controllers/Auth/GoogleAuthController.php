@@ -35,11 +35,10 @@ class GoogleAuthController extends Controller
         $user = User::where('email', $googleUser->getEmail())->first();
 
         if ($user) {
-            // Update existing user dengan Google info
+            // Update existing user dengan Google info (DON'T touch verification status)
             $user->update([
                 'name' => $googleUser->getName(),
                 'google_id' => $googleUser->getId(),
-                'phone_verified_at' => $user->phone_verified_at ?? now(),
             ]);
 
             // Ensure role is assigned (in case it was missed during creation)
@@ -49,24 +48,28 @@ class GoogleAuthController extends Controller
             }
         } else {
             // Create new user from Google
+            // Email is verified via Google, but phone still needs OTP verification
             $user = User::create([
                 'name' => $googleUser->getName(),
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getId(),
-                'password' => bcrypt(Str::random(24)), // Random password
-                'phone_verified_at' => now(), // Auto-verify Google users
+                'password' => bcrypt(Str::random(24)),
                 'email_verified_at' => now(), // Email verified via Google
+                // phone_verified_at intentionally NOT set — needs OTP verification
             ]);
 
-            // Assign role 'customer' by default (create role if it doesn't exist)
-            if ($user->roles()->count() === 0) {
-                $customerRole = Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
-                $user->assignRole($customerRole);
-            }
+            // Assign role 'customer'
+            $customerRole = Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
+            $user->assignRole($customerRole);
         }
 
         // Login user
         Auth::login($user, remember: true);
+
+        // If phone not verified yet, redirect to verification flow
+        if (!$user->hasPhoneVerified()) {
+            return redirect()->route('verification.phone.show');
+        }
 
         // Redirect based on user role
         if ($user->hasRole('admin') || $user->hasRole('schedule_manager')) {

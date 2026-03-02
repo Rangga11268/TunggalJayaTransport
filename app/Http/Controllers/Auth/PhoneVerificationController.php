@@ -34,8 +34,12 @@ class PhoneVerificationController extends Controller
         $debugOtp = $this->getDebugOtp();
 
         return Inertia::render('Auth/VerifyPhone', [
-            'debugOtp' => $debugOtp,
-            'status' => session('status'),
+            'debugOtp'        => $debugOtp,
+            'debugIdentifier' => app()->environment('local', 'development', 'testing')
+                ? session('debug_identifier')
+                : null,
+            'status'          => session('status'),
+            'needsPhone'      => $user->phone === null,
         ]);
     }
 
@@ -44,26 +48,30 @@ class PhoneVerificationController extends Controller
      */
     public function sendOtp(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'phone' => 'nullable|string',
-            'method' => 'required|in:whatsapp,email',
-        ]);
-
         $user = Auth::user();
 
         if ($user === null) {
             return redirect()->route('login');
         }
 
+        // Phone is required when user has no phone on record and method is whatsapp
+        $phoneRequired = $user->phone === null && $request->input('method') === 'whatsapp';
+
+        $validated = $request->validate([
+            'phone'  => $phoneRequired ? 'required|string|min:9|max:15' : 'nullable|string',
+            'method' => 'required|in:whatsapp,email',
+        ]);
+
         if (!empty($validated['phone'])) {
             $user->update(['phone' => $validated['phone']]);
+            $user->refresh();
         }
 
         $identifier = $this->getIdentifier($user, $validated['method']);
 
         if ($identifier === null) {
             return redirect()->back()->withErrors([
-                'phone' => 'Kontak tujuan tidak ditemukan.',
+                'phone' => 'Kontak tujuan tidak ditemukan. Masukkan nomor WhatsApp Anda.',
             ]);
         }
 

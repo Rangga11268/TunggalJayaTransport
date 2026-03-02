@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\OtpCode;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
@@ -51,6 +52,18 @@ class OtpService
         // Set cooldown: 2 minutes for next request
         Cache::put($throttleKey, now()->addMinutes(2)->timestamp, now()->addMinutes(2));
 
+        // Persist ke DB sebagai audit trail dan backup jika cache di-clear
+        OtpCode::where('identifier', $identifier)->where('used', false)->delete();
+        OtpCode::create([
+            'identifier'  => $identifier,
+            'phone'       => $method !== 'email' ? $identifier : null,
+            'method'      => $method,
+            'otp'         => $otp,
+            'expires_at'  => now()->addMinutes(self::OTP_EXPIRY_MINUTES),
+            'attempts'    => 0,
+            'ip_address'  => $clientIp,
+        ]);
+
         // Simpan OTP di session buat iseng-iseng testing dev
         if (app()->environment('local', 'development', 'testing')) {
             Session::put('debug_otp', $otp);
@@ -72,24 +85,49 @@ class OtpService
         $cacheKey = "otp_verification:{$identifier}";
         $data = Cache::get($cacheKey);
 
-        if (!$data) {
+        if ($data) {
+            if ($data['otp'] !== $otp) {
+                // Tambah counter percobaan di cache
+                $data['attempts']++;
+                if ($data['attempts'] >= self::MAX_ATTEMPTS) {
+                    Cache::forget($cacheKey);
+                    OtpCode::where('identifier', $identifier)->where('used', false)->delete();
+                } else {
+                    Cache::put($cacheKey, $data, now()->addMinutes(self::OTP_EXPIRY_MINUTES));
+                    OtpCode::where('identifier', $identifier)->where('used', false)
+                        ->latest()->first()?->increment('attempts');
+                }
+                return false;
+            }
+
+            // Valid dari cache — bersihin cache dan tandai DB
+            Cache::forget($cacheKey);
+            OtpCode::where('identifier', $identifier)->where('otp', $otp)->where('used', false)
+                ->latest()->first()?->update(['used' => true]);
+            return true;
+        }
+
+        // Cache miss — fallback ke DB (misal setelah cache:clear)
+        $dbRecord = OtpCode::where('identifier', $identifier)
+            ->where('used', false)
+            ->where('expires_at', '>', now())
+            ->latest()
+            ->first();
+
+        if (!$dbRecord) {
             return false;
         }
 
-        if ($data['otp'] !== $otp) {
-            // Tambah counter percobaan
-            $data['attempts']++;
-            if ($data['attempts'] >= self::MAX_ATTEMPTS) {
-                Cache::forget($cacheKey);
-            } else {
-                Cache::put($cacheKey, $data, now()->addMinutes(self::OTP_EXPIRY_MINUTES));
+        if ($dbRecord->otp !== $otp) {
+            $dbRecord->increment('attempts');
+            if ($dbRecord->attempts >= self::MAX_ATTEMPTS) {
+                $dbRecord->delete();
             }
             return false;
         }
 
-        // Valid nih, bersihin cache-nya
-        Cache::forget($cacheKey);
-
+        // Valid dari DB
+        $dbRecord->update(['used' => true]);
         return true;
     }
 

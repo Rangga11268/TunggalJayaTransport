@@ -11,14 +11,19 @@ class OtpCode extends Model
 
     protected $fillable = [
         'phone',
+        'identifier',   // email or phone (primary identifier going forward)
+        'method',       // 'whatsapp' or 'email'
         'otp',
         'expires_at',
         'used',
+        'attempts',
+        'ip_address',
     ];
 
     protected $casts = [
         'expires_at' => 'datetime',
         'used' => 'boolean',
+        'attempts' => 'integer',
     ];
 
     public function isExpired(): bool
