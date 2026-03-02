@@ -11,22 +11,23 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
-    
+
     public function create(): \Inertia\Response
     {
         return \Inertia\Inertia::render('Auth/Register');
     }
 
-    
+
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'phone' => ['required', 'string', 'max:15', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'phone' => ['required', 'string', 'max:15', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -37,11 +38,9 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Assign role 'user' to new registered users
-        try {
-            $user->assignRole('user');
-        } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
-        }
+        // Assign role 'customer' to new registered users (create if not exists)
+        $customerRole = Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
+        $user->assignRole($customerRole);
 
         event(new Registered($user));
 

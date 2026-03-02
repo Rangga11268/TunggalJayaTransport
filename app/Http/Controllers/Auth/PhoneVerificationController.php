@@ -27,8 +27,8 @@ class PhoneVerificationController extends Controller
             return redirect()->route('login');
         }
 
-        if ($user->isFullyVerified()) {
-            return redirect()->intended(route('dashboard', absolute: false));
+        if ($user->hasPhoneVerified()) {
+            return redirect()->intended(route('frontend.home'));
         }
 
         $debugOtp = $this->getDebugOtp();

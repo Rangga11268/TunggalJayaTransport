@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\DebugGoogleAuthController;
 use Illuminate\Support\Facades\Route;
 
+// Routes for guests only (not logged in)
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
@@ -47,16 +48,11 @@ Route::middleware('guest')->group(function () {
     // Debug route (REMOVE in production!)
     Route::get('debug/google-auth', [DebugGoogleAuthController::class, 'debug'])
         ->name('debug.google-auth');
+});
 
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
-
-    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
-
-    // Phone verification routes
+// Routes for authenticated users only
+Route::middleware('auth')->group(function () {
+    // Phone verification routes (must be authenticated, not yet verified)
     Route::get('verify-phone', [PhoneVerificationController::class, 'show'])
         ->name('verification.phone.show');
 
@@ -69,7 +65,16 @@ Route::middleware('guest')->group(function () {
     Route::post('verify-phone/resend', [PhoneVerificationController::class, 'resendOtp'])
         ->name('verification.phone.resend');
 
-    // Other auth routes
+    // Email verification routes
+    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+
+    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+
+    // Password & account management
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
         ->name('password.confirm');
 

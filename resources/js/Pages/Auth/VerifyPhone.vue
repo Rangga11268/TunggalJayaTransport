@@ -19,25 +19,44 @@ const props = defineProps({
 const submitBtn = ref(null);
 useMagnetic(submitBtn);
 
-const form = useForm({
-    otp: "",
-    method: "whatsapp", // default
-});
+// Track whether OTP has been sent (step 1 → step 2)
+// If status or debugOtp is already present (e.g. page refresh), skip to step 2
+const otpSent = ref(!!(props.status || props.debugOtp));
+const selectedMethod = ref("whatsapp");
+
+// Form for sending OTP (step 1)
+const sendForm = useForm({ method: "whatsapp" });
+
+// Form for verifying OTP (step 2)
+const verifyForm = useForm({ otp: "", method: "whatsapp" });
 
 const setMethod = (method) => {
-    form.method = method;
+    selectedMethod.value = method;
+    sendForm.method = method;
+    verifyForm.method = method;
+};
+
+const sendOtp = () => {
+    sendForm.post(route("verification.phone.send"), {
+        preserveScroll: true,
+        onSuccess: () => {
+            otpSent.value = true;
+        },
+    });
 };
 
 const submit = () => {
-    form.post(route("verification.phone.verify"), {
-        onFinish: () => form.reset("otp"),
+    verifyForm.post(route("verification.phone.verify"), {
+        onFinish: () => verifyForm.reset("otp"),
     });
 };
 
 const resendOtp = () => {
-    form.post(route("verification.phone.resend"), {
+    sendForm.post(route("verification.phone.resend"), {
         preserveScroll: true,
-        data: { method: form.method },
+        onSuccess: () => {
+            otpSent.value = true;
+        },
     });
 };
 </script>
@@ -132,7 +151,7 @@ const resendOtp = () => {
                         @click="setMethod('whatsapp')"
                         class="flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 font-unbounded uppercase tracking-wider"
                         :class="
-                            form.method === 'whatsapp'
+                            selectedMethod === 'whatsapp'
                                 ? 'bg-brand-red text-white shadow-lg'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                         "
@@ -143,7 +162,7 @@ const resendOtp = () => {
                         @click="setMethod('email')"
                         class="flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 font-unbounded uppercase tracking-wider"
                         :class="
-                            form.method === 'email'
+                            selectedMethod === 'email'
                                 ? 'bg-brand-red text-white shadow-lg'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                         "
@@ -181,14 +200,58 @@ const resendOtp = () => {
                     </p>
                 </div>
 
-                <form @submit.prevent="submit" class="mt-8 space-y-8">
+                <!-- STEP 1: Send OTP -->
+                <div v-if="!otpSent" class="mt-8 space-y-6">
+                    <p
+                        class="text-sm text-gray-500 dark:text-gray-400 font-manrope text-center"
+                    >
+                        Klik tombol di bawah untuk mengirim kode OTP ke
+                        <span class="font-bold text-gray-800 dark:text-white">
+                            {{
+                                selectedMethod === "whatsapp"
+                                    ? "WhatsApp"
+                                    : "Email"
+                            }}
+                        </span>
+                        Anda.
+                    </p>
+                    <button
+                        @click="sendOtp"
+                        :disabled="sendForm.processing"
+                        class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 dark:hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
+                    >
+                        <span v-if="!sendForm.processing">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            KIRIM KODE OTP
+                        </span>
+                        <span v-else class="flex items-center justify-center">
+                            <i class="fas fa-circle-notch fa-spin mr-3"></i>
+                            MENGIRIM...
+                        </span>
+                    </button>
+                    <p
+                        v-if="sendForm.errors.method"
+                        class="text-xs font-bold text-brand-red font-manrope text-center"
+                    >
+                        {{ sendForm.errors.method }}
+                    </p>
+                </div>
+
+                <!-- STEP 2: Verify OTP -->
+                <form
+                    v-if="otpSent"
+                    @submit.prevent="submit"
+                    class="mt-8 space-y-8"
+                >
                     <div>
                         <label
                             for="otp"
                             class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
                             >Kode OTP (via
                             {{
-                                form.method === "email" ? "Email" : "WhatsApp"
+                                selectedMethod === "email"
+                                    ? "Email"
+                                    : "WhatsApp"
                             }})</label
                         >
                         <div class="relative group">
@@ -198,7 +261,7 @@ const resendOtp = () => {
                                 <i
                                     class="fas"
                                     :class="
-                                        form.method === 'email'
+                                        selectedMethod === 'email'
                                             ? 'fa-envelope-open-text'
                                             : 'fa-mobile-alt'
                                     "
@@ -207,7 +270,7 @@ const resendOtp = () => {
                             <input
                                 id="otp"
                                 type="text"
-                                v-model="form.otp"
+                                v-model="verifyForm.otp"
                                 required
                                 autofocus
                                 autocomplete="one-time-code"
@@ -218,9 +281,9 @@ const resendOtp = () => {
                         </div>
                         <p
                             class="mt-2 text-xs font-bold text-brand-red font-manrope"
-                            v-if="form.errors.otp"
+                            v-if="verifyForm.errors.otp"
                         >
-                            {{ form.errors.otp }}
+                            {{ verifyForm.errors.otp }}
                         </p>
                     </div>
 
@@ -228,10 +291,10 @@ const resendOtp = () => {
                         <button
                             ref="submitBtn"
                             type="submit"
-                            :disabled="form.processing"
+                            :disabled="verifyForm.processing"
                             class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 dark:hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
                         >
-                            <span v-if="!form.processing"
+                            <span v-if="!verifyForm.processing"
                                 >VERIFIKASI SEKARANG</span
                             >
                             <span
@@ -247,7 +310,7 @@ const resendOtp = () => {
                             <button
                                 type="button"
                                 @click="resendOtp"
-                                :disabled="form.processing"
+                                :disabled="sendForm.processing"
                                 class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest hover:text-brand-red dark:hover:text-brand-red transition-colors font-unbounded"
                             >
                                 <i class="fas fa-redo-alt mr-2"></i> Kirim Ulang
