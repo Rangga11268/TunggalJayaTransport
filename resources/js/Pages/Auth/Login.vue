@@ -241,7 +241,7 @@ const submit = () => {
                             ref="submitBtn"
                             type="submit"
                             :disabled="form.processing"
-                            class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
+                            class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] no-hover-effect disabled:opacity-50"
                         >
                             <span v-if="!form.processing">MASUK SEKARANG</span>
                             <span
@@ -277,9 +277,7 @@ const submit = () => {
                         ></div>
                     </div>
                     <div class="relative flex justify-center text-[10px]">
-                        <span
-                            class="px-4 bg-white dark:bg-gray-950 text-gray-500 dark:text-gray-500 font-black font-unbounded uppercase tracking-widest"
-                            >ATAU MASUK DENGAN</span
+                        <span class="auth-divider">ATAU MASUK DENGAN</span>
                         >
                     </div>
                 </div>
@@ -288,7 +286,7 @@ const submit = () => {
                 <div class="grid grid-cols-2 gap-4">
                     <a
                         href="/auth/google"
-                        class="flex items-center justify-center py-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-gray-100 dark:hover:bg-white/10 transition-all group"
+                        class="social-btn flex items-center justify-center py-4 rounded-2xl transition-colors"
                     >
                         <img
                             src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -302,7 +300,9 @@ const submit = () => {
                     </a>
                     <button
                         disabled
-                        class="flex items-center justify-center py-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl opacity-50 cursor-not-allowed group"
+                        aria-disabled="true"
+                        title="Facebook login coming soon"
+                        class="social-btn disabled flex items-center justify-center py-4 rounded-2xl cursor-not-allowed"
                     >
                         <i
                             class="fab fa-facebook text-blue-500 text-lg mr-3"

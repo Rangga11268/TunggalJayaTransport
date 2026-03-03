@@ -39,6 +39,11 @@ export function useMagnetic(elRef, options = { strength: 40, duration: 0.8 }) {
     };
 
     onMounted(() => {
+        // Only enable magnetic behavior if the page explicitly opts in by
+        // adding `enable-magnetic` on the body. This allows global disabling
+        // of the mouse-follow hover effect without changing many files.
+        if (!document?.body?.classList?.contains("enable-magnetic")) return;
+
         const el = getElement();
         if (el && el.addEventListener) {
             el.addEventListener("mousemove", handleMouseMove);
@@ -47,6 +52,9 @@ export function useMagnetic(elRef, options = { strength: 40, duration: 0.8 }) {
     });
 
     onUnmounted(() => {
+        // If magnetic was never enabled, nothing to remove
+        if (!document?.body?.classList?.contains("enable-magnetic")) return;
+
         const el = getElement();
         if (el && el.removeEventListener) {
             el.removeEventListener("mousemove", handleMouseMove);
