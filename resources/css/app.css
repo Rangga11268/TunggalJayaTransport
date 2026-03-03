@@ -737,15 +737,23 @@ a:active {
 /* ===== Auth Divider (Light/Dark Support, Consolidated) ===== */
 .auth-divider {
     display: inline-block !important;
-    background: #ffffff !important;
+    position: relative !important;
+    z-index: 10 !important;
+    background: #f9fafb !important;
     color: #6b7280 !important;
-    padding: 0.25rem 0.75rem !important;
-    border-radius: 0.125rem !important;
+    padding: 0.375rem 1rem !important;
+    border-radius: 0.25rem !important;
     line-height: 1 !important;
     box-shadow: none !important;
     border: none !important;
     background-image: none !important;
+    background-clip: padding-box !important;
     text-align: center !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+    font-size: 0.625rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.15em !important;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -758,6 +766,16 @@ a:active {
 .dark .auth-divider {
     background: #0b0f17 !important;
     color: #9ca3af !important;
+}
+
+/* Divider container: ensure clean rendering and proper stacking */
+.auth-divider {
+    /* Re-apply parent section bg to override inherited gray-50 */
+}
+
+.relative.my-10 > .absolute {
+    /* Ensure line sits behind span */
+    z-index: 0 !important;
 }
 
 /* ===== Social Buttons (Light/Dark Support, Consolidated) ===== */

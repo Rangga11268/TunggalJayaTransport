@@ -278,7 +278,6 @@ const submit = () => {
                     </div>
                     <div class="relative flex justify-center text-[10px]">
                         <span class="auth-divider">ATAU MASUK DENGAN</span>
-                        >
                     </div>
                 </div>
 
