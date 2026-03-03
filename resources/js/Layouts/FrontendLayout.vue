@@ -10,6 +10,8 @@ const page = usePage();
 const pageKey = computed(() => page.url || Date.now());
 const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
+const mobileMenuRef = ref(null);
+const menuButtonRef = ref(null);
 
 // Verification banner: dismissed per session via localStorage
 const verificationBannerDismissed = ref(
@@ -113,6 +115,36 @@ onMounted(() => {
 
 onUnmounted(() => {
     window.removeEventListener("scroll", handleScroll);
+});
+
+// Close mobile menu on Escape and prevent body scroll when open
+const handleGlobalKeydown = (e) => {
+    if (e.key === "Escape" && mobileMenuOpen.value) {
+        mobileMenuOpen.value = false;
+    }
+};
+
+watch(mobileMenuOpen, (val) => {
+    try {
+        if (val) {
+            // prevent background scrolling when menu is open
+            document.body.style.overflow = "hidden";
+            // focus first element inside menu for accessibility
+            setTimeout(() => {
+                mobileMenuRef.value?.focus?.();
+            }, 50);
+            window.addEventListener("keydown", handleGlobalKeydown);
+        } else {
+            document.body.style.overflow = "";
+            window.removeEventListener("keydown", handleGlobalKeydown);
+            // restore focus to menu button
+            setTimeout(() => {
+                menuButtonRef.value?.focus?.();
+            }, 50);
+        }
+    } catch (err) {
+        // ignore
+    }
 });
 
 const isServicesActive = computed(() =>
@@ -274,6 +306,7 @@ const isActive = (routeName) => {
                     >
                         <Link
                             :href="route('frontend.home')"
+                            aria-label="TUJAGO - Beranda"
                             class="flex items-center space-x-3 group"
                         >
                             <!-- Simple Glow -->
@@ -288,7 +321,7 @@ const isActive = (routeName) => {
                                 class="h-8 w-8 md:h-10 md:w-10 transition-transform duration-500 group-hover:scale-110"
                             />
                             <span
-                                class="text-lg md:text-2xl font-black tracking-tighter font-unbounded leading-none text-gray-900 dark:text-white"
+                                class="hidden sm:inline-block text-lg md:text-2xl font-black tracking-tighter font-unbounded leading-none text-gray-900 dark:text-white"
                             >
                                 TUJAGO
                             </span>
@@ -527,7 +560,8 @@ const isActive = (routeName) => {
                         <!-- Dark Mode (Mobile) -->
                         <button
                             @click="toggleDarkMode"
-                            class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-white/5 active:scale-90 transition-all"
+                            aria-label="Toggle dark mode"
+                            class="w-11 h-11 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-white/5 active:scale-90 transition-all"
                         >
                             <i
                                 :class="
@@ -541,7 +575,8 @@ const isActive = (routeName) => {
                         <template v-if="page.props.auth.user">
                             <Link
                                 :href="route('profile.edit')"
-                                class="w-9 h-9 rounded-full bg-rose-600 flex items-center justify-center text-white text-[10px] font-black font-unbounded"
+                                aria-label="Profile"
+                                class="w-11 h-11 rounded-full bg-rose-600 flex items-center justify-center text-white text-[12px] font-black font-unbounded"
                             >
                                 {{
                                     page.props.auth.user.name
@@ -553,7 +588,8 @@ const isActive = (routeName) => {
                         <template v-else>
                             <Link
                                 :href="route('login')"
-                                class="w-9 h-9 rounded-full border border-gray-100 dark:border-white/5 flex items-center justify-center text-gray-500 dark:text-gray-400"
+                                aria-label="Login"
+                                class="w-11 h-11 rounded-full border border-gray-100 dark:border-white/5 flex items-center justify-center text-gray-500 dark:text-gray-400"
                             >
                                 <i class="fas fa-user text-xs"></i>
                             </Link>
@@ -561,8 +597,12 @@ const isActive = (routeName) => {
 
                         <!-- Mobile Menu Trigger -->
                         <button
+                            ref="menuButton"
                             @click="toggleMobileMenu"
-                            class="w-10 h-10 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center shadow-lg active:scale-95 transition-all"
+                            :aria-expanded="mobileMenuOpen"
+                            aria-controls="mobile-menu"
+                            aria-label="Toggle menu"
+                            class="w-12 h-12 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center shadow-lg active:scale-95 transition-all"
                         >
                             <i
                                 :class="
@@ -570,7 +610,7 @@ const isActive = (routeName) => {
                                         ? 'fas fa-times'
                                         : 'fas fa-bars'
                                 "
-                                class="text-xs"
+                                class="text-sm"
                             ></i>
                         </button>
                     </div>
@@ -587,7 +627,10 @@ const isActive = (routeName) => {
                 >
                     <div
                         v-if="mobileMenuOpen"
-                        class="lg:hidden absolute left-0 right-0 top-full mt-4 mx-2 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-white/10 overflow-hidden z-50 transition-all duration-300"
+                        id="mobile-menu"
+                        ref="mobileMenuRef"
+                        tabindex="-1"
+                        class="lg:hidden absolute left-0 right-0 top-full mt-4 mx-2 bg-white/95 dark:bg-[#0a0a0a]/95 md:backdrop-blur-2xl backdrop-blur-sm rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-white/10 overflow-hidden z-50 transition-all duration-300"
                     >
                         <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
                             <!-- Mobile Menu Header Info (Quick Stats/Welcome) -->
