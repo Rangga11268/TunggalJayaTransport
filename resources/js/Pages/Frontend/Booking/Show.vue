@@ -101,7 +101,7 @@ const formatTime = (dateString) => {
             <!-- Left Column: Trip Summary -->
             <div class="lg:col-span-1 space-y-6">
                 <div
-                    class="bg-white dark:bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-gray-100 dark:shadow-none border border-gray-100 dark:border-white/5 lg:sticky top-24 transform transition-all hover:scale-[1.01] duration-300"
+                    class="bg-white dark:bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-gray-100 dark:shadow-none border border-gray-100 dark:border-white/5 transform transition-all hover:scale-[1.01] duration-300"
                 >
                     <h3
                         class="font-unbounded font-bold text-gray-900 dark:text-white mb-8 flex items-center text-lg uppercase tracking-wide"

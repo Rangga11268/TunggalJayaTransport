@@ -150,7 +150,7 @@ const formatDate = (dateString) => {
                 <!-- Sidebar -->
                 <div class="lg:col-span-4 space-y-12">
                     <!-- Related News -->
-                    <div class="sticky top-24">
+                    <div class="relative">
                         <div
                             class="bg-gray-50 dark:bg-[#111] rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-2xl shadow-gray-200 dark:shadow-none"
                         >

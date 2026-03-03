@@ -47,7 +47,11 @@ export default defineConfig({
     server: {
         host: true,
         hmr: {
-            host: "localhost",
+            // Use the LAN IP so devices on the same network can connect to Vite HMR.
+            // Replace with your local IP if different (e.g. 192.168.1.15)
+            host: "192.168.1.15",
+            protocol: "ws",
+            port: 5173,
         },
     },
     resolve: {

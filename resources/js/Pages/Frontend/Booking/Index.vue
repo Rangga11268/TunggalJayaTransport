@@ -73,7 +73,7 @@ watch(
     () => {
         search();
     },
-    { deep: true }
+    { deep: true },
 );
 </script>
 
@@ -258,7 +258,7 @@ watch(
                 <!-- Sidebar Filters -->
                 <div class="hidden lg:block lg:col-span-1 space-y-6">
                     <div
-                        class="bg-white dark:bg-[#111] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm sticky top-24"
+                        class="bg-white dark:bg-[#111] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm"
                     >
                         <h3
                             class="font-unbounded font-bold text-gray-900 dark:text-white mb-6 flex items-center text-lg"

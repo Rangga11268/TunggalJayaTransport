@@ -64,9 +64,9 @@ const formatDate = (dateString) => {
             </div>
         </div>
 
-        <!-- Filter Categories -->
+        <!-- Filter Categories (sticky disabled) -->
         <div
-            class="sticky top-24 z-30 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-16 animate-fade-in-up"
+            class="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-16 animate-fade-in-up"
             style="animation-delay: 0.3s"
         >
             <div class="flex flex-wrap justify-center gap-3">

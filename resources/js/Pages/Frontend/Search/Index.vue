@@ -69,9 +69,9 @@ const formatDate = (dateString) => {
         </div>
 
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
-            <!-- Search Bar (Premium Sticky) -->
+            <!-- Search Bar (disabled sticky to avoid blocking on scroll) -->
             <div
-                class="sticky top-24 z-30 bg-white/80 dark:bg-[#111]/80 backdrop-blur-2xl rounded-[1.5rem] p-4 mb-12 border border-gray-100 dark:border-white/5 shadow-2xl"
+                class="relative z-0 bg-white/80 dark:bg-[#111]/80 backdrop-blur-2xl rounded-[1.5rem] p-4 mb-12 border border-gray-100 dark:border-white/5 shadow-2xl"
             >
                 <form @submit.prevent="search" class="flex items-center gap-4">
                     <div class="relative flex-grow">
@@ -133,7 +133,7 @@ const formatDate = (dateString) => {
                                     {{
                                         formatDate(
                                             result.published_at ||
-                                                result.created_at
+                                                result.created_at,
                                         )
                                     }}
                                 </span>

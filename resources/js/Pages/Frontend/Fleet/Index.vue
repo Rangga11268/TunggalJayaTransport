@@ -72,10 +72,8 @@ const filteredBuses = computed(() => {
             </div>
         </div>
 
-        <!-- Filter & Search Section -->
-        <div
-            class="sticky top-24 z-30 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-16"
-        >
+        <!-- Filter & Search Section (sticky disabled) -->
+        <div class="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-16">
             <div
                 class="bg-white/80 dark:bg-[#111]/80 backdrop-blur-xl p-4 md:p-6 rounded-2xl shadow-xl shadow-black/5 border border-gray-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 animate-fade-in-up"
                 style="animation-delay: 0.3s"
