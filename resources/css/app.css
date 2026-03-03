@@ -172,13 +172,15 @@
     border-radius: 1.5rem;
     border: 1px solid rgba(226, 232, 240, 0.8);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
         0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
 .card-premium:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
         0 10px 10px -5px rgba(0, 0, 0, 0.04);
     border-color: rgba(99, 102, 241, 0.3);
 }
@@ -287,7 +289,8 @@
 
 /* Hero Pattern */
 .hero-pattern {
-    background-image: radial-gradient(
+    background-image:
+        radial-gradient(
             at 0% 0%,
             rgba(99, 102, 241, 0.15) 0px,
             transparent 50%
@@ -320,11 +323,8 @@
 
 /* Planet Bus Theme Elements */
 .stars {
-    background-image: radial-gradient(
-            2px 2px at 20px 30px,
-            #eee,
-            rgba(0, 0, 0, 0)
-        ),
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, #eee, rgba(0, 0, 0, 0)),
         radial-gradient(2px 2px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
         radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0, 0, 0, 0)),
         radial-gradient(2px 2px at 90px 40px, #fff, rgba(0, 0, 0, 0)),
@@ -345,7 +345,8 @@
         rgba(220, 38, 38, 0.8),
         rgba(153, 27, 27, 0.9)
     ); /* White to Brand Red */
-    box-shadow: 0 0 60px -20px rgba(220, 38, 38, 0.8),
+    box-shadow:
+        0 0 60px -20px rgba(220, 38, 38, 0.8),
         inset -10px -10px 40px rgba(0, 0, 0, 0.5);
 }
 
@@ -428,7 +429,8 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     border-left: 1px solid transparent;
 
-    box-shadow: 0 -2px 10px rgba(220, 38, 38, 0.4),
+    box-shadow:
+        0 -2px 10px rgba(220, 38, 38, 0.4),
         /* Upper glow */ inset 0 2px 5px rgba(220, 38, 38, 0.2);
 
     transition: all 0.5s ease;
@@ -483,4 +485,115 @@
     -webkit-text-fill-color: transparent;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     font-family: "Playfair Display", serif;
+}
+
+/* ==========================
+   Clean Mode Overrides
+   (Minimal, modern, fewer colors/effects)
+   ========================== */
+
+:root {
+    --tujago-primary: #e11d48; /* single brand color */
+    --tujago-muted: #6b7280;
+    --tujago-bg-dark: #0b0b0b;
+}
+
+/* Tone down heavy glass and blur effects */
+.glass,
+.glass-white,
+.glass-dark {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Reduce very large shadows used by premium cards */
+.card-premium {
+    box-shadow: 0 6px 12px rgba(6, 8, 15, 0.06);
+}
+.card-premium:hover {
+    transform: none;
+    box-shadow: 0 10px 18px rgba(6, 8, 15, 0.08);
+}
+
+/* Simplify primary button: solid color, subtle shadow */
+.btn-premium {
+    background: var(--tujago-primary) !important;
+    box-shadow: 0 6px 14px rgba(225, 29, 72, 0.12) !important;
+    color: #fff !important;
+    filter: none !important;
+}
+.btn-premium:hover {
+    transform: translateY(0) !important;
+    box-shadow: 0 8px 20px rgba(225, 29, 72, 0.14) !important;
+}
+
+/* Make secondary buttons subtle */
+.btn-secondary-premium {
+    background: transparent !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    color: var(--tujago-muted) !important;
+    backdrop-filter: none !important;
+}
+
+/* Reduce hero/artistic patterns */
+.hero-pattern {
+    background: none !important;
+    opacity: 0.6 !important;
+}
+
+/* Reduce animated blobs and optional decorative planets */
+.blob {
+    filter: blur(32px) !important;
+    opacity: 0.25 !important;
+    animation-duration: 14s !important;
+}
+.planet-bus,
+.planet-saturn,
+.planet-ring {
+    display: none !important;
+}
+
+/* Reduce heavy backdrop blur utility globally on mobile */
+.backdrop-blur-2xl {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+}
+
+/* Shorter animations for a snappier, less flashy feel */
+.animate-float {
+    animation-duration: 4s !important;
+}
+.animate-pulse-glow {
+    animation-duration: 1.5s !important;
+}
+.animate-orbit {
+    animation-duration: 30s !important;
+}
+
+/* Text and input contrast improvements */
+.input-premium {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+}
+.dark .input-premium {
+    background: #071317 !important;
+    color: #e6eef9 !important;
+}
+
+/* Make headings and small labels slightly more neutral */
+h1,
+h2,
+h3 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+.text-muted {
+    color: var(--tujago-muted) !important;
+}
+
+/* Reduce decorative gradients used by utilities */
+.gradient-primary {
+    background: var(--tujago-primary) !important;
 }
