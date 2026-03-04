@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, nextTick, computed } from "vue";
 import { Head, Link, useForm, router } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 
@@ -23,10 +23,31 @@ const form = useForm({
     time: props.filters.time ? props.filters.time.split(",") : [],
 });
 
+// Sync form dengan filters dari URL/props - selalu up-to-date
+watch(
+    () => props.filters,
+    (newFilters) => {
+        if (newFilters) {
+            form.origin = newFilters.origin || "";
+            form.destination = newFilters.destination || "";
+            form.date = newFilters.date || "";
+            form.class = newFilters.class
+                ? newFilters.class.split(",").filter((c) => c)
+                : [];
+            form.time = newFilters.time
+                ? newFilters.time.split(",").filter((t) => t)
+                : [];
+        }
+    },
+    { deep: true, immediate: false },
+);
+
 const search = () => {
-    // Ubah array jadi string koma-komaan buat URL
+    // Build explicit filter parameters (tanpa spread form properties)
     const params = {
-        ...form,
+        origin: form.origin || null,
+        destination: form.destination || null,
+        date: form.date || null,
         class: form.class.length ? form.class.join(",") : null,
         time: form.time.length ? form.time.join(",") : null,
     };
@@ -34,7 +55,7 @@ const search = () => {
     router.get(route("frontend.booking.index"), params, {
         preserveState: true,
         preserveScroll: true,
-        only: ["schedules", "validPair", "filters"],
+        only: ["schedules", "validPair", "filters", "origins", "destinations"],
     });
 };
 
@@ -60,18 +81,35 @@ const formatDate = (dateString) => {
     });
 };
 
+// Flag buat nandain lagi swap biar watch ga dobel-request
+const isSwapping = ref(false);
+let debounceTimer = null;
+
 // Tuker kota asal sama tujuan
 const swapLocations = () => {
+    isSwapping.value = true;
+    clearTimeout(debounceTimer); // Clear pending debounce jika ada
+
     const temp = form.origin;
     form.origin = form.destination;
     form.destination = temp;
+
+    // Langsung search tanpa tunggu, watch akan di-skip
+    search();
+
+    // Reset flag setelah debounce window (biar watch bisa trigger lagi)
+    setTimeout(() => {
+        isSwapping.value = false;
+    }, 100);
 };
 
-// Cari otomatis pas filter ganti
+// Cari otomatis pas filter ganti (debounce 300ms, skip kalau lagi swap)
 watch(
     () => [form.origin, form.destination, form.date, form.class, form.time],
     () => {
-        search();
+        if (isSwapping.value) return;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => search(), 300);
     },
     { deep: true },
 );

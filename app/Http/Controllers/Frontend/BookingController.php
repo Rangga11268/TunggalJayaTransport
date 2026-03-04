@@ -26,158 +26,228 @@ class BookingController extends Controller
             return BusRoute::pluck('destination')->unique()->values();
         });
 
-        $origin = $request->get('origin');
-        $destination = $request->get('destination');
+        // Normalize & validate filter inputs
+        $origin = trim($request->get('origin') ?? '');
+        $destination = trim($request->get('destination') ?? '');
         $date = $request->get('date');
-        $classes = $request->get('class') ? explode(',', $request->get('class')) : [];
-        $times = $request->get('time') ? explode(',', $request->get('time')) : [];
-        $searchDate = $date ? Carbon::parse($date) : null;
+        $classFilters = $request->get('class') ? array_filter(explode(',', $request->get('class'))) : [];
+        $timeFilters = $request->get('time') ? array_filter(explode(',', $request->get('time'))) : [];
+
+        // Set effective date untuk consistent filtering
+        $effectiveDate = null;
+        if ($date) {
+            try {
+                $effectiveDate = Carbon::parse($date);
+            } catch (\Exception $e) {
+                $effectiveDate = null;
+            }
+        }
+
+        // If no date selected, use today as baseline untuk availability check
+        $referenceDate = $effectiveDate ?? Carbon::today();
 
         $schedules = collect();
         $validPair = false;
 
         if ($origin && $destination) {
-            // Cek rutenya valid ga, bolak balik aman
-            $validRoutes = BusRoute::where(function ($query) use ($origin, $destination) {
-                $query->where('origin', $origin)
-                    ->where('destination', $destination);
-            })->orWhere(function ($query) use ($origin, $destination) {
-                $query->where('origin', $destination)
-                    ->where('destination', $origin);
-            })->get();
+            // Cek rute arah persis yang dipilih user (origin → destination)
+            $forwardRoutes = BusRoute::where('origin', $origin)
+                ->where('destination', $destination)
+                ->get();
 
-            if ($validRoutes->count() > 0) {
-                $validPair = true;
-                // Ambil ID rutenya
-                $routeIds = $validRoutes->pluck('id');
+            // Cek juga arah balik untuk validasi pasangan kota (tapi bukan untuk fetch jadwal)
+            $reverseRoutes = BusRoute::where('origin', $destination)
+                ->where('destination', $origin)
+                ->get();
+
+            $validPair = $forwardRoutes->count() > 0 || $reverseRoutes->count() > 0;
+
+            if ($validPair) {
+                // Hanya pakai route arah yang diminta user, bukan sebaliknya
+                $routeIds = $forwardRoutes->pluck('id');
 
                 $query = Schedule::whereIn('route_id', $routeIds)
                     ->with('route', 'bus')
-                    ->withSum(['bookings as booked_seats_count' => function ($q) use ($searchDate) {
+                    ->withSum(['bookings as booked_seats_count' => function ($q) use ($referenceDate) {
                         $q->where('booking_status', 'confirmed')
-                            ->where('payment_status', 'paid');
-
-                        if ($searchDate) {
-                            $q->whereDate('booking_date', $searchDate);
-                        } else {
-                            // Kalo ga pilih tanggal, anggep buat hari ini kedepan
-                            $q->whereDate('booking_date', '>=', Carbon::today());
-                        }
+                            ->where('payment_status', 'paid')
+                            ->whereDate('booking_date', $referenceDate->toDateString());
                     }], 'number_of_seats')
                     ->available();
 
                 $allSchedules = $query->get();
 
                 // Filter schedules
-                $schedules = $allSchedules->filter(function ($schedule) use ($searchDate, $classes, $times) {
-                    // 1. Availability Check
-
-                    // Use the eager loaded count instead of querying DB
-                    $bookedSeats = $schedule->booked_seats_count ?? 0;
-                    $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
-                    $hasSeats = $availableSeats > 0;
-
-                    $active = $schedule->status === 'active';
-                    if (!$active) return false;
-
-                    if ($searchDate) {
-                        if (!$schedule->is_daily) {
-                            $dateMatch = $schedule->departure_time->toDateString() === $searchDate->toDateString();
-
-                            if (!$dateMatch) return false;
-                        }
-                        // For daily, it matches every day.
+                $schedules = $allSchedules->filter(function ($schedule) use ($effectiveDate, $referenceDate, $classFilters, $timeFilters) {
+                    // Check basic status
+                    if ($schedule->status !== 'active') {
+                        return false;
                     }
 
-                    // 2. Class Filter
-                    if (!empty($classes)) {
-                        if (!in_array($schedule->bus->bus_type, $classes)) {
+                    // Calculate available seats using the eager loaded count
+                    $bookedSeats = $schedule->booked_seats_count ?? 0;
+                    $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
+                    if ($availableSeats <= 0) {
+                        return false;
+                    }
+
+                    // Date matching logic
+                    if ($effectiveDate) {
+                        // User memilih tanggal spesifik
+                        if ($schedule->is_daily) {
+                            // Daily schedule: cek days_of_week
+                            if (!empty($schedule->days_of_week)) {
+                                $dayName = $effectiveDate->format('l');
+                                $allowedDays = is_string($schedule->days_of_week)
+                                    ? json_decode($schedule->days_of_week, true)
+                                    : $schedule->days_of_week;
+
+                                if (is_array($allowedDays) && !in_array($dayName, $allowedDays)) {
+                                    return false;
+                                }
+                            }
+                        } else {
+                            // Non-daily: must match departure date exactly
+                            $departureDate = $schedule->departure_time instanceof Carbon
+                                ? $schedule->departure_time
+                                : Carbon::parse($schedule->departure_time);
+
+                            if (!$departureDate->isSameDay($effectiveDate)) {
+                                return false;
+                            }
+
+                            // Non-daily jadwal harus belum berangkat
+                            if ($departureDate->isPast()) {
+                                return false;
+                            }
+                        }
+                    } else {
+                        // Tanpa tanggal spesifik: hanya tampilkan jadwal yang belum lewat
+                        if (!$schedule->is_daily) {
+                            $departure = $schedule->departure_time instanceof Carbon
+                                ? $schedule->departure_time
+                                : Carbon::parse($schedule->departure_time);
+                            if ($departure->isPast()) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    // Class filter
+                    if (!empty($classFilters)) {
+                        if (!in_array($schedule->bus->bus_type, $classFilters)) {
                             return false;
                         }
                     }
 
-                    // 3. Time Filter
-                    if (!empty($times)) {
-                        $departureTime = $schedule->getActualDepartureTime($searchDate);
+                    // Time filter - gunakan referenceDate untuk getActualDepartureTime
+                    if (!empty($timeFilters)) {
+                        $departureTime = $schedule->getActualDepartureTime($referenceDate);
                         $hour = $departureTime->hour;
                         $timeMatch = false;
 
-                        foreach ($times as $time) {
+                        foreach ($timeFilters as $time) {
                             if ($time === 'morning' && $hour >= 0 && $hour < 12) $timeMatch = true;
                             if ($time === 'afternoon' && $hour >= 12 && $hour < 18) $timeMatch = true;
                             if ($time === 'evening' && $hour >= 18 && $hour <= 23) $timeMatch = true;
                         }
 
-                        if (!$timeMatch) return false;
+                        if (!$timeMatch) {
+                            return false;
+                        }
                     }
 
                     return true;
                 });
             }
         } else {
-            // Default: Fetch all available schedules if no specific search
+            // Default: Fetch all available schedules jika salah satu atau keduanya kosong
             $validPair = true;
-            // For default view, still eager load to prevent N+1
+
             $query = Schedule::with('route', 'bus')
-                ->withSum(['bookings as booked_seats_count' => function ($q) {
+                ->withSum(['bookings as booked_seats_count' => function ($q) use ($referenceDate) {
                     $q->where('booking_status', 'confirmed')
                         ->where('payment_status', 'paid')
-                        ->whereDate('booking_date', '>=', Carbon::today());
+                        ->whereDate('booking_date', $referenceDate->toDateString());
                 }], 'number_of_seats')
                 ->available()
                 ->orderBy('departure_time');
 
             $allSchedules = $query->get();
 
-            $schedules = $allSchedules->filter(function ($schedule) use ($classes, $times, $searchDate) {
-                // Simplified manual check using pre-loaded data
+            $schedules = $allSchedules->filter(function ($schedule) use ($effectiveDate, $referenceDate, $classFilters, $timeFilters) {
+                // Check status
+                if ($schedule->status !== 'active') {
+                    return false;
+                }
+
+                // Calculate available seats
                 $bookedSeats = $schedule->booked_seats_count ?? 0;
                 $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
-                if ($availableSeats <= 0) return false;
+                if ($availableSeats <= 0) {
+                    return false;
+                }
 
-                // VALIDASI JADWAL NON-DAILY (Tanggal Spesifik)
-                if (!$schedule->is_daily) {
-                    $departure = $schedule->departure_time instanceof Carbon ? $schedule->departure_time : Carbon::parse($schedule->departure_time);
+                // Date matching logic (same as paired search)
+                if ($effectiveDate) {
+                    if ($schedule->is_daily) {
+                        if (!empty($schedule->days_of_week)) {
+                            $dayName = $effectiveDate->format('l');
+                            $allowedDays = is_string($schedule->days_of_week)
+                                ? json_decode($schedule->days_of_week, true)
+                                : $schedule->days_of_week;
 
-                    // 1. Cek apakah sudah lewat (relative to now)
-                    if ($departure->isPast()) return false;
+                            if (is_array($allowedDays) && !in_array($dayName, $allowedDays)) {
+                                return false;
+                            }
+                        }
+                    } else {
+                        $departureDate = $schedule->departure_time instanceof Carbon
+                            ? $schedule->departure_time
+                            : Carbon::parse($schedule->departure_time);
 
-                    if (!$departure->isSameDay($searchDate)) {
+                        if (!$departureDate->isSameDay($effectiveDate)) {
+                            return false;
+                        }
+
+                        if ($departureDate->isPast()) {
+                            return false;
+                        }
+                    }
+                } else {
+                    // Tanpa tanggal: hanya jadwal yang belum berangkat
+                    if (!$schedule->is_daily) {
+                        $departure = $schedule->departure_time instanceof Carbon
+                            ? $schedule->departure_time
+                            : Carbon::parse($schedule->departure_time);
+                        if ($departure->isPast()) {
+                            return false;
+                        }
+                    }
+                }
+
+                // Class filter
+                if (!empty($classFilters)) {
+                    if (!in_array($schedule->bus->bus_type, $classFilters)) {
                         return false;
                     }
                 }
 
-                // FILTER HARI SPESIFIK: Cek apakah jadwal ini jalan di hari tsb
-                if ($schedule->is_daily && !empty($schedule->days_of_week)) {
-                    $dayName = $searchDate->format('l'); // Sunday, Monday, etc.
-                    // Decode JSON kalo belum (biasanya auto-cast di model)
-                    $allowedDays = is_string($schedule->days_of_week) ? json_decode($schedule->days_of_week, true) : $schedule->days_of_week;
-
-                    if (is_array($allowedDays) && !in_array($dayName, $allowedDays)) {
-                        return false;
-                    }
-                }
-
-                // Class Filter
-                if (!empty($classes)) {
-                    if (!in_array($schedule->bus->bus_type, $classes)) {
-                        return false;
-                    }
-                }
-
-                // Time Filter
-                if (!empty($times)) {
-                    $departureTime = $schedule->getActualDepartureTime();
+                // Time filter
+                if (!empty($timeFilters)) {
+                    $departureTime = $schedule->getActualDepartureTime($referenceDate);
                     $hour = $departureTime->hour;
                     $timeMatch = false;
 
-                    foreach ($times as $time) {
+                    foreach ($timeFilters as $time) {
                         if ($time === 'morning' && $hour >= 0 && $hour < 12) $timeMatch = true;
                         if ($time === 'afternoon' && $hour >= 12 && $hour < 18) $timeMatch = true;
                         if ($time === 'evening' && $hour >= 18 && $hour <= 23) $timeMatch = true;
                     }
 
-                    if (!$timeMatch) return false;
+                    if (!$timeMatch) {
+                        return false;
+                    }
                 }
 
                 return true;
@@ -185,14 +255,13 @@ class BookingController extends Controller
         }
 
         // Transform schedules for frontend
-        $schedules = $schedules->map(function ($schedule) use ($date) {
-            $checkDate = $date ? Carbon::parse($date) : null;
-
+        $schedules = $schedules->map(function ($schedule) use ($effectiveDate, $referenceDate) {
             // Calculate available seats using the eager loaded value
             $bookedSeats = $schedule->booked_seats_count ?? 0;
             $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
 
-            // Check departure status
+            // Check departure status with proper context date
+            $checkDate = $effectiveDate ?? $referenceDate;
             $hasDeparted = $schedule->hasDeparted($checkDate);
 
             return [
@@ -201,7 +270,7 @@ class BookingController extends Controller
                 'departure_time' => $schedule->getActualDepartureTime($checkDate)->format('H:i'),
                 'arrival_time' => $schedule->getActualArrivalTime($checkDate)->format('H:i'),
                 'duration' => $schedule->route->formatted_duration,
-                'available_seats' => $availableSeats, // Use pre-calculated value
+                'available_seats' => $availableSeats,
                 'has_departed' => $hasDeparted,
                 'bus' => [
                     'name' => $schedule->bus->name,
