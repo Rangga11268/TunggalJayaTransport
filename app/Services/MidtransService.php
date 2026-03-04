@@ -218,6 +218,12 @@ class MidtransService
                 'midtrans_transaction_id' => $orderId
             ]);
 
+            // Increment promo code usage count ONLY after payment is settled
+            // This prevents abuse (user spam apply promo then cancel)
+            if ($booking->promo_code_id) {
+                $booking->promoCode()->increment('usage_count');
+            }
+
             // Kirim notifikasi WhatsApp e-ticket
             try {
                 $waService = app(WhatsAppNotificationService::class);

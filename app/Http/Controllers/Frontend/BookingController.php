@@ -769,11 +769,8 @@ class BookingController extends Controller
                     $booking->promo_code_id = $promoCode->id;
                     $booking->save();
 
-                    // Increment usage count
-                    $promoCode->increment('usage_count');
-
-                    if ($promoCode->isLimitReached()) {
-                    }
+                    // NOTE: usage_count will be incremented after payment is SETTLED
+                    // (see MidtransService::handleWebhook), not here to prevent abuse
                 } else {
                     return response()->json(['success' => false, 'message' => 'Kode promo tidak valid atau kadaluarsa.']);
                 }

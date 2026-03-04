@@ -98,6 +98,11 @@ class Booking extends Model implements HasMedia
         return $this->belongsTo(Schedule::class);
     }
 
+    public function promoCode()
+    {
+        return $this->belongsTo(PromoCode::class);
+    }
+
     public function paymentHistories()
     {
         return $this->hasMany(PaymentHistory::class);

@@ -34,8 +34,9 @@ class BookingPolicy
     {
         // Owner bisa update sebelum confirmation/payment
         if ($user->id === $booking->user_id) {
-            // Cegah update jika sudah di-confirm atau sudah berangkat
-            if (in_array($booking->booking_status, ['confirmed', 'departed', 'completed', 'cancelled'])) {
+            // Cegah update jika sudah di-confirm atau sudah completed
+            // Valid status: pending|confirmed|cancelled|completed
+            if (in_array($booking->booking_status, ['confirmed', 'completed', 'cancelled'])) {
                 return false;
             }
             return true;
@@ -58,12 +59,13 @@ class BookingPolicy
         // Owner booking bisa bayar
         if ($user->id === $booking->user_id) {
             // Cegah bayar jika sudah lunas atau cancelled
-            if (in_array($booking->payment_status, ['paid', 'cancelled'])) {
+            // Valid payment_status: pending|paid|failed|refunded
+            if (in_array($booking->payment_status, ['paid', 'refunded'])) {
                 return false;
             }
 
-            // Cegah bayar jika jadwal sudah berangkat
-            if ($booking->booking_status === 'departed') {
+            // Cegah bayar jika booking sudah completed
+            if ($booking->booking_status === 'completed') {
                 return false;
             }
 
@@ -83,9 +85,10 @@ class BookingPolicy
      */
     public function cancel(User $user, Booking $booking): bool
     {
-        // Owner bisa cancel selama belum berangkat
+        // Owner bisa cancel selama belum completed
         if ($user->id === $booking->user_id) {
-            if (in_array($booking->booking_status, ['departed', 'completed'])) {
+            // Valid status: pending|confirmed|cancelled|completed
+            if (in_array($booking->booking_status, ['completed', 'cancelled'])) {
                 return false;
             }
             return true;
