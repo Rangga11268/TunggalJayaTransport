@@ -605,22 +605,6 @@ h3 {
    - Disable group-hover image scaling for social buttons
    ========================== */
 
-/* Target the small uppercase divider label used on auth pages */
-.tracking-widest.uppercase.font-black.px-4 {
-    background-color: #ffffff !important;
-    color: var(--tujago-muted) !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
-    border-radius: 0.125rem !important;
-}
-
-@media (prefers-color-scheme: dark) {
-    .tracking-widest.uppercase.font-black.px-4 {
-        background-color: #0b0f17 !important;
-        color: #9ca3af !important;
-    }
-}
-
 /* Reduce and neutralize hover effects globally for buttons/interactive cards */
 button,
 a[class*="rounded-"],
@@ -670,62 +654,6 @@ a:active {
     filter: none !important;
 }
 
-/* Auth divider & social buttons styling for light/dark */
-.auth-divider {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-    border-radius: 0.125rem;
-    background-color: #ffffff !important;
-    color: #6b7280 !important; /* muted */
-    display: inline-block;
-}
-
-/* Support both system dark preference and Tailwind's `dark` class */
-@media (prefers-color-scheme: dark) {
-    .auth-divider {
-        background-color: #0b0f17 !important;
-        color: #9ca3af !important;
-    }
-}
-.dark .auth-divider {
-    background-color: #0b0f17 !important;
-    color: #9ca3af !important;
-}
-
-.social-btn {
-    background-color: #ffffff !important; /* light */
-    color: #374151 !important;
-    border: 1px solid rgba(15, 23, 42, 0.06) !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-.social-btn img {
-    transform: none !important;
-    transition: none !important;
-}
-
-@media (prefers-color-scheme: dark) {
-    .social-btn {
-        background-color: rgba(255, 255, 255, 0.03) !important;
-        color: #d1d5db !important;
-        border-color: rgba(255, 255, 255, 0.06) !important;
-    }
-}
-.dark .social-btn {
-    background-color: rgba(255, 255, 255, 0.03) !important;
-    color: #d1d5db !important;
-    border-color: rgba(255, 255, 255, 0.06) !important;
-}
-
-.social-btn.disabled,
-.social-btn[aria-disabled="true"] {
-    opacity: 0.55 !important;
-    cursor: not-allowed !important;
-    filter: grayscale(0.4) !important;
-}
-
 /* Globally neutralize 'follow-mouse' transforms if any remain (safety) */
 [class*="magnetic"],
 .magnetic,
@@ -754,13 +682,6 @@ a:active {
     font-size: 0.625rem !important;
     font-weight: 900 !important;
     letter-spacing: 0.15em !important;
-}
-
-@media (prefers-color-scheme: dark) {
-    .auth-divider {
-        background: #0b0f17 !important;
-        color: #9ca3af !important;
-    }
 }
 
 .dark .auth-divider {
@@ -805,17 +726,6 @@ a:active {
     transition: none !important;
     opacity: 1 !important;
     color: currentColor !important;
-}
-
-@media (prefers-color-scheme: dark) {
-    .social-btn {
-        background: rgba(255, 255, 255, 0.03) !important;
-        color: #d1d5db !important;
-        border-color: rgba(255, 255, 255, 0.06) !important;
-    }
-    .social-btn:hover {
-        background: rgba(255, 255, 255, 0.06) !important;
-    }
 }
 
 .dark .social-btn {
