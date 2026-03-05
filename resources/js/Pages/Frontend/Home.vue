@@ -702,7 +702,7 @@ onMounted(() => {
                                 <p
                                     class="text-2xl font-black font-unbounded text-gray-900 dark:text-white"
                                 >
-                                    2024
+                                    1973
                                 </p>
                             </div>
                         </div>
