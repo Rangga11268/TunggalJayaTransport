@@ -853,93 +853,109 @@ onMounted(() => {
             </div>
         </section>
 
-        <!-- LATEST NEWS SECTION -->
+        <!-- LATEST NEWS SECTION (Unique Poster Style) -->
         <section
             v-if="latestNews && latestNews.length > 0"
-            class="py-24 bg-gray-50 dark:bg-[#050505] relative overflow-hidden"
+            class="py-32 bg-white dark:bg-[#080808] relative overflow-hidden"
         >
-            <!-- Decor -->
+            <!-- Background Accents -->
             <div
-                class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"
+                class="absolute top-0 right-0 w-1/3 h-full bg-rose-600/5 -skew-x-12 translate-x-1/2"
             ></div>
 
             <div class="max-w-7xl mx-auto px-6 relative z-10">
-                <div class="text-center mb-16">
-                    <span
-                        class="inline-block py-1 px-3 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-600 border border-rose-100 dark:border-rose-900/20 text-xs font-bold tracking-widest uppercase mb-6 font-unbounded animate-on-scroll"
-                    >
-                        Update Terbaru
-                    </span>
-                    <h2
-                        class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white font-unbounded mb-6 animate-on-scroll"
-                    >
-                        Berita & <span class="text-rose-600">Artikel</span>
-                    </h2>
-                    <p
-                        class="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope animate-on-scroll"
-                    >
-                        Ikuti perkembangan terbaru, tips perjalanan, dan agenda
-                        kegiatan dari Tunggal Jaya Transport.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div
+                    class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8"
+                >
+                    <div class="max-w-2xl animate-on-scroll">
+                        <h2
+                            class="text-5xl md:text-7xl font-black text-gray-900 dark:text-white font-unbounded leading-none mb-6"
+                        >
+                            NEWS & <br /><span class="text-rose-600"
+                                >POSTERS.</span
+                            >
+                        </h2>
+                        <p
+                            class="text-gray-500 dark:text-gray-400 text-lg font-medium max-w-md"
+                        >
+                            Informasi terkini dan update terbaru dari layanan
+                            Tunggal Jaya Transport.
+                        </p>
+                    </div>
                     <Link
-                        v-for="(news, index) in latestNews"
-                        :key="news.id"
-                        :href="route('frontend.news.show', news.slug)"
-                        class="group bg-white dark:bg-[#111] rounded-[2rem] overflow-hidden border border-gray-100 dark:border-white/5 hover:border-rose-600/30 transition-all duration-500 hover:shadow-2xl hover:shadow-rose-600/10 flex flex-col h-full animate-on-scroll"
+                        :href="route('frontend.news.index')"
+                        class="group flex items-center gap-4 text-rose-600 font-black font-unbounded text-sm uppercase tracking-widest animate-on-scroll"
                     >
-                        <div class="relative h-60 overflow-hidden">
-                            <img
-                                :src="news.image_url"
-                                :alt="news.title"
-                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                            />
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent opacity-60"
-                            ></div>
-                            <span
-                                class="absolute top-4 left-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold rounded-lg uppercase tracking-widest font-unbounded"
-                            >
-                                {{ news.category?.name || "Info" }}
-                            </span>
-                        </div>
-                        <div class="p-8 flex-grow flex flex-col">
-                            <div
-                                class="text-xs text-gray-400 mb-4 font-manrope flex items-center gap-2"
-                            >
-                                <i class="far fa-calendar text-rose-600"></i>
-                                <span>{{
-                                    formatDate(
-                                        news.published_at || news.created_at,
-                                    )
-                                }}</span>
-                            </div>
-                            <h3
-                                class="text-lg font-bold font-unbounded text-gray-900 dark:text-white mb-4 leading-tight group-hover:text-rose-600 transition-colors line-clamp-2"
-                            >
-                                {{ news.title }}
-                            </h3>
-                            <p
-                                class="text-sm text-gray-500 dark:text-gray-400 font-manrope line-clamp-3 mb-6 flex-grow"
-                            >
-                                {{ news.excerpt }}
-                            </p>
-                            <span
-                                class="text-xs font-bold font-unbounded text-rose-600 uppercase tracking-wider group-hover:underline"
-                                >Baca Selengkapnya</span
-                            >
-                        </div>
+                        Explore All
+                        <i
+                            class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"
+                        ></i>
                     </Link>
                 </div>
 
-                <div class="text-center mt-12 animate-on-scroll">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
                     <Link
-                        :href="route('frontend.news.index')"
-                        class="inline-flex items-center gap-2 text-sm font-bold font-unbounded text-gray-900 dark:text-white hover:text-rose-600 transition-colors"
+                        v-for="(news, index) in latestNews.slice(0, 3)"
+                        :key="news.id"
+                        :href="route('frontend.news.show', news.slug)"
+                        class="group relative flex flex-col animate-on-scroll"
+                        :class="index === 1 ? 'md:mt-24' : ''"
                     >
-                        Lihat Semua Berita <i class="fas fa-arrow-right"></i>
+                        <!-- Large Index Number -->
+                        <div
+                            class="absolute -top-12 -left-4 text-8xl font-black font-unbounded text-gray-100 dark:text-white/5 pointer-events-none group-hover:text-rose-600/10 transition-colors duration-500"
+                        >
+                            0{{ index + 1 }}
+                        </div>
+
+                        <!-- Poster Card -->
+                        <div
+                            class="relative aspect-[3/4] overflow-hidden border-[12px] border-white dark:border-[#111] shadow-2xl transition-transform duration-700 group-hover:-rotate-2 group-hover:scale-[1.02]"
+                        >
+                            <img
+                                :src="news.image_url"
+                                :alt="news.title"
+                                class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                            />
+                            <!-- Overlay Info -->
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity"
+                            ></div>
+                            <div class="absolute bottom-0 left-0 right-0 p-8">
+                                <span
+                                    class="text-[10px] font-black font-unbounded text-rose-500 uppercase tracking-widest mb-2 block"
+                                >
+                                    {{ news.category?.name || "Official" }}
+                                </span>
+                                <h3
+                                    class="text-xl font-bold font-unbounded text-white leading-tight group-hover:text-rose-400 transition-colors"
+                                >
+                                    {{ news.title }}
+                                </h3>
+                            </div>
+                        </div>
+
+                        <!-- Metadata below -->
+                        <div
+                            class="mt-8 flex items-center justify-between border-b border-gray-100 dark:border-white/10 pb-4"
+                        >
+                            <span
+                                class="text-xs font-bold text-gray-400 uppercase tracking-tighter italic"
+                            >
+                                {{
+                                    formatDate(
+                                        news.published_at || news.created_at,
+                                    )
+                                }}
+                            </span>
+                            <div
+                                class="relative w-8 h-px bg-gray-200 dark:bg-white/10 overflow-hidden"
+                            >
+                                <div
+                                    class="absolute inset-0 bg-rose-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"
+                                ></div>
+                            </div>
+                        </div>
                     </Link>
                 </div>
             </div>

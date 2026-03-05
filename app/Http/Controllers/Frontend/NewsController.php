@@ -23,6 +23,14 @@ class NewsController extends Controller
         $articles = $query->latest()->paginate(9)->appends(['category' => $categoryId]);
         
         $categories = Category::all();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'articles' => $articles,
+                'categories' => $categories,
+                'currentCategory' => $categoryId
+            ]);
+        }
             
         return \Inertia\Inertia::render('Frontend/News/Index', [
             'articles' => $articles,

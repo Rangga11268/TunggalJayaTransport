@@ -1,6 +1,8 @@
 <script setup>
+import { ref, onMounted } from "vue";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
+import axios from "axios";
 
 defineOptions({ layout: FrontendLayout });
 
@@ -9,6 +11,10 @@ const props = defineProps({
     categories: Array,
     currentCategory: String, // ID or null
 });
+
+const localArticles = ref(props.articles);
+const currentCat = ref(props.currentCategory);
+const isLoading = ref(false);
 
 const formatDate = (dateString) => {
     if (!dateString) return "Tanggal Belum Tersedia";
@@ -21,6 +27,36 @@ const formatDate = (dateString) => {
         month: "long",
         year: "numeric",
     });
+};
+
+const fetchArticles = async (page = 1, categoryId = null) => {
+    isLoading.value = true;
+    currentCat.value = categoryId;
+
+    try {
+        const response = await axios.get(route("frontend.news.index"), {
+            params: {
+                page: page,
+                category: categoryId,
+            },
+        });
+
+        localArticles.value = response.data.articles;
+
+        // Update URL without reloading
+        const url = new URL(window.location);
+        if (categoryId) url.searchParams.set("category", categoryId);
+        else url.searchParams.delete("category");
+
+        if (page > 1) url.searchParams.set("page", page);
+        else url.searchParams.delete("page");
+
+        window.history.pushState({}, "", url);
+    } catch (error) {
+        console.error("Failed to fetch articles:", error);
+    } finally {
+        isLoading.value = false;
+    }
 };
 </script>
 
@@ -70,41 +106,51 @@ const formatDate = (dateString) => {
             style="animation-delay: 0.3s"
         >
             <div class="flex flex-wrap justify-center gap-3">
-                <Link
-                    :href="route('frontend.news.index')"
+                <button
+                    @click.prevent="fetchArticles(1, null)"
                     class="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider font-unbounded transition-all duration-300 border"
                     :class="
-                        !currentCategory
+                        !currentCat
                             ? 'bg-rose-600 text-white border-rose-600 shadow-lg shadow-rose-600/30'
                             : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/10 hover:border-gray-400 dark:hover:border-white/30'
                     "
                 >
                     Semua
-                </Link>
-                <Link
+                </button>
+                <button
                     v-for="cat in categories"
                     :key="cat.id"
-                    :href="route('frontend.news.index', { category: cat.id })"
+                    @click.prevent="fetchArticles(1, cat.id)"
                     class="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider font-unbounded transition-all duration-300 border"
                     :class="
-                        currentCategory == cat.id
+                        currentCat == cat.id
                             ? 'bg-rose-600 text-white border-rose-600 shadow-lg shadow-rose-600/30'
                             : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/10 hover:border-gray-400 dark:hover:border-white/30'
                     "
                 >
                     {{ cat.name }}
-                </Link>
+                </button>
             </div>
         </div>
 
         <!-- News Grid -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 relative">
+            <!-- Loading Overlay -->
             <div
-                v-if="articles.data.length > 0"
+                v-if="isLoading"
+                class="absolute inset-0 bg-white/50 dark:bg-[#050505]/50 backdrop-blur-[2px] z-20 flex items-center justify-center rounded-[3rem]"
+            >
+                <div
+                    class="w-12 h-12 border-4 border-rose-600 border-t-transparent rounded-full animate-spin"
+                ></div>
+            </div>
+
+            <div
+                v-if="localArticles.data.length > 0"
                 class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
                 <Link
-                    v-for="(article, index) in articles.data"
+                    v-for="(article, index) in localArticles.data"
                     :key="article.id"
                     :href="route('frontend.news.show', article.slug)"
                     class="group relative bg-white dark:bg-[#111] rounded-[2rem] overflow-hidden border border-gray-100 dark:border-white/5 hover:border-rose-600/30 transition-all duration-500 hover:shadow-2xl hover:shadow-rose-600/10 flex flex-col h-full animate-fade-in-up"
@@ -205,16 +251,24 @@ const formatDate = (dateString) => {
 
             <!-- Pagination -->
             <div
-                v-if="articles.links && articles.data.length > 0"
+                v-if="localArticles.links && localArticles.data.length > 0"
                 class="mt-16 flex justify-center animate-fade-in-up"
                 style="animation-delay: 0.5s"
             >
                 <div class="flex flex-wrap gap-2">
-                    <component
-                        :is="link.url ? Link : 'span'"
-                        v-for="(link, index) in articles.links"
+                    <button
+                        v-for="(link, index) in localArticles.links"
                         :key="index"
-                        :href="link.url"
+                        @click.prevent="
+                            link.url
+                                ? fetchArticles(
+                                      new URL(link.url).searchParams.get(
+                                          'page',
+                                      ),
+                                      currentCat,
+                                  )
+                                : null
+                        "
                         v-html="link.label"
                         class="px-4 py-2 rounded-xl text-sm font-bold font-unbounded transition-all duration-300"
                         :class="
