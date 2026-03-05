@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
-import { onMounted, ref, computed } from "vue";
+import { onMounted, onUnmounted, ref, computed } from "vue";
 import axios from "axios";
 import Swal from "sweetalert2";
 import html2canvas from "html2canvas";
@@ -89,7 +89,7 @@ const checkPaymentStatus = async (orderId) => {
 
     try {
         const statusResponse = await axios.get(
-            route("frontend.payment.status", { orderId: orderId })
+            route("frontend.payment.status", { orderId: orderId }),
         );
 
         const data = statusResponse.data;
@@ -151,6 +151,63 @@ const checkPaymentStatus = async (orderId) => {
         isChecking.value = false;
     }
 };
+
+// ---- Auto-refresh payment status polling ----
+let pollInterval = null;
+const lastAutoCheck = ref(null);
+
+onMounted(() => {
+    if (
+        props.booking.payment_status !== "paid" &&
+        props.booking.midtrans_transaction_id
+    ) {
+        pollInterval = setInterval(async () => {
+            if (isChecking.value) return; // Skip if manual check is running
+            try {
+                const statusResponse = await axios.get(
+                    route("frontend.payment.status", {
+                        orderId: props.booking.midtrans_transaction_id,
+                    }),
+                );
+                const data = statusResponse.data;
+                lastAutoCheck.value = new Date().toLocaleTimeString("id-ID");
+
+                if (data.status === "success") {
+                    const trxStatus = data.transaction_status;
+                    if (trxStatus === "capture" || trxStatus === "settlement") {
+                        clearInterval(pollInterval);
+                        Swal.fire({
+                            icon: "success",
+                            title: "Pembayaran Berhasil!",
+                            text: "Pembayaran Anda telah dikonfirmasi.",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        }).then(() => window.location.reload());
+                    } else if (
+                        trxStatus === "expire" ||
+                        trxStatus === "cancel" ||
+                        trxStatus === "deny"
+                    ) {
+                        clearInterval(pollInterval);
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Pembayaran Gagal",
+                            text: `Status: ${trxStatus}`,
+                            confirmButtonColor: "#e11d48",
+                        }).then(() => window.location.reload());
+                    }
+                }
+            } catch (e) {
+                // Silent fail — don't disturb user on auto-check errors
+                console.warn("Auto-check failed:", e.message);
+            }
+        }, 10000); // Every 10 seconds
+    }
+});
+
+onUnmounted(() => {
+    if (pollInterval) clearInterval(pollInterval);
+});
 
 const routeDescription = computed(() => {
     const s = props.booking?.schedule;
@@ -501,6 +558,21 @@ const formatTime = (timeString) => {
                     ></i>
                     {{ isChecking ? "Checking..." : "Check Status" }}
                 </button>
+
+                <!-- Auto-check indicator -->
+                <p
+                    v-if="
+                        booking.payment_status !== 'paid' &&
+                        booking.midtrans_transaction_id
+                    "
+                    class="text-xs text-gray-400 font-mono text-center w-full mt-2"
+                >
+                    <i class="fas fa-sync-alt fa-spin mr-1 text-[10px]"></i>
+                    Auto-check aktif
+                    <span v-if="lastAutoCheck">
+                        · terakhir {{ lastAutoCheck }}</span
+                    >
+                </p>
             </div>
 
             <p class="text-center text-gray-500 font-mono text-xs mt-8">
@@ -511,6 +583,4 @@ const formatTime = (timeString) => {
     </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -3,6 +3,7 @@ import { Head, useForm, router } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 defineOptions({ layout: FrontendLayout });
 
@@ -90,6 +91,14 @@ const isFilterMatch = (seatNum) => {
     return false;
 };
 // Initialize selected seats from booking if available
+// ---- Beforeunload guard ----
+const onBeforeUnload = (e) => {
+    if (selectedSeats.value.length > 0) {
+        e.preventDefault();
+        e.returnValue = "";
+    }
+};
+
 onMounted(() => {
     if (props.booking.seat_numbers) {
         selectedSeats.value = props.booking.seat_numbers.split(",").map(Number);
@@ -97,10 +106,13 @@ onMounted(() => {
     // Start countdown
     updateCountdown();
     countdownInterval = setInterval(updateCountdown, 1000);
+    // Prevent accidental page leave
+    window.addEventListener("beforeunload", onBeforeUnload);
 });
 
 onUnmounted(() => {
     clearInterval(countdownInterval);
+    window.removeEventListener("beforeunload", onBeforeUnload);
 });
 
 // Seat Map Configuration
@@ -117,6 +129,7 @@ const isSeatOccupied = (seatNum) =>
 const isSeatSelected = (seatNum) => selectedSeats.value.includes(seatNum);
 
 const toggleSeat = (seatNum) => {
+    if (countdown.value.expired) return;
     if (isSeatOccupied(seatNum)) return;
 
     const index = selectedSeats.value.indexOf(seatNum);
@@ -128,7 +141,12 @@ const toggleSeat = (seatNum) => {
         if (selectedSeats.value.length < props.booking.number_of_seats) {
             selectedSeats.value.push(seatNum);
         } else {
-            alert(`Anda hanya memesan ${props.booking.number_of_seats} kursi.`);
+            Swal.fire({
+                icon: "warning",
+                title: "Batas Kursi",
+                text: `Anda hanya memesan ${props.booking.number_of_seats} kursi.`,
+                confirmButtonColor: "#e11d48",
+            });
         }
     }
 };
@@ -136,7 +154,12 @@ const toggleSeat = (seatNum) => {
 // Helper to save seats returns success boolean
 const saveSeats = async () => {
     if (selectedSeats.value.length !== props.booking.number_of_seats) {
-        alert(`Harap pilih ${props.booking.number_of_seats} kursi.`);
+        Swal.fire({
+            icon: "warning",
+            title: "Kursi Belum Lengkap",
+            text: `Harap pilih ${props.booking.number_of_seats} kursi.`,
+            confirmButtonColor: "#e11d48",
+        });
         return false;
     }
 
@@ -145,23 +168,32 @@ const saveSeats = async () => {
         const response = await axios.post(
             route("frontend.booking.select-seats"),
             {
-                booking_id: props.booking.id, // Current booking ID
-                seat_numbers: selectedSeats.value, // Array [1, 5, etc]
+                booking_id: props.booking.id,
+                seat_numbers: selectedSeats.value,
             },
         );
 
         if (response.data.success) {
             return true;
         } else {
-            alert(response.data.message || "Gagal menyimpan kursi.");
+            Swal.fire({
+                icon: "error",
+                title: "Gagal Simpan Kursi",
+                text: response.data.message || "Gagal menyimpan kursi.",
+                confirmButtonColor: "#e11d48",
+            });
             return false;
         }
     } catch (e) {
         console.error("Save Seats Error:", e);
-        alert(
-            e.response?.data?.message ||
+        Swal.fire({
+            icon: "error",
+            title: "Koneksi Gagal",
+            text:
+                e.response?.data?.message ||
                 "Gagal menghubungi server untuk simpan kursi.",
-        );
+            confirmButtonColor: "#e11d48",
+        });
         return false;
     } finally {
         processing.value = false;
@@ -221,26 +253,54 @@ const resetPromo = () => {
 };
 
 const processPayment = async () => {
+    // 0. Guard: block if countdown expired
+    if (countdown.value.expired) {
+        Swal.fire({
+            icon: "error",
+            title: "Waktu Habis",
+            text: "Waktu pemesanan Anda telah habis. Silakan buat pemesanan baru.",
+            confirmButtonColor: "#e11d48",
+        });
+        return;
+    }
+
     // 1. Validation
     if (selectedSeats.value.length !== props.booking.number_of_seats) {
-        alert("Mohon pilih kursi terlebih dahulu.");
+        Swal.fire({
+            icon: "warning",
+            title: "Kursi Belum Dipilih",
+            text: "Mohon pilih kursi terlebih dahulu.",
+            confirmButtonColor: "#e11d48",
+        });
         return;
     }
     if (!paymentMethod.value) {
-        alert("Pilih metode pembayaran.");
+        Swal.fire({
+            icon: "warning",
+            title: "Metode Pembayaran",
+            text: "Pilih metode pembayaran.",
+            confirmButtonColor: "#e11d48",
+        });
         return;
     }
     if (paymentMethod.value === "e_wallet" && !ewalletType.value) {
-        alert("Pilih jenis E-Wallet.");
+        Swal.fire({
+            icon: "warning",
+            title: "E-Wallet",
+            text: "Pilih jenis E-Wallet.",
+            confirmButtonColor: "#e11d48",
+        });
         return;
     }
 
     const saved = await saveSeats();
-    if (!saved) return; // Stop if saving failed
+    if (!saved) return;
+
+    // Remove beforeunload guard during payment redirect
+    window.removeEventListener("beforeunload", onBeforeUnload);
 
     processing.value = true;
     try {
-        // Prepare payload
         const payload = {
             booking_id: props.booking.id,
             payment_method:
@@ -269,24 +329,41 @@ const processPayment = async () => {
                         );
                     },
                     onError: function (result) {
-                        alert("Pembayaran gagal!");
+                        Swal.fire({
+                            icon: "error",
+                            title: "Pembayaran Gagal",
+                            text: "Terjadi kesalahan saat memproses pembayaran.",
+                            confirmButtonColor: "#e11d48",
+                        });
                     },
                     onClose: function () {
                         // customer closed the popup without finishing the payment
+                        window.addEventListener("beforeunload", onBeforeUnload);
                     },
                 });
             } else if (response.data.redirect_url) {
                 window.location.href = response.data.redirect_url;
             }
         } else {
-            alert(response.data.message);
+            Swal.fire({
+                icon: "error",
+                title: "Gagal",
+                text: response.data.message,
+                confirmButtonColor: "#e11d48",
+            });
+            window.addEventListener("beforeunload", onBeforeUnload);
         }
     } catch (e) {
         console.error(e);
-        alert(
-            "Gagal memproses pembayaran: " +
+        Swal.fire({
+            icon: "error",
+            title: "Gagal Memproses",
+            text:
+                "Gagal memproses pembayaran: " +
                 (e.response?.data?.message || e.message),
-        );
+            confirmButtonColor: "#e11d48",
+        });
+        window.addEventListener("beforeunload", onBeforeUnload);
     } finally {
         processing.value = false;
     }
@@ -304,9 +381,7 @@ const formatCurrency = (value) => {
 const getSeatNumber = (rowIdx, colIdx) => {
     // colIdx: 0, 1 (Left) -- 2, 3, 4 (Right)
     const base = rowIdx * 5;
-    if (colIdx < 2) return base + colIdx + 1; // 1-based
-    const aisleOffset = colIdx >= 2 ? 0 : 0;
-    return base + colIdx + 1;
+    return base + colIdx + 1; // 1-based
 };
 // Helper to safely get route description
 const routeDescription = computed(() => {

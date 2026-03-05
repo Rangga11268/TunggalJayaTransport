@@ -9,8 +9,6 @@ const props = defineProps({
     schedules: Array,
     origins: Array,
     destinations: Array,
-    origin: String,
-    destination: String,
     validPair: Boolean,
     filters: Object,
 });
@@ -23,7 +21,65 @@ const form = useForm({
     time: props.filters.time ? props.filters.time.split(",") : [],
 });
 
-// Sync form dengan filters dari URL/props - selalu up-to-date
+// Gabung origins + destinations jadi satu list unik
+// Supaya pas swap, nilai tetap ada di kedua select
+const allLocations = computed(() => {
+    const set = new Set([
+        ...(props.origins || []),
+        ...(props.destinations || []),
+    ]);
+    return [...set].sort();
+});
+
+// Cek apakah ada filter aktif
+const hasActiveFilters = computed(() => {
+    return (
+        form.origin ||
+        form.destination ||
+        form.date ||
+        form.class.length > 0 ||
+        form.time.length > 0
+    );
+});
+
+// Reset semua filter
+const resetFilters = () => {
+    isSwapping.value = true;
+    form.origin = "";
+    form.destination = "";
+    form.date = "";
+    form.class = [];
+    form.time = [];
+    sortBy.value = "earliest";
+
+    router.get(
+        route("frontend.booking.index"),
+        {},
+        {
+            preserveState: true,
+            preserveScroll: true,
+            only: [
+                "schedules",
+                "validPair",
+                "filters",
+                "origins",
+                "destinations",
+            ],
+        },
+    );
+
+    setTimeout(() => {
+        isSwapping.value = false;
+    }, 100);
+};
+
+// Sort state
+const sortBy = ref("earliest");
+
+// Min date = hari ini (prevent past dates)
+const todayDate = computed(() => new Date().toISOString().split("T")[0]);
+
+// Sync form dengan filters dari URL/props
 watch(
     () => props.filters,
     (newFilters) => {
@@ -31,25 +87,69 @@ watch(
             form.origin = newFilters.origin || "";
             form.destination = newFilters.destination || "";
             form.date = newFilters.date || "";
-            form.class = newFilters.class
-                ? newFilters.class.split(",").filter((c) => c)
-                : [];
-            form.time = newFilters.time
-                ? newFilters.time.split(",").filter((t) => t)
-                : [];
         }
     },
     { deep: true, immediate: false },
 );
 
+// Client-side filter: class & time (tanpa server request)
+const filteredSchedules = computed(() => {
+    if (!props.schedules) return [];
+    let result = [...props.schedules];
+
+    // Filter by class
+    if (form.class.length > 0) {
+        result = result.filter((s) => form.class.includes(s.bus.bus_type));
+    }
+
+    // Filter by time range
+    if (form.time.length > 0) {
+        result = result.filter((s) => {
+            const hour = parseInt(s.departure_time.split(":")[0], 10);
+            return form.time.some((t) => {
+                if (t === "morning") return hour >= 0 && hour < 12;
+                if (t === "afternoon") return hour >= 12 && hour < 18;
+                if (t === "evening") return hour >= 18 && hour <= 23;
+                return false;
+            });
+        });
+    }
+
+    return result;
+});
+
+// Client-side sort
+const displaySchedules = computed(() => {
+    const list = [...filteredSchedules.value];
+    if (sortBy.value === "cheapest") {
+        list.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (sortBy.value === "fastest") {
+        list.sort((a, b) => {
+            const parseDur = (d) => {
+                if (!d) return 9999;
+                const parts = d.match(/(\d+)/g);
+                if (!parts) return 9999;
+                return parts.length >= 2
+                    ? parseInt(parts[0]) * 60 + parseInt(parts[1])
+                    : parseInt(parts[0]);
+            };
+            return parseDur(a.duration) - parseDur(b.duration);
+        });
+    } else {
+        // "earliest" — sort by departure_time
+        list.sort((a, b) =>
+            (a.departure_time || "").localeCompare(b.departure_time || ""),
+        );
+    }
+    return list;
+});
+
+// Server search: hanya untuk origin, destination, date
 const search = () => {
-    // Build explicit filter parameters (tanpa spread form properties)
     const params = {
         origin: form.origin || null,
         destination: form.destination || null,
         date: form.date || null,
-        class: form.class.length ? form.class.join(",") : null,
-        time: form.time.length ? form.time.join(",") : null,
     };
 
     router.get(route("frontend.booking.index"), params, {
@@ -88,30 +188,27 @@ let debounceTimer = null;
 // Tuker kota asal sama tujuan
 const swapLocations = () => {
     isSwapping.value = true;
-    clearTimeout(debounceTimer); // Clear pending debounce jika ada
+    clearTimeout(debounceTimer);
 
     const temp = form.origin;
     form.origin = form.destination;
     form.destination = temp;
 
-    // Langsung search tanpa tunggu, watch akan di-skip
     search();
 
-    // Reset flag setelah debounce window (biar watch bisa trigger lagi)
     setTimeout(() => {
         isSwapping.value = false;
     }, 100);
 };
 
-// Cari otomatis pas filter ganti (debounce 300ms, skip kalau lagi swap)
+// Auto-search saat origin/destination/date berubah (bukan class/time)
 watch(
-    () => [form.origin, form.destination, form.date, form.class, form.time],
+    () => [form.origin, form.destination, form.date],
     () => {
         if (isSwapping.value) return;
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => search(), 300);
     },
-    { deep: true },
 );
 </script>
 
@@ -174,7 +271,7 @@ watch(
                                         Pilih Kota Asal
                                     </option>
                                     <option
-                                        v-for="opt in origins"
+                                        v-for="opt in allLocations"
                                         :key="opt"
                                         :value="opt"
                                     >
@@ -236,7 +333,7 @@ watch(
                                         Pilih Kota Tujuan
                                     </option>
                                     <option
-                                        v-for="opt in destinations"
+                                        v-for="opt in allLocations"
                                         :key="opt"
                                         :value="opt"
                                     >
@@ -265,6 +362,7 @@ watch(
                                 <input
                                     type="date"
                                     v-model="form.date"
+                                    :min="todayDate"
                                     class="block w-full pl-12 pr-4 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all text-gray-900 dark:text-white placeholder-gray-400 relative z-0 font-manrope focus:bg-white dark:focus:bg-black [color-scheme:light] dark:[color-scheme:dark]"
                                 />
                             </div>
@@ -299,10 +397,20 @@ watch(
                         class="bg-white dark:bg-[#111] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm"
                     >
                         <h3
-                            class="font-unbounded font-bold text-gray-900 dark:text-white mb-6 flex items-center text-lg"
+                            class="font-unbounded font-bold text-gray-900 dark:text-white mb-6 flex items-center justify-between text-lg"
                         >
-                            <i class="fas fa-filter mr-3 text-rose-600"></i>
-                            Filter
+                            <span class="flex items-center">
+                                <i class="fas fa-filter mr-3 text-rose-600"></i>
+                                Filter
+                            </span>
+                            <button
+                                v-if="hasActiveFilters"
+                                @click="resetFilters"
+                                class="text-xs font-manrope font-bold text-gray-400 hover:text-rose-600 transition-colors flex items-center gap-1 normal-case tracking-normal"
+                            >
+                                <i class="fas fa-times-circle"></i>
+                                Reset
+                            </button>
                         </h3>
 
                         <div class="space-y-8">
@@ -454,11 +562,11 @@ watch(
                                 v-if="form.origin && form.destination"
                                 class="text-xl font-bold font-unbounded text-gray-900 dark:text-white flex items-center"
                             >
-                                {{ origin }}
+                                {{ form.origin }}
                                 <i
                                     class="fas fa-long-arrow-alt-right text-gray-400 mx-3"
                                 ></i>
-                                {{ destination }}
+                                {{ form.destination }}
                             </h2>
                             <h2
                                 v-else
@@ -474,7 +582,9 @@ watch(
                                 {{ formatDate(form.date) }}
                                 <span class="mx-2">•</span>
                                 <span class="text-rose-600 font-bold">{{
-                                    schedules ? schedules.length : 0
+                                    displaySchedules
+                                        ? displaySchedules.length
+                                        : 0
                                 }}</span>
                                 Bus Tersedia
                             </p>
@@ -487,11 +597,12 @@ watch(
                                 >Urutkan</span
                             >
                             <select
+                                v-model="sortBy"
                                 class="text-sm font-bold border-none bg-transparent text-gray-900 dark:text-white focus:ring-0 cursor-pointer py-1 pl-2 pr-8 rounded-lg hover:bg-white dark:hover:bg-white/10 transition-colors font-manrope"
                             >
-                                <option>Paling Awal</option>
-                                <option>Termurah</option>
-                                <option>Tercepat</option>
+                                <option value="earliest">Paling Awal</option>
+                                <option value="cheapest">Termurah</option>
+                                <option value="fastest">Tercepat</option>
                             </select>
                         </div>
                     </div>
@@ -524,7 +635,9 @@ watch(
                     </div>
 
                     <div
-                        v-else-if="schedules && schedules.length === 0"
+                        v-else-if="
+                            displaySchedules && displaySchedules.length === 0
+                        "
                         class="bg-white dark:bg-[#111] border-2 border-dashed border-gray-200 dark:border-white/10 rounded-3xl p-16 text-center animate-fade-in-up"
                     >
                         <div
@@ -549,7 +662,7 @@ watch(
                     <!-- Ticket Cards -->
                     <div v-else class="space-y-6">
                         <div
-                            v-for="(schedule, index) in schedules"
+                            v-for="(schedule, index) in displaySchedules"
                             :key="schedule.id"
                             class="group bg-white dark:bg-[#111] rounded-3xl overflow-hidden relative border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:shadow-rose-600/10 transition-all duration-300"
                             :style="{ animationDelay: `${index * 0.1}s` }"

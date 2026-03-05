@@ -1,7 +1,7 @@
 <script setup>
 import { Head, useForm, usePage } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 defineOptions({ layout: FrontendLayout });
 
@@ -55,6 +55,10 @@ const formatCurrency = (value) => {
         minimumFractionDigits: 0,
     }).format(value);
 };
+
+// Modal Refs
+const showTermsModal = ref(false);
+const showPrivacyModal = ref(false);
 
 const formatTime = (dateString) => {
     if (!dateString) return "";
@@ -322,15 +326,15 @@ const formatTime = (dateString) => {
                                         v-model="form.passenger_phone"
                                         type="tel"
                                         required
-                                        pattern="[0-9]{10,13}"
+                                        pattern="(\+62|0)[0-9]{9,12}"
                                         @input="
                                             form.passenger_phone =
                                                 form.passenger_phone.replace(
-                                                    /[^0-9]/g,
+                                                    /[^0-9+]/g,
                                                     '',
                                                 )
                                         "
-                                        placeholder="08xxxxxxxxxx"
+                                        placeholder="08xxxxxxxxxx atau +62xxx"
                                         class="block w-full pl-14 pr-4 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all text-gray-900 dark:text-white placeholder-gray-400 font-manrope focus:bg-white dark:focus:bg-black"
                                     />
                                 </div>
@@ -400,17 +404,21 @@ const formatTime = (dateString) => {
                                     class="text-sm font-medium text-gray-500 dark:text-gray-400 font-manrope leading-relaxed"
                                 >
                                     Saya setuju dengan
-                                    <a
-                                        href="#"
+                                    <button
+                                        type="button"
+                                        @click.prevent="showTermsModal = true"
                                         class="text-rose-600 font-bold hover:underline"
-                                        >Syarat & Ketentuan</a
                                     >
+                                        Syarat & Ketentuan
+                                    </button>
                                     serta
-                                    <a
-                                        href="#"
+                                    <button
+                                        type="button"
+                                        @click.prevent="showPrivacyModal = true"
                                         class="text-rose-600 font-bold hover:underline"
-                                        >Kebijakan Privasi</a
                                     >
+                                        Kebijakan Privasi
+                                    </button>
                                     yang berlaku di TUJAGO.
                                 </span>
                             </label>
@@ -454,4 +462,139 @@ const formatTime = (dateString) => {
             </div>
         </div>
     </div>
+
+    <!-- Terms & Privacy Modals -->
+    <Teleport to="body">
+        <Transition name="modal">
+            <div
+                v-if="showTermsModal"
+                class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+            >
+                <div
+                    class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                    @click="showTermsModal = false"
+                ></div>
+                <div
+                    class="relative bg-white dark:bg-[#111] rounded-3xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-8 shadow-2xl border border-gray-100 dark:border-white/10"
+                >
+                    <button
+                        @click="showTermsModal = false"
+                        class="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 hover:bg-rose-100 hover:text-rose-600 transition-colors"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2
+                        class="font-unbounded font-black text-2xl text-gray-900 dark:text-white mb-6 uppercase"
+                    >
+                        Syarat & Ketentuan
+                    </h2>
+                    <div
+                        class="prose dark:prose-invert prose-sm max-w-none font-manrope text-gray-600 dark:text-gray-300 space-y-4"
+                    >
+                        <p>
+                            <strong>1. Pemesanan Tiket</strong><br />Tiket yang
+                            sudah dipesan dan dibayar tidak dapat dibatalkan
+                            atau di-refund. Penumpang wajib menyimpan kode
+                            booking sebagai bukti pemesanan.
+                        </p>
+                        <p>
+                            <strong>2. Keberangkatan</strong><br />Penumpang
+                            wajib hadir minimal 30 menit sebelum jam
+                            keberangkatan. Keterlambatan bukan tanggung jawab
+                            Tunggal Jaya Transport.
+                        </p>
+                        <p>
+                            <strong>3. Bagasi</strong><br />Setiap penumpang
+                            diperbolehkan membawa bagasi maksimal 20 kg. Barang
+                            berharga adalah tanggung jawab penumpang.
+                        </p>
+                        <p>
+                            <strong>4. Pembatalan oleh Operator</strong
+                            ><br />Apabila terjadi pembatalan jadwal oleh
+                            operator, penumpang berhak mendapat pengembalian
+                            dana penuh atau reschedule tanpa biaya tambahan.
+                        </p>
+                        <p>
+                            <strong>5. Perilaku Penumpang</strong
+                            ><br />Penumpang dilarang merokok di dalam bus
+                            (kecuali area yang disediakan), membawa barang
+                            berbahaya, atau mengganggu kenyamanan penumpang
+                            lain.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+
+        <!-- Privacy Modal -->
+        <Transition name="modal">
+            <div
+                v-if="showPrivacyModal"
+                class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+            >
+                <div
+                    class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                    @click="showPrivacyModal = false"
+                ></div>
+                <div
+                    class="relative bg-white dark:bg-[#111] rounded-3xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-8 shadow-2xl border border-gray-100 dark:border-white/10"
+                >
+                    <button
+                        @click="showPrivacyModal = false"
+                        class="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 hover:bg-rose-100 hover:text-rose-600 transition-colors"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2
+                        class="font-unbounded font-black text-2xl text-gray-900 dark:text-white mb-6 uppercase"
+                    >
+                        Kebijakan Privasi
+                    </h2>
+                    <div
+                        class="prose dark:prose-invert prose-sm max-w-none font-manrope text-gray-600 dark:text-gray-300 space-y-4"
+                    >
+                        <p>
+                            <strong>1. Data yang Dikumpulkan</strong><br />Kami
+                            mengumpulkan data pribadi seperti nama, email, dan
+                            nomor telepon hanya untuk keperluan pemesanan tiket
+                            dan komunikasi terkait perjalanan.
+                        </p>
+                        <p>
+                            <strong>2. Penggunaan Data</strong><br />Data Anda
+                            digunakan untuk memproses pemesanan, mengirim
+                            konfirmasi tiket, dan memberikan informasi terkait
+                            jadwal perjalanan.
+                        </p>
+                        <p>
+                            <strong>3. Keamanan Data</strong><br />Kami
+                            menerapkan enkripsi dan protokol keamanan untuk
+                            melindungi data pribadi Anda dari akses tidak sah.
+                        </p>
+                        <p>
+                            <strong>4. Pihak Ketiga</strong><br />Data
+                            pembayaran diproses melalui gateway pembayaran
+                            (Midtrans) yang memiliki sertifikasi keamanan
+                            PCI-DSS.
+                        </p>
+                        <p>
+                            <strong>5. Hak Pengguna</strong><br />Anda berhak
+                            meminta penghapusan data pribadi dengan menghubungi
+                            tim support kami.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
 </template>
+
+<style scoped>
+.modal-enter-active,
+.modal-leave-active {
+    transition: opacity 0.3s ease;
+}
+.modal-enter-from,
+.modal-leave-to {
+    opacity: 0;
+}
+</style>

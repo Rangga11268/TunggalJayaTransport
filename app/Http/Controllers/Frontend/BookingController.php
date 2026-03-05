@@ -495,6 +495,7 @@ class BookingController extends Controller
 
         $request->validate([
             'schedule_id' => 'required|exists:schedules,id',
+            'date' => 'nullable|date|after_or_equal:today',
             'passenger_name' => 'required|string|max:255',
             'passenger_email' => ['required', 'string', 'email', 'max:255', 'regex:/^.+@.+\..+$/i'],
             'passenger_phone' => 'required|string|max:20',
@@ -575,8 +576,8 @@ class BookingController extends Controller
         $booking->booking_code = 'BK' . strtoupper(uniqid());
         $booking->payment_status = 'pending';
         $booking->booking_status = 'pending'; // Start as pending, confirm after payment succeeds
-        $booking->startPayment(); // Start payment timer
-        $booking->save();
+        $booking->save();           // Persist booking FIRST
+        $booking->startPayment();   // Then start the payment timer
 
         // Send notification to admins (non-critical — catch mail errors)
         try {
