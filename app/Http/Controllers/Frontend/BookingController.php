@@ -282,6 +282,16 @@ class BookingController extends Controller
             ];
         });
 
+        // If request wants JSON (axios search), return data directly without Inertia
+        if ($request->wantsJson()) {
+            return response()->json([
+                'schedules' => $schedules->values(),
+                'origins' => $origins,
+                'destinations' => $destinations,
+                'validPair' => $validPair,
+            ]);
+        }
+
         return \Inertia\Inertia::render('Frontend/Booking/Index', [
             'schedules' => $schedules->values(), // Re-index array keys
             'origins' => $origins,

@@ -2,6 +2,7 @@
 import { ref, watch, nextTick, computed } from "vue";
 import { Head, Link, useForm, router } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
+import axios from "axios";
 
 defineOptions({ layout: FrontendLayout });
 
@@ -21,12 +22,19 @@ const form = useForm({
     time: props.filters.time ? props.filters.time.split(",") : [],
 });
 
+// Local reactive state (no Inertia reload)
+const localSchedules = ref(props.schedules || []);
+const localValidPair = ref(props.validPair);
+const localOrigins = ref(props.origins || []);
+const localDestinations = ref(props.destinations || []);
+const isSearching = ref(false);
+
 // Gabung origins + destinations jadi satu list unik
 // Supaya pas swap, nilai tetap ada di kedua select
 const allLocations = computed(() => {
     const set = new Set([
-        ...(props.origins || []),
-        ...(props.destinations || []),
+        ...(localOrigins.value || []),
+        ...(localDestinations.value || []),
     ]);
     return [...set].sort();
 });
@@ -43,7 +51,7 @@ const hasActiveFilters = computed(() => {
 });
 
 // Reset semua filter
-const resetFilters = () => {
+const resetFilters = async () => {
     isSwapping.value = true;
     form.origin = "";
     form.destination = "";
@@ -52,25 +60,23 @@ const resetFilters = () => {
     form.time = [];
     sortBy.value = "earliest";
 
-    router.get(
-        route("frontend.booking.index"),
-        {},
-        {
-            preserveState: true,
-            preserveScroll: true,
-            only: [
-                "schedules",
-                "validPair",
-                "filters",
-                "origins",
-                "destinations",
-            ],
-        },
-    );
-
-    setTimeout(() => {
-        isSwapping.value = false;
-    }, 100);
+    try {
+        isSearching.value = true;
+        const { data } = await axios.get(route("frontend.booking.index"), {
+            headers: { Accept: "application/json" },
+        });
+        localSchedules.value = data.schedules || [];
+        localValidPair.value = data.validPair;
+        localOrigins.value = data.origins || [];
+        localDestinations.value = data.destinations || [];
+    } catch (e) {
+        console.error("Reset failed:", e);
+    } finally {
+        isSearching.value = false;
+        setTimeout(() => {
+            isSwapping.value = false;
+        }, 100);
+    }
 };
 
 // Sort state
@@ -79,23 +85,10 @@ const sortBy = ref("earliest");
 // Min date = hari ini (prevent past dates)
 const todayDate = computed(() => new Date().toISOString().split("T")[0]);
 
-// Sync form dengan filters dari URL/props
-watch(
-    () => props.filters,
-    (newFilters) => {
-        if (newFilters) {
-            form.origin = newFilters.origin || "";
-            form.destination = newFilters.destination || "";
-            form.date = newFilters.date || "";
-        }
-    },
-    { deep: true, immediate: false },
-);
-
 // Client-side filter: class & time (tanpa server request)
 const filteredSchedules = computed(() => {
-    if (!props.schedules) return [];
-    let result = [...props.schedules];
+    if (!localSchedules.value) return [];
+    let result = [...localSchedules.value];
 
     // Filter by class
     if (form.class.length > 0) {
@@ -144,19 +137,28 @@ const displaySchedules = computed(() => {
     return list;
 });
 
-// Server search: hanya untuk origin, destination, date
-const search = () => {
-    const params = {
-        origin: form.origin || null,
-        destination: form.destination || null,
-        date: form.date || null,
-    };
+// Server search via axios (no page reload)
+const search = async () => {
+    const params = {};
+    if (form.origin) params.origin = form.origin;
+    if (form.destination) params.destination = form.destination;
+    if (form.date) params.date = form.date;
 
-    router.get(route("frontend.booking.index"), params, {
-        preserveState: true,
-        preserveScroll: true,
-        only: ["schedules", "validPair", "filters", "origins", "destinations"],
-    });
+    try {
+        isSearching.value = true;
+        const { data } = await axios.get(route("frontend.booking.index"), {
+            params,
+            headers: { Accept: "application/json" },
+        });
+        localSchedules.value = data.schedules || [];
+        localValidPair.value = data.validPair;
+        localOrigins.value = data.origins || [];
+        localDestinations.value = data.destinations || [];
+    } catch (e) {
+        console.error("Search failed:", e);
+    } finally {
+        isSearching.value = false;
+    }
 };
 
 const formatPrice = (price) => {
@@ -265,7 +267,7 @@ watch(
                                 </div>
                                 <select
                                     v-model="form.origin"
-                                    class="block w-full pl-12 pr-10 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all cursor-pointer hover:bg-white dark:hover:bg-white/10 text-gray-900 dark:text-white appearance-none relative z-0 font-manrope focus:bg-white dark:focus:bg-black"
+                                    class="block w-full pl-12 pr-10 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all cursor-pointer hover:bg-white dark:hover:bg-white/10 text-gray-900 dark:text-white appearance-none bg-none relative z-0 font-manrope focus:bg-white dark:focus:bg-black"
                                 >
                                     <option value="" disabled>
                                         Pilih Kota Asal
@@ -327,7 +329,7 @@ watch(
                                 </div>
                                 <select
                                     v-model="form.destination"
-                                    class="block w-full pl-12 pr-10 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all cursor-pointer hover:bg-white dark:hover:bg-white/10 text-gray-900 dark:text-white appearance-none relative z-0 font-manrope focus:bg-white dark:focus:bg-black"
+                                    class="block w-full pl-12 pr-10 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all cursor-pointer hover:bg-white dark:hover:bg-white/10 text-gray-900 dark:text-white appearance-none bg-none relative z-0 font-manrope focus:bg-white dark:focus:bg-black"
                                 >
                                     <option value="" disabled>
                                         Pilih Kota Tujuan
@@ -590,26 +592,35 @@ watch(
                             </p>
                         </div>
                         <div
-                            class="flex items-center space-x-3 bg-gray-50 dark:bg-white/5 p-1 rounded-xl"
+                            class="flex items-center space-x-3 bg-gray-50 dark:bg-white/5 p-1 rounded-xl relative overflow-hidden"
                         >
                             <span
-                                class="text-[10px] font-bold text-gray-400 px-2 uppercase tracking-widest"
+                                class="text-[10px] font-bold text-gray-400 px-2 uppercase tracking-widest relative z-10"
                                 >Urutkan</span
                             >
-                            <select
-                                v-model="sortBy"
-                                class="text-sm font-bold border-none bg-transparent text-gray-900 dark:text-white focus:ring-0 cursor-pointer py-1 pl-2 pr-8 rounded-lg hover:bg-white dark:hover:bg-white/10 transition-colors font-manrope"
-                            >
-                                <option value="earliest">Paling Awal</option>
-                                <option value="cheapest">Termurah</option>
-                                <option value="fastest">Tercepat</option>
-                            </select>
+                            <div class="relative flex items-center">
+                                <select
+                                    v-model="sortBy"
+                                    class="text-sm font-bold border-none bg-transparent text-gray-900 dark:text-white focus:ring-0 cursor-pointer py-1 pl-2 pr-7 rounded-lg hover:bg-white dark:hover:bg-white/10 transition-colors font-manrope appearance-none bg-none relative z-10"
+                                >
+                                    <option value="earliest">
+                                        Paling Awal
+                                    </option>
+                                    <option value="cheapest">Termurah</option>
+                                    <option value="fastest">Tercepat</option>
+                                </select>
+                                <i
+                                    class="fas fa-chevron-down absolute right-2 text-[10px] text-gray-400 pointer-events-none z-20"
+                                ></i>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Loading / Error States -->
                     <div
-                        v-if="form.origin && form.destination && !validPair"
+                        v-if="
+                            form.origin && form.destination && !localValidPair
+                        "
                         class="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-800 rounded-3xl p-12 text-center animate-fade-in-up"
                     >
                         <div
