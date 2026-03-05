@@ -21,6 +21,8 @@ class Bus extends Model implements HasMedia
         'year',
     ];
 
+    protected $appends = ['image_url'];
+
     public function schedules()
     {
         return $this->hasMany(Schedule::class);

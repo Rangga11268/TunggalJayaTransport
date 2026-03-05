@@ -265,9 +265,10 @@ onMounted(() => {
                     <p
                         class="text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
                     >
-                        Kombinasi sempurna antara kenyamanan mewah dan ketepatan
-                        waktu. Nikmati standar baru perjalanan antar kota
-                        bersama Tunggal Jaya.
+                        Spesialis AKAP Kuningan - Jakarta & Rangkasbitung via
+                        berbagai jalur strategis. Hadir dengan layanan bus malam
+                        premium dan divisi pariwisata yang siap menemani setiap
+                        momen perjalanan Anda dengan kenyamanan maksimal.
                     </p>
 
                     <div
@@ -574,6 +575,142 @@ onMounted(() => {
             </div>
         </section>
 
+        <!-- SERVICE EXCELLENCE (AKAP & Tourism) -->
+        <section
+            class="py-24 bg-gray-50 dark:bg-[#080808] relative overflow-hidden"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div
+                    class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+                >
+                    <div class="space-y-8">
+                        <div>
+                            <span
+                                class="text-rose-600 font-black tracking-widest text-xs uppercase font-unbounded mb-4 block"
+                                >Our Specialization</span
+                            >
+                            <h2
+                                class="text-4xl md:text-5xl font-black font-unbounded text-gray-900 dark:text-white leading-tight"
+                            >
+                                Menghubungkan
+                                <span class="text-rose-600">Kuningan</span> ke
+                                Ibu Kota
+                            </h2>
+                        </div>
+                        <p
+                            class="text-gray-500 dark:text-gray-400 text-lg leading-relaxed font-medium"
+                        >
+                            Sebagai Po yang lahir dari kecintaan pada layanan
+                            transportasi, kami mendedikasikan diri sebagai
+                            spesialis rute
+                            <span
+                                class="text-gray-900 dark:text-white font-bold"
+                                >Kuningan - Jakarta</span
+                            >
+                            via berbagai jalur strategis serta menjangkau
+                            <span
+                                class="text-gray-900 dark:text-white font-bold"
+                                >Rangkasbitung</span
+                            >. Kami memastikan setiap penumpang mendapatkan
+                            pengalaman "Executive Treatment" di setiap kilometer
+                            perjalanan.
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div
+                                class="p-6 bg-white dark:bg-[#111] rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm"
+                            >
+                                <i
+                                    class="fas fa-map-marked-alt text-rose-600 text-2xl mb-4"
+                                ></i>
+                                <h4
+                                    class="font-unbounded font-bold text-gray-900 dark:text-white mb-2 text-sm uppercase"
+                                >
+                                    AKAP Division
+                                </h4>
+                                <p class="text-xs text-gray-500 font-medium">
+                                    Layanan bus malam reguler dengan sasis
+                                    premium dan ketepatan waktu tinggi.
+                                </p>
+                            </div>
+                            <div
+                                class="p-6 bg-white dark:bg-[#111] rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm"
+                            >
+                                <i
+                                    class="fas fa-umbrella-beach text-rose-600 text-2xl mb-4"
+                                ></i>
+                                <h4
+                                    class="font-unbounded font-bold text-gray-900 dark:text-white mb-2 text-sm uppercase"
+                                >
+                                    Tourism Division
+                                </h4>
+                                <p class="text-xs text-gray-500 font-medium">
+                                    Sewa bus pariwisata untuk kebutuhan grup,
+                                    ziarah, dan perjalanan wisata keluarga.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <div
+                            class="aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl relative group"
+                        >
+                            <img
+                                src="/img/heroImg.jpg"
+                                alt="Fleet Service"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            />
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"
+                            ></div>
+                            <div class="absolute bottom-10 left-10 right-10">
+                                <div
+                                    class="p-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl"
+                                >
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-12 h-12 rounded-full bg-rose-600 flex items-center justify-center text-white"
+                                        >
+                                            <i class="fas fa-shield-alt"></i>
+                                        </div>
+                                        <div>
+                                            <p
+                                                class="text-white font-bold uppercase tracking-widest text-[10px]"
+                                            >
+                                                Security Guarantee
+                                            </p>
+                                            <p class="text-rose-100 text-xs">
+                                                Asuransi penumpang & Driver
+                                                tersertifikasi
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Floating Badge -->
+                        <div
+                            class="absolute -top-6 -right-6 w-32 h-32 bg-white dark:bg-[#111] rounded-full flex items-center justify-center shadow-xl border border-gray-100 dark:border-white/5 animate-bounce-slow"
+                        >
+                            <div class="text-center">
+                                <p
+                                    class="text-[10px] font-black font-unbounded text-rose-600 uppercase"
+                                >
+                                    Since
+                                </p>
+                                <p
+                                    class="text-2xl font-black font-unbounded text-gray-900 dark:text-white"
+                                >
+                                    2024
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- POPULAR ROUTES (Clean Tickets) -->
         <section
             class="py-24 border-t border-gray-100 dark:border-[#111] bg-white dark:bg-[#080808]"
@@ -660,6 +797,56 @@ onMounted(() => {
                                     Cek Ketersediaan
                                 </Link>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FLEET SHOWREEL (Visual Gallery) -->
+        <section
+            class="py-24 bg-gray-50 dark:bg-[#050505] relative overflow-hidden"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2
+                        class="text-3xl md:text-5xl font-black font-unbounded text-gray-900 dark:text-white mb-4"
+                    >
+                        Premium <span class="text-rose-600">Showreel</span>
+                    </h2>
+                    <p class="text-gray-500 dark:text-gray-400 font-medium">
+                        Visualisasi armada Tunggal Jaya yang siap mengantar
+                        Anda.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div
+                        v-for="(bus, index) in fleet.slice(0, 3)"
+                        :key="bus.id"
+                        class="group relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-lg bento-item"
+                        :class="index === 1 ? 'md:translate-y-12' : ''"
+                    >
+                        <img
+                            :src="bus.image_url || '/img/heroImg.jpg'"
+                            :alt="bus.name"
+                            class="w-full h-full object-cover md:grayscale group-hover:grayscale-0 transition-all duration-700"
+                        />
+                        <!-- Overlay: Always visible on mobile, hover on desktop -->
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-rose-900/90 via-rose-900/20 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 md:p-8"
+                        >
+                            <h4
+                                class="text-white font-unbounded font-bold text-lg md:text-xl mb-1 md:mb-2"
+                            >
+                                {{ bus.name }}
+                            </h4>
+                            <p
+                                class="text-rose-100 text-[10px] md:text-sm leading-relaxed"
+                            >
+                                {{ bus.bus_type }} Class dengan fasilitas
+                                premium untuk kenyamanan Anda.
+                            </p>
                         </div>
                     </div>
                 </div>
