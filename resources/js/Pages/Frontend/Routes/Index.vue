@@ -109,13 +109,15 @@ const filteredRoutes = computed(() => {
                         class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 relative gap-3 sm:gap-4"
                     >
                         <!-- Origin -->
-                        <div class="flex flex-col items-start z-10 min-w-fit">
+                        <div
+                            class="flex flex-col items-start z-10 flex-1 min-w-0"
+                        >
                             <span
-                                class="text-xs text-gray-400 font-manrope font-bold uppercase tracking-wider mb-1"
+                                class="text-[9px] sm:text-[10px] text-gray-400 font-manrope font-bold uppercase tracking-wider mb-1"
                                 >Asal</span
                             >
                             <h3
-                                class="text-lg sm:text-xl font-black font-unbounded text-gray-900 dark:text-white leading-tight"
+                                class="text-base sm:text-lg md:text-xl font-black font-unbounded text-gray-900 dark:text-white leading-tight break-words"
                             >
                                 {{ routeItem.origin }}
                             </h3>
@@ -123,7 +125,7 @@ const filteredRoutes = computed(() => {
 
                         <!-- Connector -->
                         <div
-                            class="hidden sm:flex flex-1 h-full flex-col items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4"
+                            class="hidden sm:flex flex-shrink-0 h-full flex-col items-center justify-center gap-1 sm:gap-2 px-1 sm:px-2 w-12 sm:w-16"
                         >
                             <div
                                 class="relative w-full flex items-center justify-center"
@@ -150,14 +152,14 @@ const filteredRoutes = computed(() => {
 
                         <!-- Destination -->
                         <div
-                            class="flex flex-col items-start sm:items-end z-10 text-left sm:text-right min-w-fit"
+                            class="flex flex-col items-start sm:items-end z-10 text-left sm:text-right flex-1 min-w-0"
                         >
                             <span
-                                class="text-xs text-gray-400 font-manrope font-bold uppercase tracking-wider mb-1"
+                                class="text-[9px] sm:text-[10px] text-gray-400 font-manrope font-bold uppercase tracking-wider mb-1"
                                 >Tujuan</span
                             >
                             <h3
-                                class="text-lg sm:text-xl font-black font-unbounded text-gray-900 dark:text-white leading-tight"
+                                class="text-base sm:text-lg md:text-xl font-black font-unbounded text-gray-900 dark:text-white leading-tight break-words"
                             >
                                 {{ routeItem.destination }}
                             </h3>

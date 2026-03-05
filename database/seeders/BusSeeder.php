@@ -15,33 +15,51 @@ class BusSeeder extends Seeder
     {
         $buses = [
             [
-                'name' => 'Executive Class Bus 1',
-                'plate_number' => 'B 1234 XYZ',
+                'name' => 'Resi Bisma',
+                'plate_number' => 'E 7777 TJ',
                 'bus_type' => 'Executive',
-                'capacity' => 40,
-                'description' => 'Luxury bus with extra legroom and premium amenities',
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Business Class Bus 1',
-                'plate_number' => 'B 5678 ABC',
-                'bus_type' => 'Business',
-                'capacity' => 35,
-                'description' => 'Comfortable bus with reclining seats and entertainment',
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Economy Class Bus 1',
-                'plate_number' => 'B 9012 DEF',
-                'bus_type' => 'Economy',
                 'capacity' => 30,
-                'description' => 'Affordable travel with basic comfort',
+                'description' => 'Armada premium dengan kenyamanan maksimal dan fasilitas lengkap.',
                 'status' => 'active',
+                'image' => 'resiBisma.webp'
+            ],
+            [
+                'name' => 'Primadona',
+                'plate_number' => 'E 8888 TJ',
+                'bus_type' => 'Executive',
+                'capacity' => 30,
+                'description' => 'Kebanggaan Tunggal Jaya dengan interior mewah dan pelayanan prima.',
+                'status' => 'active',
+                'image' => 'primadona.webp'
+            ],
+            [
+                'name' => 'Bentas',
+                'plate_number' => 'E 9999 TJ',
+                'bus_type' => 'Executive',
+                'capacity' => 30,
+                'description' => 'Armada handal yang siap menemani perjalanan Anda dengan aman dan nyaman.',
+                'status' => 'active',
+                'image' => 'bentas01.webp'
             ],
         ];
         
-        foreach ($buses as $bus) {
-            Bus::create($bus);
+        foreach ($buses as $data) {
+            $image = $data['image'];
+            unset($data['image']);
+            
+            $bus = Bus::create($data);
+
+            // Attach Image
+            $sourcePath = public_path('img/' . $image);
+            if (\File::exists($sourcePath)) {
+                try {
+                    $bus->addMedia($sourcePath)
+                        ->preservingOriginal()
+                        ->toMediaCollection('cover');
+                } catch (\Exception $e) {
+                    dump("Failed to attach media for {$bus->name}: " . $e->getMessage());
+                }
+            }
         }
     }
 }

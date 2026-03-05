@@ -805,84 +805,93 @@ const isActive = (routeName) => {
             </nav>
         </header>
 
-        <!-- Phone Verification Banner -->
+        <!-- Phone Verification Banner (Floating Snackbar Concept) -->
         <Transition
-            enter-active-class="transition duration-300 ease-out"
-            enter-from-class="opacity-0 -translate-y-2"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition duration-200 ease-in"
-            leave-from-class="opacity-100 translate-y-0"
-            leave-to-class="opacity-0 -translate-y-2"
+            enter-active-class="transition duration-500 ease-out"
+            enter-from-class="opacity-0 translate-y-10 scale-95"
+            enter-to-class="opacity-100 translate-y-0 scale-100"
+            leave-active-class="transition duration-300 ease-in"
+            leave-from-class="opacity-100 translate-y-0 scale-100"
+            leave-to-class="opacity-0 translate-y-10 scale-95"
         >
             <div
                 v-if="showVerificationBanner"
-                class="relative z-40 overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 dark:from-amber-600 dark:via-orange-600 dark:to-amber-600 text-white shadow-lg shadow-amber-500/20"
+                class="fixed bottom-6 right-6 z-[100] w-[calc(100%-3rem)] sm:w-[450px] overflow-hidden rounded-3xl bg-white/80 dark:bg-black/80 backdrop-blur-2xl border border-amber-200/50 dark:border-amber-500/20 shadow-[0_20px_50px_-12px_rgba(245,158,11,0.3)] group"
             >
-                <!-- Animated shimmer line at top -->
+                <!-- Shimmer & Pulse Glow -->
                 <div
-                    class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer"
+                    class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-rose-500/5 pointer-events-none"
+                ></div>
+                <div
+                    class="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl animate-pulse"
                 ></div>
 
-                <!-- Subtle pattern overlay -->
-                <div
-                    class="absolute inset-0 opacity-5"
-                    style="
-                        background-image: url(&quot;data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='1.5'/%3E%3Ccircle cx='13' cy='13' r='1.5'/%3E%3C/g%3E%3C/svg%3E&quot;);
-                    "
-                ></div>
-
-                <div
-                    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4 relative"
-                >
-                    <!-- Left: Icon + Text -->
-                    <div class="flex items-center gap-4 min-w-0">
-                        <!-- Pulsing icon badge -->
-                        <div class="relative shrink-0">
+                <div class="p-5 sm:p-6 relative">
+                    <div class="flex items-start gap-5">
+                        <!-- Icon Shield -->
+                        <div class="relative shrink-0 mt-1">
                             <div
-                                class="absolute inset-0 bg-white/30 rounded-full animate-ping"
+                                class="absolute inset-0 bg-amber-500/20 rounded-2xl animate-ping opacity-75"
                             ></div>
                             <div
-                                class="relative w-8 h-8 bg-white/20 rounded-full flex items-center justify-center border border-white/30"
+                                class="relative w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/40"
                             >
                                 <i
-                                    class="fas fa-shield-halved text-white text-sm"
+                                    class="fas fa-shield-halved text-white text-xl"
                                 ></i>
                             </div>
                         </div>
 
-                        <!-- Text content -->
-                        <div class="min-w-0">
-                            <p
-                                class="text-xs font-black uppercase tracking-[0.15em] font-unbounded text-white/80 leading-none mb-0.5"
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0">
+                            <div
+                                class="flex items-center justify-between mb-1.5"
                             >
-                                Verifikasi Diperlukan
-                            </p>
-                            <p
-                                class="text-sm font-semibold font-manrope text-white truncate"
+                                <span
+                                    class="text-[10px] font-black uppercase tracking-[0.2em] font-unbounded text-amber-600 dark:text-amber-500"
+                                >
+                                    Verifikasi Diperlukan
+                                </span>
+                                <button
+                                    @click="dismissVerificationBanner"
+                                    class="text-gray-400 hover:text-rose-600 transition-colors p-1"
+                                    aria-label="Tutup"
+                                >
+                                    <i class="fas fa-times text-sm"></i>
+                                </button>
+                            </div>
+                            <h4
+                                class="text-sm font-black font-unbounded text-gray-900 dark:text-white mb-1.5 leading-snug"
                             >
-                                Nomor HP Anda belum diverifikasi &mdash;
-                                selesaikan verifikasi untuk bisa memesan tiket.
+                                Tingkatkan Keamanan Akun Anda
+                            </h4>
+                            <p
+                                class="text-xs font-semibold font-manrope text-gray-500 dark:text-gray-400 leading-relaxed mb-4"
+                            >
+                                Nomor HP Anda belum diverifikasi. Selesaikan
+                                verifikasi sekarang untuk membuka fitur
+                                pemesanan tiket.
                             </p>
+
+                            <!-- Action Link -->
+                            <Link
+                                :href="route('verification.phone.show')"
+                                class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-widest font-unbounded rounded-xl hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white transition-all duration-300 shadow-md active:scale-95"
+                            >
+                                <i class="fas fa-arrow-right text-[9px]"></i>
+                                Verifikasi Sekarang
+                            </Link>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Right: CTA + Dismiss -->
-                    <div class="flex items-center gap-2 shrink-0">
-                        <Link
-                            :href="route('verification.phone.show')"
-                            class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest font-unbounded bg-white text-amber-600 hover:bg-amber-50 transition-all px-4 py-2 rounded-xl whitespace-nowrap shadow-sm hover:shadow-md active:scale-95"
-                        >
-                            <i class="fas fa-arrow-right text-[9px]"></i>
-                            Verifikasi
-                        </Link>
-                        <button
-                            @click="dismissVerificationBanner"
-                            class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/25 transition-all text-white/70 hover:text-white active:scale-95"
-                            aria-label="Tutup banner"
-                        >
-                            <i class="fas fa-xmark text-sm"></i>
-                        </button>
-                    </div>
+                <!-- Progress Line Decoration -->
+                <div
+                    class="h-1 w-full bg-gray-100 dark:bg-white/5 overflow-hidden"
+                >
+                    <div
+                        class="h-full bg-gradient-to-r from-amber-500 to-rose-600 w-1/3 animate-shimmer-progress"
+                    ></div>
                 </div>
             </div>
         </Transition>

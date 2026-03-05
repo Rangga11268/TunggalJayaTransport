@@ -750,3 +750,17 @@ a:active {
 .social-btn[aria-disabled="true"] .fab {
     color: rgba(156, 163, 175, 0.9) !important;
 }
+
+/* Custom Verification Alert Animations */
+@keyframes shimmer-progress {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(300%);
+    }
+}
+
+.animate-shimmer-progress {
+    animation: shimmer-progress 3s infinite linear;
+}
