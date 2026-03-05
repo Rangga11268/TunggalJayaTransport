@@ -35,6 +35,12 @@ class BookingController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'bookings' => $bookings
+            ]);
+        }
+
         return Inertia::render('Admin/Bookings/Index', [
             'bookings' => $bookings,
             'filters' => $request->only(['search', 'status', 'payment_status']),

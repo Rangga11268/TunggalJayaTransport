@@ -63,6 +63,12 @@ class ScheduleController extends Controller
             ];
         });
         
+        if ($request->wantsJson()) {
+            return response()->json([
+                'schedules' => $schedules
+            ]);
+        }
+        
         return Inertia::render('Admin/Schedules/Index', [
             'schedules' => $schedules,
             'filters' => $request->only(['search', 'bus_id', 'route_id', 'status']),

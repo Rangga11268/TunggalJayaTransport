@@ -20,15 +20,13 @@
                         Liputan lengkap aktivitas sistem
                     </p>
                 </div>
-                <Link
-                    :href="route('admin.notifications.markAllRead')"
-                    method="post"
-                    as="button"
+                <button
+                    @click="markAllAsRead"
                     class="px-5 py-2.5 bg-brand-red text-white text-xs font-black font-unbounded uppercase tracking-wider rounded-xl shadow-lg shadow-brand-red/30 hover:bg-red-700 transition-all active:scale-95"
                 >
                     <i class="fas fa-check-double mr-2"></i>
                     Tandai Semua Dibaca
-                </Link>
+                </button>
             </div>
 
             <div v-if="notifications.data.length > 0">
@@ -62,7 +60,7 @@
                                 >
                                     {{
                                         new Date(
-                                            notification.created_at
+                                            notification.created_at,
                                         ).toLocaleString("id-ID", {
                                             dateStyle: "full",
                                             timeStyle: "short",
@@ -76,7 +74,7 @@
                                 Rute: {{ notification.data.route }} | Total: Rp
                                 {{
                                     new Intl.NumberFormat("id-ID").format(
-                                        notification.data.amount
+                                        notification.data.amount,
                                     )
                                 }}
                             </p>
@@ -89,14 +87,14 @@
                                     :href="
                                         route(
                                             'admin.notifications.markAsRead',
-                                            notification.id
+                                            notification.id,
                                         )
                                     "
                                     method="post"
                                     :data="{
                                         redirect_to: route(
                                             'admin.bookings.show',
-                                            notification.data.booking_id.toString()
+                                            notification.data.booking_id.toString(),
                                         ),
                                     }"
                                     class="text-sm font-bold text-brand-red hover:text-red-700 flex items-center gap-1"
@@ -106,7 +104,7 @@
                                 </Link>
                                 <button
                                     v-if="!notification.read_at"
-                                    @click="markAsRead(notification.id)"
+                                    @click="markAsRead(notification)"
                                     class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 font-manrope font-bold"
                                 >
                                     Tandai dibaca
@@ -172,20 +170,65 @@
 </template>
 
 <script setup>
-import { Head, Link, router } from "@inertiajs/vue3";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
+import axios from "axios";
 
-defineProps({
+const props = defineProps({
     notifications: Object,
 });
 
-const markAsRead = (id) => {
-    router.post(
-        route("admin.notifications.markAsRead", id),
-        {},
-        {
-            preserveScroll: true,
+const page = usePage();
+
+const markAsRead = async (notification) => {
+    try {
+        await axios.post(
+            route("admin.notifications.markAsRead", notification.id),
+            {},
+            {
+                headers: { Accept: "application/json" },
+            },
+        );
+
+        notification.read_at = new Date().toISOString();
+        if (page.props.auth.unread_notifications_count > 0) {
+            page.props.auth.unread_notifications_count--;
         }
-    );
+
+        // Also update the global layout notifications state if matching
+        const layoutNotif = page.props.auth.notifications?.find(
+            (n) => n.id === notification.id,
+        );
+        if (layoutNotif) layoutNotif.read_at = notification.read_at;
+    } catch (error) {
+        console.error("Gagal menandai notifikasi:", error);
+    }
+};
+
+const markAllAsRead = async () => {
+    try {
+        await axios.post(
+            route("admin.notifications.markAllRead"),
+            {},
+            {
+                headers: { Accept: "application/json" },
+            },
+        );
+
+        if (props.notifications && props.notifications.data) {
+            props.notifications.data.forEach((n) => {
+                n.read_at = new Date().toISOString();
+            });
+        }
+
+        page.props.auth.unread_notifications_count = 0;
+        if (page.props.auth.notifications) {
+            page.props.auth.notifications.forEach((n) => {
+                n.read_at = new Date().toISOString();
+            });
+        }
+    } catch (error) {
+        console.error("Gagal menandai semua notifikasi:", error);
+    }
 };
 </script>

@@ -3,6 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const props = defineProps({
     schedules: Object,
@@ -10,18 +11,50 @@ const props = defineProps({
 });
 
 const search = ref(props.filters?.search || "");
+const localSchedules = ref(props.schedules); // Reactive local state for schedules data
 let timeout = null;
 
+// Search via Axios (No Inertia Reload)
 watch(search, (value) => {
     clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        router.get(
-            route("admin.schedules.index"),
-            { search: value },
-            { preserveState: true, replace: true }
-        );
+    timeout = setTimeout(async () => {
+        try {
+            const { data } = await axios.get(route("admin.schedules.index"), {
+                params: { search: value },
+                headers: { Accept: "application/json" },
+            });
+            localSchedules.value = data.schedules;
+
+            // Sync URL optionally without reloading
+            const newUrl = new URL(window.location.href);
+            if (value) {
+                newUrl.searchParams.set("search", value);
+            } else {
+                newUrl.searchParams.delete("search");
+            }
+            window.history.replaceState({}, "", newUrl);
+        } catch (error) {
+            console.error("Search failed:", error);
+        }
     }, 500);
 });
+
+// Pagination via Axios (No Inertia Reload)
+const fetchPage = async (url) => {
+    if (!url) return;
+    try {
+        const { data } = await axios.get(url, {
+            headers: { Accept: "application/json" },
+        });
+        localSchedules.value = data.schedules;
+
+        // Sync URL with pagination parameter
+        window.history.replaceState({}, "", url);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        console.error("Pagination failed:", error);
+    }
+};
 
 const deleteSchedule = (id) => {
     Swal.fire({
@@ -143,7 +176,7 @@ const getStatusLabel = (status) => {
                         class="divide-y divide-gray-100 dark:divide-gray-700/50"
                     >
                         <tr
-                            v-for="schedule in schedules.data"
+                            v-for="schedule in localSchedules?.data"
                             :key="schedule.id"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                         >
@@ -230,7 +263,7 @@ const getStatusLabel = (status) => {
                                         :href="
                                             route(
                                                 'admin.schedules.edit',
-                                                schedule.id
+                                                schedule.id,
                                             )
                                         "
                                         class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors tooltip"
@@ -249,7 +282,7 @@ const getStatusLabel = (status) => {
                                 </div>
                             </td>
                         </tr>
-                        <tr v-if="schedules.data.length === 0">
+                        <tr v-if="localSchedules?.data?.length === 0">
                             <td
                                 colspan="5"
                                 class="px-6 py-12 text-center text-gray-400"
@@ -269,18 +302,19 @@ const getStatusLabel = (status) => {
             <!-- Pagination -->
             <div
                 class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between"
-                v-if="schedules.links.length > 3"
+                v-if="localSchedules?.links?.length > 3"
             >
                 <div class="text-xs text-gray-500">
-                    Menampilkan {{ schedules.from }} - {{ schedules.to }} dari
-                    {{ schedules.total }} data
+                    Menampilkan {{ localSchedules.from }} -
+                    {{ localSchedules.to }} dari {{ localSchedules.total }} data
                 </div>
                 <div class="flex gap-1">
-                    <Link
-                        v-for="(link, k) in schedules.links"
+                    <button
+                        v-for="(link, k) in localSchedules.links"
                         :key="k"
-                        :href="link.url"
+                        @click.prevent="fetchPage(link.url)"
                         v-html="link.label"
+                        :disabled="!link.url"
                         :class="[
                             'px-3 py-1 rounded-lg text-xs font-bold transition-all',
                             link.active
@@ -288,7 +322,6 @@ const getStatusLabel = (status) => {
                                 : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700',
                             !link.url ? 'opacity-50 cursor-not-allowed' : '',
                         ]"
-                        preserve-scroll
                     />
                 </div>
             </div>

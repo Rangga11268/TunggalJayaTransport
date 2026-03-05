@@ -23,6 +23,12 @@ class PromoCodeController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'promoCodes' => $promoCodes
+            ]);
+        }
+
         return Inertia::render('Admin/PromoCodes/Index', [
             'promoCodes' => $promoCodes,
             'filters' => [

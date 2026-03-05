@@ -3,6 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const props = defineProps({
     users: Object,
@@ -10,14 +11,29 @@ const props = defineProps({
 });
 
 const search = ref(props.filters?.search || "");
+const localUsers = ref(props.users); // Reactive local state for users data
 let timeout = null;
 
-const applyFilters = () => {
-    router.get(
-        route("admin.users.index"),
-        { search: search.value || "" },
-        { preserveState: true, replace: true }
-    );
+// Search via Axios (No Inertia Reload)
+const applyFilters = async () => {
+    try {
+        const { data } = await axios.get(route("admin.users.index"), {
+            params: { search: search.value || "" },
+            headers: { Accept: "application/json" },
+        });
+        localUsers.value = data.users;
+
+        // Sync URL optionally without reloading
+        const newUrl = new URL(window.location.href);
+        if (search.value) {
+            newUrl.searchParams.set("search", search.value);
+        } else {
+            newUrl.searchParams.delete("search");
+        }
+        window.history.replaceState({}, "", newUrl);
+    } catch (error) {
+        console.error("Filter failed:", error);
+    }
 };
 
 watch(search, (value) => {
@@ -26,6 +42,23 @@ watch(search, (value) => {
         applyFilters();
     }, 500);
 });
+
+// Pagination via Axios (No Inertia Reload)
+const fetchPage = async (url) => {
+    if (!url) return;
+    try {
+        const { data } = await axios.get(url, {
+            headers: { Accept: "application/json" },
+        });
+        localUsers.value = data.users;
+
+        // Sync URL with pagination parameter
+        window.history.replaceState({}, "", url);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        console.error("Pagination failed:", error);
+    }
+};
 
 const deleteUser = (id) => {
     Swal.fire({
@@ -121,7 +154,7 @@ const formatDate = (dateString) => {
                         class="divide-y divide-gray-100 dark:divide-gray-700/50"
                     >
                         <tr
-                            v-for="user in users.data"
+                            v-for="user in localUsers?.data"
                             :key="user.id"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                         >
@@ -186,7 +219,7 @@ const formatDate = (dateString) => {
                                 </div>
                             </td>
                         </tr>
-                        <tr v-if="users.data.length === 0">
+                        <tr v-if="localUsers?.data?.length === 0">
                             <td
                                 colspan="5"
                                 class="px-6 py-12 text-center text-gray-400"
@@ -206,17 +239,17 @@ const formatDate = (dateString) => {
             <!-- Pagination -->
             <div
                 class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between"
-                v-if="users.links.length > 3"
+                v-if="localUsers?.links?.length > 3"
             >
                 <div class="text-xs text-gray-500">
-                    Menampilkan {{ users.from }} - {{ users.to }} dari
-                    {{ users.total }} data
+                    Menampilkan {{ localUsers.from }} - {{ localUsers.to }} dari
+                    {{ localUsers.total }} data
                 </div>
                 <div class="flex gap-1">
-                    <template v-for="(link, k) in users.links" :key="k">
-                        <Link
+                    <template v-for="(link, k) in localUsers.links" :key="k">
+                        <button
                             v-if="link.url"
-                            :href="link.url"
+                            @click.prevent="fetchPage(link.url)"
                             v-html="link.label"
                             :class="[
                                 'px-3 py-1 rounded-lg text-xs font-bold transition-all',
@@ -224,7 +257,6 @@ const formatDate = (dateString) => {
                                     ? 'bg-brand-red text-white shadow-md shadow-brand-red/20'
                                     : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700',
                             ]"
-                            preserve-scroll
                         />
                         <span
                             v-else

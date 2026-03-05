@@ -23,6 +23,12 @@ class NewsController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'articles' => $articles
+            ]);
+        }
+
         return Inertia::render('Admin/News/Index', [
             'articles' => $articles,
             'filters' => $request->only(['search'])

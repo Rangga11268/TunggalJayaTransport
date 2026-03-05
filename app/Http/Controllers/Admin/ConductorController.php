@@ -23,6 +23,12 @@ class ConductorController extends Controller
         ->paginate(10)
         ->withQueryString();
         
+        if ($request->wantsJson()) {
+            return response()->json([
+                'conductors' => $conductors
+            ]);
+        }
+        
         return Inertia::render('Admin/Conductors/Index', [
             'conductors' => $conductors,
             'filters' => $request->only(['search']),

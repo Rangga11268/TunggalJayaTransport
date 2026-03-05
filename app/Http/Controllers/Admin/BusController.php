@@ -31,6 +31,13 @@ class BusController extends Controller
             return $bus;
         });
 
+        // Return JSON for axios calls (search/pagination)
+        if ($request->wantsJson()) {
+            return response()->json([
+                'buses' => $buses
+            ]);
+        }
+
         return Inertia::render('Admin/Buses/Index', [
             'buses' => $buses,
             'filters' => $request->only(['search'])

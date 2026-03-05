@@ -2,6 +2,7 @@
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
+import axios from "axios";
 
 const props = defineProps({
     customers: Object,
@@ -9,19 +10,50 @@ const props = defineProps({
 });
 
 const search = ref(props.filters.search || "");
+const localCustomers = ref(props.customers); // Reactive local state for customers data
 
 // Debounced search
 let searchTimeout = null;
 watch(search, (value) => {
     clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-        router.get(
-            route("admin.customers.index"),
-            { search: value },
-            { preserveState: true, replace: true }
-        );
+    searchTimeout = setTimeout(async () => {
+        try {
+            const { data } = await axios.get(route("admin.customers.index"), {
+                params: { search: value },
+                headers: { Accept: "application/json" },
+            });
+            localCustomers.value = data.customers;
+
+            // Sync URL optionally without reloading
+            const newUrl = new URL(window.location.href);
+            if (value) {
+                newUrl.searchParams.set("search", value);
+            } else {
+                newUrl.searchParams.delete("search");
+            }
+            window.history.replaceState({}, "", newUrl);
+        } catch (error) {
+            console.error("Search failed:", error);
+        }
     }, 300);
 });
+
+// Pagination via Axios (No Inertia Reload)
+const fetchPage = async (url) => {
+    if (!url) return;
+    try {
+        const { data } = await axios.get(url, {
+            headers: { Accept: "application/json" },
+        });
+        localCustomers.value = data.customers;
+
+        // Sync URL with pagination parameter
+        window.history.replaceState({}, "", url);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        console.error("Pagination failed:", error);
+    }
+};
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat("id-ID", {
@@ -118,7 +150,7 @@ const formatDate = (dateString) => {
                         class="divide-y divide-gray-200 dark:divide-gray-700"
                     >
                         <tr
-                            v-for="customer in customers.data"
+                            v-for="customer in localCustomers?.data"
                             :key="customer.passenger_email"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                         >
@@ -170,7 +202,7 @@ const formatDate = (dateString) => {
                                     :href="
                                         route(
                                             'admin.customers.show',
-                                            customer.passenger_email
+                                            customer.passenger_email,
                                         )
                                     "
                                     class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-red text-white font-semibold hover:bg-red-700 transition-all duration-300"
@@ -188,7 +220,7 @@ const formatDate = (dateString) => {
                             </td>
                         </tr>
                         <tr
-                            v-if="customers.data.length === 0"
+                            v-if="localCustomers?.data?.length === 0"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/50"
                         >
                             <td colspan="6" class="px-6 py-12 text-center">
@@ -208,21 +240,22 @@ const formatDate = (dateString) => {
 
             <!-- Pagination -->
             <div
-                v-if="customers.links && customers.links.length > 3"
+                v-if="localCustomers?.links && localCustomers.links.length > 3"
                 class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between"
             >
                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Menampilkan {{ customers.from }} - {{ customers.to }} dari
-                    {{ customers.total }} pelanggan
+                    Menampilkan {{ localCustomers.from }} -
+                    {{ localCustomers.to }} dari
+                    {{ localCustomers.total }} pelanggan
                 </div>
                 <div class="flex gap-2">
                     <template
-                        v-for="link in customers.links"
+                        v-for="link in localCustomers.links"
                         :key="link?.label || Math.random()"
                     >
-                        <Link
+                        <button
                             v-if="link && link.url"
-                            :href="link.url"
+                            @click.prevent="fetchPage(link.url)"
                             v-html="link.label"
                             :class="[
                                 'px-4 py-2 rounded-xl font-semibold transition-all duration-300',
@@ -230,7 +263,7 @@ const formatDate = (dateString) => {
                                     ? 'bg-brand-red text-white'
                                     : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600',
                             ]"
-                        ></Link>
+                        ></button>
                         <span
                             v-else-if="link && !link.url"
                             v-html="link.label"

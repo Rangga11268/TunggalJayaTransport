@@ -27,6 +27,12 @@ class UserController extends Controller
         ->paginate(10)
         ->withQueryString();
         
+        if ($request->wantsJson()) {
+            return response()->json([
+                'users' => $users
+            ]);
+        }
+        
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
             'filters' => $request->only(['search']),

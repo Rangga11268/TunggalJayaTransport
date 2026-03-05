@@ -39,6 +39,12 @@ class CustomerController extends Controller
         $customers = $customersQuery
             ->orderBy('total_spent', 'desc')
             ->paginate(15);
+            
+        if ($request->wantsJson()) {
+            return response()->json([
+                'customers' => $customers
+            ]);
+        }
 
         return Inertia::render('Admin/Customers/Index', [
             'customers' => $customers,

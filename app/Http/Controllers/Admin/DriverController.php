@@ -25,6 +25,12 @@ class DriverController extends Controller
         ->paginate(10)
         ->withQueryString();
         
+        if ($request->wantsJson()) {
+            return response()->json([
+                'drivers' => $drivers
+            ]);
+        }
+        
         return Inertia::render('Admin/Drivers/Index', [
             'drivers' => $drivers,
             'filters' => $request->only(['search']),

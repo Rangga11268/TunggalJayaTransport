@@ -3,6 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const props = defineProps({
     drivers: Object,
@@ -10,14 +11,29 @@ const props = defineProps({
 });
 
 const search = ref(props.filters?.search || "");
+const localDrivers = ref(props.drivers); // Reactive local state for drivers data
 let timeout = null;
 
-const applyFilters = () => {
-    router.get(
-        route("admin.drivers.index"),
-        { search: search.value || "" },
-        { preserveState: true, replace: true }
-    );
+// Search via Axios (No Inertia Reload)
+const applyFilters = async () => {
+    try {
+        const { data } = await axios.get(route("admin.drivers.index"), {
+            params: { search: search.value || "" },
+            headers: { Accept: "application/json" },
+        });
+        localDrivers.value = data.drivers;
+
+        // Sync URL optionally without reloading
+        const newUrl = new URL(window.location.href);
+        if (search.value) {
+            newUrl.searchParams.set("search", search.value);
+        } else {
+            newUrl.searchParams.delete("search");
+        }
+        window.history.replaceState({}, "", newUrl);
+    } catch (error) {
+        console.error("Filter failed:", error);
+    }
 };
 
 watch(search, (value) => {
@@ -26,6 +42,23 @@ watch(search, (value) => {
         applyFilters();
     }, 500);
 });
+
+// Pagination via Axios (No Inertia Reload)
+const fetchPage = async (url) => {
+    if (!url) return;
+    try {
+        const { data } = await axios.get(url, {
+            headers: { Accept: "application/json" },
+        });
+        localDrivers.value = data.drivers;
+
+        // Sync URL with pagination parameter
+        window.history.replaceState({}, "", url);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        console.error("Pagination failed:", error);
+    }
+};
 
 const deleteDriver = (id) => {
     Swal.fire({
@@ -112,7 +145,7 @@ const deleteDriver = (id) => {
                         class="divide-y divide-gray-100 dark:divide-gray-700/50"
                     >
                         <tr
-                            v-for="driver in drivers.data"
+                            v-for="driver in localDrivers?.data"
                             :key="driver.id"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                         >
@@ -187,7 +220,7 @@ const deleteDriver = (id) => {
                                         :href="
                                             route(
                                                 'admin.drivers.edit',
-                                                driver.id
+                                                driver.id,
                                             )
                                         "
                                         class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors tooltip"
@@ -205,7 +238,7 @@ const deleteDriver = (id) => {
                                 </div>
                             </td>
                         </tr>
-                        <tr v-if="drivers.data.length === 0">
+                        <tr v-if="localDrivers?.data?.length === 0">
                             <td
                                 colspan="5"
                                 class="px-6 py-12 text-center text-gray-400"
@@ -225,17 +258,17 @@ const deleteDriver = (id) => {
             <!-- Pagination -->
             <div
                 class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between"
-                v-if="drivers.links.length > 3"
+                v-if="localDrivers?.links?.length > 3"
             >
                 <div class="text-xs text-gray-500">
-                    Menampilkan {{ drivers.from }} - {{ drivers.to }} dari
-                    {{ drivers.total }} data
+                    Menampilkan {{ localDrivers.from }} -
+                    {{ localDrivers.to }} dari {{ localDrivers.total }} data
                 </div>
                 <div class="flex gap-1">
-                    <template v-for="(link, k) in drivers.links" :key="k">
-                        <Link
+                    <template v-for="(link, k) in localDrivers.links" :key="k">
+                        <button
                             v-if="link.url"
-                            :href="link.url"
+                            @click.prevent="fetchPage(link.url)"
                             v-html="link.label"
                             :class="[
                                 'px-3 py-1 rounded-lg text-xs font-bold transition-all',
@@ -243,7 +276,6 @@ const deleteDriver = (id) => {
                                     ? 'bg-brand-red text-white shadow-md shadow-brand-red/20'
                                     : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700',
                             ]"
-                            preserve-scroll
                         />
                         <span
                             v-else

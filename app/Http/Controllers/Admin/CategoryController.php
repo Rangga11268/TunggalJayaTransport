@@ -21,6 +21,12 @@ class CategoryController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'categories' => $categories
+            ]);
+        }
+
         return Inertia::render('Admin/Categories/Index', [
             'categories' => $categories,
             'filters' => $request->only(['search'])

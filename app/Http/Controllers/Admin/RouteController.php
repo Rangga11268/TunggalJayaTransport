@@ -21,6 +21,12 @@ class RouteController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'routes' => $routes
+            ]);
+        }
+
         return Inertia::render('Admin/Routes/Index', [
             'routes' => $routes,
             'filters' => $request->only(['search'])

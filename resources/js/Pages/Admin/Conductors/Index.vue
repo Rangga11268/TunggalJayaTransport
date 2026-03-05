@@ -3,6 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const props = defineProps({
     conductors: Object,
@@ -10,14 +11,29 @@ const props = defineProps({
 });
 
 const search = ref(props.filters?.search || "");
+const localConductors = ref(props.conductors); // Reactive local state for conductors data
 let timeout = null;
 
-const applyFilters = () => {
-    router.get(
-        route("admin.conductors.index"),
-        { search: search.value || "" },
-        { preserveState: true, replace: true }
-    );
+// Search via Axios (No Inertia Reload)
+const applyFilters = async () => {
+    try {
+        const { data } = await axios.get(route("admin.conductors.index"), {
+            params: { search: search.value || "" },
+            headers: { Accept: "application/json" },
+        });
+        localConductors.value = data.conductors;
+
+        // Sync URL optionally without reloading
+        const newUrl = new URL(window.location.href);
+        if (search.value) {
+            newUrl.searchParams.set("search", search.value);
+        } else {
+            newUrl.searchParams.delete("search");
+        }
+        window.history.replaceState({}, "", newUrl);
+    } catch (error) {
+        console.error("Filter failed:", error);
+    }
 };
 
 watch(search, (value) => {
@@ -26,6 +42,23 @@ watch(search, (value) => {
         applyFilters();
     }, 500);
 });
+
+// Pagination via Axios (No Inertia Reload)
+const fetchPage = async (url) => {
+    if (!url) return;
+    try {
+        const { data } = await axios.get(url, {
+            headers: { Accept: "application/json" },
+        });
+        localConductors.value = data.conductors;
+
+        // Sync URL with pagination parameter
+        window.history.replaceState({}, "", url);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        console.error("Pagination failed:", error);
+    }
+};
 
 const deleteConductor = (id) => {
     Swal.fire({
@@ -112,7 +145,7 @@ const deleteConductor = (id) => {
                         class="divide-y divide-gray-100 dark:divide-gray-700/50"
                     >
                         <tr
-                            v-for="conductor in conductors.data"
+                            v-for="conductor in localConductors?.data"
                             :key="conductor.id"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                         >
@@ -184,7 +217,7 @@ const deleteConductor = (id) => {
                                         :href="
                                             route(
                                                 'admin.conductors.edit',
-                                                conductor.id
+                                                conductor.id,
                                             )
                                         "
                                         class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors tooltip"
@@ -202,7 +235,7 @@ const deleteConductor = (id) => {
                                 </div>
                             </td>
                         </tr>
-                        <tr v-if="conductors.data.length === 0">
+                        <tr v-if="localConductors?.data?.length === 0">
                             <td
                                 colspan="5"
                                 class="px-6 py-12 text-center text-gray-400"
@@ -222,17 +255,21 @@ const deleteConductor = (id) => {
             <!-- Pagination -->
             <div
                 class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between"
-                v-if="conductors.links.length > 3"
+                v-if="localConductors?.links?.length > 3"
             >
                 <div class="text-xs text-gray-500">
-                    Menampilkan {{ conductors.from }} - {{ conductors.to }} dari
-                    {{ conductors.total }} data
+                    Menampilkan {{ localConductors.from }} -
+                    {{ localConductors.to }} dari
+                    {{ localConductors.total }} data
                 </div>
                 <div class="flex gap-1">
-                    <template v-for="(link, k) in conductors.links" :key="k">
-                        <Link
+                    <template
+                        v-for="(link, k) in localConductors.links"
+                        :key="k"
+                    >
+                        <button
                             v-if="link.url"
-                            :href="link.url"
+                            @click.prevent="fetchPage(link.url)"
                             v-html="link.label"
                             :class="[
                                 'px-3 py-1 rounded-lg text-xs font-bold transition-all',
@@ -240,7 +277,6 @@ const deleteConductor = (id) => {
                                     ? 'bg-brand-red text-white shadow-md shadow-brand-red/20'
                                     : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700',
                             ]"
-                            preserve-scroll
                         />
                         <span
                             v-else

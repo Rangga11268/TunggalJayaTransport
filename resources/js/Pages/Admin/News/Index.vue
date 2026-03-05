@@ -3,6 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import { ref, computed, watch } from "vue";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const props = defineProps({
     articles: Object,
@@ -10,18 +11,50 @@ const props = defineProps({
 });
 
 const search = ref(props.filters?.search || "");
+const localArticles = ref(props.articles); // Reactive local state for articles data
 let timeout = null;
 
+// Search via Axios (No Inertia Reload)
 watch(search, (value) => {
     clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        router.get(
-            route("admin.news.index"),
-            { search: value },
-            { preserveState: true, replace: true }
-        );
+    timeout = setTimeout(async () => {
+        try {
+            const { data } = await axios.get(route("admin.news.index"), {
+                params: { search: value },
+                headers: { Accept: "application/json" },
+            });
+            localArticles.value = data.articles;
+
+            // Sync URL optionally without reloading
+            const newUrl = new URL(window.location.href);
+            if (value) {
+                newUrl.searchParams.set("search", value);
+            } else {
+                newUrl.searchParams.delete("search");
+            }
+            window.history.replaceState({}, "", newUrl);
+        } catch (error) {
+            console.error("Search failed:", error);
+        }
     }, 500);
 });
+
+// Pagination via Axios (No Inertia Reload)
+const fetchPage = async (url) => {
+    if (!url) return;
+    try {
+        const { data } = await axios.get(url, {
+            headers: { Accept: "application/json" },
+        });
+        localArticles.value = data.articles;
+
+        // Sync URL with pagination parameter
+        window.history.replaceState({}, "", url);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        console.error("Pagination failed:", error);
+    }
+};
 
 const deleteArticle = (id) => {
     Swal.fire({
@@ -40,7 +73,7 @@ const deleteArticle = (id) => {
                     Swal.fire(
                         "Terhapus!",
                         "Artikel berhasil dihapus.",
-                        "success"
+                        "success",
                     );
                 },
             });
@@ -123,7 +156,7 @@ const formatDate = (dateString) => {
                         class="divide-y divide-gray-100 dark:divide-gray-700/50"
                     >
                         <tr
-                            v-for="article in articles.data"
+                            v-for="article in localArticles?.data"
                             :key="article.id"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                         >
@@ -136,7 +169,7 @@ const formatDate = (dateString) => {
                                             v-if="
                                                 article.image_url &&
                                                 article.image_url.startsWith(
-                                                    'http'
+                                                    'http',
                                                 )
                                             "
                                             :src="article.image_url"
@@ -218,7 +251,7 @@ const formatDate = (dateString) => {
                                 </div>
                             </td>
                         </tr>
-                        <tr v-if="articles.data.length === 0">
+                        <tr v-if="localArticles?.data?.length === 0">
                             <td
                                 colspan="5"
                                 class="px-6 py-12 text-center text-gray-400"
@@ -238,18 +271,19 @@ const formatDate = (dateString) => {
             <!-- Pagination -->
             <div
                 class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between"
-                v-if="articles.links.length > 3"
+                v-if="localArticles?.links?.length > 3"
             >
                 <div class="text-xs text-gray-500">
-                    Menampilkan {{ articles.from }} - {{ articles.to }} dari
-                    {{ articles.total }} data
+                    Menampilkan {{ localArticles.from }} -
+                    {{ localArticles.to }} dari {{ localArticles.total }} data
                 </div>
                 <div class="flex gap-1">
-                    <Link
-                        v-for="(link, k) in articles.links"
+                    <button
+                        v-for="(link, k) in localArticles.links"
                         :key="k"
-                        :href="link.url"
+                        @click.prevent="fetchPage(link.url)"
                         v-html="link.label"
+                        :disabled="!link.url"
                         :class="[
                             'px-3 py-1 rounded-lg text-xs font-bold transition-all',
                             link.active
@@ -257,7 +291,6 @@ const formatDate = (dateString) => {
                                 : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700',
                             !link.url ? 'opacity-50 cursor-not-allowed' : '',
                         ]"
-                        preserve-scroll
                     />
                 </div>
             </div>

@@ -3,6 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const props = defineProps({
     promoCodes: Object,
@@ -10,18 +11,50 @@ const props = defineProps({
 });
 
 const search = ref(props.filters?.search || "");
+const localPromoCodes = ref(props.promoCodes); // Reactive local state for promo codes data
 let timeout = null;
 
+// Search via Axios (No Inertia Reload)
 watch(search, (value) => {
     clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        router.get(
-            route("admin.promo-codes.index"),
-            { search: value },
-            { preserveState: true, replace: true }
-        );
+    timeout = setTimeout(async () => {
+        try {
+            const { data } = await axios.get(route("admin.promo-codes.index"), {
+                params: { search: value },
+                headers: { Accept: "application/json" },
+            });
+            localPromoCodes.value = data.promoCodes;
+
+            // Sync URL optionally without reloading
+            const newUrl = new URL(window.location.href);
+            if (value) {
+                newUrl.searchParams.set("search", value);
+            } else {
+                newUrl.searchParams.delete("search");
+            }
+            window.history.replaceState({}, "", newUrl);
+        } catch (error) {
+            console.error("Search failed:", error);
+        }
     }, 500);
 });
+
+// Pagination via Axios (No Inertia Reload)
+const fetchPage = async (url) => {
+    if (!url) return;
+    try {
+        const { data } = await axios.get(url, {
+            headers: { Accept: "application/json" },
+        });
+        localPromoCodes.value = data.promoCodes;
+
+        // Sync URL with pagination parameter
+        window.history.replaceState({}, "", url);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        console.error("Pagination failed:", error);
+    }
+};
 
 const deletePromoCode = (id) => {
     Swal.fire({
@@ -123,7 +156,7 @@ const formatDate = (dateString) => {
                         class="divide-y divide-gray-100 dark:divide-gray-700/50"
                     >
                         <tr
-                            v-for="promo in promoCodes.data"
+                            v-for="promo in localPromoCodes?.data"
                             :key="promo.id"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                         >
@@ -154,7 +187,7 @@ const formatDate = (dateString) => {
                                         promo.discount_type === "percentage"
                                             ? promo.discount_amount + "%"
                                             : formatCurrency(
-                                                  promo.discount_amount
+                                                  promo.discount_amount,
                                               )
                                     }}
                                 </span>
@@ -165,7 +198,7 @@ const formatDate = (dateString) => {
                                     Min:
                                     {{
                                         formatCurrency(
-                                            promo.min_purchase_amount
+                                            promo.min_purchase_amount,
                                         )
                                     }}
                                 </div>
@@ -207,7 +240,7 @@ const formatDate = (dateString) => {
                                                     (promo.usage_count /
                                                         promo.usage_limit) *
                                                         100,
-                                                    100
+                                                    100,
                                                 ) + '%',
                                         }"
                                     ></div>
@@ -235,7 +268,7 @@ const formatDate = (dateString) => {
                                         :href="
                                             route(
                                                 'admin.promo-codes.edit',
-                                                promo.id
+                                                promo.id,
                                             )
                                         "
                                         class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors tooltip"
@@ -253,7 +286,7 @@ const formatDate = (dateString) => {
                                 </div>
                             </td>
                         </tr>
-                        <tr v-if="promoCodes.data.length === 0">
+                        <tr v-if="localPromoCodes?.data?.length === 0">
                             <td
                                 colspan="6"
                                 class="px-6 py-12 text-center text-gray-400"
@@ -273,18 +306,20 @@ const formatDate = (dateString) => {
             <!-- Pagination -->
             <div
                 class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between"
-                v-if="promoCodes.links.length > 3"
+                v-if="localPromoCodes?.links?.length > 3"
             >
                 <div class="text-xs text-gray-500">
-                    Menampilkan {{ promoCodes.from }} - {{ promoCodes.to }} dari
-                    {{ promoCodes.total }} data
+                    Menampilkan {{ localPromoCodes.from }} -
+                    {{ localPromoCodes.to }} dari
+                    {{ localPromoCodes.total }} data
                 </div>
                 <div class="flex gap-1">
-                    <Link
-                        v-for="(link, k) in promoCodes.links"
+                    <button
+                        v-for="(link, k) in localPromoCodes.links"
                         :key="k"
-                        :href="link.url"
+                        @click.prevent="fetchPage(link.url)"
                         v-html="link.label"
+                        :disabled="!link.url"
                         :class="[
                             'px-3 py-1 rounded-lg text-xs font-bold transition-all',
                             link.active
@@ -292,7 +327,6 @@ const formatDate = (dateString) => {
                                 : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700',
                             !link.url ? 'opacity-50 cursor-not-allowed' : '',
                         ]"
-                        preserve-scroll
                     />
                 </div>
             </div>

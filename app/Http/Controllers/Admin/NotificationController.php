@@ -23,6 +23,10 @@ class NotificationController extends Controller
             $notification->markAsRead();
         }
 
+        if ($request->wantsJson() && !$request->has('redirect_to')) {
+            return response()->json(['success' => true]);
+        }
+
         if ($request->has('redirect_to')) {
             return redirect($request->redirect_to);
         }
@@ -30,9 +34,14 @@ class NotificationController extends Controller
         return redirect()->back();
     }
 
-    public function markAllRead()
+    public function markAllRead(Request $request)
     {
         auth()->user()->unreadNotifications->markAsRead();
+        
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+        
         return redirect()->back()->with('success', 'Semua notifikasi telah ditandai sebagai sudah dibaca.');
     }
 }

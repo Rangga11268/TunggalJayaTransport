@@ -3,6 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const props = defineProps({
     bookings: Object,
@@ -12,19 +13,40 @@ const props = defineProps({
 const search = ref(props.filters?.search || "");
 const status = ref(props.filters?.status || "all");
 const paymentStatus = ref(props.filters?.payment_status || "all");
+const localBookings = ref(props.bookings); // Reactive local state for bookings data
 
 let timeout = null;
 
-const applyFilters = () => {
-    router.get(
-        route("admin.bookings.index"),
-        {
-            search: search.value || "",
-            status: status.value || "all",
-            payment_status: paymentStatus.value || "all",
-        },
-        { preserveState: true, replace: true }
-    );
+// Filtering via Axios (No Inertia Reload)
+const applyFilters = async () => {
+    try {
+        const { data } = await axios.get(route("admin.bookings.index"), {
+            params: {
+                search: search.value || "",
+                status: status.value || "all",
+                payment_status: paymentStatus.value || "all",
+            },
+            headers: { Accept: "application/json" },
+        });
+        localBookings.value = data.bookings;
+
+        // Sync URL optionally without reloading
+        const newUrl = new URL(window.location.href);
+        if (search.value) newUrl.searchParams.set("search", search.value);
+        else newUrl.searchParams.delete("search");
+
+        if (status.value && status.value !== "all")
+            newUrl.searchParams.set("status", status.value);
+        else newUrl.searchParams.delete("status");
+
+        if (paymentStatus.value && paymentStatus.value !== "all")
+            newUrl.searchParams.set("payment_status", paymentStatus.value);
+        else newUrl.searchParams.delete("payment_status");
+
+        window.history.replaceState({}, "", newUrl);
+    } catch (error) {
+        console.error("Filter failed:", error);
+    }
 };
 
 watch(search, (value) => {
@@ -37,6 +59,23 @@ watch(search, (value) => {
 watch([status, paymentStatus], () => {
     applyFilters();
 });
+
+// Pagination via Axios (No Inertia Reload)
+const fetchPage = async (url) => {
+    if (!url) return;
+    try {
+        const { data } = await axios.get(url, {
+            headers: { Accept: "application/json" },
+        });
+        localBookings.value = data.bookings;
+
+        // Sync URL with pagination parameter
+        window.history.replaceState({}, "", url);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        console.error("Pagination failed:", error);
+    }
+};
 
 const deleteBooking = (id) => {
     Swal.fire({
@@ -211,7 +250,7 @@ const translateStatus = (status) => {
                         class="divide-y divide-gray-100 dark:divide-gray-700/50"
                     >
                         <tr
-                            v-for="booking in bookings.data"
+                            v-for="booking in localBookings?.data"
                             :key="booking.id"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                         >
@@ -264,7 +303,7 @@ const translateStatus = (status) => {
                                         {{
                                             formatDate(
                                                 booking.departure_time,
-                                                true
+                                                true,
                                             )
                                         }}
                                     </div>
@@ -293,7 +332,7 @@ const translateStatus = (status) => {
                                     :class="[
                                         'px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide',
                                         getPaymentStatusBadgeClass(
-                                            booking.payment_status
+                                            booking.payment_status,
                                         ),
                                     ]"
                                 >
@@ -307,7 +346,7 @@ const translateStatus = (status) => {
                                     :class="[
                                         'px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide',
                                         getBookingStatusBadgeClass(
-                                            booking.booking_status
+                                            booking.booking_status,
                                         ),
                                     ]"
                                 >
@@ -324,7 +363,7 @@ const translateStatus = (status) => {
                                         :href="
                                             route(
                                                 'admin.bookings.show',
-                                                booking.id
+                                                booking.id,
                                             )
                                         "
                                         class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors tooltip"
@@ -336,7 +375,7 @@ const translateStatus = (status) => {
                                         :href="
                                             route(
                                                 'admin.bookings.edit',
-                                                booking.id
+                                                booking.id,
                                             )
                                         "
                                         class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors tooltip"
@@ -355,7 +394,7 @@ const translateStatus = (status) => {
                                 </div>
                             </td>
                         </tr>
-                        <tr v-if="bookings.data.length === 0">
+                        <tr v-if="localBookings?.data?.length === 0">
                             <td
                                 colspan="7"
                                 class="px-6 py-12 text-center text-gray-400"
@@ -375,17 +414,17 @@ const translateStatus = (status) => {
             <!-- Pagination -->
             <div
                 class="px-4 sm:px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-3"
-                v-if="bookings.links.length > 3"
+                v-if="localBookings?.links?.length > 3"
             >
                 <div class="text-xs text-gray-500 text-center sm:text-left">
-                    Menampilkan {{ bookings.from }} - {{ bookings.to }} dari
-                    {{ bookings.total }} data
+                    Menampilkan {{ localBookings.from }} -
+                    {{ localBookings.to }} dari {{ localBookings.total }} data
                 </div>
                 <div class="flex flex-wrap gap-1 justify-center">
-                    <template v-for="(link, k) in bookings.links" :key="k">
-                        <Link
+                    <template v-for="(link, k) in localBookings.links" :key="k">
+                        <button
                             v-if="link.url"
-                            :href="link.url"
+                            @click.prevent="fetchPage(link.url)"
                             v-html="link.label"
                             :class="[
                                 'px-3 py-1 rounded-lg text-xs font-bold transition-all',
@@ -393,7 +432,6 @@ const translateStatus = (status) => {
                                     ? 'bg-brand-red text-white shadow-md shadow-brand-red/20'
                                     : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700',
                             ]"
-                            preserve-scroll
                         />
                         <span
                             v-else

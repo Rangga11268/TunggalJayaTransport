@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
+import axios from "axios";
 
 const props = defineProps({
     title: String,
@@ -22,15 +23,31 @@ const usersOpen = ref(false);
 const userDropdownOpen = ref(false);
 const notificationDropdownOpen = ref(false);
 
-const markAsRead = (id) => {
-    if (!id) return;
-    router.post(
-        route("admin.notifications.markAsRead", id.toString()),
-        {},
-        {
-            preserveScroll: true,
+const markAllAsRead = async () => {
+    try {
+        await axios.post(
+            route("admin.notifications.markAllRead"),
+            {},
+            {
+                headers: { Accept: "application/json" },
+            },
+        );
+
+        // Update local state directly to instantly show changes
+        page.props.auth.unread_notifications_count = 0;
+        if (page.props.auth.notifications) {
+            page.props.auth.notifications.forEach((n) => {
+                n.read_at = new Date().toISOString();
+            });
         }
-    );
+
+        addToast(
+            "Semua notifikasi telah ditandai sebagai sudah dibaca.",
+            "success",
+        );
+    } catch (error) {
+        console.error("Gagal menandai semua notifikasi:", error);
+    }
 };
 
 // Initialize dropdowns based on current route
@@ -138,7 +155,7 @@ watch(
             addToast(newValue, "success");
         }
     },
-    { immediate: true }
+    { immediate: true },
 );
 
 watch(
@@ -148,7 +165,7 @@ watch(
             addToast(newValue, "error");
         }
     },
-    { immediate: true }
+    { immediate: true },
 );
 </script>
 
@@ -172,8 +189,8 @@ watch(
                         ? 'fixed inset-y-0 left-0 w-72'
                         : 'fixed inset-y-0 left-0 w-0 overflow-hidden'
                     : sidebarOpen
-                    ? 'w-72 relative'
-                    : 'w-20 relative',
+                      ? 'w-72 relative'
+                      : 'w-20 relative',
             ]"
         >
             <!-- Background Gradient Texture (Dark Mode Only) -->
@@ -397,7 +414,7 @@ watch(
                                         class="w-1.5 h-1.5 rounded-full"
                                         :class="
                                             route().current(
-                                                'admin.categories.*'
+                                                'admin.categories.*',
                                             )
                                                 ? 'bg-brand-red'
                                                 : 'bg-slate-300 dark:bg-gray-700'
@@ -744,7 +761,7 @@ watch(
                                         class="w-1.5 h-1.5 rounded-full"
                                         :class="
                                             route().current(
-                                                'admin.conductors.*'
+                                                'admin.conductors.*',
                                             )
                                                 ? 'bg-brand-red'
                                                 : 'bg-slate-300 dark:bg-gray-700'
@@ -952,20 +969,16 @@ watch(
                                 >
                                     Notifikasi
                                 </h3>
-                                <Link
+                                <button
                                     v-if="
                                         $page.props.auth
                                             .unread_notifications_count > 0
                                     "
-                                    :href="
-                                        route('admin.notifications.markAllRead')
-                                    "
-                                    method="post"
-                                    as="button"
+                                    @click="markAllAsRead"
                                     class="text-xs text-brand-red hover:text-red-700 font-medium"
                                 >
                                     Tandai semua dibaca
-                                </Link>
+                                </button>
                             </div>
 
                             <div
@@ -1020,7 +1033,7 @@ watch(
                                                 >
                                                     {{
                                                         new Date(
-                                                            notification.created_at
+                                                            notification.created_at,
                                                         ).toLocaleString(
                                                             "id-ID",
                                                             {
@@ -1028,7 +1041,7 @@ watch(
                                                                 month: "short",
                                                                 hour: "2-digit",
                                                                 minute: "2-digit",
-                                                            }
+                                                            },
                                                         )
                                                     }}
                                                 </p>
@@ -1050,14 +1063,14 @@ watch(
                                             :href="
                                                 route(
                                                     'admin.notifications.markAsRead',
-                                                    notification.id
+                                                    notification.id,
                                                 )
                                             "
                                             method="post"
                                             :data="{
                                                 redirect_to: route(
                                                     'admin.bookings.show',
-                                                    notification.data.booking_id.toString()
+                                                    notification.data.booking_id.toString(),
                                                 ),
                                             }"
                                             class="absolute inset-0 z-10"

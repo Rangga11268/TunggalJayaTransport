@@ -3,6 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const props = defineProps({
     categories: Object,
@@ -10,18 +11,51 @@ const props = defineProps({
 });
 
 const search = ref(props.filters?.search || "");
+const localCategories = ref(props.categories); // Reactive local state for categories data
 let timeout = null;
 
+// Search via Axios (No Inertia Reload)
 watch(search, (value) => {
     clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        router.get(
-            route("admin.categories.index"),
-            { search: value },
-            { preserveState: true, replace: true }
-        );
+    timeout = setTimeout(async () => {
+        try {
+            const { data } = await axios.get(route("admin.categories.index"), {
+                params: { search: value },
+                headers: { Accept: "application/json" },
+            });
+            localCategories.value = data.categories;
+
+            // Sync URL optionally without reloading
+            const newUrl = new URL(window.location.href);
+            if (value) {
+                newUrl.searchParams.set("search", value);
+            } else {
+                newUrl.searchParams.delete("search");
+            }
+            window.history.replaceState({}, "", newUrl);
+        } catch (error) {
+            console.error("Search failed:", error);
+        }
     }, 500);
 });
+
+// Pagination via Axios (No Inertia Reload)
+const fetchPage = async (url) => {
+    if (!url) return;
+    try {
+        const { data } = await axios.get(url, {
+            headers: { Accept: "application/json" },
+        });
+        localCategories.value = data.categories;
+
+        // Sync URL with pagination parameter
+        window.history.replaceState({}, "", url);
+        // Scroll to table top
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        console.error("Pagination failed:", error);
+    }
+};
 
 const deleteCategory = (id) => {
     Swal.fire({
@@ -106,7 +140,7 @@ const deleteCategory = (id) => {
                             class="divide-y divide-gray-100 dark:divide-gray-700/50"
                         >
                             <tr
-                                v-for="category in categories.data"
+                                v-for="category in localCategories?.data"
                                 :key="category.id"
                                 class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                             >
@@ -139,7 +173,7 @@ const deleteCategory = (id) => {
                                             :href="
                                                 route(
                                                     'admin.categories.edit',
-                                                    category.id
+                                                    category.id,
                                                 )
                                             "
                                             class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors tooltip"
@@ -157,7 +191,7 @@ const deleteCategory = (id) => {
                                     </div>
                                 </td>
                             </tr>
-                            <tr v-if="categories.data.length === 0">
+                            <tr v-if="localCategories?.data?.length === 0">
                                 <td
                                     colspan="3"
                                     class="px-6 py-12 text-center text-gray-400"
@@ -176,17 +210,18 @@ const deleteCategory = (id) => {
                 <!-- Pagination -->
                 <div
                     class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between"
-                    v-if="categories.links.length > 3"
+                    v-if="localCategories?.links?.length > 3"
                 >
                     <div class="text-xs text-gray-500">
-                        Total {{ categories.total }}
+                        Total {{ localCategories.total }}
                     </div>
                     <div class="flex gap-1">
-                        <Link
-                            v-for="(link, k) in categories.links"
+                        <button
+                            v-for="(link, k) in localCategories.links"
                             :key="k"
-                            :href="link.url"
+                            @click.prevent="fetchPage(link.url)"
                             v-html="link.label"
+                            :disabled="!link.url"
                             :class="[
                                 'px-3 py-1 rounded-lg text-xs font-bold transition-all',
                                 link.active
@@ -196,7 +231,6 @@ const deleteCategory = (id) => {
                                     ? 'opacity-50 cursor-not-allowed'
                                     : '',
                             ]"
-                            preserve-scroll
                         />
                     </div>
                 </div>
