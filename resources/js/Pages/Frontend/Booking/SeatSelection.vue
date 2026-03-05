@@ -157,7 +157,7 @@ const saveSeats = async () => {
         Swal.fire({
             icon: "warning",
             title: "Kursi Belum Lengkap",
-            text: `Harap pilih ${props.booking.number_of_seats} kursi.`,
+            text: `Anda baru memilih ${selectedSeats.value.length} dari ${props.booking.number_of_seats} kursi yang dipesan.`,
             confirmButtonColor: "#e11d48",
         });
         return false;
@@ -268,8 +268,8 @@ const processPayment = async () => {
     if (selectedSeats.value.length !== props.booking.number_of_seats) {
         Swal.fire({
             icon: "warning",
-            title: "Kursi Belum Dipilih",
-            text: "Mohon pilih kursi terlebih dahulu.",
+            title: "Kursi Belum Lengkap",
+            text: `Anda baru memilih ${selectedSeats.value.length} dari ${props.booking.number_of_seats} kursi yang dipesan.`,
             confirmButtonColor: "#e11d48",
         });
         return;

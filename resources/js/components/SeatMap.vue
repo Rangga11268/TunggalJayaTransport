@@ -59,142 +59,175 @@ const handleSeatClick = (seat) => {
 
 const getSeatClass = (seat) => {
     if (seat.isOccupied) {
-        return "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 cursor-not-allowed border-red-300 dark:border-red-700";
+        return "bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50";
     }
     if (seat.isSelected) {
-        return "bg-blue-500 text-white border-blue-600 cursor-pointer hover:bg-blue-600 shadow-lg shadow-blue-500/30";
+        return "bg-rose-50 dark:bg-rose-900/10 shadow-lg shadow-rose-600/20 ring-2 ring-rose-600 -translate-y-1";
     }
-    if (props.mode === "select") {
-        return "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 hover:scale-110 transition-all";
-    }
-    return "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600";
+    return "bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 border border-gray-100 dark:border-white/5";
+};
+
+const getSeatIconClass = (seat) => {
+    if (seat.isOccupied) return "grayscale";
+    if (seat.isSelected) return "sepia-[1] hue-rotate-[300deg] saturate-[2.5]";
+    return "dark:brightness-90 hover:brightness-110";
+};
+
+const getSeatNumberBadgeClass = (seat) => {
+    if (seat.isSelected) return "bg-rose-600 text-white border-rose-600";
+    return "bg-gray-100 dark:bg-white/10 text-gray-500 border-gray-200 dark:border-white/10";
 };
 </script>
 
 <template>
-    <div class="seat-map-container">
+    <div class="seat-map-container font-manrope">
         <!-- Legend -->
         <div
-            class="flex flex-wrap gap-2 sm:gap-4 mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 justify-center sm:justify-start"
+            class="flex flex-wrap gap-4 mb-8 p-4 bg-white dark:bg-[#111] rounded-2xl border border-gray-100 dark:border-white/5 justify-center sm:justify-start shadow-sm"
         >
-            <div class="flex items-center gap-1.5 sm:gap-2">
+            <div class="flex items-center gap-2">
                 <div
-                    class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700"
+                    class="w-6 h-6 rounded-lg bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10"
                 ></div>
                 <span
-                    class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300"
+                    class="text-xs font-bold text-gray-500 uppercase tracking-wider"
                     >Tersedia</span
                 >
             </div>
-            <div class="flex items-center gap-1.5 sm:gap-2">
+            <div class="flex items-center gap-2">
                 <div
-                    class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700"
+                    class="w-6 h-6 rounded-lg bg-gray-200 dark:bg-white/5 opacity-50"
                 ></div>
                 <span
-                    class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300"
+                    class="text-xs font-bold text-gray-500 uppercase tracking-wider"
                     >Terisi</span
                 >
             </div>
-            <div
-                v-if="selectedSeats.length > 0"
-                class="flex items-center gap-1.5 sm:gap-2"
-            >
+            <div class="flex items-center gap-2">
                 <div
-                    class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-blue-500 border-2 border-blue-600"
+                    class="w-6 h-6 rounded-lg bg-rose-50 dark:bg-rose-900/10 border-2 border-rose-600"
                 ></div>
                 <span
-                    class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300"
-                    >Dipilih</span
+                    class="text-xs font-bold text-rose-600 uppercase tracking-wider"
+                    >Pilihan</span
                 >
             </div>
         </div>
 
-        <!-- Bus Front Indicator -->
-        <div class="text-center mb-4">
-            <div
-                class="inline-block px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-t-2xl"
-            >
-                <i
-                    class="fas fa-steering-wheel mr-2 text-gray-600 dark:text-gray-400"
-                ></i>
-                <span class="font-bold text-sm text-gray-700 dark:text-gray-300"
-                    >DEPAN BUS</span
-                >
-            </div>
-        </div>
-
-        <!-- Seat Grid (2-3 Layout) -->
+        <!-- Bus Visual Wrapper -->
         <div
-            class="bg-white dark:bg-gray-800 border-4 border-gray-300 dark:border-gray-600 rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-xl overflow-x-auto"
+            class="bg-white dark:bg-[#111] rounded-[3rem] p-4 md:p-8 shadow-xl border border-gray-100 dark:border-white/5"
         >
-            <div class="space-y-2 sm:space-y-3 min-w-max">
+            <div
+                class="bg-gray-50 dark:bg-[#080808] rounded-[2.5rem] p-6 border border-gray-200 dark:border-white/5"
+            >
+                <!-- Bus Front -->
                 <div
-                    v-for="(row, rowIndex) in seatLayout"
-                    :key="rowIndex"
-                    class="flex items-center justify-center gap-2 sm:gap-3"
+                    class="flex justify-between items-center mb-10 border-b-2 border-dashed border-gray-200 dark:border-white/10 pb-6"
                 >
-                    <!-- Left seats (2 seats) -->
-                    <div class="flex gap-2 sm:gap-3">
+                    <!-- Door -->
+                    <div class="flex flex-col items-center opacity-40">
                         <div
-                            v-for="seat in row.filter((s) => s.position < 2)"
-                            :key="seat.number"
-                            @click="handleSeatClick(seat)"
-                            :class="[
-                                'seat relative flex flex-col items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-lg border-2 font-bold text-[10px] sm:text-xs transition-all duration-200',
-                                getSeatClass(seat),
-                            ]"
+                            class="w-10 h-10 rounded-xl border-2 border-dashed border-gray-300 dark:border-white/20 flex items-center justify-center mb-1"
                         >
-                            <i
-                                class="fas text-sm sm:text-lg mb-0.5 sm:mb-1"
-                                :class="
-                                    seat.isOccupied
-                                        ? 'fa-user-slash'
-                                        : seat.isSelected
-                                        ? 'fa-user-check'
-                                        : 'fa-chair'
-                                "
-                            ></i>
-                            <span>{{ seat.number }}</span>
+                            <i class="fas fa-door-open text-sm"></i>
                         </div>
-                    </div>
-
-                    <!-- Aisle -->
-                    <div class="flex items-center justify-center px-2 sm:px-4">
-                        <div
-                            class="h-8 sm:h-12 w-px bg-gray-300 dark:bg-gray-600"
-                        ></div>
-                    </div>
-
-                    <!-- Right seats (3 seats) -->
-                    <div class="flex gap-2 sm:gap-3">
-                        <div
-                            v-for="seat in row.filter((s) => s.position >= 2)"
-                            :key="seat.number"
-                            @click="handleSeatClick(seat)"
-                            :class="[
-                                'seat relative flex flex-col items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-lg border-2 font-bold text-[10px] sm:text-xs transition-all duration-200',
-                                getSeatClass(seat),
-                            ]"
+                        <span
+                            class="text-[9px] font-black uppercase tracking-widest text-gray-400"
+                            >Pintu</span
                         >
-                            <i
-                                class="fas text-sm sm:text-lg mb-0.5 sm:mb-1"
-                                :class="
-                                    seat.isOccupied
-                                        ? 'fa-user-slash'
-                                        : seat.isSelected
-                                        ? 'fa-user-check'
-                                        : 'fa-chair'
-                                "
-                            ></i>
-                            <span>{{ seat.number }}</span>
-                        </div>
                     </div>
 
-                    <!-- Row number indicator -->
+                    <!-- Steering -->
+                    <div class="flex flex-col items-center opacity-60">
+                        <div
+                            class="w-12 h-12 bg-white dark:bg-white/5 rounded-2xl flex items-center justify-center shadow-inner mb-1"
+                        >
+                            <i class="fas fa-steering-wheel text-gray-400"></i>
+                        </div>
+                        <span
+                            class="text-[9px] font-black uppercase tracking-widest text-gray-400"
+                            >Kemudi</span
+                        >
+                    </div>
+                </div>
+
+                <!-- Seat Grid -->
+                <div class="space-y-4">
                     <div
-                        class="text-[10px] sm:text-xs font-bold text-gray-400 ml-1 sm:ml-2 min-w-[40px] sm:min-w-[60px]"
+                        v-for="(row, rowIndex) in seatLayout"
+                        :key="rowIndex"
+                        class="flex items-center justify-center gap-4 md:gap-8"
                     >
-                        Baris {{ rowIndex + 1 }}
+                        <!-- Left seats (2 seats) -->
+                        <div class="flex gap-3">
+                            <div
+                                v-for="seat in row.filter(
+                                    (s) => s.position < 2,
+                                )"
+                                :key="seat.number"
+                                @click="handleSeatClick(seat)"
+                                :class="[
+                                    'relative w-12 md:w-14 aspect-square rounded-xl flex items-center justify-center transition-all duration-300 p-1 overflow-hidden',
+                                    getSeatClass(seat),
+                                ]"
+                            >
+                                <img
+                                    src="/img/car-seat.png"
+                                    class="w-full h-auto object-contain transition-all duration-300"
+                                    :class="getSeatIconClass(seat)"
+                                    alt="Seat"
+                                />
+                                <span
+                                    class="absolute -top-1 -right-1 text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm border z-10"
+                                    :class="getSeatNumberBadgeClass(seat)"
+                                >
+                                    {{ seat.number }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Aisle -->
+                        <div class="w-8 flex justify-center items-center">
+                            <span
+                                class="text-[10px] font-black text-gray-300 dark:text-white/10 border-b border-gray-300 dark:border-white/10"
+                            >
+                                {{ rowIndex + 1 }}
+                            </span>
+                        </div>
+
+                        <!-- Right seats (3 seats) -->
+                        <div class="flex gap-3">
+                            <div
+                                v-for="seat in row.filter(
+                                    (s) => s.position >= 2,
+                                )"
+                                :key="seat.number"
+                                @click="handleSeatClick(seat)"
+                                :class="[
+                                    'relative w-12 md:w-14 aspect-square rounded-xl flex items-center justify-center transition-all duration-300 p-1 overflow-hidden',
+                                    getSeatClass(seat),
+                                ]"
+                            >
+                                <img
+                                    src="/img/car-seat.png"
+                                    class="w-full h-auto object-contain transition-all duration-300"
+                                    :class="getSeatIconClass(seat)"
+                                    alt="Seat"
+                                />
+                                <span
+                                    class="absolute -top-1 -right-1 text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm border z-10"
+                                    :class="getSeatNumberBadgeClass(seat)"
+                                >
+                                    {{ seat.number }}
+                                </span>
+                                <!-- Checkmark for Selected -->
+                                <i
+                                    v-if="seat.isSelected"
+                                    class="fas fa-check-circle absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-base drop-shadow-md z-20"
+                                ></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -202,7 +235,7 @@ const getSeatClass = (seat) => {
 
         <!-- Summary -->
         <div
-            class="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
+            class="mt-8 p-6 bg-white dark:bg-[#111] rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm"
         >
             <div class="grid grid-cols-3 gap-4 text-center">
                 <div>
