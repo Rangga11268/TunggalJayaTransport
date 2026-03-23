@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, computed } from "vue";
-import { Link, usePage } from "@inertiajs/vue3";
+import { Link, usePage, router } from "@inertiajs/vue3";
 import FlashMessages from "@/Components/FlashMessages.vue";
 import WhatsAppButton from "@/Components/WhatsAppButton.vue";
+import LoginModal from "@/Components/LoginModal.vue";
+import RegisterModal from "@/Components/RegisterModal.vue";
 import { useMagnetic } from "@/Composables/useMagnetic";
 import gsap from "gsap";
 
@@ -12,6 +14,18 @@ const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
 const mobileMenuRef = ref(null);
 const menuButtonRef = ref(null);
+
+const showLoginModal = ref(false);
+const showRegisterModal = ref(false);
+
+const openLoginModal = () => {
+    mobileMenuOpen.value = false;
+    showLoginModal.value = true;
+};
+const openRegisterModal = () => {
+    mobileMenuOpen.value = false;
+    showRegisterModal.value = true;
+};
 
 // Verification banner: dismissed per session via localStorage
 const verificationBannerDismissed = ref(
@@ -27,6 +41,19 @@ const dismissVerificationBanner = () => {
     verificationBannerDismissed.value = true;
     localStorage.setItem("verification_banner_dismissed", "1");
 };
+
+// Global Loading State
+const isLoading = ref(false);
+
+router.on('start', () => {
+    isLoading.value = true;
+});
+
+router.on('finish', () => {
+    setTimeout(() => {
+        isLoading.value = false;
+    }, 400); // Slightly longer for the frontend styling
+});
 
 // Transitions
 const onBeforeEnter = (el) => {
@@ -111,6 +138,17 @@ onMounted(() => {
     if (isDarkMode.value) {
         document.documentElement.classList.add("dark");
     }
+
+    // Check for auth query parameter to open modals automatically
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('auth') === 'login') {
+        showLoginModal.value = true;
+        // Optionally remove the param from URL without reloading
+        window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (params.get('auth') === 'register') {
+        showRegisterModal.value = true;
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
 });
 
 onUnmounted(() => {
@@ -186,6 +224,18 @@ const isActive = (routeName) => {
     <div
         class="min-h-screen flex flex-col bg-white dark:bg-[#080808] transition-colors duration-500 font-manrope selection:bg-rose-500/30"
     >
+        <!-- Auth Modals -->
+        <LoginModal 
+            :show="showLoginModal" 
+            @close="showLoginModal = false" 
+            @switchToRegister="showLoginModal = false; showRegisterModal = true"
+        />
+        <RegisterModal 
+            :show="showRegisterModal" 
+            @close="showRegisterModal = false" 
+            @switchToLogin="showRegisterModal = false; showLoginModal = true"
+        />
+
         <!-- WhatsApp Floating Button -->
         <WhatsAppButton />
 
@@ -453,20 +503,20 @@ const isActive = (routeName) => {
 
                             <!-- Auth Buttons -->
                             <template v-if="!page.props.auth.user">
-                                <Link
+                                <button
                                     ref="loginBtn"
-                                    :href="route('login')"
+                                    @click="openLoginModal"
                                     class="px-5 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:text-rose-600 transition-colors"
                                 >
                                     Masuk
-                                </Link>
-                                <Link
+                                </button>
+                                <button
                                     ref="registerBtn"
-                                    :href="route('register')"
+                                    @click="openRegisterModal"
                                     class="px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-black text-sm font-bold rounded-full shadow-lg hover:scale-105 transition-all duration-300"
                                 >
                                     Daftar
-                                </Link>
+                                </button>
                             </template>
                             <template v-else>
                                 <div class="relative group">
@@ -586,13 +636,13 @@ const isActive = (routeName) => {
                             </Link>
                         </template>
                         <template v-else>
-                            <Link
-                                :href="route('login')"
+                            <button
+                                @click="openLoginModal"
                                 aria-label="Login"
                                 class="w-11 h-11 rounded-full border border-gray-100 dark:border-white/5 flex items-center justify-center text-gray-500 dark:text-gray-400"
                             >
                                 <i class="fas fa-user text-xs"></i>
-                            </Link>
+                            </button>
                         </template>
 
                         <!-- Mobile Menu Trigger -->
@@ -785,18 +835,18 @@ const isActive = (routeName) => {
 
                             <template v-if="!page.props.auth.user">
                                 <div class="grid grid-cols-2 gap-3 px-2 pb-4">
-                                    <Link
-                                        :href="route('login')"
-                                        class="py-4 text-center text-sm font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 rounded-[1.5rem]"
+                                    <button
+                                        @click="openLoginModal"
+                                        class="py-4 w-full text-center text-sm font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 rounded-[1.5rem]"
                                     >
                                         Masuk
-                                    </Link>
-                                    <Link
-                                        :href="route('register')"
-                                        class="py-4 bg-rose-600 text-white text-center text-sm font-bold rounded-[1.5rem] shadow-lg shadow-rose-600/20"
+                                    </button>
+                                    <button
+                                        @click="openRegisterModal"
+                                        class="py-4 w-full bg-rose-600 text-white text-center text-sm font-bold rounded-[1.5rem] shadow-lg shadow-rose-600/20"
                                     >
                                         Daftar
-                                    </Link>
+                                    </button>
                                 </div>
                             </template>
                         </div>
@@ -898,6 +948,24 @@ const isActive = (routeName) => {
 
         <!-- Main Content -->
         <main class="flex-grow relative">
+            <!-- Skeleton Loader Overlay -->
+            <transition name="fade">
+                <div v-if="isLoading" class="absolute inset-x-0 top-0 z-40 w-full min-h-[80vh] pt-[120px] pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-white dark:bg-[#080808]">
+                    <div class="animate-pulse space-y-8 w-full">
+                        <!-- Header/Hero Skeleton -->
+                        <div class="bg-gray-100 dark:bg-white/5 rounded-[2.5rem] h-[35vh] min-h-[250px] max-h-[400px] w-full"></div>
+                        
+                        <!-- Content Area Skeleton -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <div class="bg-gray-100 dark:bg-white/5 rounded-3xl h-80 w-full"></div>
+                            <div class="bg-gray-100 dark:bg-white/5 rounded-3xl h-80 w-full"></div>
+                            <div class="bg-gray-100 dark:bg-white/5 rounded-3xl h-80 w-full hidden md:block"></div>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+
+            <!-- Page Content -->
             <Transition
                 name="page-fade"
                 mode="out-in"
@@ -905,7 +973,7 @@ const isActive = (routeName) => {
                 @enter="onEnter"
                 @leave="onLeave"
             >
-                <div :key="pageKey">
+                <div :key="pageKey" :class="{ 'opacity-0': isLoading }">
                     <slot />
                 </div>
             </Transition>

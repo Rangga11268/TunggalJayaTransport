@@ -242,6 +242,12 @@ const formatTime = (dateString) => {
                     ></div>
 
                     <form @submit.prevent="submit" class="space-y-8 relative">
+                        <!-- Instructions -->
+                        <div class="mb-2">
+                            <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-1 uppercase tracking-widest font-unbounded">Langkah 1: Isi Data Penumpang</h2>
+                            <p class="text-xs text-gray-500 font-manrope">Pastikan data yang diisi sesuai dengan identitas (KTP/SIM) penumpang yang berangkat.</p>
+                        </div>
+
                         <!-- Personal Details -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div class="md:col-span-2 group">

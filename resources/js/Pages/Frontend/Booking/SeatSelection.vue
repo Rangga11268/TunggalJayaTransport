@@ -509,6 +509,12 @@ const busType = computed(() => {
                 <div
                     class="bg-white dark:bg-[#111] rounded-[3rem] p-4 md:p-6 shadow-xl shadow-gray-200 dark:shadow-none border border-gray-100 dark:border-white/5"
                 >
+                    <!-- Instructions -->
+                    <div class="mb-6 text-center">
+                        <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-1 uppercase tracking-widest font-unbounded">Langkah 2: Pilih Tempat Duduk</h2>
+                        <p class="text-xs text-gray-500 font-manrope">Klik kursi yang tersedia (berwarna putih) sesuai dengan jumlah penumpang yang Anda pesan.</p>
+                    </div>
+
                     <!-- Bus Body -->
                     <div
                         class="bg-gray-50 dark:bg-[#080808] rounded-[2.5rem] p-4 md:p-6 relative min-h-[500px] overflow-x-auto border border-gray-200 dark:border-white/5"
@@ -592,84 +598,39 @@ const busType = computed(() => {
                                                     "
                                                     class="relative w-12 md:w-14 transition-all duration-300 focus:outline-none"
                                                 >
-                                                    <!-- Seat Visual -->
+                                                    <!-- New CSS Seat Visual -->
                                                     <div
-                                                        class="w-full aspect-square rounded-xl flex items-center justify-center relative transition-all duration-300 shadow-sm overflow-hidden p-1"
+                                                        class="w-full aspect-[4/5] rounded-xl rounded-t-3xl flex flex-col items-center justify-center relative transition-all duration-300 shadow-sm border-2 overflow-hidden"
                                                         :class="[
-                                                            isSeatSelected(
-                                                                getSeatNumber(
-                                                                    r - 1,
-                                                                    c - 1,
-                                                                ),
-                                                            )
-                                                                ? 'bg-rose-50 dark:bg-rose-900/10 shadow-lg shadow-rose-600/20 ring-2 ring-rose-600 -translate-y-1'
-                                                                : isSeatOccupied(
-                                                                        getSeatNumber(
-                                                                            r -
-                                                                                1,
-                                                                            c -
-                                                                                1,
-                                                                        ),
-                                                                    )
-                                                                  ? 'bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50'
-                                                                  : isFilterMatch(
-                                                                          getSeatNumber(
-                                                                              r -
-                                                                                  1,
-                                                                              c -
-                                                                                  1,
-                                                                          ),
-                                                                      )
-                                                                    ? 'bg-rose-50 dark:bg-rose-600/10 border-rose-300 dark:border-rose-600/50 scale-105 shadow-md'
-                                                                    : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 hover:shadow-md border border-gray-100 dark:border-white/5',
+                                                            isSeatSelected(getSeatNumber(r - 1, c - 1))
+                                                                ? 'bg-rose-600 border-rose-600 shadow-lg shadow-rose-600/30 text-white -translate-y-1'
+                                                                : isSeatOccupied(getSeatNumber(r - 1, c - 1))
+                                                                  ? 'bg-gray-200 dark:bg-white/5 border-gray-300 dark:border-white/10 text-gray-400 cursor-not-allowed opacity-60'
+                                                                  : isFilterMatch(getSeatNumber(r - 1, c - 1))
+                                                                    ? 'bg-rose-50 dark:bg-rose-900/10 border-rose-400 scale-105'
+                                                                    : 'bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10 hover:border-rose-400 hover:shadow-md'
                                                         ]"
                                                     >
-                                                        <img
-                                                            src="/img/car-seat.png"
-                                                            class="w-full h-auto object-contain transition-all duration-300"
-                                                            :class="[
-                                                                isSeatSelected(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c - 1,
-                                                                    ),
-                                                                )
-                                                                    ? 'sepia-[1] hue-rotate-[300deg] saturate-[2.5]'
-                                                                    : isSeatOccupied(
-                                                                            getSeatNumber(
-                                                                                r -
-                                                                                    1,
-                                                                                c -
-                                                                                    1,
-                                                                            ),
-                                                                        )
-                                                                      ? 'grayscale'
-                                                                      : 'dark:brightness-90 hover:brightness-110',
-                                                            ]"
-                                                            alt="Seat"
-                                                        />
-
-                                                        <!-- Number Badge -->
-                                                        <span
-                                                            class="absolute -top-1 -right-1 text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm border font-manrope z-10"
-                                                            :class="[
-                                                                isSeatSelected(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c - 1,
-                                                                    ),
-                                                                )
-                                                                    ? 'bg-rose-600 text-white border-rose-600'
-                                                                    : 'bg-gray-100 dark:bg-white/10 text-gray-500 border-gray-200 dark:border-white/10',
-                                                            ]"
-                                                        >
-                                                            {{
-                                                                getSeatNumber(
-                                                                    r - 1,
-                                                                    c - 1,
-                                                                )
-                                                            }}
-                                                        </span>
+                                                        <!-- Top inner element to simulate headrest -->
+                                                        <div class="absolute top-0 left-0 right-0 h-1/4 bg-black/5 dark:bg-white/5 opacity-50 border-b border-black/5 dark:border-white/5"></div>
+                                                        
+                                                        <div class="relative z-10 flex flex-col items-center justify-center h-full w-full pt-2">
+                                                            <i
+                                                                v-if="isSeatSelected(getSeatNumber(r - 1, c - 1))"
+                                                                class="fas fa-check text-base sm:text-lg mb-1"
+                                                            ></i>
+                                                            <span
+                                                                v-else
+                                                                class="font-black font-unbounded text-xs sm:text-sm"
+                                                                :class="[
+                                                                    isSeatOccupied(getSeatNumber(r - 1, c - 1))
+                                                                        ? 'text-gray-400'
+                                                                        : 'text-gray-700 dark:text-gray-300 group-hover:text-rose-600'
+                                                                ]"
+                                                            >
+                                                                {{ getSeatNumber(r - 1, c - 1) }}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </button>
                                             </div>
@@ -724,97 +685,39 @@ const busType = computed(() => {
                                                     "
                                                     class="relative w-12 md:w-14 transition-all duration-300 focus:outline-none"
                                                 >
-                                                    <!-- Seat Visual -->
+                                                    <!-- New CSS Seat Visual (Right Side) -->
                                                     <div
-                                                        class="w-full aspect-square rounded-xl flex items-center justify-center relative transition-all duration-300 shadow-sm overflow-hidden p-1"
+                                                        class="w-full aspect-[4/5] rounded-xl rounded-t-3xl flex flex-col items-center justify-center relative transition-all duration-300 shadow-sm border-2 overflow-hidden"
                                                         :class="[
-                                                            isSeatSelected(
-                                                                getSeatNumber(
-                                                                    r - 1,
-                                                                    c + 1,
-                                                                ),
-                                                            )
-                                                                ? 'bg-rose-600 dark:bg-rose-600 shadow-xl shadow-rose-600/40 ring-4 ring-rose-400 -translate-y-1 scale-110'
-                                                                : isSeatOccupied(
-                                                                        getSeatNumber(
-                                                                            r -
-                                                                                1,
-                                                                            c +
-                                                                                1,
-                                                                        ),
-                                                                    )
-                                                                  ? 'bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed opacity-50'
-                                                                  : isFilterMatch(
-                                                                          getSeatNumber(
-                                                                              r -
-                                                                                  1,
-                                                                              c +
-                                                                                  1,
-                                                                          ),
-                                                                      )
-                                                                    ? 'bg-rose-50 dark:bg-rose-600/10 border-rose-300 dark:border-rose-600/50 scale-105 shadow-md'
-                                                                    : 'bg-white dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 hover:shadow-md border border-gray-100 dark:border-white/5',
+                                                            isSeatSelected(getSeatNumber(r - 1, c + 1))
+                                                                ? 'bg-rose-600 border-rose-600 shadow-lg shadow-rose-600/30 text-white -translate-y-1'
+                                                                : isSeatOccupied(getSeatNumber(r - 1, c + 1))
+                                                                  ? 'bg-gray-200 dark:bg-white/5 border-gray-300 dark:border-white/10 text-gray-400 cursor-not-allowed opacity-60'
+                                                                  : isFilterMatch(getSeatNumber(r - 1, c + 1))
+                                                                    ? 'bg-rose-50 dark:bg-rose-900/10 border-rose-400 scale-105'
+                                                                    : 'bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10 hover:border-rose-400 hover:shadow-md'
                                                         ]"
                                                     >
-                                                        <img
-                                                            src="/img/car-seat.png"
-                                                            class="w-full h-auto object-contain transition-all duration-300"
-                                                            :class="[
-                                                                isSeatSelected(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c + 1,
-                                                                    ),
-                                                                )
-                                                                    ? 'brightness-0 invert'
-                                                                    : isSeatOccupied(
-                                                                            getSeatNumber(
-                                                                                r -
-                                                                                    1,
-                                                                                c +
-                                                                                    1,
-                                                                            ),
-                                                                        )
-                                                                      ? 'grayscale'
-                                                                      : 'dark:brightness-90 hover:brightness-110',
-                                                            ]"
-                                                            alt="Seat"
-                                                        />
-
-                                                        <!-- Checkmark for Selected -->
-                                                        <i
-                                                            v-if="
-                                                                isSeatSelected(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c + 1,
-                                                                    ),
-                                                                )
-                                                            "
-                                                            class="fas fa-check-circle absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl drop-shadow-lg z-20"
-                                                        ></i>
-
-                                                        <!-- Number Badge -->
-                                                        <span
-                                                            class="absolute -top-1 -right-1 text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm border font-manrope z-10"
-                                                            :class="[
-                                                                isSeatSelected(
-                                                                    getSeatNumber(
-                                                                        r - 1,
-                                                                        c + 1,
-                                                                    ),
-                                                                )
-                                                                    ? 'bg-white text-rose-600 border-white'
-                                                                    : 'bg-gray-100 dark:bg-white/10 text-gray-500 border-gray-200 dark:border-white/10',
-                                                            ]"
-                                                        >
-                                                            {{
-                                                                getSeatNumber(
-                                                                    r - 1,
-                                                                    c + 1,
-                                                                )
-                                                            }}
-                                                        </span>
+                                                        <!-- Top inner element to simulate headrest -->
+                                                        <div class="absolute top-0 left-0 right-0 h-1/4 bg-black/5 dark:bg-white/5 opacity-50 border-b border-black/5 dark:border-white/5"></div>
+                                                        
+                                                        <div class="relative z-10 flex flex-col items-center justify-center h-full w-full pt-2">
+                                                            <i
+                                                                v-if="isSeatSelected(getSeatNumber(r - 1, c + 1))"
+                                                                class="fas fa-check text-base sm:text-lg mb-1"
+                                                            ></i>
+                                                            <span
+                                                                v-else
+                                                                class="font-black font-unbounded text-xs sm:text-sm"
+                                                                :class="[
+                                                                    isSeatOccupied(getSeatNumber(r - 1, c + 1))
+                                                                        ? 'text-gray-400'
+                                                                        : 'text-gray-700 dark:text-gray-300 group-hover:text-rose-600'
+                                                                ]"
+                                                            >
+                                                                {{ getSeatNumber(r - 1, c + 1) }}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </button>
                                             </div>
@@ -836,16 +739,13 @@ const busType = computed(() => {
 
                     <!-- Legend -->
                     <div
-                        class="flex justify-center gap-6 flex-wrap mt-8 pt-8 border-t border-gray-100 dark:border-white/5"
+                        class="flex justify-center gap-8 flex-wrap mt-8 pt-8 border-t border-gray-100 dark:border-white/5"
                     >
                         <div class="flex items-center gap-3">
                             <div
-                                class="w-8 h-8 rounded-lg bg-gray-200 dark:bg-white/5 border border-gray-300 dark:border-white/10 flex items-center justify-center p-1"
+                                class="w-8 aspect-[4/5] rounded-md rounded-t-xl bg-gray-200 border-2 border-gray-300 dark:bg-white/5 dark:border-white/10 flex items-center justify-center opacity-70"
                             >
-                                <img
-                                    src="/img/car-seat.png"
-                                    class="w-full h-full object-contain grayscale opacity-50"
-                                />
+                                <i class="fas fa-times text-gray-400 text-[10px]"></i>
                             </div>
                             <span
                                 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-manrope"
@@ -854,12 +754,9 @@ const busType = computed(() => {
                         </div>
                         <div class="flex items-center gap-3">
                             <div
-                                class="w-8 h-8 rounded-lg bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 flex items-center justify-center p-1"
+                                class="w-8 aspect-[4/5] rounded-md rounded-t-xl bg-white dark:bg-[#1a1a1a] border-2 border-gray-200 dark:border-white/10 flex items-center justify-center relative overflow-hidden"
                             >
-                                <img
-                                    src="/img/car-seat.png"
-                                    class="w-full h-full object-contain dark:brightness-90"
-                                />
+                                <div class="absolute top-0 left-0 right-0 h-1/4 bg-black/5 dark:bg-white/5 opacity-50 border-b border-black/5 dark:border-white/5"></div>
                             </div>
                             <span
                                 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-manrope"
@@ -868,15 +765,9 @@ const busType = computed(() => {
                         </div>
                         <div class="flex items-center gap-3">
                             <div
-                                class="w-8 h-8 rounded-lg bg-rose-600 dark:bg-rose-600 ring-2 ring-rose-400 flex items-center justify-center p-1 relative"
+                                class="w-8 aspect-[4/5] rounded-md rounded-t-xl bg-rose-600 border-2 border-rose-600 shadow-md shadow-rose-600/30 flex items-center justify-center"
                             >
-                                <img
-                                    src="/img/car-seat.png"
-                                    class="w-full h-full object-contain brightness-0 invert"
-                                />
-                                <i
-                                    class="fas fa-check-circle absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs"
-                                ></i>
+                                <i class="fas fa-check text-white text-[10px]"></i>
                             </div>
                             <span
                                 class="text-[10px] font-bold text-rose-600 uppercase tracking-wider font-manrope"

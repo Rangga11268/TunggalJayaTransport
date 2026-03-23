@@ -4,6 +4,9 @@ import { Link, usePage } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
 import axios from "axios";
 
+// Global Loading State
+const isLoading = ref(false);
+
 const props = defineProps({
     title: String,
 });
@@ -49,6 +52,17 @@ const markAllAsRead = async () => {
         console.error("Gagal menandai semua notifikasi:", error);
     }
 };
+
+// Initialize router events for loading state
+router.on('start', () => {
+    isLoading.value = true;
+});
+
+router.on('finish', () => {
+    setTimeout(() => {
+        isLoading.value = false;
+    }, 300); // Slight delay for smoother transition
+});
 
 // Initialize dropdowns based on current route
 onMounted(() => {
@@ -1298,8 +1312,28 @@ watch(
                         </div>
                     </TransitionGroup>
                 </div>
+                
+                <!-- Skeleton Loading State -->
+                <div v-if="isLoading" class="w-full space-y-6 animate-pulse">
+                    <!-- Page Header Skeleton -->
+                    <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+                        <div class="bg-gray-200 dark:bg-white/5 rounded-xl h-10 w-48"></div>
+                        <div class="bg-gray-200 dark:bg-white/5 rounded-xl h-10 w-32"></div>
+                    </div>
+                    
+                    <!-- Metrics Row Skeleton -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div v-for="i in 4" :key="i" class="bg-gray-200 dark:bg-white/5 rounded-2xl h-28 w-full shadow-sm"></div>
+                    </div>
+                    
+                    <!-- Main Content Skeleton -->
+                    <div class="bg-gray-200 dark:bg-white/5 rounded-3xl h-[400px] w-full shadow-sm"></div>
+                </div>
 
-                <slot />
+                <!-- Actual Page Content -->
+                <div v-show="!isLoading">
+                    <slot />
+                </div>
             </main>
         </div>
     </div>

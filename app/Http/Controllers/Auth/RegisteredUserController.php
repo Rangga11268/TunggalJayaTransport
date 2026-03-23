@@ -15,10 +15,9 @@ use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
-
-    public function create(): \Inertia\Response
+    public function create(): RedirectResponse
     {
-        return \Inertia\Inertia::render('Auth/Register');
+        return redirect()->route('frontend.home', ['auth' => 'register']);
     }
 
 

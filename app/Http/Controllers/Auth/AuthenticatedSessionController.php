@@ -11,13 +11,9 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    
-    public function create(): \Inertia\Response
+    public function create(): RedirectResponse
     {
-        return \Inertia\Inertia::render('Auth/Login', [
-            'canResetPassword' => \Illuminate\Support\Facades\Route::has('password.request'),
-            'status' => session('status'),
-        ]);
+        return redirect()->route('frontend.home', ['auth' => 'login']);
     }
 
     
