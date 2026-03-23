@@ -27,6 +27,13 @@ class Schedule extends Model
         'days_of_week' => 'array',
     ];
 
+    protected $appends = ['schedule_type'];
+
+    public function getScheduleTypeAttribute()
+    {
+        return $this->is_daily ? 'daily_recurring' : 'daily';
+    }
+
 
     protected static function boot()
     {
