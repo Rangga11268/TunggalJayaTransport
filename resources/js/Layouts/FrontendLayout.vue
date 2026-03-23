@@ -12,6 +12,8 @@ const page = usePage();
 const pageKey = computed(() => page.url || Date.now());
 const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
+const mobileServicesOpen = ref(false);
+const mobileCompanyOpen = ref(false);
 const mobileMenuRef = ref(null);
 const menuButtonRef = ref(null);
 
@@ -705,13 +707,19 @@ const isActive = (routeName) => {
                                     <i class="fas fa-bus text-xl"></i>
                                 </div>
                             </div>
-                            <div class="mb-4">
-                                <h3
-                                    class="px-6 text-[10px] font-black text-rose-600 uppercase tracking-widest font-unbounded mb-4"
+                            <div class="mb-2">
+                                <button
+                                    @click="mobileServicesOpen = !mobileServicesOpen"
+                                    class="w-full flex items-center justify-between px-6 py-3 group"
                                 >
-                                    Layanan
-                                </h3>
-                                <div class="space-y-1 px-2">
+                                    <h3 class="text-[10px] font-black text-rose-600 uppercase tracking-widest font-unbounded text-left mb-0">
+                                        Layanan
+                                    </h3>
+                                    <div class="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-rose-600 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-colors">
+                                        <i :class="mobileServicesOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] transition-transform duration-300"></i>
+                                    </div>
+                                </button>
+                                <div v-show="mobileServicesOpen" class="space-y-1 px-2 pb-2 origin-top">
                                     <Link
                                         v-for="link in serviceLinks"
                                         :key="link.href"
@@ -748,13 +756,19 @@ const isActive = (routeName) => {
                                 </div>
                             </div>
 
-                            <div class="mb-4">
-                                <h3
-                                    class="px-6 text-[10px] font-black text-rose-600 uppercase tracking-widest font-unbounded mb-4"
+                            <div class="mb-2">
+                                <button
+                                    @click="mobileCompanyOpen = !mobileCompanyOpen"
+                                    class="w-full flex items-center justify-between px-6 py-3 group"
                                 >
-                                    Perusahaan
-                                </h3>
-                                <div class="space-y-1 px-2">
+                                    <h3 class="text-[10px] font-black text-rose-600 uppercase tracking-widest font-unbounded text-left mb-0">
+                                        Perusahaan
+                                    </h3>
+                                    <div class="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-rose-600 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-colors">
+                                        <i :class="mobileCompanyOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] transition-transform duration-300"></i>
+                                    </div>
+                                </button>
+                                <div v-show="mobileCompanyOpen" class="space-y-1 px-2 pb-2 origin-top">
                                     <Link
                                         v-for="link in companyLinks"
                                         :key="link.href"
