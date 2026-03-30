@@ -23,9 +23,7 @@ use Carbon\Carbon;
  * @property string $payment_status
  * @property string $booking_status
  * @property Carbon|null $payment_started_at
- * @property string|null $snap_token
  * @property string|null $midtrans_transaction_id
- * @property Carbon|null $check_in_time
  * @property int|null $promo_code_id
  * @property float|string|int $discount_amount
  * @property float|string|int $original_total_price
@@ -50,23 +48,18 @@ class Booking extends Model implements HasMedia
         'payment_status',
         'booking_status',
         'payment_started_at',
-        'snap_token',
         'midtrans_transaction_id',
-        'check_in_time',
         'promo_code_id',
         'discount_amount',
         'original_total_price',
     ];
 
     protected $casts = [
-        'booking_date' => 'date', // Renamed to departure_date in snippet, but original is booking_date. Keeping booking_date as per original.
-        'departure_date' => 'date', // Added from snippet
+        'booking_date' => 'date',
         'payment_started_at' => 'datetime',
         'total_price' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'original_total_price' => 'decimal:2',
-        // 'seat_numbers' => 'array', // Removed as it conflicts with CSV storage
-        'check_in_time' => 'datetime',
     ];
 
     protected $appends = ['departure_time'];
