@@ -40,6 +40,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:' . App\Models
 
     // Atur Rute
     Route::resource('routes', RouteController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
+    Route::get('/routes/geocode', [RouteController::class, 'geocode'])->name('routes.geocode')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
 
     // Kelola Jadwal
     Route::resource('schedules', ScheduleController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);

@@ -1,15 +1,29 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import RouteCoordinatePicker from "@/Components/RouteCoordinatePicker.vue";
 
 const form = useForm({
     name: "",
     origin: "",
     destination: "",
+    origin_lat: null,
+    origin_lng: null,
+    destination_lat: null,
+    destination_lng: null,
+    waypoints: [],
     distance: "",
     duration: "",
     description: "",
 });
+
+const applyCoordinates = (payload) => {
+    form.origin_lat = payload.origin_lat;
+    form.origin_lng = payload.origin_lng;
+    form.destination_lat = payload.destination_lat;
+    form.destination_lng = payload.destination_lng;
+    form.waypoints = payload.waypoints;
+};
 
 const submit = () => {
     form.post(route("admin.routes.store"), {
@@ -211,6 +225,33 @@ const submit = () => {
                             </p>
                         </div>
                     </div>
+                </div>
+
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl shadow-gray-100/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700/50"
+                >
+                    <h3
+                        class="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2"
+                    >
+                        <i class="fas fa-map-marked-alt text-brand-red"></i>
+                        Koordinat Rute
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                        Gunakan nama asal dan tujuan untuk ambil koordinat
+                        otomatis, lalu koreksi titiknya langsung di peta jika
+                        perlu.
+                    </p>
+
+                    <RouteCoordinatePicker
+                        :origin-name="form.origin"
+                        :destination-name="form.destination"
+                        :origin-lat="form.origin_lat"
+                        :origin-lng="form.origin_lng"
+                        :destination-lat="form.destination_lat"
+                        :destination-lng="form.destination_lng"
+                        :waypoints="form.waypoints"
+                        @change="applyCoordinates"
+                    />
                 </div>
 
                 <!-- Action Buttons -->

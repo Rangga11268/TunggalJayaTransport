@@ -15,72 +15,74 @@ const props = defineProps({
 
 const mapContainer = ref(null);
 
-// Mock coordinates for Indonesian cities
-const cityCoords = {
-    Jakarta: [-6.2088, 106.8456],
-    Bandung: [-6.9175, 107.6191],
-    Surabaya: [-7.2575, 112.7521],
-    Semarang: [-7.0051, 110.4381],
-    Yogyakarta: [-7.7956, 110.3695],
-    Solo: [-7.5755, 110.8243],
-    Malang: [-7.9666, 112.6326],
-    Cirebon: [-6.732, 108.5523],
-    Tegal: [-6.8677, 109.1378],
-    Pekalongan: [-6.8886, 109.6753],
-    Purwokerto: [-7.4244, 109.2303],
-    Magelang: [-7.4706, 110.2178],
-    Salatiga: [-7.3305, 110.5084],
-    Kediri: [-7.848, 112.0178],
-    Madiun: [-7.6298, 111.5239],
-    Blitar: [-8.0954, 112.1623],
-    Probolinggo: [-7.7569, 113.2161],
-    Jember: [-8.1724, 113.6995],
-    Banyuwangi: [-8.2192, 114.3691],
-    Kuningan: [-6.9788, 108.4846],
-    Cipali: [-6.6833, 108.4167],
-    Deresan: [-6.2274, 106.8231],
-    Rangkasbitung: [-6.3667, 106.2167],
-    Banten: [-6.1667, 106.1667],
-};
+const defaultCenter = [-2.5489, 118.0149];
+
+function normalizeCoordinate(value) {
+    if (value === null || value === undefined || value === "") {
+        return null;
+    }
+
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? null : parsed;
+}
 
 function getCoordinates() {
+    const originLat = normalizeCoordinate(props.originLat);
+    const originLng = normalizeCoordinate(props.originLng);
+    const destinationLat = normalizeCoordinate(props.destinationLat);
+    const destinationLng = normalizeCoordinate(props.destinationLng);
+
     const originCoord =
-        props.originLat && props.originLng
-            ? [props.originLat, props.originLng]
-            : cityCoords[props.origin] || [-6.2088, 106.8456];
+        originLat !== null && originLng !== null
+            ? [originLat, originLng]
+            : null;
 
     const destCoord =
-        props.destinationLat && props.destinationLng
-            ? [props.destinationLat, props.destinationLng]
-            : cityCoords[props.destination] || [-7.2575, 112.7521];
+        destinationLat !== null && destinationLng !== null
+            ? [destinationLat, destinationLng]
+            : null;
 
     // Build waypoint array
-    let routeCoordinates = [originCoord];
+    const routeCoordinates = [];
+
+    if (originCoord) {
+        routeCoordinates.push(originCoord);
+    }
 
     if (props.waypoints && Array.isArray(props.waypoints)) {
         props.waypoints.forEach((waypoint) => {
-            if (waypoint.lat && waypoint.lng) {
-                routeCoordinates.push([waypoint.lat, waypoint.lng]);
-            } else if (waypoint.name && cityCoords[waypoint.name]) {
-                routeCoordinates.push(cityCoords[waypoint.name]);
+            const lat = normalizeCoordinate(waypoint.lat);
+            const lng = normalizeCoordinate(waypoint.lng);
+
+            if (lat !== null && lng !== null) {
+                routeCoordinates.push([lat, lng]);
             }
         });
     }
 
-    routeCoordinates.push(destCoord);
+    if (destCoord) {
+        routeCoordinates.push(destCoord);
+    }
 
     return { originCoord, destCoord, routeCoordinates };
 }
 
+const coordinatesData = getCoordinates();
+const hasCoordinates = coordinatesData.routeCoordinates.length > 0;
+
 onMounted(() => {
     if (!mapContainer.value) return;
 
-    const { originCoord, destCoord, routeCoordinates } = getCoordinates();
+    if (!hasCoordinates) {
+        return;
+    }
+
+    const { originCoord, destCoord, routeCoordinates } = coordinatesData;
 
     const map = L.map(mapContainer.value, {
         zoomControl: false,
         attributionControl: false,
-    }).setView(originCoord, 7);
+    }).setView(originCoord || destCoord || defaultCenter, 7);
 
     // Dark Mode Tiles (CartoDB Dark Matter)
     L.tileLayer(
@@ -115,13 +117,15 @@ onMounted(() => {
     });
 
     // Add Origin Marker
-    L.marker(originCoord, { icon: originIcon })
-        .addTo(map)
-        .bindPopup(
-            `<b style="color: #22c55e;">📍 ${props.origin}</b>
+    if (originCoord) {
+        L.marker(originCoord, { icon: originIcon })
+            .addTo(map)
+            .bindPopup(
+                `<b style="color: #22c55e;">📍 ${props.origin}</b>
                     <p style="margin: 4px 0; font-size: 12px;">Keberangkatan</p>`,
-        )
-        .openPopup();
+            )
+            .openPopup();
+    }
 
     // Add Waypoint Markers
     if (props.waypoints && Array.isArray(props.waypoints)) {
@@ -144,27 +148,44 @@ onMounted(() => {
     }
 
     // Add Destination Marker
-    L.marker(destCoord, { icon: destIcon }).addTo(map)
-        .bindPopup(`<b style="color: #e11d48;">📍 ${props.destination}</b>
+    if (destCoord) {
+        L.marker(destCoord, { icon: destIcon }).addTo(map)
+            .bindPopup(`<b style="color: #e11d48;">📍 ${props.destination}</b>
                     <p style="margin: 4px 0; font-size: 12px;">Tujuan Akhir</p>`);
+    }
 
     // Draw Polyline (Route Line)
-    const polyline = L.polyline(routeCoordinates, {
-        color: "#e11d48",
-        weight: 3,
-        opacity: 0.8,
-        dashArray: "5, 10",
-        lineCap: "round",
-        lineJoin: "round",
-    }).addTo(map);
+    if (routeCoordinates.length > 1) {
+        const polyline = L.polyline(routeCoordinates, {
+            color: "#e11d48",
+            weight: 3,
+            opacity: 0.8,
+            dashArray: "5, 10",
+            lineCap: "round",
+            lineJoin: "round",
+        }).addTo(map);
 
-    // Fit bounds with padding
-    map.fitBounds(polyline.getBounds(), { padding: [60, 60] });
+        // Fit bounds with padding
+        map.fitBounds(polyline.getBounds(), { padding: [60, 60] });
+    }
 });
 </script>
 
 <template>
-    <div ref="mapContainer" class="w-full h-full min-h-[300px] z-0"></div>
+    <div
+        v-if="hasCoordinates"
+        ref="mapContainer"
+        class="w-full h-full min-h-[300px] z-0"
+    ></div>
+    <div
+        v-else
+        class="w-full h-full min-h-[300px] z-0 flex items-center justify-center text-center p-6 bg-gray-100 dark:bg-[#111] text-gray-500 dark:text-gray-400"
+    >
+        <div>
+            <i class="fas fa-map-marked-alt text-3xl mb-3 opacity-40"></i>
+            <p>Koordinat rute belum diatur admin.</p>
+        </div>
+    </div>
 </template>
 
 <style>

@@ -342,4 +342,6 @@ Catatan untuk Draw.io CSV di atas:
 
 - Model Booking telah disinkronkan dengan migration inti: atribut non-skema (`snap_token`, `check_in_time`, `departure_date`) dihapus dari definisi model.
 - OTP sudah beralih ke pola identifier + method (WA/email), dengan kolom audit attempts dan ip_address.
+- `snap_token` tetap dipakai sebagai payload runtime dari proses pembayaran Midtrans, bukan sebagai kolom tersimpan di tabel `bookings`.
+- `departure_date` dipakai di form/controller jadwal admin sebagai input tanggal operasional, bukan field pada tabel `bookings`.
 - Status saat ini: tidak ada mismatch mayor model-vs-migration pada tabel utama yang dipetakan di dokumen ini.

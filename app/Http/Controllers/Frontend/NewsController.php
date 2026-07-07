@@ -24,7 +24,7 @@ class NewsController extends Controller
         
         $categories = Category::all();
 
-        if ($request->wantsJson() || $request->ajax()) {
+        if (!$request->header('X-Inertia') && ($request->wantsJson() || $request->ajax())) {
             return response()->json([
                 'articles' => $articles,
                 'categories' => $categories,
