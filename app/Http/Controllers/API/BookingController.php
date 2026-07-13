@@ -199,6 +199,10 @@ class BookingController extends Controller
                     'seat_numbers' => implode(',', $request->seat_numbers),
                 ]);
 
+                foreach ($request->seat_numbers as $seat) {
+                    broadcast(new \App\Events\SeatLocked($schedule->id, $seat, true));
+                }
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Kursi berhasil dipilih',
