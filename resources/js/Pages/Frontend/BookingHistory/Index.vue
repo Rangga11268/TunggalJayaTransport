@@ -60,263 +60,164 @@ const getStatusBadge = (status) => {
 <template>
     <Head title="Riwayat Pemesanan" />
 
-    <div
-        class="bg-gray-50 dark:bg-[#050505] min-h-screen font-sans selection:bg-rose-600 selection:text-white pb-32"
-    >
-        <!-- Dashboard Header -->
-        <div
-            class="relative pt-24 md:pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden"
-        >
-            <!-- Abstract Decor -->
-            <div
-                class="absolute top-0 right-0 w-[400px] h-[400px] bg-rose-600/5 rounded-full blur-[100px] -z-10"
-            ></div>
-
-            <span
-                class="inline-block py-1 px-3 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-600 border border-rose-100 dark:border-rose-900/20 text-xs font-bold tracking-widest uppercase mb-6 font-unbounded"
-            >
+    <div class="min-h-screen bg-[#fcf9f8] pb-32">
+        <!-- Header -->
+        <div class="pt-28 pb-8 px-4 sm:px-6 lg:px-8 text-center">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-white border border-[#ebe7e7] text-[#10207a] text-[11px] font-bold tracking-widest uppercase mb-5 shadow-sm">
                 Dashboard Penumpang
             </span>
-            <h1
-                class="text-3xl sm:text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 font-unbounded"
-            >
-                Riwayat <span class="text-rose-600">Perjalanan</span>
-            </h1>
-            <p
-                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto "
-            >
-                Pantau status tiket dan kelola riwayat perjalanan Anda di satu
-                tempat yang aman.
-            </p>
+            <h1 class="font-unbounded font-black text-4xl md:text-5xl text-[#1c1b1b] mb-3">Riwayat Perjalanan</h1>
+            <p class="text-[#454652] text-[16px] max-w-xl mx-auto">Pantau status tiket dan kelola riwayat perjalanan Anda di satu tempat.</p>
         </div>
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-            
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Stats Summary -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white border border-[#ebe7e7] rounded-[12px] p-5 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-[#1c1b1b] font-unbounded">{{ bookings.data?.length || 0 }}</div>
+                    <div class="text-[11px] text-[#454652] uppercase tracking-wider font-semibold mt-1">Total Tiket</div>
+                </div>
+                <div class="bg-white border border-[#ebe7e7] rounded-[12px] p-5 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-emerald-600 font-unbounded">{{ bookings.data?.filter(b => b.payment_status === 'paid').length || 0 }}</div>
+                    <div class="text-[11px] text-[#454652] uppercase tracking-wider font-semibold mt-1">Lunas</div>
+                </div>
+                <div class="bg-white border border-[#ebe7e7] rounded-[12px] p-5 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-amber-600 font-unbounded">{{ bookings.data?.filter(b => b.payment_status === 'pending').length || 0 }}</div>
+                    <div class="text-[11px] text-[#454652] uppercase tracking-wider font-semibold mt-1">Menunggu</div>
+                </div>
+                <div class="bg-white border border-[#ebe7e7] rounded-[12px] p-5 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-[#10207a] font-unbounded">{{ charter_bookings?.data?.length || 0 }}</div>
+                    <div class="text-[11px] text-[#454652] uppercase tracking-wider font-semibold mt-1">Sewa Bus</div>
+                </div>
+            </div>
+
             <!-- Tabs -->
-            <div class="flex flex-wrap justify-center gap-4 mb-10">
-                <button 
-                    @click="activeTab = 'reguler'" 
-                    class="px-6 py-3 rounded-full font-bold transition-all"
-                    :class="activeTab === 'reguler' ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30' : 'bg-white dark:bg-[#111] text-gray-500 hover:text-gray-900 dark:hover:text-white'"
-                >
+            <div class="flex gap-2 mb-8">
+                <button @click="activeTab = 'reguler'"
+                    class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border"
+                    :class="activeTab === 'reguler' ? 'bg-[#10207a] text-white border-[#10207a] shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
                     Tiket Reguler
                 </button>
-                <button 
-                    @click="activeTab = 'charter'" 
-                    class="px-6 py-3 rounded-full font-bold transition-all"
-                    :class="activeTab === 'charter' ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30' : 'bg-white dark:bg-[#111] text-gray-500 hover:text-gray-900 dark:hover:text-white'"
-                >
+                <button @click="activeTab = 'charter'"
+                    class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border"
+                    :class="activeTab === 'charter' ? 'bg-[#10207a] text-white border-[#10207a] shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
                     Sewa Pariwisata
                 </button>
             </div>
 
             <!-- Empty State -->
-            <div
-                v-if="(activeTab === 'reguler' && bookings.data.length === 0) || (activeTab === 'charter' && charter_bookings?.data.length === 0)"
-                class="bg-white dark:bg-[#111] rounded-[2.5rem] p-16 text-center shadow-xl border border-gray-100 dark:border-white/5"
-            >
-                <div
-                    class="w-24 h-24 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8"
-                >
-                    <i
-                        class="text-4xl text-gray-200 dark:text-white/10"
-                        :class="activeTab === 'reguler' ? 'fas fa-ticket-alt' : 'fas fa-umbrella-beach'"
-                    ></i>
+            <div v-if="(activeTab === 'reguler' && (!bookings.data || bookings.data.length === 0)) || (activeTab === 'charter' && (!charter_bookings?.data || charter_bookings.data.length === 0))"
+                class="bg-white border border-[#ebe7e7] rounded-[12px] p-16 text-center shadow-sm">
+                <div class="w-20 h-20 bg-[#f6f3f2] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="text-3xl text-gray-300" :class="activeTab === 'reguler' ? 'fas fa-ticket-alt' : 'fas fa-umbrella-beach'"></i>
                 </div>
-                <h3
-                    class="text-2xl font-black font-unbounded text-gray-900 dark:text-white mb-4"
-                >
-                    Belum Ada {{ activeTab === 'reguler' ? 'Tiket' : 'Sewa Pariwisata' }}
-                </h3>
-                <p
-                    class="text-gray-500 dark:text-gray-400 mb-10 max-w-sm mx-auto "
-                >
-                    Sepertinya Anda belum memiliki riwayat pemesanan di kategori ini. Mulai perjalanan baru sekarang!
-                </p>
-                <Link
-                    :href="activeTab === 'reguler' ? route('booking.index') : route('frontend.charter.index')"
-                    class="inline-flex py-4 px-10 bg-rose-600 text-white font-black font-unbounded rounded-2xl shadow-lg shadow-rose-600/30 hover:bg-rose-700 hover:scale-[1.02] transition-all duration-300"
-                >
-                    {{ activeTab === 'reguler' ? 'Pesan Tiket Sekarang' : 'Sewa Bus Pariwisata' }}
+                <h3 class="text-xl font-bold text-[#1c1b1b] mb-3">Belum Ada {{ activeTab === 'reguler' ? 'Tiket' : 'Sewa Pariwisata' }}</h3>
+                <p class="text-[#454652] text-sm mb-8">Mulai perjalanan baru sekarang!</p>
+                <Link :href="activeTab === 'reguler' ? route('frontend.booking.index') : route('frontend.charter.index')"
+                    class="inline-block px-8 py-3.5 bg-[#10207a] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#0c185e] transition-all shadow-sm">
+                    {{ activeTab === 'reguler' ? 'Pesan Tiket' : 'Sewa Bus Pariwisata' }}
                 </Link>
             </div>
 
             <!-- Booking List -->
-            <div v-else class="space-y-8">
-                <!-- Reguler List -->
-                <div v-if="activeTab === 'reguler'" class="space-y-8">
-                    <div
-                        v-for="booking in bookings.data"
-                    :key="booking.id"
-                    class="group relative bg-white dark:bg-[#111] rounded-[2.5rem] p-6 md:p-8 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-rose-600/10 transition-all duration-500"
-                >
-                    <div
-                        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8"
-                    >
-                        <!-- Route & Time Flow -->
-                        <div class="flex-grow">
-                            <div class="flex items-center gap-3 mb-6">
-                                <span
-                                    class="text-[10px] font-black px-3 py-1 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-400 dark:text-gray-500 uppercase tracking-widest font-unbounded border border-gray-100 dark:border-white/10"
-                                >
-                                    {{ booking.booking_code }}
-                                </span>
-
-                                <span
-                                    v-if="booking.payment_status === 'paid'"
-                                    class="text-[10px] font-black px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400 uppercase tracking-widest font-unbounded border border-emerald-100 dark:border-emerald-900/20"
-                                >
-                                    Lunas
-                                </span>
-                                <span
-                                    v-else
-                                    class="text-[10px] font-black px-3 py-1 rounded-lg bg-amber-50 dark:bg-amber-900/10 text-amber-600 dark:text-amber-400 uppercase tracking-widest font-unbounded border border-amber-100 dark:border-amber-900/20"
-                                >
-                                    {{
-                                        booking.payment_status === "pending"
-                                            ? "Menunggu"
-                                            : booking.payment_status
-                                    }}
-                                </span>
-                            </div>
-
-                            <div
-                                class="flex items-center gap-4 md:gap-6 mb-6 overflow-hidden"
-                            >
-                                <div
-                                    class="text-lg md:text-2xl font-black text-gray-900 dark:text-white font-unbounded leading-none truncate"
-                                >
-                                    {{ booking.schedule?.route?.origin }}
+            <div v-else class="space-y-4">
+                <!-- Reguler -->
+                <div v-if="activeTab === 'reguler'" class="space-y-4">
+                    <div v-for="booking in bookings.data" :key="booking.id"
+                        class="bg-white border border-[#ebe7e7] rounded-[12px] p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+                            <div class="flex-grow w-full md:w-auto">
+                                <!-- Top row: code + status -->
+                                <div class="flex items-center gap-2.5 mb-4 flex-wrap">
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-[#f6f3f2] text-[#454652] uppercase tracking-wider border border-[#ebe7e7]">
+                                        {{ booking.booking_code }}
+                                    </span>
+                                    <span v-if="booking.payment_status === 'paid'"
+                                        class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 uppercase tracking-wider border border-emerald-200">
+                                        Lunas
+                                    </span>
+                                    <span v-else
+                                        class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 uppercase tracking-wider border border-amber-200">
+                                        {{ booking.payment_status === 'pending' ? 'Menunggu' : booking.payment_status }}
+                                    </span>
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider border"
+                                        :class="booking.booking_status === 'confirmed' ? 'bg-blue-50 text-blue-700 border-blue-200' : booking.booking_status === 'completed' ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-gray-50 text-gray-600 border-gray-200'">
+                                        {{ booking.booking_status }}
+                                    </span>
                                 </div>
-                                <div
-                                    class="flex flex-col items-center justify-center flex-shrink-0 w-8 md:w-12"
-                                >
-                                    <div
-                                        class="h-[2px] w-full bg-rose-600/20 relative"
-                                    >
-                                        <div
-                                            class="absolute right-0 -top-[3px] w-2 h-2 rounded-full bg-rose-600 shadow-[0_0_10px_rgba(225,29,72,0.8)]"
-                                        ></div>
+
+                                <!-- Route -->
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="font-bold text-[#1c1b1b] text-[18px] truncate">{{ booking.schedule?.route?.origin }}</div>
+                                    <div class="flex flex-col items-center shrink-0">
+                                        <div class="w-10 h-[2px] bg-[#10207a]/20 relative">
+                                            <div class="absolute right-0 -top-[4px] w-[10px] h-[10px] rounded-full bg-[#10207a]"></div>
+                                        </div>
                                     </div>
+                                    <div class="font-bold text-[#1c1b1b] text-[18px] text-right truncate">{{ booking.schedule?.route?.destination }}</div>
                                 </div>
-                                <div
-                                    class="text-lg md:text-2xl font-black text-gray-900 dark:text-white font-unbounded leading-none text-right truncate"
-                                >
-                                    {{ booking.schedule?.route?.destination }}
+
+                                <!-- Meta -->
+                                <div class="flex flex-wrap items-center gap-4 text-[13px] text-[#454652]">
+                                    <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-[#10207a] text-[11px]"></i> {{ formatDate(booking.booking_date) }}</span>
+                                    <span class="flex items-center gap-1.5"><i class="far fa-clock text-[#10207a] text-[11px]"></i> {{ formatTime(booking.schedule?.departure_time) }} WIB</span>
+                                    <span class="flex items-center gap-1.5"><i class="fas fa-bus text-[#10207a] text-[11px]"></i> {{ booking.schedule?.bus?.name || 'Armada' }}</span>
+                                    <span class="flex items-center gap-1.5"><i class="fas fa-chair text-[#10207a] text-[11px]"></i> {{ booking.seat_numbers || '-' }}</span>
                                 </div>
                             </div>
 
-                            <div
-                                class="flex flex-wrap items-center gap-6 text-sm text-gray-400  font-bold"
-                            >
-                                <div class="flex items-center gap-2">
-                                    <i
-                                        class="far fa-calendar-alt text-rose-600"
-                                    ></i>
-                                    {{ formatDate(booking.booking_date) }}
+                            <!-- Price & Action -->
+                            <div class="flex flex-row md:flex-col items-center md:items-end justify-between md:border-l md:border-[#ebe7e7] md:pl-6 w-full md:w-auto gap-4 md:gap-3">
+                                <div class="text-right">
+                                    <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider">Total</div>
+                                    <div class="text-xl font-bold text-[#10207a] font-unbounded">{{ formatCurrency(booking.total_price) }}</div>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="far fa-clock text-rose-600"></i>
-                                    {{
-                                        formatTime(
-                                            booking.schedule?.departure_time
-                                        )
-                                    }}
-                                    WIB
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-bus text-rose-600"></i>
-                                    {{
-                                        booking.schedule?.bus?.name ||
-                                        "Armada Utama"
-                                    }}
-                                </div>
+                                <Link :href="route('booking-history.show', booking.id)"
+                                    class="px-6 py-2.5 bg-[#10207a] text-white rounded-[10px] font-bold text-[12px] hover:bg-[#0c185e] transition-all shadow-sm text-center whitespace-nowrap">
+                                    Detail
+                                </Link>
                             </div>
-                        </div>
-
-                        <!-- Price & Action -->
-                        <div
-                            class="flex flex-col items-end md:border-l md:border-gray-100 md:dark:border-white/5 md:pl-10 w-full md:w-auto"
-                        >
-                            <div
-                                class="text-xs font-bold text-gray-400 uppercase tracking-widest font-unbounded mb-1"
-                            >
-                                Total Bayar
-                            </div>
-                            <div
-                                class="text-2xl md:text-3xl font-black text-rose-600 font-unbounded mb-6"
-                            >
-                                {{ formatCurrency(booking.total_price) }}
-                            </div>
-                            <Link
-                                :href="
-                                    route('booking-history.show', booking.id)
-                                "
-                                class="w-full md:w-auto py-3 px-8 bg-black dark:bg-white text-white dark:text-black font-black font-unbounded text-xs rounded-xl hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white transition-all duration-300 text-center"
-                            >
-                                Detail Tiket
-                            </Link>
                         </div>
                     </div>
                 </div>
-                </div>
 
-                <!-- Charter List -->
-                <div v-if="activeTab === 'charter'" class="space-y-8">
-                    <div
-                        v-for="charter in charter_bookings.data"
-                        :key="charter.id"
-                        class="group relative bg-white dark:bg-[#111] rounded-[2.5rem] p-6 md:p-8 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-rose-600/10 transition-all duration-500"
-                    >
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-                            <div class="flex-grow">
-                                <div class="flex items-center gap-3 mb-6">
-                                    <span class="text-[10px] font-black px-3 py-1 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-400 dark:text-gray-500 uppercase tracking-widest font-unbounded border border-gray-100 dark:border-white/10">
+                <!-- Charter -->
+                <div v-if="activeTab === 'charter'" class="space-y-4">
+                    <div v-for="charter in charter_bookings.data" :key="charter.id"
+                        class="bg-white border border-[#ebe7e7] rounded-[12px] p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+                            <div class="flex-grow w-full md:w-auto">
+                                <div class="flex items-center gap-2.5 mb-4 flex-wrap">
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-[#f6f3f2] text-[#454652] uppercase tracking-wider border border-[#ebe7e7]">
                                         {{ charter.charter_code }}
                                     </span>
-                                    <span
-                                        class="text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest font-unbounded border"
-                                        :class="getStatusBadge(charter.status)"
-                                    >
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider border"
+                                        :class="getStatusBadge(charter.status)">
                                         {{ charter.status }}
                                     </span>
                                 </div>
 
-                                <div class="flex items-center gap-4 md:gap-6 mb-6 overflow-hidden">
-                                    <div class="text-lg md:text-2xl font-black text-gray-900 dark:text-white font-unbounded leading-none truncate">
-                                        {{ charter.pickup_location }}
-                                    </div>
-                                    <div class="flex flex-col items-center justify-center flex-shrink-0 w-8 md:w-12">
-                                        <div class="h-[2px] w-full bg-rose-600/20 relative">
-                                            <div class="absolute right-0 -top-[3px] w-2 h-2 rounded-full bg-rose-600 shadow-[0_0_10px_rgba(225,29,72,0.8)]"></div>
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="font-bold text-[#1c1b1b] text-[18px] truncate">{{ charter.pickup_location }}</div>
+                                    <div class="flex flex-col items-center shrink-0">
+                                        <div class="w-10 h-[2px] bg-[#10207a]/20 relative">
+                                            <div class="absolute right-0 -top-[4px] w-[10px] h-[10px] rounded-full bg-[#10207a]"></div>
                                         </div>
                                     </div>
-                                    <div class="text-lg md:text-2xl font-black text-gray-900 dark:text-white font-unbounded leading-none text-right truncate">
-                                        {{ charter.destination }}
-                                    </div>
+                                    <div class="font-bold text-[#1c1b1b] text-[18px] text-right truncate">{{ charter.destination }}</div>
                                 </div>
 
-                                <div class="flex flex-wrap items-center gap-6 text-sm text-gray-400  font-bold">
-                                    <div class="flex items-center gap-2">
-                                        <i class="far fa-calendar-alt text-rose-600"></i>
-                                        {{ formatDate(charter.pickup_date) }} - {{ formatDate(charter.return_date) }}
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <i class="fas fa-bus text-rose-600"></i>
-                                        {{ charter.bus_type_requested }}
-                                    </div>
+                                <div class="flex flex-wrap items-center gap-4 text-[13px] text-[#454652]">
+                                    <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-[#10207a] text-[11px]"></i> {{ formatDate(charter.pickup_date) }} - {{ formatDate(charter.return_date) }}</span>
+                                    <span class="flex items-center gap-1.5"><i class="fas fa-bus text-[#10207a] text-[11px]"></i> {{ charter.bus_type_requested }}</span>
                                 </div>
                             </div>
 
-                            <div class="flex flex-col items-end md:border-l md:border-gray-100 md:dark:border-white/5 md:pl-10 w-full md:w-auto">
-                                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest font-unbounded mb-1">
-                                    Total / DP
-                                </div>
-                                <div class="text-xl md:text-2xl font-black text-rose-600 font-unbounded mb-1">
-                                    {{ charter.total_price > 0 ? formatCurrency(charter.total_price) : 'Menunggu Harga' }}
-                                </div>
-                                <div class="text-xs text-gray-500 mb-6" v-if="charter.down_payment > 0">
-                                    DP: {{ formatCurrency(charter.down_payment) }}
+                            <div class="flex flex-row md:flex-col items-center md:items-end justify-between md:border-l md:border-[#ebe7e7] md:pl-6 w-full md:w-auto gap-4 md:gap-3">
+                                <div class="text-right">
+                                    <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider">Total / DP</div>
+                                    <div class="text-lg font-bold text-[#10207a] font-unbounded">{{ charter.total_price > 0 ? formatCurrency(charter.total_price) : 'Menunggu' }}</div>
+                                    <div v-if="charter.down_payment > 0" class="text-[11px] text-[#454652]">DP: {{ formatCurrency(charter.down_payment) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -325,23 +226,15 @@ const getStatusBadge = (status) => {
             </div>
 
             <!-- Pagination -->
-            <div
-                v-if="bookings.next_page_url || bookings.prev_page_url"
-                class="mt-16 flex justify-center gap-4"
-            >
-                <Link
-                    v-if="bookings.prev_page_url"
-                    :href="bookings.prev_page_url"
-                    class="px-8 py-4 bg-white dark:bg-[#111] rounded-2xl border border-gray-100 dark:border-white/5 text-gray-600 dark:text-gray-300 font-black font-unbounded text-xs hover:border-rose-600 transition-all shadow-xl"
-                >
-                    <i class="fas fa-chevron-left mr-2"></i> Sebelumnya
+            <div v-if="activeTab === 'reguler' && (bookings.next_page_url || bookings.prev_page_url)"
+                class="mt-10 flex justify-center gap-3">
+                <Link v-if="bookings.prev_page_url" :href="bookings.prev_page_url"
+                    class="px-6 py-3 bg-white border border-[#ebe7e7] rounded-[10px] text-[#454652] font-semibold text-[13px] hover:border-gray-300 transition-all shadow-sm">
+                    <i class="fas fa-chevron-left mr-1.5"></i> Sebelumnya
                 </Link>
-                <Link
-                    v-if="bookings.next_page_url"
-                    :href="bookings.next_page_url"
-                    class="px-8 py-4 bg-white dark:bg-[#111] rounded-2xl border border-gray-100 dark:border-white/5 text-gray-600 dark:text-gray-300 font-black font-unbounded text-xs hover:border-rose-600 transition-all shadow-xl"
-                >
-                    Selanjutnya <i class="fas fa-chevron-right ml-2"></i>
+                <Link v-if="bookings.next_page_url" :href="bookings.next_page_url"
+                    class="px-6 py-3 bg-white border border-[#ebe7e7] rounded-[10px] text-[#454652] font-semibold text-[13px] hover:border-gray-300 transition-all shadow-sm">
+                    Selanjutnya <i class="fas fa-chevron-right ml-1.5"></i>
                 </Link>
             </div>
         </div>

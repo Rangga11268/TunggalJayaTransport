@@ -14,8 +14,18 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Get featured routes (limit to 3)
-        $featuredRoutes = BusRoute::limit(3)->get();
+        // Get featured routes with schedules & starting price
+        $featuredRoutes = BusRoute::whereHas('schedules', function ($q) {
+            $q->where('status', 'active');
+        })->limit(3)->get()->map(function ($route) {
+            $minPrice = \App\Models\Schedule::where('route_id', $route->id)
+                ->where('status', 'active')->min('price');
+            $firstSchedule = \App\Models\Schedule::where('route_id', $route->id)
+                ->where('status', 'active')->with('bus')->first();
+            $route->starting_price = (float) $minPrice;
+            $route->bus_type = $firstSchedule?->bus?->bus_type ?? 'Executive';
+            return $route;
+        });
 
         // Get latest news (limit to 3)
         $latestNews = NewsArticle::with('category')

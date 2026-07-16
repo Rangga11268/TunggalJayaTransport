@@ -252,85 +252,22 @@ const getInitial = (name) => {
 
                 <div class="w-full overflow-x-auto pb-8 snap-x">
                     <div class="flex gap-[24px] w-max">
-                        <!-- Example Card 1 -->
-                        <div class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[360px] flex flex-col p-6 snap-center">
+                        <div v-for="item in featuredRoutes" :key="item.id"
+                            class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[360px] flex flex-col p-6 snap-center">
                             <div class="flex items-center justify-between w-full mb-6">
-                                <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">Eksekutif</span>
+                                <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">{{ item.bus_type || 'Executive' }}</span>
                                 <i class="fas fa-star text-yellow-400"></i>
                             </div>
                             <div class="flex items-center gap-4 mb-4">
-                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Kuningan</span>
-                                <i class="fas fa-arrow-right text-gray-400"></i>
-                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Jakarta</span>
+                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[18px] min-w-0 truncate">{{ item.origin }}</span>
+                                <i class="fas fa-arrow-right text-gray-400 shrink-0"></i>
+                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[18px] min-w-0 truncate">{{ item.destination }}</span>
                             </div>
-                            <p class="font-normal text-[#454652] text-[16px] mb-6">Keberangkatan Pagi & Malam</p>
+                            <p class="font-normal text-[#454652] text-[16px] mb-6">Keberangkatan tersedia setiap hari</p>
                             <div class="border-t border-[#ebe7e7] pt-4 mt-auto">
                                 <p class="font-bold text-[#454652] text-[12px] tracking-wider uppercase mb-1">Mulai Dari</p>
-                                <p class="font-unbounded font-semibold text-[#10207a] text-[24px]">Rp 150.000</p>
-                                <Link :href="route('frontend.booking.index', { origin: 'Kuningan', destination: 'Jakarta' })" class="mt-4 w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center block hover:bg-[#0c185e] transition-colors">
-                                    Pesan Tiket
-                                </Link>
-                            </div>
-                        </div>
-
-                        <!-- Example Card 2 -->
-                        <div class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[360px] flex flex-col p-6 snap-center">
-                            <div class="flex items-center justify-between w-full mb-6">
-                                <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">Super Eksekutif</span>
-                                <i class="fas fa-star text-yellow-400"></i>
-                            </div>
-                            <div class="flex items-center gap-4 mb-4">
-                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Cirebon</span>
-                                <i class="fas fa-arrow-right text-gray-400"></i>
-                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Bandung</span>
-                            </div>
-                            <p class="font-normal text-[#454652] text-[16px] mb-6">Via Tol Cipali</p>
-                            <div class="border-t border-[#ebe7e7] pt-4 mt-auto">
-                                <p class="font-bold text-[#454652] text-[12px] tracking-wider uppercase mb-1">Mulai Dari</p>
-                                <p class="font-unbounded font-semibold text-[#10207a] text-[24px]">Rp 120.000</p>
-                                <Link :href="route('frontend.booking.index', { origin: 'Cirebon', destination: 'Bandung' })" class="mt-4 w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center block hover:bg-[#0c185e] transition-colors">
-                                    Pesan Tiket
-                                </Link>
-                            </div>
-                        </div>
-
-                        <!-- Example Card 3 -->
-                        <div class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[360px] flex flex-col p-6 snap-center">
-                            <div class="flex items-center justify-between w-full mb-6">
-                                <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">Eksekutif</span>
-                                <i class="fas fa-star text-yellow-400"></i>
-                            </div>
-                            <div class="flex items-center gap-4 mb-4">
-                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Majalengka</span>
-                                <i class="fas fa-arrow-right text-gray-400"></i>
-                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Bekasi</span>
-                            </div>
-                            <p class="font-normal text-[#454652] text-[16px] mb-6">Keberangkatan Sore</p>
-                            <div class="border-t border-[#ebe7e7] pt-4 mt-auto">
-                                <p class="font-bold text-[#454652] text-[12px] tracking-wider uppercase mb-1">Mulai Dari</p>
-                                <p class="font-unbounded font-semibold text-[#10207a] text-[24px]">Rp 130.000</p>
-                                <Link :href="route('frontend.booking.index', { origin: 'Majalengka', destination: 'Bekasi' })" class="mt-4 w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center block hover:bg-[#0c185e] transition-colors">
-                                    Pesan Tiket
-                                </Link>
-                            </div>
-                        </div>
-
-                        <!-- Example Card 4 -->
-                        <div class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[360px] flex flex-col p-6 snap-center">
-                            <div class="flex items-center justify-between w-full mb-6">
-                                <span class="bg-[#f3e72b] text-[#1e1c00] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">Sleeper</span>
-                                <i class="fas fa-star text-yellow-400"></i>
-                            </div>
-                            <div class="flex items-center gap-4 mb-4">
-                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Kuningan</span>
-                                <i class="fas fa-arrow-right text-gray-400"></i>
-                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Tangerang</span>
-                            </div>
-                            <p class="font-normal text-[#454652] text-[16px] mb-6">Fasilitas Penuh</p>
-                            <div class="border-t border-[#ebe7e7] pt-4 mt-auto">
-                                <p class="font-bold text-[#454652] text-[12px] tracking-wider uppercase mb-1">Mulai Dari</p>
-                                <p class="font-unbounded font-semibold text-[#10207a] text-[24px]">Rp 250.000</p>
-                                <Link :href="route('frontend.booking.index', { origin: 'Kuningan', destination: 'Tangerang' })" class="mt-4 w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center block hover:bg-[#0c185e] transition-colors">
+                                <p class="font-unbounded font-semibold text-[#10207a] text-[24px]">{{ item.starting_price ? 'Rp ' + new Intl.NumberFormat('id-ID').format(item.starting_price) : '-' }}</p>
+                                <Link :href="route('frontend.booking.index', { origin: item.origin, destination: item.destination })" class="mt-4 w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center block hover:bg-[#0c185e] transition-colors">
                                     Pesan Tiket
                                 </Link>
                             </div>
