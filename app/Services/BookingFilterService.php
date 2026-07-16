@@ -41,7 +41,7 @@ class BookingFilterService
             }
         }
         // Use effective date if provided, otherwise default to today
-        $referenceDate = $effectiveDate ?? Carbon::today();
+        $referenceDate = $effectiveDate ?? Carbon::today('Asia/Jakarta');
 
         // Filter by origin (via route)
         if ($origin) {
@@ -192,9 +192,9 @@ class BookingFilterService
         try {
             $bookingDate = $date instanceof Carbon
                 ? $date
-                : ($date ? Carbon::parse($date) : Carbon::today());
+                : ($date ? Carbon::parse($date) : Carbon::today('Asia/Jakarta'));
         } catch (\Exception $e) {
-            $bookingDate = Carbon::today();
+            $bookingDate = Carbon::today('Asia/Jakarta');
         }
 
         $bookedCount = $schedule->bookings()

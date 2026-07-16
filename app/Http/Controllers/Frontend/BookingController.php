@@ -44,7 +44,7 @@ class BookingController extends Controller
         }
 
         // If no date selected, use today as baseline untuk availability check
-        $referenceDate = $effectiveDate ?? Carbon::today();
+        $referenceDate = $effectiveDate ?? Carbon::today('Asia/Jakarta');
 
         $schedules = collect();
         $validPair = false;
@@ -313,7 +313,7 @@ class BookingController extends Controller
         $origin = $request->get('origin');
         $destination = $request->get('destination');
         $dateParam = $request->get('date');
-        $searchDate = $dateParam ? Carbon::parse($dateParam) : Carbon::today();
+        $searchDate = $dateParam ? Carbon::parse($dateParam) : Carbon::today('Asia/Jakarta');
         $classes = $request->get('class') ? explode(',', $request->get('class')) : [];
         $times = $request->get('time') ? explode(',', $request->get('time')) : [];
 

@@ -92,7 +92,7 @@ class BookingController extends Controller
 
         $bookingDate = $request->date
             ? Carbon::parse($request->date)
-            : ($schedule->is_daily ? Carbon::today() : $schedule->departure_time);
+            : ($schedule->is_daily ? Carbon::today('Asia/Jakarta') : $schedule->departure_time);
 
         $availableSeats = $schedule->getAvailableSeatsCount($bookingDate);
 

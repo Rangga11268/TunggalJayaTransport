@@ -15,7 +15,7 @@ class ScheduleController extends Controller
         $origin = $request->get('origin');
         $destination = $request->get('destination');
         $dateParam = $request->get('date');
-        $searchDate = $dateParam ? Carbon::parse($dateParam) : Carbon::today();
+        $searchDate = $dateParam ? Carbon::parse($dateParam) : Carbon::today('Asia/Jakarta');
 
         $query = Schedule::with(['bus', 'route'])
             ->available()
@@ -99,7 +99,7 @@ class ScheduleController extends Controller
         }
 
         $dateParam = $request->get('date');
-        $checkDate = $dateParam ? Carbon::parse($dateParam) : Carbon::today();
+        $checkDate = $dateParam ? Carbon::parse($dateParam) : Carbon::today('Asia/Jakarta');
 
         if ($schedule->hasDeparted($checkDate)) {
             return response()->json([
