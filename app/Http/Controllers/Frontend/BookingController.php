@@ -274,6 +274,7 @@ class BookingController extends Controller
                     'bus_type' => $schedule->bus->bus_type,
                     'plate_number' => $schedule->bus->plate_number,
                     'capacity' => $schedule->bus->capacity,
+                    'image_url' => $schedule->bus->image_url,
                 ],
                 'route' => $schedule->route,
             ];
@@ -422,6 +423,7 @@ class BookingController extends Controller
                     'capacity' => $schedule->bus->capacity,
                     'plate_number' => $schedule->bus->plate_number,
                     'bus_type' => $schedule->bus->bus_type,
+                    'image_url' => $schedule->bus->image_url,
                 ],
                 'route' => [
                     'origin' => $schedule->route->origin,

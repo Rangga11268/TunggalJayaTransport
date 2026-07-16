@@ -71,6 +71,7 @@ class ScheduleController extends Controller
                     'type' => $schedule->bus->bus_type,
                     'capacity' => $schedule->bus->capacity,
                     'plate_number' => $schedule->bus->plate_number,
+                    'image_url' => $schedule->bus->image_url,
                 ],
                 'route' => [
                     'id' => $schedule->route->id,

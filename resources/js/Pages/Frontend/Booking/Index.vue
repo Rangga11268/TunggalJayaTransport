@@ -352,9 +352,14 @@ watch(
 
                 <!-- Schedule Cards -->
                 <div v-else class="flex flex-col gap-6">
-                    <div v-for="schedule in displaySchedules" :key="schedule.id" class="bg-white border border-[#ebe7e7] rounded-[16px] p-6 flex flex-col md:flex-row gap-6 hover:shadow-lg transition-shadow">
+                    <div v-for="schedule in displaySchedules" :key="schedule.id" class="bg-white border border-[#ebe7e7] rounded-[16px] p-5 flex flex-col md:flex-row gap-5 hover:shadow-lg transition-shadow">
+                        <!-- Bus Image -->
+                        <div class="w-full md:w-[160px] h-[140px] rounded-[12px] overflow-hidden bg-[#f6f3f2] flex-shrink-0">
+                            <img :src="schedule.bus?.image_url || '/img/noImg.png'" :alt="schedule.bus?.name"
+                                class="w-full h-full object-cover" />
+                        </div>
                         <!-- Left Info -->
-                        <div class="flex-1 flex flex-col gap-4 border-b md:border-b-0 md:border-r border-[#ebe7e7] pb-4 md:pb-0 md:pr-6">
+                        <div class="flex-1 flex flex-col gap-3 border-b md:border-b-0 md:border-r border-[#ebe7e7] pb-4 md:pb-0 md:pr-5">
                             <div class="flex justify-between items-center">
                                 <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">
                                     {{ schedule.bus?.bus_type || 'Executive' }}
