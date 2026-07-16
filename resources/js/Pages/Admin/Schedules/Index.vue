@@ -4,6 +4,7 @@ import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { useBulkDelete } from "@/Composables/useBulkDelete.js";
 
 const props = defineProps({
     schedules: Object,
@@ -11,8 +12,36 @@ const props = defineProps({
 });
 
 const search = ref(props.filters?.search || "");
-const localSchedules = ref(props.schedules); // Reactive local state for schedules data
+const localSchedules = ref(props.schedules);
+const { selectedIds, selectAll } = useBulkDelete(localSchedules);
 let timeout = null;
+
+const bulkDelete = () => {
+    if (selectedIds.value.length === 0) return;
+    Swal.fire({
+        title: `Hapus ${selectedIds.value.length} jadwal?`,
+        text: "Data yang dihapus tidak dapat dikembalikan!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Ya, hapus semua!",
+        cancelButtonText: "Batal",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios.delete(route("admin.schedules.bulk-destroy"), { data: { ids: selectedIds.value } })
+                .then(() => {
+                    Swal.fire({ icon: "success", title: "Berhasil!", text: `${selectedIds.value.length} jadwal dihapus.`, timer: 1500, showConfirmButton: false });
+                    localSchedules.value = {
+                        ...localSchedules.value,
+                        data: localSchedules.value.data.filter(s => !selectedIds.value.includes(s.id)),
+                        total: localSchedules.value.total - selectedIds.value.length,
+                    };
+                    selectedIds.value = [];
+                }).catch(() => Swal.fire({ icon: "error", title: "Gagal!", text: "Terjadi kesalahan." }));
+        }
+    });
+};
 
 // Search via Axios (No Inertia Reload)
 watch(search, (value) => {
@@ -69,8 +98,14 @@ const deleteSchedule = (id) => {
     }).then((result) => {
         if (result.isConfirmed) {
             router.delete(route("admin.schedules.destroy", id), {
+                preserveScroll: true,
                 onSuccess: () => {
-                    // Success handled by layout flash message
+                    localSchedules.value = {
+                        ...localSchedules.value,
+                        data: localSchedules.value.data.filter(s => s.id !== id),
+                        total: localSchedules.value.total - 1,
+                    };
+                    selectedIds.value = selectedIds.value.filter(sid => sid !== id);
                 },
             });
         }
@@ -133,23 +168,18 @@ const getStatusLabel = (status) => {
 
             <div class="flex items-center gap-3">
                 <div class="relative">
-                    <input
-                        type="text"
-                        v-model="search"
-                        placeholder="Cari (Bus/Rute)..."
-                        class="pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-brand-red/50 outline-none transition-all w-full md:w-64"
-                    />
-                    <div
-                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400"
-                    >
+                    <input type="text" v-model="search" placeholder="Cari (Bus/Rute)..."
+                        class="pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-brand-red/50 outline-none transition-all w-full md:w-64" />
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                         <i class="fas fa-search"></i>
                     </div>
                 </div>
-
-                <Link
-                    :href="route('admin.schedules.create')"
-                    class="px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 flex items-center gap-2 whitespace-nowrap"
-                >
+                <button v-if="selectedIds.length > 0" @click="bulkDelete"
+                    class="px-4 py-2.5 rounded-xl bg-red-600 text-white font-semibold shadow-sm hover:bg-red-700 transition-all flex items-center gap-2 whitespace-nowrap text-sm">
+                    <i class="fas fa-trash-alt"></i> Hapus ({{ selectedIds.length }})
+                </button>
+                <Link :href="route('admin.schedules.create')"
+                    class="px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 flex items-center gap-2 whitespace-nowrap">
                     <i class="fas fa-plus"></i>
                     <span class="hidden md:inline">Buat Jadwal</span>
                 </Link>
@@ -161,10 +191,12 @@ const getStatusLabel = (status) => {
         >
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
-                    <thead
-                        class="bg-gray-50/50 dark:bg-gray-900/20 text-gray-500 dark:text-gray-400 text-xs uppercase font-bold tracking-wider"
-                    >
+                    <thead class="bg-gray-50/50 dark:bg-gray-900/20 text-gray-500 dark:text-gray-400 text-xs uppercase font-bold tracking-wider">
                         <tr>
+                            <th class="px-4 py-4 w-10">
+                                <input type="checkbox" v-model="selectAll"
+                                    class="w-4 h-4 rounded border-gray-300 text-brand-red focus:ring-brand-red cursor-pointer" />
+                            </th>
                             <th class="px-6 py-4">Armada & Rute</th>
                             <th class="px-6 py-4">Waktu Keberangkatan</th>
                             <th class="px-6 py-4">Tarif</th>
@@ -175,12 +207,14 @@ const getStatusLabel = (status) => {
                     <tbody
                         class="divide-y divide-gray-100 dark:divide-gray-700/50"
                     >
-                        <tr
-                            v-for="schedule in localSchedules?.data"
-                            :key="schedule.id"
-                            class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
-                        >
-                            <td class="px-6 py-4">
+                    <tr v-for="schedule in localSchedules?.data" :key="schedule.id"
+                        class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
+                        :class="{'bg-brand-red/5': selectedIds.includes(schedule.id)}">
+                        <td class="px-4 py-4">
+                            <input type="checkbox" :value="schedule.id" v-model="selectedIds"
+                                class="w-4 h-4 rounded border-gray-300 text-brand-red focus:ring-brand-red cursor-pointer" />
+                        </td>
+                        <td class="px-6 py-4">
                                 <div class="flex flex-col gap-1">
                                     <div
                                         class="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2"
@@ -284,7 +318,7 @@ const getStatusLabel = (status) => {
                         </tr>
                         <tr v-if="localSchedules?.data?.length === 0">
                             <td
-                                colspan="5"
+                                colspan="6"
                                 class="px-6 py-12 text-center text-gray-400"
                             >
                                 <div class="flex flex-col items-center">

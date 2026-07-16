@@ -46,292 +46,133 @@ const formatTime = (dateString) => {
 <template>
     <Head :title="`Detail Booking ${booking.booking_code}`" />
 
-    <div
-        class="bg-gray-50 dark:bg-[#050505] min-h-screen font-sans selection:bg-rose-600 selection:text-white pt-24 md:pt-32 pb-24 px-4 sm:px-6 lg:px-8"
-    >
+    <div class="min-h-screen bg-[#fcf9f8] pt-28 pb-20 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto">
-            <!-- Back Button -->
-            <div class="mb-10 animate-fade-in-up">
-                <Link
-                    :href="route('booking-history.index')"
-                    class="inline-flex items-center text-gray-400 hover:text-rose-600 transition-colors group font-unbounded text-xs uppercase tracking-widest"
-                >
-                    <i
-                        class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"
-                    ></i>
-                    Kembali ke Riwayat
-                </Link>
-            </div>
+            <!-- Back -->
+            <Link :href="route('booking-history.index')"
+                class="inline-flex items-center text-[#454652] hover:text-[#10207a] transition-colors text-sm mb-8">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Riwayat
+            </Link>
 
-            <div
-                class="bg-white dark:bg-[#111] rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-16 border border-gray-100 dark:border-white/5 shadow-2xl animate-fade-in-up"
-                style="animation-delay: 0.1s"
-            >
-                <!-- Status Badge Header -->
-                <div
-                    class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-16 pb-12 border-b border-gray-50 dark:border-white/5"
-                >
+            <!-- Main Card -->
+            <div class="bg-white border border-[#ebe7e7] rounded-[12px] p-6 md:p-10 shadow-sm">
+                
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5 mb-10 pb-8 border-b border-[#ebe7e7]">
                     <div>
-                        <span
-                            class="text-[10px] font-black px-3 py-1 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-400 dark:text-gray-500 uppercase tracking-widest font-unbounded border border-gray-100 dark:border-white/10 mb-2 inline-block"
-                        >
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-[#f6f3f2] text-[#454652] uppercase tracking-wider border border-[#ebe7e7] mb-2 inline-block">
                             E-Ticket Perjalanan
                         </span>
-                        <h1
-                            class="text-2xl sm:text-3xl md:text-5xl font-black text-gray-900 dark:text-white font-unbounded"
-                        >
-                            {{ booking.booking_code }}
-                        </h1>
+                        <h1 class="text-2xl md:text-4xl font-bold text-[#1c1b1b] font-unbounded">{{ booking.booking_code }}</h1>
                     </div>
-
-                    <div class="flex flex-col items-start md:items-end">
-                        <span
-                            v-if="booking.payment_status === 'paid'"
-                            class="px-6 py-2 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-sm font-black font-unbounded border border-emerald-100 dark:border-emerald-900/30 shadow-lg shadow-emerald-500/10"
-                        >
-                            <i class="fas fa-check-circle mr-2"></i> LUNAS
+                    <div class="flex flex-col items-start md:items-end gap-2">
+                        <span v-if="booking.payment_status === 'paid'"
+                            class="px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-1.5">
+                            <i class="fas fa-check-circle"></i> LUNAS
                         </span>
-                        <span
-                            v-else
-                            class="px-6 py-2 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-sm font-black font-unbounded border border-amber-100 dark:border-amber-900/30 shadow-lg shadow-amber-500/10"
-                        >
-                            <i class="fas fa-hourglass-half mr-2"></i>
-                            {{ booking.payment_status.toUpperCase() }}
+                        <span v-else
+                            class="px-4 py-1.5 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200 flex items-center gap-1.5">
+                            <i class="fas fa-hourglass-half"></i> {{ booking.payment_status.toUpperCase() }}
                         </span>
-                        <span
-                            class="text-[10px] text-gray-400 mt-3  font-bold"
-                            >Terdaftar pada
-                            {{ formatDate(booking.created_at) }}</span
-                        >
+                        <span class="text-[11px] text-[#454652]">Terdaftar {{ formatDate(booking.created_at) }}</span>
                     </div>
                 </div>
 
-                <!-- Main Details Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16">
-                    <!-- Journey Details -->
-                    <div class="space-y-10">
+                <!-- Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+                    <!-- Journey -->
+                    <div class="space-y-8">
                         <div>
-                            <h3
-                                class="text-xs font-black text-gray-400 uppercase tracking-widest font-unbounded mb-6 flex items-center gap-3"
-                            >
-                                <span
-                                    class="w-2 h-2 rounded-full bg-rose-600"
-                                ></span>
+                            <h3 class="text-xs font-bold text-[#454652] uppercase tracking-wider mb-5 flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#10207a]"></span>
                                 Rincian Perjalanan
                             </h3>
 
-                            <div class="relative pl-8 space-y-10">
-                                <!-- Decorative Line -->
-                                <div
-                                    class="absolute left-[3.5px] top-3 bottom-3 w-[1px] bg-gradient-to-b from-rose-600 via-gray-200 dark:via-white/10 to-rose-600"
-                                ></div>
+                            <div class="relative pl-7 space-y-8">
+                                <div class="absolute left-[3px] top-2 bottom-2 w-[1px] bg-gradient-to-b from-[#10207a] via-[#ebe7e7] to-[#10207a]"></div>
 
                                 <div class="relative">
-                                    <div
-                                        class="absolute -left-[32px] top-1 w-2 h-2 rounded-full bg-rose-600 border-4 border-white dark:border-[#111] box-content"
-                                    ></div>
-                                    <div
-                                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-unbounded mb-1"
-                                    >
-                                        Berangkat
-                                    </div>
-                                    <div
-                                        class="text-xl font-black text-gray-900 dark:text-white font-unbounded"
-                                    >
-                                        {{ booking.schedule?.route?.origin }}
-                                    </div>
-                                    <div
-                                        class="text-sm text-gray-500 "
-                                    >
-                                        {{
-                                            formatDate(
-                                                booking.departure_time,
-                                                true
-                                            )
-                                        }}
-                                        WIB
-                                    </div>
+                                    <div class="absolute -left-[26px] top-1 w-2 h-2 rounded-full bg-[#10207a] border-2 border-white"></div>
+                                    <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-0.5">Berangkat</div>
+                                    <div class="text-lg font-bold text-[#1c1b1b]">{{ booking.schedule?.route?.origin }}</div>
+                                    <div class="text-sm text-[#454652]">{{ formatDate(booking.booking_date) }} • {{ formatTime(booking.schedule?.departure_time) }} WIB</div>
                                 </div>
 
                                 <div class="relative">
-                                    <div
-                                        class="absolute -left-[32px] top-1 w-2 h-2 rounded-full bg-rose-600 border-4 border-white dark:border-[#111] box-content"
-                                    ></div>
-                                    <div
-                                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-unbounded mb-1"
-                                    >
-                                        Tujuan
-                                    </div>
-                                    <div
-                                        class="text-xl font-black text-gray-900 dark:text-white font-unbounded"
-                                    >
-                                        {{
-                                            booking.schedule?.route?.destination
-                                        }}
-                                    </div>
-                                    <div
-                                        class="text-sm text-gray-500 "
-                                    >
-                                        Durasi estimasi:
-                                        {{
-                                            booking.schedule?.route
-                                                ?.formatted_duration || "N/A"
-                                        }}
-                                    </div>
+                                    <div class="absolute -left-[26px] top-1 w-2 h-2 rounded-full bg-[#10207a] border-2 border-white"></div>
+                                    <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-0.5">Tujuan</div>
+                                    <div class="text-lg font-bold text-[#1c1b1b]">{{ booking.schedule?.route?.destination }}</div>
+                                    <div class="text-sm text-[#454652]">Durasi: {{ booking.schedule?.route?.formatted_duration || '-' }}</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div
-                            class="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-10 border-t border-gray-50 dark:border-white/5"
-                        >
+                        <!-- Bus Info -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-6 border-t border-[#ebe7e7]">
                             <div>
-                                <div
-                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-unbounded mb-1"
-                                >
-                                    Armada
-                                </div>
-                                <div
-                                    class="text-sm font-black text-gray-900 dark:text-white font-unbounded"
-                                >
-                                    {{ booking.schedule?.bus?.name }}
-                                </div>
-                                <div
-                                    class="text-xs text-rose-600  font-bold"
-                                >
-                                    {{
-                                        booking.schedule?.bus?.bus_type ||
-                                        "Executive"
-                                    }}
-                                    Class
-                                </div>
+                                <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-1">Armada</div>
+                                <div class="text-sm font-bold text-[#1c1b1b]">{{ booking.schedule?.bus?.name || '-' }}</div>
+                                <div class="text-xs text-[#10207a] font-semibold">{{ booking.schedule?.bus?.bus_type || 'Executive' }}</div>
                             </div>
                             <div>
-                                <div
-                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-unbounded mb-1"
-                                >
-                                    No. Lambung
-                                </div>
-                                <div
-                                    class="text-sm font-black text-gray-900 dark:text-white font-unbounded"
-                                >
-                                    {{
-                                        booking.schedule?.bus?.plate_number ||
-                                        "TJT-01"
-                                    }}
-                                </div>
+                                <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-1">Nomor Polisi</div>
+                                <div class="text-sm font-bold text-[#1c1b1b] font-mono">{{ booking.schedule?.bus?.plate_number || '-' }}</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Passenger & Price -->
-                    <div
-                        class="bg-gray-50 dark:bg-white/5 rounded-[2rem] p-6 md:p-10 space-y-10 h-fit border border-gray-100 dark:border-white/5"
-                    >
+                    <div class="bg-[#fcf9f8] border border-[#ebe7e7] rounded-[12px] p-6 md:p-8 space-y-8 h-fit">
                         <div>
-                            <h3
-                                class="text-xs font-black text-gray-400 uppercase tracking-widest font-unbounded mb-6"
-                            >
-                                Informasi Penumpang
-                            </h3>
-                            <div class="space-y-6">
+                            <h3 class="text-xs font-bold text-[#454652] uppercase tracking-wider mb-5">Informasi Penumpang</h3>
+                            <div class="space-y-5">
                                 <div>
-                                    <div
-                                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-unbounded mb-1"
-                                    >
-                                        Nama Penumpang
-                                    </div>
-                                    <div
-                                        class="text-lg font-black text-gray-900 dark:text-white font-unbounded"
-                                    >
-                                        {{ booking.passenger_name }}
-                                    </div>
+                                    <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-1">Nama</div>
+                                    <div class="text-base font-bold text-[#1c1b1b]">{{ booking.passenger_name }}</div>
                                 </div>
-                                <div
-                                    class="flex items-center justify-between gap-4"
-                                >
+                                <div class="flex items-center justify-between gap-4">
                                     <div>
-                                        <div
-                                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-unbounded mb-1"
-                                        >
-                                            Nomor Kursi
-                                        </div>
-                                        <div
-                                            class="text-base md:text-lg font-black text-rose-600 font-unbounded"
-                                        >
-                                            {{ booking.seat_numbers }}
-                                        </div>
+                                        <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-1">Kursi</div>
+                                        <div class="text-lg font-bold text-[#10207a]">{{ booking.seat_numbers || '-' }}</div>
                                     </div>
                                     <div class="text-right">
-                                        <div
-                                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-unbounded mb-1"
-                                        >
-                                            Kontak
-                                        </div>
-                                        <div
-                                            class="text-sm font-black text-gray-900 dark:text-white font-unbounded"
-                                        >
-                                            {{ booking.passenger_phone || "-" }}
-                                        </div>
+                                        <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-1">Email</div>
+                                        <div class="text-sm font-bold text-[#1c1b1b]">{{ booking.passenger_email }}</div>
                                     </div>
+                                </div>
+                                <div v-if="booking.passenger_phone">
+                                    <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-1">Telepon</div>
+                                    <div class="text-sm font-bold text-[#1c1b1b]">{{ booking.passenger_phone }}</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div
-                            class="pt-8 border-t border-gray-200 dark:border-white/10"
-                        >
-                            <div class="flex items-center justify-between mb-8">
-                                <div
-                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest font-unbounded"
-                                >
-                                    Total Pembayaran
-                                </div>
-                                <div
-                                    class="text-2xl font-black text-rose-600 font-unbounded"
-                                >
-                                    {{ formatCurrency(booking.total_price) }}
-                                </div>
+                        <!-- Total -->
+                        <div class="pt-6 border-t border-[#ebe7e7]">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider">Total Pembayaran</div>
+                                <div class="text-xl md:text-2xl font-bold text-[#10207a]">{{ formatCurrency(booking.total_price) }}</div>
+                            </div>
+                            <div v-if="booking.discount_amount > 0" class="flex items-center justify-between mb-4 text-sm">
+                                <span class="text-[#454652]">Diskon</span>
+                                <span class="text-emerald-600 font-semibold">-{{ formatCurrency(booking.discount_amount) }}</span>
                             </div>
 
-                            <div class="space-y-4">
-                                <a
-                                    v-if="booking.payment_status === 'paid'"
-                                    :href="
-                                        route(
-                                            'frontend.booking.download-ticket',
-                                            booking.id
-                                        )
-                                    "
-                                    class="flex items-center justify-center gap-3 w-full py-4 bg-rose-600 text-white font-black font-unbounded text-xs rounded-xl shadow-lg shadow-rose-600/30 hover:bg-rose-700 hover:scale-[1.02] transition-all"
-                                    target="_blank"
-                                >
-                                    <i class="fas fa-download"></i> UNDUH
-                                    E-TIKET (PDF)
+                            <div class="space-y-3">
+                                <a v-if="booking.payment_status === 'paid'" :href="route('frontend.booking.download-ticket', booking.id)" target="_blank"
+                                    class="flex items-center justify-center gap-2 w-full py-3.5 bg-[#10207a] text-white rounded-[10px] font-bold text-[13px] hover:bg-[#0c185e] transition-all shadow-sm">
+                                    <i class="fas fa-download"></i> Unduh E-Tiket (PDF)
                                 </a>
 
-                                <Link
-                                    v-if="
-                                        booking.payment_status === 'pending' &&
-                                        booking.midtrans_transaction_id
-                                    "
-                                    :href="
-                                        route(
-                                            'frontend.booking.confirmation',
-                                            booking.id
-                                        )
-                                    "
-                                    class="flex items-center justify-center gap-3 w-full py-4 bg-rose-600 text-white font-black font-unbounded text-xs rounded-xl shadow-lg shadow-rose-600/30 hover:bg-rose-700 hover:scale-[1.02] transition-all"
-                                >
-                                    <i class="fas fa-credit-card"></i> BAYAR
-                                    SEKARANG
+                                <Link v-if="booking.payment_status === 'pending' && booking.midtrans_transaction_id"
+                                    :href="route('frontend.booking.confirmation', booking.id)"
+                                    class="flex items-center justify-center gap-2 w-full py-3.5 bg-[#10207a] text-white rounded-[10px] font-bold text-[13px] hover:bg-[#0c185e] transition-all shadow-sm">
+                                    <i class="fas fa-credit-card"></i> Bayar Sekarang
                                 </Link>
 
-                                <button
-                                    class="w-full py-4 border border-gray-200 dark:border-white/5 text-gray-400 text-[10px] font-black font-unbounded uppercase rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all"
-                                >
-                                    <i class="fas fa-print mr-2"></i> Cetak
-                                    Invoice
+                                <button @click="window.print()"
+                                    class="w-full py-3.5 border border-[#e5e2e1] text-[#454652] font-semibold text-[12px] rounded-[10px] hover:bg-[#f6f3f2] transition-all">
+                                    <i class="fas fa-print mr-1.5"></i> Cetak Invoice
                                 </button>
                             </div>
                         </div>
@@ -339,19 +180,10 @@ const formatTime = (dateString) => {
                 </div>
             </div>
 
-            <!-- Footer Info -->
-            <div
-                class="mt-12 text-center animate-fade-in-up"
-                style="animation-delay: 0.3s"
-            >
-                <p
-                    class="text-xs text-gray-400  leading-relaxed max-w-lg mx-auto"
-                >
-                    Silakan tunjukkan E-Tiket ini atau berikan Kode Booking
-                    kepada petugas di loket keberangkatan minimal 30 menit
-                    sebelum jam keberangkatan.
-                </p>
-            </div>
+            <!-- Info -->
+            <p class="text-center text-xs text-[#454652] mt-8 max-w-lg mx-auto">
+                Tunjukkan E-Tiket ini atau berikan Kode Booking kepada petugas di loket minimal 30 menit sebelum keberangkatan.
+            </p>
         </div>
     </div>
 </template>

@@ -236,7 +236,16 @@ class BusController extends Controller
         return redirect()->route('admin.buses.index')->with('success', 'Bus berhasil dihapus.');
     }
 
-    
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada data dipilih.'], 400);
+        }
+        Bus::whereIn('id', $ids)->delete();
+        return response()->json(['success' => true, 'message' => count($ids) . ' bus berhasil dihapus.']);
+    }
+
     private function getAssignedDrivers($excludeBusId = null)
     {
         $query = Bus::with('drivers');

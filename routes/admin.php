@@ -35,6 +35,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:' . App\Models
 
     // Urusan Bus (Manager jadwal boleh akses)
     Route::resource('buses', BusController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
+    Route::delete('/buses/bulk-delete', [BusController::class, 'bulkDestroy'])->name('buses.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
 
     // Cek plat nomor ada ga via AJAX
     Route::get('/buses/check-plate/{plateNumber}', [BusController::class, 'checkPlateNumber'])->name('buses.check-plate');
@@ -46,6 +47,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:' . App\Models
     // Kelola Jadwal
     Route::resource('schedules', ScheduleController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
     Route::post('/schedules/{schedule}/create-next-day', [ScheduleController::class, 'createNextDaySchedule'])->name('schedules.create-next-day')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
+    Route::delete('/schedules/bulk/delete', [ScheduleController::class, 'bulkDestroy'])->name('schedules.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
 
     // Dashboard Jadwal
     Route::get('/schedule-management', [ScheduleManagementController::class, 'index'])->name('schedule-management.index')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
