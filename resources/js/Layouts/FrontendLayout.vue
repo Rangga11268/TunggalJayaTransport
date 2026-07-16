@@ -47,8 +47,10 @@ const dismissVerificationBanner = () => {
 // Global Loading State
 const isLoading = ref(false);
 
-router.on('start', () => {
-    isLoading.value = true;
+router.on('start', (event) => {
+    if (event.detail.visit.method === 'get' && !event.detail.visit.preserveState) {
+        isLoading.value = true;
+    }
 });
 
 router.on('finish', () => {
@@ -109,6 +111,13 @@ const serviceLinks = [
         href: "frontend.fleet.index",
         icon: "fas fa-bus",
         note: "Eksplorasi armada premium terbaru.",
+        image: "/img/heroImg.jpg",
+    },
+    {
+        name: "Sewa Pariwisata",
+        href: "frontend.charter.index",
+        icon: "fas fa-umbrella-beach",
+        note: "Rental bus untuk wisata rombongan.",
         image: "/img/heroImg.jpg",
     },
 ];
@@ -349,6 +358,18 @@ const isActive = (routeName) => {
                             "
                         >
                             Rute
+                        </Link>
+                        
+                        <Link
+                            :href="route('frontend.charter.index')"
+                            class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300"
+                            :class="
+                                isActive('frontend.charter.index')
+                                    ? 'text-rose-600 bg-rose-50 dark:bg-rose-900/10'
+                                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
+                            "
+                        >
+                            Pariwisata
                         </Link>
                     </div>
 

@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\ConductorController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ScheduleManagementController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\CharterBookingController;
 
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER, 'phone.verified'])->group(function () {
@@ -54,6 +55,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:' . App\Models
 
     // Data Booking (Khusus admin yang megang duit/tiket)
     Route::resource('bookings', BookingController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN);
+    
+    // Data Sewa Pariwisata
+    Route::resource('charter-bookings', CharterBookingController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN);
 
     // Fitur Berita
     Route::post('news/upload-image', [NewsController::class, 'uploadImage'])->name('news.upload-image')->middleware('role:' . App\Models\User::ROLE_ADMIN);

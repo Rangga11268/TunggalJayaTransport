@@ -23,8 +23,14 @@ class BookingHistoryController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10); // Paginate results for better UI
 
+        $charterBookings = \App\Models\CharterBooking::where('user_id', $user->id)
+            ->with('assignedBus')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
         return \Inertia\Inertia::render('Frontend/BookingHistory/Index', [
-            'bookings' => $bookings
+            'bookings' => $bookings,
+            'charter_bookings' => $charterBookings
         ]);
     }
 

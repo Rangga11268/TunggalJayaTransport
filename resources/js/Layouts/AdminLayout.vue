@@ -54,8 +54,10 @@ const markAllAsRead = async () => {
 };
 
 // Initialize router events for loading state
-router.on('start', () => {
-    isLoading.value = true;
+router.on('start', (event) => {
+    if (event.detail.visit.method === 'get' && !event.detail.visit.preserveState) {
+        isLoading.value = true;
+    }
 });
 
 router.on('finish', () => {
@@ -632,6 +634,35 @@ watch(
                         v-if="sidebarOpen"
                         class="ml-auto bg-brand-red text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-lg shadow-brand-red/40"
                         >Baru</span
+                    >
+                </Link>
+
+                <!-- Pariwisata (Charter Bookings) -->
+                <Link
+                    :href="route('admin.charter-bookings.index')"
+                    :class="[
+                        'flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative my-1',
+                        route().current('admin.charter-bookings.*')
+                            ? 'bg-gradient-to-r from-brand-red to-red-800 text-white shadow-lg shadow-brand-red/25'
+                            : 'text-gray-600 dark:text-gray-500 hover:bg-white dark:hover:bg-white/5 hover:text-brand-red dark:hover:text-white hover:shadow-sm dark:hover:shadow-none',
+                    ]"
+                >
+                    <i
+                        class="fas fa-umbrella-beach text-lg w-6 text-center z-10 transition-transform group-hover:scale-110 duration-300"
+                        :class="
+                            route().current('admin.charter-bookings.*')
+                                ? 'text-white'
+                                : 'text-gray-400 dark:text-gray-500 group-hover:text-brand-red dark:group-hover:text-white'
+                        "
+                    ></i>
+                    <span
+                        :class="[
+                            'ml-3 font-medium whitespace-nowrap transition-opacity duration-300 z-10',
+                            !sidebarOpen && !isMobile
+                                ? 'opacity-0 hidden'
+                                : 'opacity-100',
+                        ]"
+                        >Pariwisata</span
                     >
                 </Link>
 

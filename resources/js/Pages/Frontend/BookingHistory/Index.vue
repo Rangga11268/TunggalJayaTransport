@@ -4,9 +4,14 @@ import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 
 defineOptions({ layout: FrontendLayout });
 
+import { ref } from "vue";
+
 const props = defineProps({
     bookings: Object,
+    charter_bookings: Object,
 });
+
+const activeTab = ref('reguler');
 
 const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("id-ID", {
@@ -38,6 +43,17 @@ const formatTime = (dateString) => {
             hour12: false,
         })
         .replace(".", ":");
+};
+
+const getStatusBadge = (status) => {
+    switch (status) {
+        case "pending": return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-900/20";
+        case "quoted": return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900/20";
+        case "confirmed": return "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-900/20";
+        case "completed": return "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-900/20";
+        case "cancelled": return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900/20";
+        default: return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700";
+    }
 };
 </script>
 
@@ -74,42 +90,63 @@ const formatTime = (dateString) => {
             </p>
         </div>
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            
+            <!-- Tabs -->
+            <div class="flex flex-wrap justify-center gap-4 mb-10">
+                <button 
+                    @click="activeTab = 'reguler'" 
+                    class="px-6 py-3 rounded-full font-bold transition-all"
+                    :class="activeTab === 'reguler' ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30' : 'bg-white dark:bg-[#111] text-gray-500 hover:text-gray-900 dark:hover:text-white'"
+                >
+                    Tiket Reguler
+                </button>
+                <button 
+                    @click="activeTab = 'charter'" 
+                    class="px-6 py-3 rounded-full font-bold transition-all"
+                    :class="activeTab === 'charter' ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30' : 'bg-white dark:bg-[#111] text-gray-500 hover:text-gray-900 dark:hover:text-white'"
+                >
+                    Sewa Pariwisata
+                </button>
+            </div>
+
             <!-- Empty State -->
             <div
-                v-if="bookings.data.length === 0"
+                v-if="(activeTab === 'reguler' && bookings.data.length === 0) || (activeTab === 'charter' && charter_bookings?.data.length === 0)"
                 class="bg-white dark:bg-[#111] rounded-[2.5rem] p-16 text-center shadow-xl border border-gray-100 dark:border-white/5"
             >
                 <div
                     class="w-24 h-24 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8"
                 >
                     <i
-                        class="fas fa-ticket-alt text-4xl text-gray-200 dark:text-white/10"
+                        class="text-4xl text-gray-200 dark:text-white/10"
+                        :class="activeTab === 'reguler' ? 'fas fa-ticket-alt' : 'fas fa-umbrella-beach'"
                     ></i>
                 </div>
                 <h3
                     class="text-2xl font-black font-unbounded text-gray-900 dark:text-white mb-4"
                 >
-                    Belum Ada Tiket
+                    Belum Ada {{ activeTab === 'reguler' ? 'Tiket' : 'Sewa Pariwisata' }}
                 </h3>
                 <p
                     class="text-gray-500 dark:text-gray-400 mb-10 max-w-sm mx-auto font-manrope"
                 >
-                    Sepertinya Anda belum memiliki riwayat pemesanan. Mulai
-                    perjalanan baru sekarang!
+                    Sepertinya Anda belum memiliki riwayat pemesanan di kategori ini. Mulai perjalanan baru sekarang!
                 </p>
                 <Link
-                    :href="route('booking.index')"
+                    :href="activeTab === 'reguler' ? route('booking.index') : route('frontend.charter.index')"
                     class="inline-flex py-4 px-10 bg-rose-600 text-white font-black font-unbounded rounded-2xl shadow-lg shadow-rose-600/30 hover:bg-rose-700 hover:scale-[1.02] transition-all duration-300"
                 >
-                    Pesan Tiket Sekarang
+                    {{ activeTab === 'reguler' ? 'Pesan Tiket Sekarang' : 'Sewa Bus Pariwisata' }}
                 </Link>
             </div>
 
             <!-- Booking List -->
             <div v-else class="space-y-8">
-                <div
-                    v-for="booking in bookings.data"
+                <!-- Reguler List -->
+                <div v-if="activeTab === 'reguler'" class="space-y-8">
+                    <div
+                        v-for="booking in bookings.data"
                     :key="booking.id"
                     class="group relative bg-white dark:bg-[#111] rounded-[2.5rem] p-6 md:p-8 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-rose-600/10 transition-all duration-500"
                 >
@@ -219,6 +256,69 @@ const formatTime = (dateString) => {
                             >
                                 Detail Tiket
                             </Link>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- Charter List -->
+                <div v-if="activeTab === 'charter'" class="space-y-8">
+                    <div
+                        v-for="charter in charter_bookings.data"
+                        :key="charter.id"
+                        class="group relative bg-white dark:bg-[#111] rounded-[2.5rem] p-6 md:p-8 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-rose-600/10 transition-all duration-500"
+                    >
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                            <div class="flex-grow">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="text-[10px] font-black px-3 py-1 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-400 dark:text-gray-500 uppercase tracking-widest font-unbounded border border-gray-100 dark:border-white/10">
+                                        {{ charter.charter_code }}
+                                    </span>
+                                    <span
+                                        class="text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest font-unbounded border"
+                                        :class="getStatusBadge(charter.status)"
+                                    >
+                                        {{ charter.status }}
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center gap-4 md:gap-6 mb-6 overflow-hidden">
+                                    <div class="text-lg md:text-2xl font-black text-gray-900 dark:text-white font-unbounded leading-none truncate">
+                                        {{ charter.pickup_location }}
+                                    </div>
+                                    <div class="flex flex-col items-center justify-center flex-shrink-0 w-8 md:w-12">
+                                        <div class="h-[2px] w-full bg-rose-600/20 relative">
+                                            <div class="absolute right-0 -top-[3px] w-2 h-2 rounded-full bg-rose-600 shadow-[0_0_10px_rgba(225,29,72,0.8)]"></div>
+                                        </div>
+                                    </div>
+                                    <div class="text-lg md:text-2xl font-black text-gray-900 dark:text-white font-unbounded leading-none text-right truncate">
+                                        {{ charter.destination }}
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-6 text-sm text-gray-400 font-manrope font-bold">
+                                    <div class="flex items-center gap-2">
+                                        <i class="far fa-calendar-alt text-rose-600"></i>
+                                        {{ formatDate(charter.pickup_date) }} - {{ formatDate(charter.return_date) }}
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-bus text-rose-600"></i>
+                                        {{ charter.bus_type_requested }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col items-end md:border-l md:border-gray-100 md:dark:border-white/5 md:pl-10 w-full md:w-auto">
+                                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest font-unbounded mb-1">
+                                    Total / DP
+                                </div>
+                                <div class="text-xl md:text-2xl font-black text-rose-600 font-unbounded mb-1">
+                                    {{ charter.total_price > 0 ? formatCurrency(charter.total_price) : 'Menunggu Harga' }}
+                                </div>
+                                <div class="text-xs text-gray-500 mb-6" v-if="charter.down_payment > 0">
+                                    DP: {{ formatCurrency(charter.down_payment) }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

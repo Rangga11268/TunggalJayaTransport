@@ -60,6 +60,11 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class);
     }
 
+    public function charterBookings()
+    {
+        return $this->hasMany(CharterBooking::class);
+    }
+
     public function hasPhoneVerified(): bool
     {
         return !is_null($this->phone_verified_at);

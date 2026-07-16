@@ -28,6 +28,11 @@ class Bus extends Model implements HasMedia
         return $this->hasMany(Schedule::class);
     }
 
+    public function charterBookings()
+    {
+        return $this->hasMany(CharterBooking::class, 'assigned_bus_id');
+    }
+
     public function drivers()
     {
         return $this->belongsToMany(Driver::class)->withTimestamps();

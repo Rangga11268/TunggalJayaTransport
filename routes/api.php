@@ -5,7 +5,9 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\RouteController;
 use App\Http\Controllers\API\ScheduleController;
 use App\Http\Controllers\API\BookingController;
+// use App\Http\Controllers\API\MidtransController;
 use App\Http\Controllers\API\NewsController;
+use App\Http\Controllers\API\CharterController;
 use App\Http\Controllers\PaymentController;
 
 Route::prefix('auth')->group(function () {
@@ -34,6 +36,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings/process-payment', [BookingController::class, 'processPayment']);
     Route::get('/bookings', [BookingController::class, 'index']);
     Route::get('/bookings/{id}', [BookingController::class, 'show']);
+
+    // Route::post('/midtrans/token', [MidtransController::class, 'getToken']);
+    // Route::post('/midtrans/update-status', [MidtransController::class, 'updateStatus']);
+
+    // Pariwisata (Charter)
+    Route::get('/charter/history', [CharterController::class, 'index']);
+    Route::post('/charter/request', [CharterController::class, 'store']);
 });
 
 Route::get('/news', [NewsController::class, 'index']);

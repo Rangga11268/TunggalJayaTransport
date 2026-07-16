@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Frontend\SearchController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\CharterController;
 use Illuminate\Support\Facades\Route;
 
 // Frontend Routes
@@ -51,6 +52,10 @@ Route::prefix('')->name('frontend.')->group(function () {
     })->name('contact');
 
     Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'store'])->name('contact.store');
+
+    // Charter Routes
+    Route::get('/pariwisata', [CharterController::class, 'index'])->name('charter.index');
+    Route::post('/pariwisata/request', [CharterController::class, 'store'])->name('charter.store');
 });
 
 Route::get('/dashboard', function () {
