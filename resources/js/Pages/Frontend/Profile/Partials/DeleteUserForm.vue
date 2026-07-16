@@ -40,7 +40,7 @@ const closeModal = () => {
                 Zona Bahaya
             </h2>
             <p
-                class="mt-2 text-sm text-gray-500 dark:text-gray-400 font-manrope"
+                class="mt-2 text-sm text-gray-500 dark:text-gray-400 "
             >
                 Penghapusan akun bersifat permanen. Semua data pemesanan dan
                 profil Anda akan hilang selamanya.
@@ -65,7 +65,7 @@ const closeModal = () => {
                 </h2>
 
                 <p
-                    class="text-sm text-gray-500 dark:text-gray-400 font-manrope mb-8"
+                    class="text-sm text-gray-500 dark:text-gray-400  mb-8"
                 >
                     Apakah Anda benar-benar yakin? Tindakan ini tidak dapat
                     dibatalkan. Harap masukkan kata sandi Anda untuk
@@ -83,7 +83,7 @@ const closeModal = () => {
                         ref="passwordInput"
                         v-model="form.password"
                         type="password"
-                        class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all font-manrope text-gray-900 dark:text-white"
+                        class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all  text-gray-900 dark:text-white"
                         placeholder="••••••••"
                         @keyup.enter="deleteUser"
                     />

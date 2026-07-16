@@ -43,7 +43,7 @@ defineProps({
                 Pengaturan <span class="text-rose-600">Profil</span>
             </h1>
             <p
-                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope"
+                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto "
             >
                 Kelola informasi pribadi, keamanan akun, dan preferensi profil
                 Anda.

@@ -31,7 +31,7 @@ const form = useForm({
                 Informasi Profil
             </h2>
             <p
-                class="mt-2 text-sm text-gray-500 dark:text-gray-400 font-manrope"
+                class="mt-2 text-sm text-gray-500 dark:text-gray-400 "
             >
                 Perbarui informasi akun dan alamat email resmi Anda.
             </p>
@@ -50,7 +50,7 @@ const form = useForm({
                 <input
                     id="name"
                     type="text"
-                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all font-manrope text-gray-900 dark:text-white"
+                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all  text-gray-900 dark:text-white"
                     v-model="form.name"
                     required
                     autofocus
@@ -68,7 +68,7 @@ const form = useForm({
                 <input
                     id="email"
                     type="email"
-                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all font-manrope text-gray-900 dark:text-white"
+                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all  text-gray-900 dark:text-white"
                     v-model="form.email"
                     required
                     autocomplete="username"
@@ -81,7 +81,7 @@ const form = useForm({
                     class="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20"
                 >
                     <p
-                        class="text-xs text-amber-700 dark:text-amber-400 font-manrope font-bold"
+                        class="text-xs text-amber-700 dark:text-amber-400  font-bold"
                     >
                         Email Anda belum diverifikasi.
                         <Link

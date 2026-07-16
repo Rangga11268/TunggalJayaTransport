@@ -44,7 +44,7 @@ const submit = () => {
                 Hubungi <span class="text-rose-600">Kami</span>
             </h1>
             <p
-                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope animate-fade-in-up"
+                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto  animate-fade-in-up"
                 style="animation-delay: 0.1s"
             >
                 Punya pertanyaan atau butuh bantuan perjalanan? Tim support kami
@@ -75,7 +75,7 @@ const submit = () => {
                                 Telepon
                             </h3>
                             <p
-                                class="text-gray-500 dark:text-gray-400 font-manrope text-sm"
+                                class="text-gray-500 dark:text-gray-400  text-sm"
                             >
                                 +62 21 1234 5678
                             </p>
@@ -99,7 +99,7 @@ const submit = () => {
                                 Email
                             </h3>
                             <p
-                                class="text-gray-500 dark:text-gray-400 font-manrope text-sm"
+                                class="text-gray-500 dark:text-gray-400  text-sm"
                             >
                                 support@tujago.com
                             </p>
@@ -141,7 +141,7 @@ const submit = () => {
                                         Kantor Pusat
                                     </h4>
                                     <p
-                                        class="text-xs text-gray-500 dark:text-gray-400 font-manrope"
+                                        class="text-xs text-gray-500 dark:text-gray-400 "
                                     >
                                         Jl. Transportasi No. 88, Jakarta Selatan
                                     </p>
@@ -172,7 +172,7 @@ const submit = () => {
                                 <input
                                     v-model="form.name"
                                     type="text"
-                                    class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all font-manrope text-gray-900 dark:text-white"
+                                    class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all  text-gray-900 dark:text-white"
                                     placeholder="Nama Anda"
                                     required
                                 />
@@ -186,7 +186,7 @@ const submit = () => {
                                 <input
                                     v-model="form.email"
                                     type="email"
-                                    class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all font-manrope text-gray-900 dark:text-white"
+                                    class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all  text-gray-900 dark:text-white"
                                     placeholder="email@anda.com"
                                     required
                                 />
@@ -202,7 +202,7 @@ const submit = () => {
                             <input
                                 v-model="form.subject"
                                 type="text"
-                                class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all font-manrope text-gray-900 dark:text-white"
+                                class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all  text-gray-900 dark:text-white"
                                 placeholder="Perihal"
                                 required
                             />
@@ -217,7 +217,7 @@ const submit = () => {
                             <textarea
                                 v-model="form.message"
                                 rows="5"
-                                class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all font-manrope text-gray-900 dark:text-white resize-none"
+                                class="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A1A] border-transparent focus:bg-white focus:dark:bg-black focus:border-rose-500 focus:ring-0 transition-all  text-gray-900 dark:text-white resize-none"
                                 placeholder="Tulis pesan Anda disini..."
                                 required
                             ></textarea>

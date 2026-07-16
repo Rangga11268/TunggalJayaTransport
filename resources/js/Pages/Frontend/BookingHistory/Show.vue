@@ -99,7 +99,7 @@ const formatTime = (dateString) => {
                             {{ booking.payment_status.toUpperCase() }}
                         </span>
                         <span
-                            class="text-[10px] text-gray-400 mt-3 font-manrope font-bold"
+                            class="text-[10px] text-gray-400 mt-3  font-bold"
                             >Terdaftar pada
                             {{ formatDate(booking.created_at) }}</span
                         >
@@ -141,7 +141,7 @@ const formatTime = (dateString) => {
                                         {{ booking.schedule?.route?.origin }}
                                     </div>
                                     <div
-                                        class="text-sm text-gray-500 font-manrope"
+                                        class="text-sm text-gray-500 "
                                     >
                                         {{
                                             formatDate(
@@ -170,7 +170,7 @@ const formatTime = (dateString) => {
                                         }}
                                     </div>
                                     <div
-                                        class="text-sm text-gray-500 font-manrope"
+                                        class="text-sm text-gray-500 "
                                     >
                                         Durasi estimasi:
                                         {{
@@ -197,7 +197,7 @@ const formatTime = (dateString) => {
                                     {{ booking.schedule?.bus?.name }}
                                 </div>
                                 <div
-                                    class="text-xs text-rose-600 font-manrope font-bold"
+                                    class="text-xs text-rose-600  font-bold"
                                 >
                                     {{
                                         booking.schedule?.bus?.bus_type ||
@@ -345,7 +345,7 @@ const formatTime = (dateString) => {
                 style="animation-delay: 0.3s"
             >
                 <p
-                    class="text-xs text-gray-400 font-manrope leading-relaxed max-w-lg mx-auto"
+                    class="text-xs text-gray-400  leading-relaxed max-w-lg mx-auto"
                 >
                     Silakan tunjukkan E-Tiket ini atau berikan Kode Booking
                     kepada petugas di loket keberangkatan minimal 30 menit

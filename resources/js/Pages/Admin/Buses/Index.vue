@@ -209,9 +209,19 @@ const getStatusLabel = (status) => {
                                         class="text-sm text-gray-700 dark:text-gray-300"
                                         >{{ bus.bus_type }}</span
                                     >
-                                    <span class="text-xs text-gray-500"
-                                        >{{ bus.capacity }} Kursi</span
-                                    >
+                                    <div class="flex items-center gap-2">
+                                        <span
+                                            class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                            :class="bus.bus_category === 'pariwisata'
+                                                ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                                                : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'"
+                                        >
+                                            {{ bus.bus_category === 'pariwisata' ? 'Pariwisata' : 'AKAP' }}
+                                        </span>
+                                        <span class="text-xs text-gray-500"
+                                            >{{ bus.capacity }} Kursi</span
+                                        >
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4">

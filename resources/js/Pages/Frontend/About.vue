@@ -87,7 +87,7 @@ const toggleVideo = () => {
                     Evolusi <span class="text-rose-600">Transportasi</span>
                 </h1>
                 <p
-                    class="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-3xl mx-auto font-manrope leading-relaxed animate-fade-in-up"
+                    class="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-3xl mx-auto  leading-relaxed animate-fade-in-up"
                     style="animation-delay: 0.2s"
                 >
                     Dari sepeda penjual ubi hingga menjadi raja jalanan modern.
@@ -118,7 +118,7 @@ const toggleVideo = () => {
                             >
                         </h2>
                         <div
-                            class="space-y-6 text-gray-600 dark:text-gray-400 font-manrope text-lg leading-relaxed"
+                            class="space-y-6 text-gray-600 dark:text-gray-400  text-lg leading-relaxed"
                         >
                             <p>
                                 Semua bermula dari H. Asim pada tahun 1973.
@@ -247,7 +247,7 @@ const toggleVideo = () => {
                             Visi Kami
                         </h3>
                         <p
-                            class="text-gray-600 dark:text-gray-400 font-manrope leading-relaxed"
+                            class="text-gray-600 dark:text-gray-400  leading-relaxed"
                         >
                             "Menjadi pionir transportasi darat modern yang
                             menghubungkan setiap sudut nusantara dengan standar
@@ -271,7 +271,7 @@ const toggleVideo = () => {
                             Misi Kami
                         </h3>
                         <ul
-                            class="space-y-4 text-gray-600 dark:text-gray-400 font-manrope"
+                            class="space-y-4 text-gray-600 dark:text-gray-400 "
                         >
                             <li class="flex items-start gap-3">
                                 <i
@@ -341,7 +341,7 @@ const toggleVideo = () => {
                         </button>
                         <div
                             v-show="activeFaq === faq.id"
-                            class="px-6 pb-6 text-sm text-gray-600 dark:text-gray-400 font-manrope leading-relaxed border-t border-gray-200 dark:border-white/5 pt-4"
+                            class="px-6 pb-6 text-sm text-gray-600 dark:text-gray-400  leading-relaxed border-t border-gray-200 dark:border-white/5 pt-4"
                         >
                             {{ faq.answer }}
                         </div>

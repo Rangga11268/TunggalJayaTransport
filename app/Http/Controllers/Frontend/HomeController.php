@@ -18,7 +18,8 @@ class HomeController extends Controller
         $featuredRoutes = BusRoute::limit(3)->get();
 
         // Get latest news (limit to 3)
-        $latestNews = NewsArticle::where('is_published', true)
+        $latestNews = NewsArticle::with('category')
+            ->where('is_published', true)
             ->latest()
             ->limit(3)
             ->get();

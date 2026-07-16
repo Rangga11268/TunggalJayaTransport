@@ -91,7 +91,7 @@ const fetchArticles = async (page = 1, categoryId = null) => {
                     Kabar <span class="text-rose-600">Tunggal Jaya</span>
                 </h1>
                 <p
-                    class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope animate-fade-in-up"
+                    class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto  animate-fade-in-up"
                     style="animation-delay: 0.2s"
                 >
                     Dapatkan informasi terbaru seputar armada, tips perjalanan,
@@ -180,7 +180,7 @@ const fetchArticles = async (page = 1, categoryId = null) => {
                     <!-- Content -->
                     <div class="p-6 md:p-8 flex-grow flex flex-col">
                         <div
-                            class="flex items-center gap-3 text-xs text-gray-400 mb-4 font-manrope"
+                            class="flex items-center gap-3 text-xs text-gray-400 mb-4 "
                         >
                             <span
                                 ><i
@@ -206,7 +206,7 @@ const fetchArticles = async (page = 1, categoryId = null) => {
                         </h3>
 
                         <p
-                            class="text-sm text-gray-500 dark:text-gray-400 font-manrope line-clamp-3 mb-6 flex-grow"
+                            class="text-sm text-gray-500 dark:text-gray-400  line-clamp-3 mb-6 flex-grow"
                         >
                             {{ article.excerpt }}
                         </p>
@@ -243,7 +243,7 @@ const fetchArticles = async (page = 1, categoryId = null) => {
                 >
                     Belum Ada Artikel
                 </h3>
-                <p class="text-gray-500 dark:text-gray-400 font-manrope">
+                <p class="text-gray-500 dark:text-gray-400 ">
                     Belum ada berita atau artikel yang tersedia untuk kategori
                     ini.
                 </p>

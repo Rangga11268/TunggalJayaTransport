@@ -80,7 +80,7 @@ const formatDate = (dateString) => {
                             <i
                                 class="fas fa-user-circle text-rose-500 mr-2 text-lg"
                             ></i>
-                            <span class="font-bold text-sm font-manrope">{{
+                            <span class="font-bold text-sm ">{{
                                 article.author?.name || "Admin"
                             }}</span>
                         </div>
@@ -90,7 +90,7 @@ const formatDate = (dateString) => {
                             <i
                                 class="far fa-calendar-alt text-rose-500 mr-2"
                             ></i>
-                            <span class="font-bold text-sm font-manrope">{{
+                            <span class="font-bold text-sm ">{{
                                 formatDate(
                                     article.published_at || article.created_at,
                                 )
@@ -107,7 +107,7 @@ const formatDate = (dateString) => {
                 <div class="lg:col-span-8">
                     <!-- Article Body -->
                     <div
-                        class="prose prose-base md:prose-lg prose-rose dark:prose-invert max-w-none font-manrope text-gray-800 dark:text-gray-200"
+                        class="prose prose-base md:prose-lg prose-rose dark:prose-invert max-w-none  text-gray-800 dark:text-gray-200"
                     >
                         <!-- Content is sanitized server-side with allowlist of safe tags -->
                         <div v-html="article.safe_content"></div>
@@ -190,12 +190,12 @@ const formatDate = (dateString) => {
                                             >{{ related.category?.name }}</span
                                         >
                                         <h4
-                                            class="text-sm font-bold text-gray-900 dark:text-white line-clamp-2 group-hover:text-rose-600 transition-colors font-manrope leading-normal"
+                                            class="text-sm font-bold text-gray-900 dark:text-white line-clamp-2 group-hover:text-rose-600 transition-colors  leading-normal"
                                         >
                                             {{ related.title }}
                                         </h4>
                                         <span
-                                            class="text-xs text-gray-500 dark:text-gray-400 mt-2 block font-manrope"
+                                            class="text-xs text-gray-500 dark:text-gray-400 mt-2 block "
                                             >{{
                                                 formatDate(
                                                     related.published_at ||
@@ -208,7 +208,7 @@ const formatDate = (dateString) => {
 
                                 <div
                                     v-if="relatedArticles.length === 0"
-                                    class="text-gray-500 text-sm font-manrope text-center py-4"
+                                    class="text-gray-500 text-sm  text-center py-4"
                                 >
                                     Tidak ada artikel terkait ditemukan.
                                 </div>

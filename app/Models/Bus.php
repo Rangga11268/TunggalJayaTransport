@@ -15,6 +15,7 @@ class Bus extends Model implements HasMedia
         'name',
         'plate_number',
         'bus_type',
+        'bus_category',
         'capacity',
         'description',
         'status',

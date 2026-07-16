@@ -44,21 +44,6 @@ const dismissVerificationBanner = () => {
     localStorage.setItem("verification_banner_dismissed", "1");
 };
 
-// Global Loading State
-const isLoading = ref(false);
-
-router.on('start', (event) => {
-    if (event.detail.visit.method === 'get' && !event.detail.visit.preserveState) {
-        isLoading.value = true;
-    }
-});
-
-router.on('finish', () => {
-    setTimeout(() => {
-        isLoading.value = false;
-    }, 400); // Slightly longer for the frontend styling
-});
-
 // Transitions
 const onBeforeEnter = (el) => {
     gsap.set(el, {
@@ -87,7 +72,6 @@ const onLeave = (el, done) => {
     });
 };
 
-const isDarkMode = ref(false);
 
 const hoveredMenu = ref(null);
 
@@ -99,13 +83,7 @@ const serviceLinks = [
         note: "Booking kursi pilihan Anda sekarang.",
         image: "/img/pesanTiketTujago.png",
     },
-    {
-        name: "Rute Perjalanan",
-        href: "frontend.routes.index",
-        icon: "fas fa-road",
-        note: "Lihat daftar rute dan jadwal lengkap.",
-        image: "/img/homeTujago.png",
-    },
+
     {
         name: "Armada Kami",
         href: "frontend.fleet.index",
@@ -145,10 +123,6 @@ const companyLinks = [
 
 onMounted(() => {
     window.addEventListener("scroll", handleScroll);
-    isDarkMode.value = localStorage.getItem("darkMode") === "true";
-    if (isDarkMode.value) {
-        document.documentElement.classList.add("dark");
-    }
 
     // Check for auth query parameter to open modals automatically
     const params = new URLSearchParams(window.location.search);
@@ -216,12 +190,6 @@ const handleScroll = () => {
     isScrolled.value = window.scrollY > 20;
 };
 
-const toggleDarkMode = () => {
-    isDarkMode.value = !isDarkMode.value;
-    localStorage.setItem("darkMode", isDarkMode.value);
-    document.documentElement.classList.toggle("dark");
-};
-
 const toggleMobileMenu = () => {
     mobileMenuOpen.value = !mobileMenuOpen.value;
 };
@@ -233,7 +201,7 @@ const isActive = (routeName) => {
 
 <template>
     <div
-        class="min-h-screen flex flex-col bg-white dark:bg-[#080808] transition-colors duration-500 font-manrope selection:bg-rose-500/30"
+        class="min-h-screen flex flex-col bg-white dark:bg-[#080808] transition-colors duration-500 font-manrope selection:bg-blue-500/30"
     >
         <!-- Auth Modals -->
         <LoginModal 
@@ -259,12 +227,8 @@ const isActive = (routeName) => {
             :class="isScrolled ? 'pt-4' : 'pt-6'"
         >
             <nav
-                class="max-w-7xl mx-auto rounded-full transition-all duration-700 relative"
-                :class="
-                    isScrolled
-                        ? 'bg-white/70 dark:bg-black/40 backdrop-blur-2xl shadow-2xl shadow-black/5 py-2 px-6 border border-gray-100 dark:border-white/5 mx-2 md:mx-auto'
-                        : 'bg-transparent py-4 px-0'
-                "
+                class="max-w-7xl mx-auto rounded-full transition-all duration-700 relative bg-white/95 backdrop-blur-2xl shadow-xl shadow-black/5 py-2 px-6 border border-gray-100 mx-2 md:mx-auto mt-4"
+                :class="isScrolled ? 'translate-y-0' : 'translate-y-2'"
             >
                 <div
                     class="flex items-center justify-between relative z-10 h-full px-4 lg:px-0"
@@ -282,7 +246,7 @@ const isActive = (routeName) => {
                                 :class="
                                     hoveredMenu === 'services' ||
                                     isServicesActive
-                                        ? 'text-rose-600 bg-rose-50 dark:bg-rose-900/10'
+                                        ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/10'
                                         : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
                                 "
                             >
@@ -319,7 +283,7 @@ const isActive = (routeName) => {
                                                 class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all group/link"
                                             >
                                                 <div
-                                                    class="w-12 h-12 rounded-xl bg-gray-50 dark:bg-[#111] flex items-center justify-center text-gray-400 group-hover/link:bg-rose-600 group-hover/link:text-white transition-all shadow-sm"
+                                                    class="w-12 h-12 rounded-xl bg-gray-50 dark:bg-[#111] flex items-center justify-center text-gray-400 group-hover/link:bg-blue-600 group-hover/link:text-white transition-all shadow-sm"
                                                 >
                                                     <i
                                                         :class="link.icon"
@@ -328,7 +292,7 @@ const isActive = (routeName) => {
                                                 </div>
                                                 <div class="flex-1">
                                                     <div
-                                                        class="text-sm font-black font-unbounded text-gray-900 dark:text-white group-hover/link:text-rose-600 transition-colors"
+                                                        class="text-sm font-black font-unbounded text-gray-900 dark:text-white group-hover/link:text-blue-600 transition-colors"
                                                     >
                                                         {{ link.name }}
                                                     </div>
@@ -339,7 +303,7 @@ const isActive = (routeName) => {
                                                     </div>
                                                 </div>
                                                 <i
-                                                    class="fas fa-arrow-right text-[10px] text-gray-300 group-hover/link:text-rose-600 transform transition-all -translate-x-2 group-hover/link:translate-x-0 opacity-0 group-hover/link:opacity-100"
+                                                    class="fas fa-arrow-right text-[10px] text-gray-300 group-hover/link:text-blue-600 transform transition-all -translate-x-2 group-hover/link:translate-x-0 opacity-0 group-hover/link:opacity-100"
                                                 ></i>
                                             </Link>
                                         </div>
@@ -348,24 +312,13 @@ const isActive = (routeName) => {
                             </transition>
                         </div>
 
-                        <Link
-                            :href="route('frontend.routes.index')"
-                            class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300"
-                            :class="
-                                isActive('frontend.routes.index')
-                                    ? 'text-rose-600 bg-rose-50 dark:bg-rose-900/10'
-                                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
-                            "
-                        >
-                            Rute
-                        </Link>
-                        
+
                         <Link
                             :href="route('frontend.charter.index')"
                             class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300"
                             :class="
                                 isActive('frontend.charter.index')
-                                    ? 'text-rose-600 bg-rose-50 dark:bg-rose-900/10'
+                                    ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/10'
                                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
                             "
                         >
@@ -384,7 +337,7 @@ const isActive = (routeName) => {
                         >
                             <!-- Simple Glow -->
                             <div
-                                class="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-rose-500 rounded-full blur-2xl opacity-10 group-hover:opacity-30 transition-opacity w-32 h-32 -z-10 mx-auto"
+                                class="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-blue-500 rounded-full blur-2xl opacity-10 group-hover:opacity-30 transition-opacity w-32 h-32 -z-10 mx-auto"
                             ></div>
 
                             <!-- Logo Img -->
@@ -415,7 +368,7 @@ const isActive = (routeName) => {
                                 class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-2 group"
                                 :class="
                                     hoveredMenu === 'company' || isCompanyActive
-                                        ? 'text-rose-600 bg-rose-50 dark:bg-rose-900/10'
+                                        ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/10'
                                         : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
                                 "
                             >
@@ -447,11 +400,11 @@ const isActive = (routeName) => {
                                             class="col-span-5 p-4 flex flex-col justify-between bg-gray-50 dark:bg-[#111] rounded-2xl relative overflow-hidden group/card"
                                         >
                                             <div
-                                                class="absolute inset-0 bg-gradient-to-br from-rose-600/10 to-indigo-600/10 opacity-50"
+                                                class="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-indigo-600/10 opacity-50"
                                             ></div>
                                             <div class="relative z-10">
                                                 <div
-                                                    class="text-[10px] font-black text-rose-600 uppercase tracking-widest font-unbounded mb-2"
+                                                    class="text-[10px] font-black text-blue-600 uppercase tracking-widest font-unbounded mb-2"
                                                 >
                                                     Sejak 1973
                                                 </div>
@@ -474,7 +427,7 @@ const isActive = (routeName) => {
                                                     :href="
                                                         route('frontend.about')
                                                     "
-                                                    class="text-[10px] font-black text-rose-600 uppercase tracking-widest border-b border-rose-600 pb-0.5 hover:text-rose-500 transition-colors"
+                                                    class="text-[10px] font-black text-blue-600 uppercase tracking-widest border-b border-blue-600 pb-0.5 hover:text-blue-500 transition-colors"
                                                     >Lihat Cerita &rarr;</Link
                                                 >
                                             </div>
@@ -489,7 +442,7 @@ const isActive = (routeName) => {
                                             >
                                                 <div class="flex-1">
                                                     <div
-                                                        class="text-sm font-black font-unbounded text-gray-900 dark:text-white group-hover/link:text-rose-600 transition-colors"
+                                                        class="text-sm font-black font-unbounded text-gray-900 dark:text-white group-hover/link:text-blue-600 transition-colors"
                                                     >
                                                         {{ link.name }}
                                                     </div>
@@ -510,26 +463,12 @@ const isActive = (routeName) => {
                         <div
                             class="flex items-center space-x-2 pl-4 border-l border-gray-100 dark:border-white/10 ml-2"
                         >
-                            <!-- Dark Mode Toggle -->
-                            <button
-                                @click="toggleDarkMode"
-                                class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-rose-600 transition-all duration-300"
-                            >
-                                <i
-                                    :class="
-                                        isDarkMode
-                                            ? 'fas fa-sun'
-                                            : 'fas fa-moon'
-                                    "
-                                ></i>
-                            </button>
-
                             <!-- Auth Buttons -->
                             <template v-if="!page.props.auth.user">
                                 <button
                                     ref="loginBtn"
                                     @click="openLoginModal"
-                                    class="px-5 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:text-rose-600 transition-colors"
+                                    class="px-5 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:text-blue-600 transition-colors"
                                 >
                                     Masuk
                                 </button>
@@ -545,10 +484,10 @@ const isActive = (routeName) => {
                                 <div class="relative group">
                                     <button
                                         ref="userBtn"
-                                        class="flex items-center space-x-2 p-1 rounded-full border border-gray-200 dark:border-white/10 hover:border-rose-600 transition-all duration-300"
+                                        class="flex items-center space-x-2 p-1 rounded-full border border-gray-200 dark:border-white/10 hover:border-blue-600 transition-all duration-300"
                                     >
                                         <div
-                                            class="w-8 h-8 rounded-full bg-rose-600 flex items-center justify-center text-white text-xs font-black font-unbounded"
+                                            class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-black font-unbounded"
                                         >
                                             {{
                                                 page.props.auth.user.name
@@ -581,7 +520,7 @@ const isActive = (routeName) => {
                                         </div>
                                         <Link
                                             :href="route('profile.edit')"
-                                            class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-rose-600 transition-colors"
+                                            class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-blue-600 transition-colors"
                                             ><i
                                                 class="fas fa-user w-4 mr-2 opacity-50"
                                             ></i
@@ -591,7 +530,7 @@ const isActive = (routeName) => {
                                             :href="
                                                 route('booking-history.index')
                                             "
-                                            class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-rose-600 transition-colors"
+                                            class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-blue-600 transition-colors"
                                             ><i
                                                 class="fas fa-history w-4 mr-2 opacity-50"
                                             ></i
@@ -616,7 +555,7 @@ const isActive = (routeName) => {
                                             :href="route('logout')"
                                             method="post"
                                             as="button"
-                                            class="w-full text-left flex items-center px-4 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors font-unbounded"
+                                            class="w-full text-left flex items-center px-4 py-2.5 text-xs font-bold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors font-unbounded"
                                             ><i
                                                 class="fas fa-sign-out-alt w-4 mr-2 opacity-50"
                                             ></i
@@ -630,26 +569,12 @@ const isActive = (routeName) => {
 
                     <!-- Mobile Header Actions -->
                     <div class="flex lg:hidden items-center space-x-2">
-                        <!-- Dark Mode (Mobile) -->
-                        <button
-                            @click="toggleDarkMode"
-                            aria-label="Toggle dark mode"
-                            class="w-11 h-11 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-white/5 active:scale-90 transition-all"
-                        >
-                            <i
-                                :class="
-                                    isDarkMode ? 'fas fa-sun' : 'fas fa-moon'
-                                "
-                                class="text-sm"
-                            ></i>
-                        </button>
-
                         <!-- User Profile/Login (Mobile) -->
                         <template v-if="page.props.auth.user">
                             <Link
                                 :href="route('profile.edit')"
                                 aria-label="Profile"
-                                class="w-11 h-11 rounded-full bg-rose-600 flex items-center justify-center text-white text-[12px] font-black font-unbounded"
+                                class="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center text-white text-[12px] font-black font-unbounded"
                             >
                                 {{
                                     page.props.auth.user.name
@@ -708,7 +633,7 @@ const isActive = (routeName) => {
                         <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
                             <!-- Mobile Menu Header Info (Quick Stats/Welcome) -->
                             <div
-                                class="p-6 bg-gradient-to-br from-rose-600 to-rose-700 rounded-[2rem] text-white flex items-center justify-between shadow-xl shadow-rose-600/20"
+                                class="p-6 bg-gradient-to-br from-blue-600 to-blue-700 rounded-[2rem] text-white flex items-center justify-between shadow-xl shadow-blue-600/20"
                             >
                                 <div>
                                     <div
@@ -733,10 +658,10 @@ const isActive = (routeName) => {
                                     @click="mobileServicesOpen = !mobileServicesOpen"
                                     class="w-full flex items-center justify-between px-6 py-3 group"
                                 >
-                                    <h3 class="text-[10px] font-black text-rose-600 uppercase tracking-widest font-unbounded text-left mb-0">
+                                    <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-widest font-unbounded text-left mb-0">
                                         Layanan
                                     </h3>
-                                    <div class="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-rose-600 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-colors">
+                                    <div class="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-blue-600 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
                                         <i :class="mobileServicesOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] transition-transform duration-300"></i>
                                     </div>
                                 </button>
@@ -749,7 +674,7 @@ const isActive = (routeName) => {
                                         class="flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold transition-all duration-200"
                                         :class="
                                             isActive(link.href)
-                                                ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20'
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
                                                 : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5'
                                         "
                                     >
@@ -759,21 +684,6 @@ const isActive = (routeName) => {
                                         ></i>
                                         {{ link.name }}
                                     </Link>
-                                    <Link
-                                        :href="route('frontend.routes.index')"
-                                        @click="mobileMenuOpen = false"
-                                        class="flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold transition-all duration-200"
-                                        :class="
-                                            isActive('frontend.routes.index')
-                                                ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20'
-                                                : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5'
-                                        "
-                                    >
-                                        <i
-                                            class="fas fa-search-location text-lg opacity-70"
-                                        ></i>
-                                        Eksplorasi Rute
-                                    </Link>
                                 </div>
                             </div>
 
@@ -782,10 +692,10 @@ const isActive = (routeName) => {
                                     @click="mobileCompanyOpen = !mobileCompanyOpen"
                                     class="w-full flex items-center justify-between px-6 py-3 group"
                                 >
-                                    <h3 class="text-[10px] font-black text-rose-600 uppercase tracking-widest font-unbounded text-left mb-0">
+                                    <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-widest font-unbounded text-left mb-0">
                                         Perusahaan
                                     </h3>
-                                    <div class="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-rose-600 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-colors">
+                                    <div class="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-blue-600 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
                                         <i :class="mobileCompanyOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] transition-transform duration-300"></i>
                                     </div>
                                 </button>
@@ -798,7 +708,7 @@ const isActive = (routeName) => {
                                         class="flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold transition-all duration-200"
                                         :class="
                                             isActive(link.href)
-                                                ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20'
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
                                                 : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5'
                                         "
                                     >
@@ -813,7 +723,7 @@ const isActive = (routeName) => {
 
                             <div v-if="page.props.auth.user" class="mb-4">
                                 <h3
-                                    class="px-6 text-[10px] font-black text-rose-600 uppercase tracking-widest font-unbounded mb-4"
+                                    class="px-6 text-[10px] font-black text-blue-600 uppercase tracking-widest font-unbounded mb-4"
                                 >
                                     Akun Saya
                                 </h3>
@@ -854,7 +764,7 @@ const isActive = (routeName) => {
                                         :href="route('logout')"
                                         method="post"
                                         as="button"
-                                        class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-rose-50 dark:bg-rose-900/10 text-[11px] font-black text-rose-600 dark:text-rose-400 font-unbounded"
+                                        class="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/10 text-[11px] font-black text-blue-600 dark:text-blue-400 font-unbounded"
                                     >
                                         <i
                                             class="fas fa-sign-out-alt opacity-50"
@@ -878,7 +788,7 @@ const isActive = (routeName) => {
                                     </button>
                                     <button
                                         @click="openRegisterModal"
-                                        class="py-4 w-full bg-rose-600 text-white text-center text-sm font-bold rounded-[1.5rem] shadow-lg shadow-rose-600/20"
+                                        class="py-4 w-full bg-blue-600 text-white text-center text-sm font-bold rounded-[1.5rem] shadow-lg shadow-blue-600/20"
                                     >
                                         Daftar
                                     </button>
@@ -905,7 +815,7 @@ const isActive = (routeName) => {
             >
                 <!-- Shimmer & Pulse Glow -->
                 <div
-                    class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-rose-500/5 pointer-events-none"
+                    class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-blue-500/5 pointer-events-none"
                 ></div>
                 <div
                     class="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl animate-pulse"
@@ -939,7 +849,7 @@ const isActive = (routeName) => {
                                 </span>
                                 <button
                                     @click="dismissVerificationBanner"
-                                    class="text-gray-400 hover:text-rose-600 transition-colors p-1"
+                                    class="text-gray-400 hover:text-blue-600 transition-colors p-1"
                                     aria-label="Tutup"
                                 >
                                     <i class="fas fa-times text-sm"></i>
@@ -961,7 +871,7 @@ const isActive = (routeName) => {
                             <!-- Action Link -->
                             <Link
                                 :href="route('verification.phone.show')"
-                                class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-widest font-unbounded rounded-xl hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white transition-all duration-300 shadow-md active:scale-95"
+                                class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-widest font-unbounded rounded-xl hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-md active:scale-95"
                             >
                                 <i class="fas fa-arrow-right text-[9px]"></i>
                                 Verifikasi Sekarang
@@ -975,7 +885,7 @@ const isActive = (routeName) => {
                     class="h-1 w-full bg-gray-100 dark:bg-white/5 overflow-hidden"
                 >
                     <div
-                        class="h-full bg-gradient-to-r from-amber-500 to-rose-600 w-1/3 animate-shimmer-progress"
+                        class="h-full bg-gradient-to-r from-amber-500 to-blue-600 w-1/3 animate-shimmer-progress"
                     ></div>
                 </div>
             </div>
@@ -983,22 +893,6 @@ const isActive = (routeName) => {
 
         <!-- Main Content -->
         <main class="flex-grow relative">
-            <!-- Skeleton Loader Overlay -->
-            <transition name="fade">
-                <div v-if="isLoading" class="absolute inset-x-0 top-0 z-40 w-full min-h-[80vh] pt-[120px] pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-white dark:bg-[#080808]">
-                    <div class="animate-pulse space-y-8 w-full">
-                        <!-- Header/Hero Skeleton -->
-                        <div class="bg-gray-100 dark:bg-white/5 rounded-[2.5rem] h-[35vh] min-h-[250px] max-h-[400px] w-full"></div>
-                        
-                        <!-- Content Area Skeleton -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <div class="bg-gray-100 dark:bg-white/5 rounded-3xl h-80 w-full"></div>
-                            <div class="bg-gray-100 dark:bg-white/5 rounded-3xl h-80 w-full"></div>
-                            <div class="bg-gray-100 dark:bg-white/5 rounded-3xl h-80 w-full hidden md:block"></div>
-                        </div>
-                    </div>
-                </div>
-            </transition>
 
             <!-- Page Content -->
             <Transition
@@ -1008,7 +902,7 @@ const isActive = (routeName) => {
                 @enter="onEnter"
                 @leave="onLeave"
             >
-                <div :key="pageKey" :class="{ 'opacity-0': isLoading }">
+                <div :key="pageKey">
                     <slot />
                 </div>
             </Transition>
@@ -1020,10 +914,10 @@ const isActive = (routeName) => {
         >
             <!-- Background Subtle Elements -->
             <div
-                class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-rose-600 to-transparent opacity-50"
+                class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-600 to-transparent opacity-50"
             ></div>
             <div
-                class="absolute -bottom-24 -right-24 w-96 h-96 bg-rose-50 dark:bg-rose-900/5 rounded-full blur-3xl opacity-50 pointer-events-none"
+                class="absolute -bottom-24 -right-24 w-96 h-96 bg-blue-50 dark:bg-blue-900/5 rounded-full blur-3xl opacity-50 pointer-events-none"
             ></div>
 
             <div
@@ -1039,7 +933,7 @@ const isActive = (routeName) => {
                             class="flex items-center space-x-4 mb-8 group"
                         >
                             <div
-                                class="relative w-16 h-16 flex items-center justify-center bg-gray-50 dark:bg-[#151515] rounded-2xl border border-gray-100 dark:border-[#222] group-hover:border-rose-100 dark:group-hover:border-rose-900/20 transition-all duration-500 overflow-hidden"
+                                class="relative w-16 h-16 flex items-center justify-center bg-gray-50 dark:bg-[#151515] rounded-2xl border border-gray-100 dark:border-[#222] group-hover:border-blue-100 dark:group-hover:border-blue-900/20 transition-all duration-500 overflow-hidden"
                             >
                                 <!-- Logo -->
                                 <img
@@ -1048,7 +942,7 @@ const isActive = (routeName) => {
                                     class="w-12 h-12 object-contain relative z-10 transition-transform duration-500 group-hover:scale-110 drop-shadow-sm"
                                 />
                                 <div
-                                    class="absolute inset-0 bg-rose-600/5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    class="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity"
                                 ></div>
                             </div>
                             <div class="flex flex-col">
@@ -1078,46 +972,23 @@ const isActive = (routeName) => {
                                     'linkedin-in',
                                 ]"
                                 href="#"
-                                class="w-12 h-12 rounded-full bg-gray-50 dark:bg-[#151515] border border-gray-100 dark:border-[#222] flex items-center justify-center text-gray-400 hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-rose-600/20"
+                                class="w-12 h-12 rounded-full bg-gray-50 dark:bg-[#151515] border border-gray-100 dark:border-[#222] flex items-center justify-center text-gray-400 hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-blue-600/20"
                             >
                                 <i :class="`fab fa-${social} text-lg`"></i>
                             </a>
                         </div>
                     </div>
 
-                    <!-- Quick Links -->
+                    <!-- Company -->
                     <div class="lg:col-span-2">
-                        <h3
-                            class="text-lg font-bold font-unbounded mb-8 flex items-center gap-2"
-                        >
-                            <span
-                                class="w-2 h-2 rounded-full bg-rose-600"
-                            ></span>
-                            Link Cepat
+                        <h3 class="text-lg font-bold font-unbounded mb-8 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                            COMPANY
                         </h3>
-                        <ul
-                            class="space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400"
-                        >
-                            <li
-                                v-for="item in [
-                                    'Tentang Kami',
-                                    'Rute',
-                                    'Info Armada',
-                                    'Berita',
-                                    'Kontak',
-                                ]"
-                                :key="item"
-                            >
-                                <a
-                                    href="#"
-                                    class="hover:text-rose-600 dark:hover:text-rose-500 transition-colors flex items-center gap-2 group"
-                                >
-                                    <span
-                                        class="w-0 overflow-hidden transition-all duration-300 group-hover:w-3 text-rose-600"
-                                        ><i
-                                            class="fas fa-arrow-right text-[10px]"
-                                        ></i
-                                    ></span>
+                        <ul class="space-y-4 text-sm font-medium text-gray-500">
+                            <li v-for="item in ['Tentang Kami', 'Karir', 'Berita', 'Kontak']" :key="item">
+                                <a href="#" class="hover:text-blue-600 transition-colors flex items-center gap-2 group">
+                                    <span class="w-0 overflow-hidden transition-all duration-300 group-hover:w-3 text-blue-600"><i class="fas fa-arrow-right text-[10px]"></i></span>
                                     {{ item }}
                                 </a>
                             </li>
@@ -1126,84 +997,32 @@ const isActive = (routeName) => {
 
                     <!-- Services -->
                     <div class="lg:col-span-3">
-                        <h3
-                            class="text-lg font-bold font-unbounded mb-8 flex items-center gap-2"
-                        >
-                            <span
-                                class="w-2 h-2 rounded-full bg-rose-600"
-                            ></span>
-                            Layanan
+                        <h3 class="text-lg font-bold font-unbounded mb-8 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                            SERVICES
                         </h3>
-                        <ul
-                            class="space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400"
-                        >
-                            <li
-                                v-for="item in [
-                                    'Antar Kota',
-                                    'Shuttle Bus',
-                                    'Transfer Bandara',
-                                    'Paket Wisata',
-                                    'Korporasi',
-                                ]"
-                                :key="item"
-                            >
-                                <a
-                                    href="#"
-                                    class="hover:text-rose-600 dark:hover:text-rose-500 transition-colors flex items-center gap-2 group"
-                                >
-                                    <span
-                                        class="w-0 overflow-hidden transition-all duration-300 group-hover:w-3 text-rose-600"
-                                        ><i class="fas fa-check text-[10px]"></i
-                                    ></span>
+                        <ul class="space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400">
+                            <li v-for="item in ['Sewa Bus Pariwisata', 'Tiket Reguler AKAP', 'Layanan Logistik', 'Paket Wisata']" :key="item">
+                                <a href="#" class="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2 group">
+                                    <span class="w-0 overflow-hidden transition-all duration-300 group-hover:w-3 text-blue-600"><i class="fas fa-arrow-right text-[10px]"></i></span>
                                     {{ item }}
                                 </a>
                             </li>
                         </ul>
                     </div>
 
-                    <!-- Contact -->
+                    <!-- Help -->
                     <div class="lg:col-span-3">
-                        <h3
-                            class="text-lg font-bold font-unbounded mb-8 flex items-center gap-2"
-                        >
-                            <span
-                                class="w-2 h-2 rounded-full bg-rose-600"
-                            ></span>
-                            Hubungi Kami
+                        <h3 class="text-lg font-bold font-unbounded mb-8 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                            HELP
                         </h3>
-                        <ul
-                            class="space-y-6 text-sm font-medium text-gray-500 dark:text-gray-400"
-                        >
-                            <li
-                                class="flex items-start gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-[#151515] border border-gray-100 dark:border-[#222]"
-                            >
-                                <div
-                                    class="w-8 h-8 rounded-full bg-white dark:bg-[#111] flex items-center justify-center text-rose-600 shadow-sm shrink-0"
-                                >
-                                    <i
-                                        class="fas fa-map-marker-alt text-xs"
-                                    ></i>
-                                </div>
-                                <span class="leading-relaxed"
-                                    >Jl. Transportasi No. 123,<br />Jakarta
-                                    12345, Indonesia</span
-                                >
-                            </li>
-                            <li class="flex items-center gap-4">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-gray-50 dark:bg-[#151515] flex items-center justify-center text-rose-600 border border-gray-100 dark:border-[#222]"
-                                >
-                                    <i class="fas fa-phone text-xs"></i>
-                                </div>
-                                <span>+62 21 1234 5678</span>
-                            </li>
-                            <li class="flex items-center gap-4">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-gray-50 dark:bg-[#151515] flex items-center justify-center text-rose-600 border border-gray-100 dark:border-[#222]"
-                                >
-                                    <i class="fas fa-envelope text-xs"></i>
-                                </div>
-                                <span>tujago@email.com</span>
+                        <ul class="space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400">
+                            <li v-for="item in ['Pusat Bantuan', 'Syarat & Ketentuan', 'Kebijakan Privasi', 'FAQ']" :key="item">
+                                <a href="#" class="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2 group">
+                                    <span class="w-0 overflow-hidden transition-all duration-300 group-hover:w-3 text-blue-600"><i class="fas fa-arrow-right text-[10px]"></i></span>
+                                    {{ item }}
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -1221,17 +1040,17 @@ const isActive = (routeName) => {
                     <div class="flex space-x-8 mt-4 md:mt-0">
                         <a
                             href="#"
-                            class="hover:text-rose-600 transition-colors"
+                            class="hover:text-blue-600 transition-colors"
                             >Privasi</a
                         >
                         <a
                             href="#"
-                            class="hover:text-rose-600 transition-colors"
+                            class="hover:text-blue-600 transition-colors"
                             >Syarat & Ketentuan</a
                         >
                         <a
                             href="#"
-                            class="hover:text-rose-600 transition-colors"
+                            class="hover:text-blue-600 transition-colors"
                             >Cookie</a
                         >
                     </div>

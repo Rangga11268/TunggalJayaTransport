@@ -39,7 +39,7 @@ const updatePassword = () => {
                 Keamanan Akun
             </h2>
             <p
-                class="mt-2 text-sm text-gray-500 dark:text-gray-400 font-manrope"
+                class="mt-2 text-sm text-gray-500 dark:text-gray-400 "
             >
                 Gunakan kata sandi yang kuat untuk menjaga keamanan akun TUJAGO
                 Anda.
@@ -58,7 +58,7 @@ const updatePassword = () => {
                     ref="currentPasswordInput"
                     v-model="form.current_password"
                     type="password"
-                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all font-manrope text-gray-900 dark:text-white"
+                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all  text-gray-900 dark:text-white"
                     autocomplete="current-password"
                 />
                 <InputError
@@ -78,7 +78,7 @@ const updatePassword = () => {
                     ref="passwordInput"
                     v-model="form.password"
                     type="password"
-                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all font-manrope text-gray-900 dark:text-white"
+                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all  text-gray-900 dark:text-white"
                     autocomplete="new-password"
                 />
                 <InputError :message="form.errors.password" class="mt-2" />
@@ -94,7 +94,7 @@ const updatePassword = () => {
                     id="password_confirmation"
                     v-model="form.password_confirmation"
                     type="password"
-                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all font-manrope text-gray-900 dark:text-white"
+                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all  text-gray-900 dark:text-white"
                     autocomplete="new-password"
                 />
                 <InputError

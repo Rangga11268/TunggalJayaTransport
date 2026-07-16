@@ -87,9 +87,6 @@ class BookingController extends Controller
                     // Calculate available seats using the eager loaded count
                     $bookedSeats = $schedule->booked_seats_count ?? 0;
                     $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
-                    if ($availableSeats <= 0) {
-                        return false;
-                    }
 
                     // Date matching logic
                     if ($effectiveDate) {
@@ -417,6 +414,7 @@ class BookingController extends Controller
                 'arrival_time' => $schedule->getActualArrivalTime($searchDate)->format('H:i'),
                 'duration' => $schedule->route->formatted_duration,
                 'is_daily' => $schedule->is_daily,
+                'is_departed' => $schedule->hasDeparted($searchDate),
                 'available_seats' => $availableSeats,
                 'bus' => [
                     'name' => $schedule->bus->name,
@@ -470,9 +468,23 @@ class BookingController extends Controller
 
         // Get the selected date from the request
         $selectedDate = $request->get('date');
+        $checkDate = null;
 
-        // Check if schedule has departed for the selected date (or today if no specific date)
-        $checkDate = $selectedDate ? Carbon::parse($selectedDate) : null;
+        if ($selectedDate) {
+            $checkDate = Carbon::parse($selectedDate);
+        } else {
+            if ($schedule->is_daily) {
+                $checkDate = Carbon::today('Asia/Jakarta');
+                $todayDeparture = $checkDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
+                if ($todayDeparture->isPast()) {
+                    $checkDate = $checkDate->addDay();
+                }
+            } else {
+                $checkDate = Carbon::parse($schedule->departure_time);
+            }
+        }
+
+        // Check if schedule has departed for the selected date
         if ($schedule->hasDeparted($checkDate)) {
             return redirect()->route('frontend.booking.index')
                 ->withErrors(['schedule' => 'This schedule has already departed and is no longer available for booking.'])
@@ -515,27 +527,13 @@ class BookingController extends Controller
 
         $schedule = Schedule::with('bus')->findOrFail($request->schedule_id);
 
-        // Additional check: if schedule has already departed, redirect with error
-        if ($schedule->hasDeparted()) {
-            return redirect()->route('frontend.booking.index')
-                ->withErrors(['schedule' => 'This schedule has already departed and is no longer available for booking.'])
-                ->withInput();
-        }
-
-        // Check if schedule is available for booking
-        if (!$schedule->isAvailableForBooking()) {
-            return redirect()->route('frontend.booking.index')
-                ->withErrors(['schedule' => 'This schedule is no longer available for booking.'])
-                ->withInput();
-        }
-
-        // If the request came with a specific date, use it
+        // Calculate booking date first
         if ($request->date) {
             $bookingDate = Carbon::parse($request->date);
         } else {
             // For daily recurring schedules, calculate the next available date
             if ($schedule->is_daily) {
-                $bookingDate = Carbon::today();
+                $bookingDate = Carbon::today('Asia/Jakarta');
                 // If today's departure time hasn't passed, use today; otherwise use tomorrow
                 $todayDeparture = $bookingDate->copy()->setTimeFromTimeString($schedule->departure_time->format('H:i:s'));
                 if ($todayDeparture->isPast()) {
@@ -543,8 +541,22 @@ class BookingController extends Controller
                 }
             } else {
                 // For regular schedules, use the schedule's departure date
-                $bookingDate = $schedule->departure_time;
+                $bookingDate = Carbon::parse($schedule->departure_time);
             }
+        }
+
+        // Additional check: if schedule has already departed, redirect with error
+        if ($schedule->hasDeparted($bookingDate)) {
+            return redirect()->route('frontend.booking.index')
+                ->withErrors(['schedule' => 'This schedule has already departed and is no longer available for booking.'])
+                ->withInput();
+        }
+
+        // Check if schedule is available for booking
+        if (!$schedule->isAvailableForBooking($bookingDate)) {
+            return redirect()->route('frontend.booking.index')
+                ->withErrors(['schedule' => 'This schedule is no longer available for booking.'])
+                ->withInput();
         }
 
         // Check if there are enough seats available for the specific date
@@ -611,14 +623,14 @@ class BookingController extends Controller
 
         // Authorization check: Pastikan user punya akses ke booking ini
         Gate::authorize('view', $booking);
-        if ($booking->schedule->hasDeparted()) {
+        if ($booking->schedule->hasDeparted($booking->booking_date)) {
             return redirect()->route('frontend.booking.index')
                 ->withErrors(['schedule' => 'The schedule for this booking has already departed.'])
                 ->withInput();
         }
 
         // Check if the schedule is still available for booking
-        if (!$booking->schedule->isAvailableForBooking()) {
+        if (!$booking->schedule->isAvailableForBooking($booking->booking_date)) {
             return redirect()->route('frontend.booking.index')
                 ->withErrors(['schedule' => 'The schedule for this booking is no longer available.'])
                 ->withInput();

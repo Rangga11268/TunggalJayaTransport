@@ -30,7 +30,6 @@ const localDestinations = ref(props.destinations || []);
 const isSearching = ref(false);
 
 // Gabung origins + destinations jadi satu list unik
-// Supaya pas swap, nilai tetap ada di kedua select
 const allLocations = computed(() => {
     const set = new Set([
         ...(localOrigins.value || []),
@@ -183,11 +182,16 @@ const formatDate = (dateString) => {
     });
 };
 
-// Flag buat nandain lagi swap biar watch ga dobel-request
+const getAvailableSeats = (schedule) => {
+    const total = schedule.bus.capacity || 0;
+    const booked = schedule.booked_seats_count || 0;
+    return Math.max(0, total - booked);
+};
+
+// Tuker kota asal sama tujuan
 const isSwapping = ref(false);
 let debounceTimer = null;
 
-// Tuker kota asal sama tujuan
 const swapLocations = () => {
     isSwapping.value = true;
     clearTimeout(debounceTimer);
@@ -215,715 +219,169 @@ watch(
 </script>
 
 <template>
-    <Head title="Pesan Tiket" />
+    <Head title="Pesan Tiket - Tunggal Jaya Transport" />
 
-    <div
-        class="pt-24 md:pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative z-10"
-    >
-        <span
-            class="inline-block px-4 py-2 rounded-full bg-rose-600 text-white text-[10px] font-bold tracking-[0.2em] mb-6 animate-fade-in uppercase font-unbounded shadow-lg shadow-rose-600/20"
-        >
-            Reservasi Online
-        </span>
-        <h1
-            class="font-unbounded font-black text-3xl sm:text-4xl md:text-6xl text-gray-900 dark:text-white mb-6 animate-fade-in-up leading-tight uppercase"
-        >
-            Pesan
-            <span class="text-rose-600">Tiket Anda</span>
-        </h1>
-        <p
-            class="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-1 font-manrope leading-relaxed"
-        >
-            Temukan jadwal terbaik dengan standar kenyamanan tertinggi untuk
-            perjalanan Anda bersama TUJAGO.
-        </p>
-    </div>
+    <div class="relative w-full min-h-screen bg-[#fcf9f8]  pb-24">
+        <!-- HEADER / SEARCH SECTION -->
+        <div class="pt-[140px] px-8 lg:px-16 pb-8 bg-white shadow-sm mb-8 flex justify-center">
+            <div class="max-w-[1280px] w-full">
+                <!-- Search Console -->
+                <div class="bg-white border border-[#f0edec] border-solid flex flex-col md:flex-row gap-6 items-end p-6 rounded-[16px] shadow-sm">
+                    <div class="flex flex-col gap-2 flex-1 w-full">
+                        <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Dari</label>
+                        <select v-model="form.origin" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-10 py-3 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer appearance-none">
+                            <option value="" disabled>Pilih Kota Asal</option>
+                            <option v-for="opt in allLocations" :key="opt" :value="opt">{{ opt }}</option>
+                        </select>
+                    </div>
 
-    <!-- Booking Interface -->
-    <div class="bg-white dark:bg-[#050505] min-h-screen relative z-20 pb-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
-            <!-- Search Card (Matched with Home Page Style) -->
-            <div
-                class="bg-white dark:bg-[#111] rounded-3xl shadow-xl border border-gray-100 dark:border-white/5 p-6 md:p-8 backdrop-blur-xl animate-fade-in-up stagger-2 relative z-30"
-            >
-                <form @submit.prevent="search">
-                    <div
-                        class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end relative"
-                    >
-                        <!-- Origin -->
-                        <div class="md:col-span-3 space-y-2 group">
-                            <label
-                                class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 font-manrope"
-                            >
-                                Keberangkatan
+                    <div class="flex items-center justify-center pb-2 px-2 cursor-pointer text-gray-500 hover:text-[#10207a] transition-colors" @click="swapLocations">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+
+                    <div class="flex flex-col gap-2 flex-1 w-full">
+                        <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Ke</label>
+                        <select v-model="form.destination" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-10 py-3 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer appearance-none">
+                            <option value="" disabled>Pilih Kota Tujuan</option>
+                            <option v-for="opt in allLocations" :key="opt" :value="opt">{{ opt }}</option>
+                        </select>
+                    </div>
+
+                    <div class="flex flex-col gap-2 flex-1 w-full">
+                        <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Tanggal</label>
+                        <input v-model="form.date" type="date" :min="todayDate" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] px-4 py-3 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN LAYOUT (Filters + Schedules) -->
+        <div class="max-w-[1280px] mx-auto px-8 lg:px-16 flex flex-col md:flex-row gap-8">
+            
+            <!-- LEFT SIDEBAR: FILTERS -->
+            <div class="w-full md:w-[280px] shrink-0 bg-[#f6f3f2] border border-[#c6c5d3] rounded-[8px] p-6 h-fit">
+                <div class="flex flex-col gap-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-semibold text-[#1c1b1b] text-[14px] tracking-[0.7px] uppercase">Filters</h3>
+                        <button v-if="hasActiveFilters" @click="resetFilters" class="text-rose-600 text-[12px] font-bold uppercase tracking-wider hover:underline">Reset</button>
+                    </div>
+                    
+                    <div class="flex flex-col gap-4">
+                        <h4 class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Waktu Keberangkatan</h4>
+                        <div class="flex flex-col gap-3">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" v-model="form.time" value="morning" class="w-4 h-4 rounded border-[#767683] text-[#10207a] focus:ring-[#10207a]">
+                                <span class="font-normal text-[#1c1b1b] text-[14px] group-hover:text-[#10207a]">Pagi (00:00 - 11:59)</span>
                             </label>
-                            <div class="relative group">
-                                <div
-                                    class="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-rose-600 transition-colors pl-5"
-                                >
-                                    <i
-                                        class="fas fa-map-marker-alt text-lg"
-                                    ></i>
-                                </div>
-                                <select
-                                    v-model="form.origin"
-                                    class="block w-full pl-12 pr-10 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all cursor-pointer hover:bg-white dark:hover:bg-white/10 text-gray-900 dark:text-white appearance-none bg-none relative z-0 font-manrope focus:bg-white dark:focus:bg-black"
-                                >
-                                    <option value="" disabled>
-                                        Pilih Kota Asal
-                                    </option>
-                                    <option
-                                        v-for="opt in allLocations"
-                                        :key="opt"
-                                        :value="opt"
-                                    >
-                                        {{ opt }}
-                                    </option>
-                                </select>
-                                <i
-                                    class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"
-                                ></i>
-                            </div>
-
-                            <!-- Mobile Swap Button -->
-                            <div
-                                class="flex md:hidden justify-center -my-3 relative z-10"
-                            >
-                                <button
-                                    type="button"
-                                    @click="swapLocations"
-                                    class="w-10 h-10 rounded-full bg-white dark:bg-[#222] border-2 border-gray-100 dark:border-white/10 text-gray-400 hover:text-rose-600 hover:border-rose-600 transition-all flex items-center justify-center shadow-md transform active:rotate-180 duration-300"
-                                >
-                                    <i
-                                        class="fas fa-exchange-alt text-xs rotate-90"
-                                    ></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Swap Button -->
-                        <div
-                            class="hidden md:flex md:col-span-1 justify-center pb-3 relative"
-                        >
-                            <button
-                                type="button"
-                                @click="swapLocations"
-                                class="w-12 h-12 rounded-full bg-white dark:bg-[#222] border-2 border-gray-100 dark:border-white/10 text-gray-400 hover:text-rose-600 hover:border-rose-600 transition-all flex items-center justify-center shadow-lg transform hover:rotate-180 duration-300 relative z-20"
-                            >
-                                <i class="fas fa-exchange-alt text-sm"></i>
-                            </button>
-                        </div>
-
-                        <!-- Destination -->
-                        <div class="md:col-span-3 space-y-2 group">
-                            <label
-                                class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 font-manrope"
-                            >
-                                Tujuan
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" v-model="form.time" value="afternoon" class="w-4 h-4 rounded border-[#767683] text-[#10207a] focus:ring-[#10207a]">
+                                <span class="font-normal text-[#1c1b1b] text-[14px] group-hover:text-[#10207a]">Siang (12:00 - 17:59)</span>
                             </label>
-                            <div class="relative group">
-                                <div
-                                    class="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-rose-600 transition-colors pl-5"
-                                >
-                                    <i class="fas fa-location-dot text-lg"></i>
-                                </div>
-                                <select
-                                    v-model="form.destination"
-                                    class="block w-full pl-12 pr-10 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all cursor-pointer hover:bg-white dark:hover:bg-white/10 text-gray-900 dark:text-white appearance-none bg-none relative z-0 font-manrope focus:bg-white dark:focus:bg-black"
-                                >
-                                    <option value="" disabled>
-                                        Pilih Kota Tujuan
-                                    </option>
-                                    <option
-                                        v-for="opt in allLocations"
-                                        :key="opt"
-                                        :value="opt"
-                                    >
-                                        {{ opt }}
-                                    </option>
-                                </select>
-                                <i
-                                    class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"
-                                ></i>
-                            </div>
-                        </div>
-
-                        <!-- Date -->
-                        <div class="md:col-span-3 space-y-2 group">
-                            <label
-                                class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 font-manrope"
-                            >
-                                Tanggal
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" v-model="form.time" value="evening" class="w-4 h-4 rounded border-[#767683] text-[#10207a] focus:ring-[#10207a]">
+                                <span class="font-normal text-[#1c1b1b] text-[14px] group-hover:text-[#10207a]">Malam (18:00 - 23:59)</span>
                             </label>
-                            <div class="relative group">
-                                <div
-                                    class="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-rose-600 transition-colors pl-5"
-                                >
-                                    <i class="fas fa-calendar-alt text-lg"></i>
-                                </div>
-                                <input
-                                    type="date"
-                                    v-model="form.date"
-                                    :min="todayDate"
-                                    class="block w-full pl-12 pr-4 py-4 text-lg font-bold border-2 border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-white/5 focus:border-rose-600 focus:ring-0 transition-all text-gray-900 dark:text-white placeholder-gray-400 relative z-0 font-manrope focus:bg-white dark:focus:bg-black [color-scheme:light] dark:[color-scheme:dark]"
-                                />
-                            </div>
-                        </div>
-
-                        <!-- Submit -->
-                        <div class="md:col-span-2">
-                            <button
-                                type="submit"
-                                :disabled="form.processing"
-                                class="w-full h-[62px] bg-rose-600 hover:bg-rose-700 text-white rounded-2xl shadow-lg shadow-rose-600/30 transform transition-all hover:-translate-y-1 active:scale-[0.98] font-bold flex items-center justify-center space-x-2 group font-unbounded uppercase tracking-wider text-sm"
-                            >
-                                <span class="group-hover:mr-2 transition-all"
-                                    >Cari</span
-                                >
-                                <i
-                                    class="fas fa-arrow-right opacity-0 group-hover:opacity-100 transition-all -ml-4 group-hover:ml-0"
-                                ></i>
-                            </button>
                         </div>
                     </div>
-                </form>
-            </div>
 
-            <!-- Layout Grid: Sidebar & Results -->
-            <div
-                class="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-8 animate-fade-in-up"
-            >
-                <!-- Sidebar Filters -->
-                <div class="hidden lg:block lg:col-span-1 space-y-6">
-                    <div
-                        class="bg-white dark:bg-[#111] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm"
-                    >
-                        <h3
-                            class="font-unbounded font-bold text-gray-900 dark:text-white mb-6 flex items-center justify-between text-lg"
-                        >
-                            <span class="flex items-center">
-                                <i class="fas fa-filter mr-3 text-rose-600"></i>
-                                Filter
-                            </span>
-                            <button
-                                v-if="hasActiveFilters"
-                                @click="resetFilters"
-                                class="text-xs font-manrope font-bold text-gray-400 hover:text-rose-600 transition-colors flex items-center gap-1 normal-case tracking-normal"
-                            >
-                                <i class="fas fa-times-circle"></i>
-                                Reset
-                            </button>
-                        </h3>
-
-                        <div class="space-y-8">
-                            <div>
-                                <label
-                                    class="text-[11px] font-bold text-gray-400 uppercase mb-4 block tracking-widest font-manrope"
-                                    >Kelas Layanan</label
-                                >
-                                <div class="space-y-3">
-                                    <label
-                                        class="flex items-center space-x-3 cursor-pointer group"
-                                    >
-                                        <div class="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                v-model="form.class"
-                                                value="Executive"
-                                                class="peer h-5 w-5 cursor-pointer appearance-none rounded-lg border-2 border-gray-200 dark:border-gray-700 transition-all checked:border-rose-600 checked:bg-rose-600 hover:border-rose-400"
-                                            />
-                                            <i
-                                                class="fas fa-check absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"
-                                            ></i>
-                                        </div>
-                                        <span
-                                            class="text-sm font-bold text-gray-600 dark:text-gray-300 group-hover:text-rose-600 transition-colors font-manrope"
-                                            >Executive</span
-                                        >
-                                    </label>
-                                    <label
-                                        class="flex items-center space-x-3 cursor-pointer group"
-                                    >
-                                        <div class="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                v-model="form.class"
-                                                value="Suites Class"
-                                                class="peer h-5 w-5 cursor-pointer appearance-none rounded-lg border-2 border-gray-200 dark:border-gray-700 transition-all checked:border-rose-600 checked:bg-rose-600 hover:border-rose-400"
-                                            />
-                                            <i
-                                                class="fas fa-check absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"
-                                            ></i>
-                                        </div>
-                                        <span
-                                            class="text-sm font-bold text-gray-600 dark:text-gray-300 group-hover:text-rose-600 transition-colors font-manrope"
-                                            >Suites Class</span
-                                        >
-                                    </label>
-                                    <label
-                                        class="flex items-center space-x-3 cursor-pointer group"
-                                    >
-                                        <div class="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                v-model="form.class"
-                                                value="Economy"
-                                                class="peer h-5 w-5 cursor-pointer appearance-none rounded-lg border-2 border-gray-200 dark:border-gray-700 transition-all checked:border-rose-600 checked:bg-rose-600 hover:border-rose-400"
-                                            />
-                                            <i
-                                                class="fas fa-check absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"
-                                            ></i>
-                                        </div>
-                                        <span
-                                            class="text-sm font-bold text-gray-600 dark:text-gray-300 group-hover:text-rose-600 transition-colors font-manrope"
-                                            >Economy</span
-                                        >
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div
-                                class="pt-6 border-t border-gray-100 dark:border-white/5"
-                            >
-                                <label
-                                    class="text-[11px] font-bold text-gray-400 uppercase mb-4 block tracking-widest font-manrope"
-                                    >Waktu Berangkat</label
-                                >
-                                <div class="space-y-3">
-                                    <label
-                                        class="flex items-center space-x-3 cursor-pointer group"
-                                    >
-                                        <div class="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                v-model="form.time"
-                                                value="morning"
-                                                class="peer h-5 w-5 cursor-pointer appearance-none rounded-lg border-2 border-gray-200 dark:border-gray-700 transition-all checked:border-rose-600 checked:bg-rose-600 hover:border-rose-400"
-                                            />
-                                            <i
-                                                class="fas fa-check absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"
-                                            ></i>
-                                        </div>
-                                        <span
-                                            class="text-sm font-bold text-gray-600 dark:text-gray-300 group-hover:text-rose-600 transition-colors font-manrope"
-                                            >Pagi (00:00 - 12:00)</span
-                                        >
-                                    </label>
-                                    <label
-                                        class="flex items-center space-x-3 cursor-pointer group"
-                                    >
-                                        <div class="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                v-model="form.time"
-                                                value="afternoon"
-                                                class="peer h-5 w-5 cursor-pointer appearance-none rounded-lg border-2 border-gray-200 dark:border-gray-700 transition-all checked:border-rose-600 checked:bg-rose-600 hover:border-rose-400"
-                                            />
-                                            <i
-                                                class="fas fa-check absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"
-                                            ></i>
-                                        </div>
-                                        <span
-                                            class="text-sm font-bold text-gray-600 dark:text-gray-300 group-hover:text-rose-600 transition-colors font-manrope"
-                                            >Sore (12:00 - 18:00)</span
-                                        >
-                                    </label>
-                                    <label
-                                        class="flex items-center space-x-3 cursor-pointer group"
-                                    >
-                                        <div class="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                v-model="form.time"
-                                                value="evening"
-                                                class="peer h-5 w-5 cursor-pointer appearance-none rounded-lg border-2 border-gray-200 dark:border-gray-700 transition-all checked:border-rose-600 checked:bg-rose-600 hover:border-rose-400"
-                                            />
-                                            <i
-                                                class="fas fa-check absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"
-                                            ></i>
-                                        </div>
-                                        <span
-                                            class="text-sm font-bold text-gray-600 dark:text-gray-300 group-hover:text-rose-600 transition-colors font-manrope"
-                                            >Malam (18:00 - 00:00)</span
-                                        >
-                                    </label>
-                                </div>
-                            </div>
+                    <div class="border-t border-[#c6c5d3] pt-6 flex flex-col gap-4">
+                        <h4 class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Kelas Bus</h4>
+                        <div class="flex flex-col gap-3">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" v-model="form.class" value="Executive" class="w-4 h-4 rounded border-[#767683] text-[#10207a] focus:ring-[#10207a]">
+                                <span class="font-normal text-[#1c1b1b] text-[14px] group-hover:text-[#10207a]">Eksekutif</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" v-model="form.class" value="Super Executive" class="w-4 h-4 rounded border-[#767683] text-[#10207a] focus:ring-[#10207a]">
+                                <span class="font-normal text-[#1c1b1b] text-[14px] group-hover:text-[#10207a]">Super Eksekutif</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" v-model="form.class" value="Sleeper" class="w-4 h-4 rounded border-[#767683] text-[#10207a] focus:ring-[#10207a]">
+                                <span class="font-normal text-[#1c1b1b] text-[14px] group-hover:text-[#10207a]">Sleeper</span>
+                            </label>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Results List -->
-                <div class="lg:col-span-3 space-y-6">
-                    <!-- Header -->
-                    <div
-                        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-[#111] p-6 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm"
-                    >
-                        <div>
-                            <h2
-                                v-if="form.origin && form.destination"
-                                class="text-xl font-bold font-unbounded text-gray-900 dark:text-white flex items-center"
-                            >
-                                {{ form.origin }}
-                                <i
-                                    class="fas fa-long-arrow-alt-right text-gray-400 mx-3"
-                                ></i>
-                                {{ form.destination }}
-                            </h2>
-                            <h2
-                                v-else
-                                class="text-xl font-bold font-unbounded text-gray-900 dark:text-white flex items-center"
-                            >
-                                Semua Jadwal Keberangkatan
-                            </h2>
-                            <p
-                                class="text-sm font-bold text-gray-500 mt-1 font-manrope"
-                                v-if="form.date"
-                            >
-                                <i class="far fa-calendar-alt mr-1"></i>
-                                {{ formatDate(form.date) }}
-                                <span class="mx-2">•</span>
-                                <span class="text-rose-600 font-bold">{{
-                                    displaySchedules
-                                        ? displaySchedules.length
-                                        : 0
-                                }}</span>
-                                Bus Tersedia
-                            </p>
-                        </div>
-                        <div
-                            class="flex items-center space-x-3 bg-gray-50 dark:bg-white/5 p-1 rounded-xl relative overflow-hidden"
-                        >
-                            <span
-                                class="text-[10px] font-bold text-gray-400 px-2 uppercase tracking-widest relative z-10"
-                                >Urutkan</span
-                            >
-                            <div class="relative flex items-center">
-                                <select
-                                    v-model="sortBy"
-                                    class="text-sm font-bold border-none bg-transparent text-gray-900 dark:text-white focus:ring-0 cursor-pointer py-1 pl-2 pr-7 rounded-lg hover:bg-white dark:hover:bg-white/10 transition-colors font-manrope appearance-none bg-none relative z-10"
-                                >
-                                    <option value="earliest">
-                                        Paling Awal
-                                    </option>
-                                    <option value="cheapest">Termurah</option>
-                                    <option value="fastest">Tercepat</option>
-                                </select>
-                                <i
-                                    class="fas fa-chevron-down absolute right-2 text-[10px] text-gray-400 pointer-events-none z-20"
-                                ></i>
+            <!-- RIGHT CONTENT: SCHEDULES LIST -->
+            <div class="flex-1 w-full flex flex-col gap-6">
+                
+                <div class="flex justify-between items-center border-b border-[#c6c5d3] pb-4">
+                    <p class="font-semibold text-[#1c1b1b] text-[16px] m-0">Menampilkan {{ displaySchedules.length }} jadwal tersedia</p>
+                    <div class="flex items-center gap-2">
+                        <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Urutkan:</label>
+                        <select v-model="sortBy" class="bg-transparent border-none font-semibold text-[#10207a] cursor-pointer outline-none text-[14px]">
+                            <option value="earliest">Waktu Paling Awal</option>
+                            <option value="cheapest">Harga Termurah</option>
+                            <option value="fastest">Durasi Tercepat</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Loader -->
+                <div v-if="isSearching" class="py-12 flex justify-center">
+                    <div class="w-10 h-10 border-4 border-gray-200 border-t-[#10207a] rounded-full animate-spin"></div>
+                </div>
+
+                <!-- Empty State -->
+                <div v-else-if="displaySchedules.length === 0" class="py-20 flex flex-col items-center justify-center bg-white rounded-[16px] border border-[#f0edec]">
+                    <i class="fas fa-bus-slash text-4xl text-gray-300 mb-4"></i>
+                    <p class="font-semibold text-[#1c1b1b] text-[18px]">Tidak ada jadwal yang sesuai</p>
+                    <p class="text-[#454652] mt-2">Coba ubah tanggal keberangkatan atau filter Anda.</p>
+                </div>
+
+                <!-- Schedule Cards -->
+                <div v-else class="flex flex-col gap-6">
+                    <div v-for="schedule in displaySchedules" :key="schedule.id" class="bg-white border border-[#ebe7e7] rounded-[16px] p-6 flex flex-col md:flex-row gap-6 hover:shadow-lg transition-shadow">
+                        <!-- Left Info -->
+                        <div class="flex-1 flex flex-col gap-4 border-b md:border-b-0 md:border-r border-[#ebe7e7] pb-4 md:pb-0 md:pr-6">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">
+                                    {{ schedule.bus?.bus_type || 'Executive' }}
+                                </span>
+                                <span class="font-medium text-[#454652] text-[14px] flex items-center gap-1">
+                                    <i class="fas fa-chair text-gray-400"></i>
+                                    {{ getAvailableSeats(schedule) }} Kursi Tersedia
+                                </span>
+                            </div>
+
+                            <div class="flex flex-row items-center gap-6 py-2">
+                                <div class="flex flex-col items-end">
+                                    <span class="font-bold text-[#1c1b1b] text-[20px]">{{ schedule.departure_time?.slice(0, 5) }}</span>
+                                    <span class="text-[#454652] text-[14px]">{{ schedule.route?.origin }}</span>
+                                </div>
+                                <div class="flex-1 flex flex-col items-center gap-1 relative text-[#454652] text-[12px]">
+                                    <span>{{ schedule.duration }}</span>
+                                    <div class="w-full h-[1px] border-t border-dashed border-[#c6c5d3] relative">
+                                        <div class="absolute -left-1 -top-1 w-2 h-2 rounded-full border border-[#c6c5d3] bg-white"></div>
+                                        <div class="absolute -right-1 -top-1 w-2 h-2 rounded-full bg-[#10207a]"></div>
+                                    </div>
+                                    <span v-if="!schedule.is_direct" class="text-rose-500 font-medium">1 Transit</span>
+                                    <span v-else class="text-emerald-500 font-medium">Langsung</span>
+                                </div>
+                                <div class="flex flex-col items-start">
+                                    <span class="font-bold text-[#1c1b1b] text-[20px]">{{ schedule.arrival_time?.slice(0, 5) }}</span>
+                                    <span class="text-[#454652] text-[14px]">{{ schedule.route?.destination }}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Loading / Error States -->
-                    <div
-                        v-if="
-                            form.origin && form.destination && !localValidPair
-                        "
-                        class="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-800 rounded-3xl p-12 text-center animate-fade-in-up"
-                    >
-                        <div
-                            class="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-red-600 dark:text-red-400 text-3xl"
-                        >
-                            <i class="fas fa-route"></i>
-                        </div>
-                        <h3
-                            class="font-unbounded font-bold text-red-800 dark:text-red-200 text-xl mb-2"
-                        >
-                            Rute Tidak Ditemukan
-                        </h3>
-                        <p
-                            class="text-red-600 dark:text-red-300 max-w-md mx-auto font-manrope font-medium"
-                        >
-                            Mohon maaf, rute perjalanan dari
-                            <span class="font-bold">{{ form.origin }}</span> ke
-                            <span class="font-bold">{{
-                                form.destination
-                            }}</span>
-                            belum tersedia saat ini.
-                        </p>
-                    </div>
-
-                    <div
-                        v-else-if="
-                            displaySchedules && displaySchedules.length === 0
-                        "
-                        class="bg-white dark:bg-[#111] border-2 border-dashed border-gray-200 dark:border-white/10 rounded-3xl p-16 text-center animate-fade-in-up"
-                    >
-                        <div
-                            class="w-24 h-24 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300 text-5xl"
-                        >
-                            <i class="fas fa-bus-alt"></i>
-                        </div>
-                        <h3
-                            class="font-unbounded font-bold text-gray-900 dark:text-white text-xl mb-3"
-                        >
-                            Tidak Ada Jadwal
-                        </h3>
-                        <p
-                            class="text-gray-500 max-w-md mx-auto font-manrope font-medium"
-                        >
-                            Tidak ada keberangkatan bus yang ditemukan untuk
-                            tanggal yang dipilih. Silakan coba cari tanggal
-                            lain.
-                        </p>
-                    </div>
-
-                    <!-- Ticket Cards -->
-                    <div v-else class="space-y-6">
-                        <div
-                            v-for="(schedule, index) in displaySchedules"
-                            :key="schedule.id"
-                            class="group bg-white dark:bg-[#111] rounded-3xl overflow-hidden relative border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:shadow-rose-600/10 transition-all duration-300"
-                            :style="{ animationDelay: `${index * 0.1}s` }"
-                        >
-                            <div class="flex flex-col md:flex-row">
-                                <!-- Left: Bus & Route Info -->
-                                <div class="p-6 md:p-8 flex-1 relative">
-                                    <!-- Background watermark -->
-                                    <div
-                                        class="absolute right-0 bottom-0 opacity-[0.02] text-9xl text-gray-900 dark:text-white pointer-events-none select-none overflow-hidden"
-                                    >
-                                        <i class="fas fa-bus"></i>
-                                    </div>
-
-                                    <div
-                                        class="flex flex-col md:flex-row justify-between md:items-center gap-8 relative z-10"
-                                    >
-                                        <!-- Bus Identity -->
-                                        <div
-                                            class="flex items-center space-x-5"
-                                        >
-                                            <div
-                                                class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center text-gray-400 dark:text-gray-500 text-3xl shrink-0"
-                                            >
-                                                <i class="fas fa-bus"></i>
-                                            </div>
-                                            <div>
-                                                <h4
-                                                    class="text-xl font-black font-unbounded text-gray-900 dark:text-white tracking-tight"
-                                                >
-                                                    {{ schedule.bus.name }}
-                                                </h4>
-                                                <div
-                                                    class="flex items-center space-x-3 mt-2"
-                                                >
-                                                    <span
-                                                        class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider"
-                                                    >
-                                                        {{
-                                                            schedule.bus
-                                                                .bus_type
-                                                        }}
-                                                    </span>
-                                                    <span
-                                                        class="text-xs font-mono font-bold text-gray-400 border border-gray-200 dark:border-white/10 px-1.5 py-0.5 rounded"
-                                                        >{{
-                                                            schedule.bus
-                                                                .plate_number
-                                                        }}</span
-                                                    >
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Departure > Arrival Flow -->
-                                        <div
-                                            class="flex items-center flex-1 justify-center px-4 md:px-8 mt-4 md:mt-0"
-                                        >
-                                            <div class="text-center w-24">
-                                                <div
-                                                    class="text-2xl font-black font-unbounded text-gray-900 dark:text-white"
-                                                >
-                                                    {{
-                                                        schedule.departure_time
-                                                    }}
-                                                </div>
-                                                <div
-                                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 truncate font-manrope"
-                                                >
-                                                    {{ schedule.route.origin }}
-                                                </div>
-                                            </div>
-
-                                            <div
-                                                class="flex-1 flex flex-col items-center px-4 relative"
-                                            >
-                                                <div
-                                                    class="text-[10px] font-bold text-gray-400 mb-1.5 font-manrope"
-                                                >
-                                                    {{ schedule.duration }}
-                                                </div>
-                                                <div
-                                                    class="w-full h-0.5 bg-gray-200 dark:bg-gray-800 relative flex items-center justify-between"
-                                                >
-                                                    <div
-                                                        class="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-700"
-                                                    ></div>
-                                                    <i
-                                                        class="fas fa-chevron-right text-gray-200 dark:text-gray-800 text-[10px] absolute left-1/2 -translate-x-1/2"
-                                                    ></i>
-                                                    <div
-                                                        class="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-700"
-                                                    ></div>
-                                                </div>
-                                                <div
-                                                    class="mt-1.5 flex items-center space-x-1"
-                                                >
-                                                    <i
-                                                        class="fas fa-leaf text-green-500 text-[10px]"
-                                                    ></i>
-                                                    <span
-                                                        class="text-[10px] font-bold text-green-600 font-manrope"
-                                                        >Langsung</span
-                                                    >
-                                                </div>
-                                            </div>
-
-                                            <div class="text-center w-24">
-                                                <div
-                                                    class="text-2xl font-black font-unbounded text-gray-900 dark:text-white"
-                                                >
-                                                    {{ schedule.arrival_time }}
-                                                </div>
-                                                <div
-                                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 truncate font-manrope"
-                                                >
-                                                    {{
-                                                        schedule.route
-                                                            .destination
-                                                    }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Facilities Line -->
-                                    <div
-                                        class="flex flex-wrap gap-2 mt-6 pt-6 border-t border-gray-100 dark:border-white/5"
-                                    >
-                                        <div
-                                            class="flex items-center text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-white/5"
-                                            title="USB Charger"
-                                        >
-                                            <i
-                                                class="fas fa-bolt mr-2 text-yellow-500"
-                                            ></i>
-                                            USB
-                                        </div>
-                                        <div
-                                            class="flex items-center text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-white/5"
-                                            title="Air Conditioner"
-                                        >
-                                            <i
-                                                class="fas fa-snowflake mr-2 text-cyan-500"
-                                            ></i>
-                                            AC
-                                        </div>
-                                        <div
-                                            class="flex items-center text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-white/5"
-                                            title="Reclining Seat"
-                                        >
-                                            <i
-                                                class="fas fa-couch mr-2 text-rose-500"
-                                            ></i>
-                                            Seat 2-2
-                                        </div>
-                                        <div
-                                            class="flex items-center text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-white/5"
-                                        >
-                                            <i
-                                                class="fas fa-wifi mr-2 text-violet-500"
-                                            ></i>
-                                            WIFI
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Divider (Dotted Line) -->
-                                <div
-                                    class="relative md:w-px w-full md:h-auto h-px bg-transparent shrink-0"
-                                >
-                                    <div
-                                        class="absolute inset-0 md:border-l-2 border-t-2 border-dashed border-gray-100 dark:border-[#222] m-auto"
-                                    ></div>
-                                    <!-- Cutout Circles -->
-                                    <div
-                                        class="absolute -top-3 -left-3 md:-top-3 md:-left-1.5 w-6 h-6 bg-white dark:bg-[#050505] rounded-full z-10 border-b border-gray-100 dark:border-white/5"
-                                    ></div>
-                                    <div
-                                        class="absolute -bottom-3 -left-3 md:-bottom-3 md:-left-1.5 w-6 h-6 bg-white dark:bg-[#050505] rounded-full z-10 border-t border-gray-100 dark:border-white/5"
-                                    ></div>
-                                </div>
-
-                                <!-- Right: Price & Action -->
-                                <div
-                                    class="p-6 md:p-8 md:w-72 bg-gray-50/50 dark:bg-white/5 flex flex-col justify-center items-center text-center space-y-5 shrink-0 relative"
-                                >
-                                    <!-- Departed Overlay -->
-                                    <div
-                                        v-if="schedule.has_departed"
-                                        class="absolute inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-[2px] z-10 flex items-center justify-center p-4"
-                                    >
-                                        <div
-                                            class="bg-rose-600 text-white px-4 py-2 rounded-2xl font-black font-unbounded text-sm shadow-xl transform -rotate-12 border-2 border-white dark:border-black"
-                                        >
-                                            BERANGKAT
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div
-                                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 font-manrope"
-                                        >
-                                            Harga Tiket
-                                        </div>
-                                        <div
-                                            class="text-3xl font-black text-rose-600 tracking-tight font-unbounded"
-                                            :class="{
-                                                'opacity-50 grayscale':
-                                                    schedule.has_departed,
-                                            }"
-                                        >
-                                            {{ formatPrice(schedule.price) }}
-                                        </div>
-                                    </div>
-
-                                    <div class="w-full space-y-3">
-                                        <Link
-                                            v-if="!schedule.has_departed"
-                                            :href="
-                                                route('frontend.booking.show', {
-                                                    id: schedule.id,
-                                                    date: form.date,
-                                                })
-                                            "
-                                            class="w-full flex items-center justify-center py-4 bg-gray-900 dark:bg-white hover:bg-rose-600 dark:hover:bg-rose-600 text-white dark:text-gray-900 hover:text-white dark:hover:text-white rounded-2xl font-bold font-unbounded text-sm transition-all duration-300 shadow-lg shadow-gray-200 dark:shadow-none group-hover:scale-105"
-                                        >
-                                            Pilih Tiket
-                                        </Link>
-                                        <button
-                                            v-else
-                                            disabled
-                                            class="w-full py-4 text-sm bg-gray-200 dark:bg-gray-800 text-gray-400 rounded-2xl font-bold font-unbounded cursor-not-allowed"
-                                        >
-                                            Habis
-                                        </button>
-
-                                        <div
-                                            class="text-[10px] font-bold text-gray-400 flex items-center justify-center space-x-1"
-                                        >
-                                            <i class="fas fa-chair text-xs"></i>
-                                            <span>
-                                                Sisa
-                                                {{ schedule.available_seats }}
-                                                Kursi
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                        <!-- Right Info -->
+                        <div class="w-full md:w-[220px] flex flex-col items-start md:items-end justify-center gap-4">
+                            <div class="flex flex-col items-start md:items-end w-full">
+                                <span class="font-bold text-[#10207a] text-[24px]">{{ formatPrice(schedule.price) }}</span>
+                                <span class="text-[#454652] text-[12px]">/ kursi</span>
                             </div>
+                            <Link v-if="!schedule.has_departed && getAvailableSeats(schedule) > 0" :href="route('frontend.booking.show', { id: schedule.id, date: form.date })" class="w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center hover:bg-[#0c185e] transition-colors">
+                                Pilih Kursi
+                            </Link>
+                            <button v-else-if="schedule.has_departed" disabled class="w-full bg-gray-300 text-gray-500 py-3 rounded-[8px] font-semibold text-[14px] text-center cursor-not-allowed">
+                                Sudah Berangkat
+                            </button>
+                            <button v-else disabled class="w-full bg-rose-100 text-rose-500 py-3 rounded-[8px] font-semibold text-[14px] text-center cursor-not-allowed">
+                                Habis Terjual
+                            </button>
                         </div>
                     </div>
                 </div>

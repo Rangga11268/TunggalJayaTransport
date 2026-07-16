@@ -16,6 +16,7 @@ const form = useForm({
     name: props.bus.name,
     plate_number: props.bus.plate_number,
     bus_type: props.bus.bus_type,
+    bus_category: props.bus.bus_category || "akap",
     capacity: props.bus.capacity,
     description: props.bus.description,
     year: props.bus.year,
@@ -189,6 +190,32 @@ const availableConductors = computed(() => {
                                 class="text-red-500 text-xs mt-1"
                             >
                                 {{ form.errors.bus_type }}
+                            </p>
+                        </div>
+
+                        <!-- Bus Category -->
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                            >
+                                Kategori Bus
+                            </label>
+                            <select
+                                v-model="form.bus_category"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red outline-none transition-all"
+                                :class="{
+                                    'border-red-500 focus:ring-red-500/50':
+                                        form.errors.bus_category,
+                                }"
+                            >
+                                <option value="akap">AKAP (Antar Kota)</option>
+                                <option value="pariwisata">Pariwisata (Sewa)</option>
+                            </select>
+                            <p
+                                v-if="form.errors.bus_category"
+                                class="text-red-500 text-xs mt-1"
+                            >
+                                {{ form.errors.bus_category }}
                             </p>
                         </div>
 

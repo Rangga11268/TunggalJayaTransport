@@ -1,13 +1,7 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
-import { Link, usePage } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
+import { Link, useForm, usePage, Head } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useMagnetic } from "@/Composables/useMagnetic";
-
-// Register ScrollTrigger
-gsap.registerPlugin(ScrollTrigger);
 
 defineOptions({ layout: FrontendLayout });
 
@@ -15,1054 +9,441 @@ const props = defineProps({
     featuredRoutes: Array,
     latestNews: Array,
     fleet: Array,
-    fleetCount: Number,
-    routeCount: Number,
-    customerCount: Number,
     origins: Array,
     destinations: Array,
-    personalizedRecommendations: Array,
 });
 
 const page = usePage();
 
 // Form State
-const origin = ref("");
-const destination = ref("");
-const date = ref("");
-const busType = ref("");
-const showOriginDropdown = ref(false);
-const showDestinationDropdown = ref(false);
-const filteredOrigins = ref([]);
-const filteredDestinations = ref([]);
+const form = useForm({
+    origin: "",
+    destination: "",
+    date: "",
+    class: "",
+});
 
-// Magnetic Refs
-const heroBtn1 = ref(null);
-const heroBtn2 = ref(null);
-const searchBtn = ref(null);
-const ctaBtn1 = ref(null);
-const ctaBtn2 = ref(null);
+const today = new Date().toISOString().split("T")[0];
+const activeTab = ref('reguler'); // reguler or charter
 
-useMagnetic(heroBtn1);
-useMagnetic(heroBtn2);
-useMagnetic(searchBtn);
-useMagnetic(ctaBtn1);
-useMagnetic(ctaBtn2);
-
-// UI State
-const isScrolled = ref(false);
-const currentHeroImage = ref(0);
-const heroImages = [
-    "/img/heroImg.jpg", // Ensure this exists or use a fallback
-    // Add more if available
-];
+const submitSearch = () => {
+    form.get(route('frontend.booking.index'));
+};
 
 const busTypes = [
-    { id: "", name: "All Classes", icon: "fas fa-layer-group" },
-    { id: "Executive", name: "Executive Class", icon: "fas fa-crown" },
-    { id: "Business", name: "Business Class", icon: "fas fa-briefcase" },
-    { id: "Economy", name: "Economy Class", icon: "fas fa-piggy-bank" },
+    { id: "", name: "Semua Kelas" },
+    { id: "Executive", name: "Eksekutif" },
+    { id: "Super Executive", name: "Super Eksekutif" },
+    { id: "Sleeper", name: "Sleeper" },
 ];
 
-const features = [
-    {
-        title: "Leg Rest",
-        desc: "Maksimal selunjur",
-        icon: "fas fa-couch",
-        color: "text-rose-400",
-        bg: "bg-rose-400/10",
-        colSpan: "col-span-1 md:col-span-2",
-    },
-    {
-        title: "Entertain",
-        desc: "Audio Video on Demand",
-        icon: "fas fa-tv",
-        color: "text-blue-400",
-        bg: "bg-blue-400/10",
-        colSpan: "col-span-1",
-    },
-    {
-        title: "Snack",
-        desc: "Gratis snack & minum",
-        icon: "fas fa-cookie-bite",
-        color: "text-amber-400",
-        bg: "bg-amber-400/10",
-        colSpan: "col-span-1",
-    },
-    {
-        title: "Charger",
-        desc: "USB Port tiap kursi",
-        icon: "fas fa-bolt",
-        color: "text-emerald-400",
-        bg: "bg-emerald-400/10",
-        colSpan: "col-span-1 md:col-span-2",
-    },
-];
-
-const formatDate = (dateString) => {
-    if (!dateString) return "Tanggal Belum Tersedia";
-    const date = new Date(dateString);
-    if (isNaN(date.getTime()) || date.getFullYear() <= 1970)
-        return "Tanggal Belum Tersedia";
-    return date.toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
-};
-
-// Computed
-const today = computed(() => new Date().toISOString().split("T")[0]);
-
-// Methods
-const filterOrigins = () => {
-    if (!origin.value) {
-        filteredOrigins.value = props.origins || [];
-    } else {
-        filteredOrigins.value = (props.origins || []).filter((o) =>
-            o.toLowerCase().includes(origin.value.toLowerCase()),
-        );
-    }
-    showOriginDropdown.value = true;
-};
-
-const filterDestinations = () => {
-    if (!destination.value) {
-        filteredDestinations.value = props.destinations || [];
-    } else {
-        filteredDestinations.value = (props.destinations || []).filter((d) =>
-            d.toLowerCase().includes(destination.value.toLowerCase()),
-        );
-    }
-    showDestinationDropdown.value = true;
-};
-
-const selectOrigin = (val) => {
-    origin.value = val;
-    showOriginDropdown.value = false;
-};
-
-const selectDestination = (val) => {
-    destination.value = val;
-    showDestinationDropdown.value = false;
-};
-
-const swapLocations = () => {
-    [origin.value, destination.value] = [destination.value, origin.value];
-};
-
-const formatPrice = (price) => {
-    return new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(price);
-};
-
-// Animations
-onMounted(() => {
-    filteredOrigins.value = props.origins || [];
-    filteredDestinations.value = props.destinations || [];
-
-    // GSAP Hero Animation
-    gsap.from(".hero-text-char", {
-        y: 100,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.05,
-        ease: "power4.out",
-    });
-
-    gsap.from(".hero-console", {
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        delay: 0.5,
-        ease: "power3.out",
-    });
-
-    // Scroll Trigger for Bento Grid
-    gsap.utils.toArray(".bento-item").forEach((item, i) => {
-        gsap.from(item, {
-            scrollTrigger: {
-                trigger: item,
-                start: "top 85%",
-            },
-            y: 50,
-            opacity: 0,
-            duration: 0.8,
-            delay: i * 0.1,
-            ease: "back.out(1.7)",
-        });
-    });
-
-    // Close dropdowns on click outside
-    document.addEventListener("click", (e) => {
-        if (!e.target.closest(".origin-group"))
-            showOriginDropdown.value = false;
-        if (!e.target.closest(".destination-group"))
-            showDestinationDropdown.value = false;
-    });
+// Charter Form State
+const charterForm = useForm({
+    destination: "",
+    date: "",
+    duration: "1",
 });
+
+const openWhatsAppInquiry = () => {
+    const dest = charterForm.destination || "-";
+    const date = charterForm.date || "-";
+    const text = `Halo Tunggal Jaya, saya ingin bertanya tentang sewa bus pariwisata.\n\nTujuan: ${dest}\nTanggal: ${date}\nDurasi: ${charterForm.duration} Hari\n\nMohon info ketersediaan dan harganya. Terima kasih.`;
+    window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(text)}`, '_blank');
+};
 </script>
 
 <template>
-    <Head title="Future Travel" />
+    <Head title="Beranda - Tunggal Jaya Transport" />
 
-    <div
-        class="bg-gray-50 dark:bg-[#050505] min-h-screen text-gray-900 dark:text-gray-100 font-manrope selection:bg-rose-600 selection:text-white overflow-x-hidden transition-colors duration-300"
-    >
+    <div class="relative size-full  bg-[#fcf9f8]">
         <!-- HERO SECTION -->
-        <section
-            class="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 overflow-hidden"
-        >
-            <!-- Minimal Background -->
-            <div class="absolute inset-0 z-0 select-none">
-                <!-- Solid Overlays -->
-                <div
-                    class="absolute inset-0 bg-white/90 dark:bg-black/70 z-10 transition-colors duration-300"
-                ></div>
-                <img
-                    src="/img/heroImg.jpg"
-                    alt="Background"
-                    class="w-full h-full object-cover grayscale opacity-40 dark:opacity-50 scale-105 animate-subtle-zoom"
-                />
+        <div class="relative content-stretch flex items-center justify-center left-0 min-h-[800px] pb-[128px] pt-[192px] right-0 top-0">
+            <div class="absolute content-stretch flex flex-col inset-0 items-start justify-center">
+                <div class="flex-[1_0_0] min-h-px relative w-full">
+                    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                        <!-- Hero Background (Replacing local asset with original image style) -->
+                        <img class="absolute block h-full left-0 object-cover top-0 w-full z-0" src="/img/primadona.webp" alt="Hero Image" />
+                    </div>
+                </div>
+                <div class="absolute bg-gradient-to-r from-[rgba(0,0,0,0.8)] inset-0 to-[rgba(0,0,0,0)] via-1/2 via-[rgba(0,0,0,0.5)]"></div>
+                <div class="absolute bg-gradient-to-t bottom-0 from-[#fcf9f8] h-[128px] left-0 to-[rgba(252,249,248,0)] w-full"></div>
             </div>
 
-            <div
-                class="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center"
-            >
-                <!-- Hero Typography -->
-                <div class="lg:col-span-7 space-y-8 text-center lg:text-left">
-                    <div
-                        class="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 backdrop-blur-md mb-4 shadow-sm"
-                    >
-                        <span
-                            class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"
-                        ></span>
-                        <span
-                            class="text-xs font-bold tracking-[0.2em] font-unbounded text-rose-600 dark:text-white uppercase"
-                            >Revolusi Perjalanan Darat</span
-                        >
+            <div class="flex-[1_0_0] max-w-[1280px] w-full min-w-px relative px-16">
+                <div class="content-stretch flex flex-col gap-[24px] items-start max-w-[672px]">
+                    <div class="content-stretch flex flex-col items-start relative shrink-0 w-full">
+                        <div class="flex flex-col font-unbounded font-extrabold justify-center leading-[0] relative shrink-0 text-[56px] text-white tracking-[-1.4px] w-full">
+                            <p class="leading-[61.6px] mb-0">Perjalanan Nyaman,</p>
+                            <p class="leading-[61.6px]">Tiba Tepat Waktu</p>
+                        </div>
                     </div>
-
-                    <h1
-                        class="text-4xl sm:text-7xl lg:text-8xl font-black font-unbounded leading-[0.9] tracking-tight text-gray-900 dark:text-white"
-                    >
-                        <div class="overflow-hidden">
-                            <span class="hero-text-char inline-block"
-                                >JELAJAH</span
-                            >
+                    <div class="content-stretch flex flex-col items-start max-w-[576px] relative shrink-0 w-full">
+                        <div class="flex flex-col font-normal justify-center leading-[0] relative shrink-0 text-[20px] text-[rgba(255,255,255,0.9)]">
+                            <p class="leading-[30px] mb-0">Pesan tiket bus AKAP kelas eksekutif atau sewa armada bus</p>
+                            <p class="leading-[30px] mb-0">pariwisata premium untuk perjalanan yang tak terlupakan</p>
+                            <p class="leading-[30px]">bersama Tunggal Jaya.</p>
                         </div>
-                        <!-- Solid Red Emphasis -->
-                        <div class="overflow-hidden">
-                            <span
-                                class="hero-text-char inline-block text-rose-600"
-                                >TANPA BATAS</span
-                            >
-                        </div>
-                    </h1>
-
-                    <p
-                        class="text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
-                    >
-                        Spesialis AKAP Kuningan - Jakarta & Rangkasbitung via
-                        berbagai jalur strategis. Hadir dengan layanan bus malam
-                        premium dan divisi pariwisata yang siap menemani setiap
-                        momen perjalanan Anda dengan kenyamanan maksimal.
-                    </p>
-
-                    <div
-                        class="flex flex-wrap gap-4 justify-center lg:justify-start pt-6"
-                    >
-                        <!-- Solid High-Contrast Button -->
-                        <Link
-                            ref="heroBtn1"
-                            :href="route('frontend.fleet.index')"
-                            class="group relative px-10 py-5 bg-rose-600 text-white font-unbounded font-bold rounded-full overflow-hidden transition-all hover:bg-rose-700 hover:scale-[1.02] shadow-xl shadow-rose-600/20 inline-flex items-center"
-                        >
-                            <span class="relative z-10 flex items-center gap-2">
-                                Lihat Armada
-                                <i
-                                    class="fas fa-arrow-right text-sm -rotate-45 group-hover:rotate-0 transition-transform"
-                                ></i>
-                            </span>
-                        </Link>
-                        <Link
-                            ref="heroBtn2"
-                            :href="route('frontend.routes.index')"
-                            class="px-10 py-5 bg-transparent border-2 border-gray-200 dark:border-white/20 text-gray-900 dark:text-white font-unbounded font-bold rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-all inline-flex items-center"
-                        >
-                            Rute Aktif
-                        </Link>
                     </div>
                 </div>
 
-                <!-- Travel Console (Clean Glass) -->
-                <div class="lg:col-span-5 hero-console">
-                    <div
-                        class="bg-white/80 dark:bg-[#111]/80 backdrop-blur-2xl border border-white/20 dark:border-white/10 p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 dark:shadow-black/50 relative overflow-hidden transition-colors duration-300"
-                    >
-                        <h3
-                            class="text-2xl font-unbounded font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3"
-                        >
-                            <span
-                                class="w-8 h-8 rounded-full bg-rose-600 flex items-center justify-center text-white text-sm"
-                            >
+                <!-- Booking Console -->
+                <div class="mt-12 bg-white border border-[#f0edec] border-solid content-stretch flex flex-col gap-[24px] items-center max-w-[1000px] p-[13px] rounded-[16px] shadow-xl relative z-10 w-full">
+                    <div class="bg-[#f6f3f2] relative rounded-[8px] shrink-0">
+                        <div class="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-start p-[4px] relative size-full">
+                            <button @click="activeTab = 'reguler'" :class="[activeTab === 'reguler' ? 'bg-white drop-shadow-sm text-[#10207a]' : 'text-[#454652] hover:bg-gray-100']" class="content-stretch flex gap-[8px] items-center justify-center px-[32px] py-[12px] relative rounded-[4px] shrink-0 font-semibold text-[14px] transition-colors">
                                 <i class="fas fa-ticket-alt"></i>
-                            </span>
-                            Pesan Tiket
-                        </h3>
+                                Tiket Reguler
+                            </button>
+                            <button @click="activeTab = 'charter'" :class="[activeTab === 'charter' ? 'bg-white drop-shadow-sm text-[#10207a]' : 'text-[#454652] hover:bg-gray-100']" class="content-stretch flex gap-[8px] items-center justify-center px-[32px] py-[12px] relative rounded-[4px] shrink-0 font-semibold text-[14px] transition-colors">
+                                <i class="fas fa-bus"></i>
+                                Sewa Bus
+                            </button>
+                        </div>
+                    </div>
 
-                        <form
-                            :action="route('frontend.booking.index')"
-                            method="GET"
-                            class="space-y-6 relative z-10"
-                        >
-                            <!-- Origin -->
-                            <div class="relative origin-group">
-                                <label
-                                    class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block"
-                                    >Keberangkatan</label
-                                >
-                                <div class="relative group">
-                                    <div
-                                        class="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-rose-600 transition-colors pl-4"
-                                    >
-                                        <i
-                                            class="fas fa-map-marker-alt text-lg"
-                                        ></i>
-                                    </div>
-                                    <input
-                                        v-model="origin"
-                                        @input="filterOrigins"
-                                        @focus="showOriginDropdown = true"
-                                        type="text"
-                                        name="origin"
-                                        class="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-rose-600 rounded-2xl py-4 pl-12 pr-4 text-lg font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-black transition-all font-manrope"
-                                        placeholder="Dari mana?"
-                                        autocomplete="off"
-                                    />
-                                    <!-- Dropdown -->
-                                    <div
-                                        v-if="
-                                            showOriginDropdown &&
-                                            filteredOrigins.length
-                                        "
-                                        class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl shadow-xl z-50 max-h-60 overflow-y-auto p-2"
-                                    >
-                                        <div
-                                            v-for="city in filteredOrigins"
-                                            :key="city"
-                                            @click="selectOrigin(city)"
-                                            class="px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer text-gray-700 dark:text-gray-200 font-medium transition-colors"
-                                        >
-                                            {{ city }}
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- Search Form -->
+                    <div class="relative shrink-0 w-full">
+                        <form v-if="activeTab === 'reguler'" @submit.prevent="submitSearch" class="bg-clip-padding border-0 border-[transparent] border-solid flex gap-[16px] items-end p-[16px] relative size-full">
+                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
+                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Dari</label>
+                                <select v-model="form.origin" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-10 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer appearance-none">
+                                    <option value="" disabled>Pilih Kota Asal</option>
+                                    <option v-for="origin in origins" :key="origin" :value="origin">{{ origin }}</option>
+                                </select>
+                            </div>
 
-                                <!-- Swap Button (Absolute to Origin, Centered in Gap) -->
-                                <div
-                                    class="absolute right-4 top-[calc(100%+12px)] -translate-y-1/2 z-30"
-                                >
-                                    <button
-                                        type="button"
-                                        @click="swapLocations"
-                                        class="w-10 h-10 rounded-full bg-white dark:bg-[#222] border-2 border-gray-100 dark:border-[#333] text-gray-400 hover:text-rose-600 hover:border-rose-600 transition-all flex items-center justify-center shadow-lg transform hover:rotate-180 duration-300"
-                                    >
-                                        <i
-                                            class="fas fa-exchange-alt text-sm"
-                                        ></i>
-                                    </button>
+                            <div class="flex items-center justify-center pt-8">
+                                <div class="bg-[#f0edec] rounded-full p-2 text-[#454652] cursor-pointer hover:bg-gray-200">
+                                    <i class="fas fa-exchange-alt"></i>
                                 </div>
                             </div>
 
-                            <!-- Destination -->
-                            <div class="relative destination-group">
-                                <label
-                                    class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block"
-                                    >Tujuan</label
-                                >
-                                <div class="relative group">
-                                    <div
-                                        class="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-rose-600 transition-colors pl-4"
-                                    >
-                                        <i
-                                            class="fas fa-location-dot text-lg"
-                                        ></i>
-                                    </div>
-                                    <input
-                                        v-model="destination"
-                                        @input="filterDestinations"
-                                        @focus="showDestinationDropdown = true"
-                                        type="text"
-                                        name="destination"
-                                        class="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-rose-600 rounded-2xl py-4 pl-12 pr-4 text-lg font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-black transition-all font-manrope"
-                                        placeholder="Mau kemana?"
-                                        autocomplete="off"
-                                    />
-                                    <!-- Dropdown -->
-                                    <div
-                                        v-if="
-                                            showDestinationDropdown &&
-                                            filteredDestinations.length
-                                        "
-                                        class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl shadow-xl z-50 max-h-60 overflow-y-auto p-2"
-                                    >
-                                        <div
-                                            v-for="city in filteredDestinations"
-                                            :key="city"
-                                            @click="selectDestination(city)"
-                                            class="px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer text-gray-700 dark:text-gray-200 font-medium transition-colors"
-                                        >
-                                            {{ city }}
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
+                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Ke</label>
+                                <select v-model="form.destination" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-10 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer appearance-none">
+                                    <option value="" disabled>Pilih Kota Tujuan</option>
+                                    <option v-for="dest in destinations" :key="dest" :value="dest">{{ dest }}</option>
+                                </select>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <!-- Date -->
-                                <div class="relative">
-                                    <label
-                                        class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block"
-                                        >Tanggal</label
-                                    >
-                                    <input
-                                        v-model="date"
-                                        name="date"
-                                        type="date"
-                                        :min="today"
-                                        class="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-rose-600 rounded-2xl py-4 pl-4 pr-2 text-gray-900 dark:text-white font-bold focus:outline-none focus:bg-white dark:focus:bg-black transition-all font-manrope [color-scheme:light] dark:[color-scheme:dark]"
-                                    />
-                                </div>
-
-                                <!-- Class -->
-                                <div class="relative">
-                                    <label
-                                        class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block"
-                                        >Kelas</label
-                                    >
-                                    <select
-                                        v-model="busType"
-                                        name="class"
-                                        class="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-rose-600 rounded-2xl py-4 pl-4 pr-8 text-gray-900 dark:text-white font-bold focus:outline-none focus:bg-white dark:focus:bg-black transition-all font-manrope appearance-none cursor-pointer"
-                                    >
-                                        <option
-                                            v-for="t in busTypes"
-                                            :key="t.id"
-                                            :value="t.id"
-                                            class="bg-white dark:bg-[#222]"
-                                        >
-                                            {{ t.name }}
-                                        </option>
-                                    </select>
-                                    <i
-                                        class="fas fa-chevron-down absolute right-4 top-[3.2rem] text-gray-400 text-xs pointer-events-none"
-                                    ></i>
-                                </div>
+                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
+                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Tanggal</label>
+                                <input v-model="form.date" type="date" :min="today" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-4 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer">
                             </div>
 
-                            <button
-                                type="submit"
-                                ref="searchBtn"
-                                class="w-full py-5 bg-rose-600 text-white font-unbounded font-bold rounded-2xl shadow-xl shadow-rose-600/30 hover:bg-rose-700 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 group"
-                            >
-                                <i
-                                    class="fas fa-search group-hover:rotate-90 transition-transform duration-300"
-                                ></i>
-                                <span>Cari Jadwal Perjalanan</span>
+                            <button type="submit" class="bg-[#10207a] hover:bg-[#0c185e] text-white px-8 py-4 rounded-[8px] font-semibold text-[16px] transition-colors h-[58px] flex items-center justify-center gap-2">
+                                <i class="fas fa-search"></i>
+                                Cari
+                            </button>
+                        </form>
+
+                        <form v-if="activeTab === 'charter'" @submit.prevent="openWhatsAppInquiry" class="bg-clip-padding border-0 border-[transparent] border-solid flex gap-[16px] items-end p-[16px] relative size-full">
+                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
+                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Tujuan Wisata</label>
+                                <input v-model="charterForm.destination" type="text" placeholder="Contoh: Bali, Jogja..." class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-4 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none">
+                            </div>
+                            
+                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
+                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Tanggal Berangkat</label>
+                                <input v-model="charterForm.date" type="date" :min="today" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-4 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none">
+                            </div>
+
+                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
+                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Durasi (Hari)</label>
+                                <select v-model="charterForm.duration" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-10 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none appearance-none">
+                                    <option value="1">1 Hari</option>
+                                    <option value="2">2 Hari</option>
+                                    <option value="3">3 Hari</option>
+                                    <option value="4">4+ Hari</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="bg-[#25D366] hover:bg-[#128C7E] text-white px-8 py-4 rounded-[8px] font-semibold text-[16px] transition-colors h-[58px] flex items-center justify-center gap-2">
+                                <i class="fab fa-whatsapp text-lg"></i>
+                                Tanya Admin
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- BENTO FEATURES (Solid & Clean) -->
-        <section class="py-24 relative z-10">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div
-                    class="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6"
-                >
-                    <div>
-                        <h2
-                            class="text-3xl md:text-5xl font-black font-unbounded text-gray-900 dark:text-white mb-4"
-                        >
-                            Standar <span class="text-rose-600">Premium</span>
-                        </h2>
-                        <p
-                            class="text-gray-500 dark:text-gray-400 max-w-xl text-lg font-medium"
-                        >
-                            Meningkatkan kenyamanan perjalanan Anda dengan
-                            fasilitas kelas satu dan kebersihan terjamin.
-                        </p>
+        <!-- POPULAR ROUTES SECTION -->
+        <div class="bg-[#f8f9fa] flex flex-col items-center py-[128px]">
+            <div class="flex flex-col gap-[48px] items-start max-w-[1280px] px-[64px] w-full">
+                <div class="flex items-end justify-between w-full">
+                    <div class="flex flex-col gap-[8px] items-start">
+                        <h2 class="font-unbounded font-bold text-[#1c1b1b] text-[32px] tracking-[-0.32px] m-0">Rute Perjalanan Populer</h2>
+                        <p class="font-normal text-[#454652] text-[16px] m-0">Pilihan destinasi favorit penumpang kami.</p>
+                    </div>
+                    <div class="flex gap-[8px] items-start hidden sm:flex">
+                        <button class="bg-white border border-[#c6c5d3] flex items-center justify-center rounded-[12px] size-[40px] hover:bg-gray-50 transition-colors"><i class="fas fa-arrow-left text-gray-500"></i></button>
+                        <button class="bg-white border border-[#c6c5d3] flex items-center justify-center rounded-[12px] size-[40px] hover:bg-gray-50 transition-colors"><i class="fas fa-arrow-right text-gray-500"></i></button>
                     </div>
                 </div>
 
-                <div
-                    class="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-[220px]"
-                >
-                    <!-- Stats Block (Solid Rose) -->
-                    <div
-                        class="bento-item col-span-1 md:col-span-2 row-span-2 bg-rose-600 rounded-[2.5rem] p-10 flex flex-col justify-between relative overflow-hidden group shadow-2xl shadow-rose-900/20"
-                    >
-                        <!-- Abstract Clean Shapes -->
-                        <div
-                            class="absolute -right-10 -top-10 w-64 h-64 bg-rose-500 rounded-full opacity-50 blur-3xl"
-                        ></div>
-                        <i
-                            class="fas fa-bus text-[10rem] text-rose-800 opacity-20 absolute -bottom-8 -right-8 rotate-[-15deg] group-hover:rotate-0 transition-transform duration-700 ease-out"
-                        ></i>
-
-                        <div class="relative z-10">
-                            <div class="flex items-center gap-3 mb-6">
-                                <span
-                                    class="w-3 h-3 rounded-full bg-white animate-pulse"
-                                ></span>
-                                <span
-                                    class="text-rose-200 font-bold tracking-widest text-xs uppercase"
-                                    >Status Armada</span
-                                >
+                <div class="w-full overflow-x-auto pb-8 snap-x">
+                    <div class="flex gap-[24px] w-max">
+                        <!-- Example Card 1 -->
+                        <div class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[360px] flex flex-col p-6 snap-center">
+                            <div class="flex items-center justify-between w-full mb-6">
+                                <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">Eksekutif</span>
+                                <i class="fas fa-star text-yellow-400"></i>
                             </div>
-                            <div
-                                class="text-6xl md:text-8xl font-black font-unbounded text-white tracking-tighter"
-                            >
-                                {{ fleetCount
-                                }}<span class="text-3xl md:text-4xl align-top"
-                                    >+</span
-                                >
+                            <div class="flex items-center gap-4 mb-4">
+                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Kuningan</span>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Jakarta</span>
+                            </div>
+                            <p class="font-normal text-[#454652] text-[16px] mb-6">Keberangkatan Pagi & Malam</p>
+                            <div class="border-t border-[#ebe7e7] pt-4 mt-auto">
+                                <p class="font-bold text-[#454652] text-[12px] tracking-wider uppercase mb-1">Mulai Dari</p>
+                                <p class="font-unbounded font-semibold text-[#10207a] text-[24px]">Rp 150.000</p>
+                                <Link :href="route('frontend.booking.index', { origin: 'Kuningan', destination: 'Jakarta' })" class="mt-4 w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center block hover:bg-[#0c185e] transition-colors">
+                                    Pesan Tiket
+                                </Link>
                             </div>
                         </div>
-                        <div
-                            class="text-rose-100 font-medium text-xl max-w-xs relative z-10 leading-snug"
-                        >
-                            Armada modern beroperasi setiap hari di rute
-                            Trans-Jawa.
-                        </div>
-                    </div>
 
-                    <!-- Feature Items (Clean Cards) -->
-                    <div
-                        v-for="(feat, i) in features"
-                        :key="i"
-                        class="bento-item rounded-[2.5rem] p-8 bg-white dark:bg-[#111] hover:bg-gray-50 dark:hover:bg-[#151515] transition-all border border-gray-100 dark:border-[#222] group shadow-sm hover:shadow-md flex flex-col justify-between"
-                        :class="feat.colSpan"
-                    >
-                        <div
-                            class="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-[#222] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300"
-                        >
-                            <!-- Solid Colors for icons, no gradients -->
-                            <i
-                                :class="[feat.icon]"
-                                class="text-gray-900 dark:text-white"
-                            ></i>
-                        </div>
-                        <div>
-                            <h3
-                                class="font-unbounded font-bold text-gray-900 dark:text-white text-xl mb-2"
-                            >
-                                {{ feat.title }}
-                            </h3>
-                            <p
-                                class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-relaxed"
-                            >
-                                {{ feat.desc }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SERVICE EXCELLENCE (AKAP & Tourism) -->
-        <section
-            class="py-24 bg-gray-50 dark:bg-[#080808] relative overflow-hidden"
-        >
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div
-                    class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
-                >
-                    <div class="space-y-8">
-                        <div>
-                            <span
-                                class="text-rose-600 font-black tracking-widest text-xs uppercase font-unbounded mb-4 block"
-                                >Our Specialization</span
-                            >
-                            <h2
-                                class="text-4xl md:text-5xl font-black font-unbounded text-gray-900 dark:text-white leading-tight"
-                            >
-                                Menghubungkan
-                                <span class="text-rose-600">Kuningan</span> ke
-                                Ibu Kota
-                            </h2>
-                        </div>
-                        <p
-                            class="text-gray-500 dark:text-gray-400 text-lg leading-relaxed font-medium"
-                        >
-                            Sebagai Po yang lahir dari kecintaan pada layanan
-                            transportasi, kami mendedikasikan diri sebagai
-                            spesialis rute
-                            <span
-                                class="text-gray-900 dark:text-white font-bold"
-                                >Kuningan - Jakarta</span
-                            >
-                            via berbagai jalur strategis serta menjangkau
-                            <span
-                                class="text-gray-900 dark:text-white font-bold"
-                                >Rangkasbitung</span
-                            >. Kami memastikan setiap penumpang mendapatkan
-                            pengalaman "Executive Treatment" di setiap kilometer
-                            perjalanan.
-                        </p>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div
-                                class="p-6 bg-white dark:bg-[#111] rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm"
-                            >
-                                <i
-                                    class="fas fa-map-marked-alt text-rose-600 text-2xl mb-4"
-                                ></i>
-                                <h4
-                                    class="font-unbounded font-bold text-gray-900 dark:text-white mb-2 text-sm uppercase"
-                                >
-                                    AKAP Division
-                                </h4>
-                                <p class="text-xs text-gray-500 font-medium">
-                                    Layanan bus malam reguler dengan sasis
-                                    premium dan ketepatan waktu tinggi.
-                                </p>
+                        <!-- Example Card 2 -->
+                        <div class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[360px] flex flex-col p-6 snap-center">
+                            <div class="flex items-center justify-between w-full mb-6">
+                                <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">Super Eksekutif</span>
+                                <i class="fas fa-star text-yellow-400"></i>
                             </div>
-                            <div
-                                class="p-6 bg-white dark:bg-[#111] rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm"
-                            >
-                                <i
-                                    class="fas fa-umbrella-beach text-rose-600 text-2xl mb-4"
-                                ></i>
-                                <h4
-                                    class="font-unbounded font-bold text-gray-900 dark:text-white mb-2 text-sm uppercase"
-                                >
-                                    Tourism Division
-                                </h4>
-                                <p class="text-xs text-gray-500 font-medium">
-                                    Sewa bus pariwisata untuk kebutuhan grup,
-                                    ziarah, dan perjalanan wisata keluarga.
-                                </p>
+                            <div class="flex items-center gap-4 mb-4">
+                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Cirebon</span>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Bandung</span>
+                            </div>
+                            <p class="font-normal text-[#454652] text-[16px] mb-6">Via Tol Cipali</p>
+                            <div class="border-t border-[#ebe7e7] pt-4 mt-auto">
+                                <p class="font-bold text-[#454652] text-[12px] tracking-wider uppercase mb-1">Mulai Dari</p>
+                                <p class="font-unbounded font-semibold text-[#10207a] text-[24px]">Rp 120.000</p>
+                                <Link :href="route('frontend.booking.index', { origin: 'Cirebon', destination: 'Bandung' })" class="mt-4 w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center block hover:bg-[#0c185e] transition-colors">
+                                    Pesan Tiket
+                                </Link>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="relative">
-                        <div
-                            class="aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl relative group"
-                        >
-                            <img
-                                src="/img/heroImg.jpg"
-                                alt="Fleet Service"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"
-                            ></div>
-                            <div class="absolute bottom-10 left-10 right-10">
-                                <div
-                                    class="p-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl"
-                                >
-                                    <div class="flex items-center gap-4">
-                                        <div
-                                            class="w-12 h-12 rounded-full bg-rose-600 flex items-center justify-center text-white"
-                                        >
-                                            <i class="fas fa-shield-alt"></i>
-                                        </div>
-                                        <div>
-                                            <p
-                                                class="text-white font-bold uppercase tracking-widest text-[10px]"
-                                            >
-                                                Security Guarantee
-                                            </p>
-                                            <p class="text-rose-100 text-xs">
-                                                Asuransi penumpang & Driver
-                                                tersertifikasi
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                        <!-- Example Card 3 -->
+                        <div class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[360px] flex flex-col p-6 snap-center">
+                            <div class="flex items-center justify-between w-full mb-6">
+                                <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">Eksekutif</span>
+                                <i class="fas fa-star text-yellow-400"></i>
+                            </div>
+                            <div class="flex items-center gap-4 mb-4">
+                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Majalengka</span>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Bekasi</span>
+                            </div>
+                            <p class="font-normal text-[#454652] text-[16px] mb-6">Keberangkatan Sore</p>
+                            <div class="border-t border-[#ebe7e7] pt-4 mt-auto">
+                                <p class="font-bold text-[#454652] text-[12px] tracking-wider uppercase mb-1">Mulai Dari</p>
+                                <p class="font-unbounded font-semibold text-[#10207a] text-[24px]">Rp 130.000</p>
+                                <Link :href="route('frontend.booking.index', { origin: 'Majalengka', destination: 'Bekasi' })" class="mt-4 w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center block hover:bg-[#0c185e] transition-colors">
+                                    Pesan Tiket
+                                </Link>
                             </div>
                         </div>
-                        <!-- Floating Badge -->
-                        <div
-                            class="absolute -top-6 -right-6 w-32 h-32 bg-white dark:bg-[#111] rounded-full flex items-center justify-center shadow-xl border border-gray-100 dark:border-white/5 animate-bounce-slow"
-                        >
-                            <div class="text-center">
-                                <p
-                                    class="text-[10px] font-black font-unbounded text-rose-600 uppercase"
-                                >
-                                    Since
-                                </p>
-                                <p
-                                    class="text-2xl font-black font-unbounded text-gray-900 dark:text-white"
-                                >
-                                    1973
-                                </p>
+
+                        <!-- Example Card 4 -->
+                        <div class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[360px] flex flex-col p-6 snap-center">
+                            <div class="flex items-center justify-between w-full mb-6">
+                                <span class="bg-[#f3e72b] text-[#1e1c00] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">Sleeper</span>
+                                <i class="fas fa-star text-yellow-400"></i>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- POPULAR ROUTES (Clean Tickets) -->
-        <section
-            class="py-24 border-t border-gray-100 dark:border-[#111] bg-white dark:bg-[#080808]"
-        >
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-end justify-between mb-16">
-                    <div>
-                        <h2
-                            class="text-3xl font-black font-unbounded text-gray-900 dark:text-white"
-                        >
-                            Rute Populer
-                        </h2>
-                        <p
-                            class="text-gray-500 dark:text-gray-400 mt-2 font-medium"
-                        >
-                            Destinasi favorit pilihan pelanggan kami.
-                        </p>
-                    </div>
-                    <Link
-                        :href="route('frontend.routes.index')"
-                        class="hidden md:inline-flex items-center gap-3 text-rose-600 font-bold hover:text-rose-700 transition-colors"
-                    >
-                        Lihat Semua <i class="fas fa-arrow-right"></i>
-                    </Link>
-                </div>
-
-                <div
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                >
-                    <div
-                        v-for="(busRoute, i) in featuredRoutes"
-                        :key="busRoute.id"
-                        class="group relative bg-white dark:bg-[#111] rounded-[2rem] border border-gray-100 dark:border-[#222] hover:border-rose-600 dark:hover:border-rose-600 transition-all duration-300 hover:-translate-y-2 overflow-hidden"
-                    >
-                        <div class="p-8 h-full flex flex-col">
-                            <div
-                                class="flex items-center justify-between mb-12 relative z-10"
-                            >
-                                <div class="text-left w-2/5">
-                                    <div
-                                        class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2"
-                                    >
-                                        DARI
-                                    </div>
-                                    <div
-                                        class="text-xl font-unbounded font-bold text-gray-900 dark:text-white leading-tight"
-                                    >
-                                        {{ busRoute.origin }}
-                                    </div>
-                                </div>
-                                <div class="w-1/5 flex justify-center">
-                                    <div
-                                        class="w-12 h-12 rounded-full bg-gray-50 dark:bg-[#222] flex items-center justify-center text-gray-400 group-hover:text-rose-600 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-all"
-                                    >
-                                        <i
-                                            class="fas fa-arrow-right transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"
-                                        ></i>
-                                    </div>
-                                </div>
-                                <div class="text-right w-2/5">
-                                    <div
-                                        class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2"
-                                    >
-                                        KE
-                                    </div>
-                                    <div
-                                        class="text-xl font-unbounded font-bold text-gray-900 dark:text-white leading-tight"
-                                    >
-                                        {{ busRoute.destination }}
-                                    </div>
-                                </div>
+                            <div class="flex items-center gap-4 mb-4">
+                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Kuningan</span>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                                <span class="font-unbounded font-semibold text-[#1c1b1b] text-[20px]">Tangerang</span>
                             </div>
-
-                            <div class="mt-auto">
-                                <Link
-                                    :href="
-                                        route('frontend.booking.index', {
-                                            origin: busRoute.origin,
-                                            destination: busRoute.destination,
-                                        })
-                                    "
-                                    class="block w-full py-4 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-rose-600 hover:text-white text-center rounded-xl text-gray-900 dark:text-white font-bold transition-all duration-300"
-                                >
-                                    Cek Ketersediaan
+                            <p class="font-normal text-[#454652] text-[16px] mb-6">Fasilitas Penuh</p>
+                            <div class="border-t border-[#ebe7e7] pt-4 mt-auto">
+                                <p class="font-bold text-[#454652] text-[12px] tracking-wider uppercase mb-1">Mulai Dari</p>
+                                <p class="font-unbounded font-semibold text-[#10207a] text-[24px]">Rp 250.000</p>
+                                <Link :href="route('frontend.booking.index', { origin: 'Kuningan', destination: 'Tangerang' })" class="mt-4 w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center block hover:bg-[#0c185e] transition-colors">
+                                    Pesan Tiket
                                 </Link>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- FLEET SHOWREEL (Visual Gallery) -->
-        <section
-            class="py-24 bg-gray-50 dark:bg-[#050505] relative overflow-hidden"
-        >
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2
-                        class="text-3xl md:text-5xl font-black font-unbounded text-gray-900 dark:text-white mb-4"
-                    >
-                        Premium <span class="text-rose-600">Showreel</span>
-                    </h2>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium">
-                        Visualisasi armada Tunggal Jaya yang siap mengantar
-                        Anda.
+        <!-- TESTIMONIALS SECTION -->
+        <div class="bg-[#f6f3f2] border-y border-[#ebe7e7] flex flex-col items-center py-[96px]">
+            <div class="flex flex-col gap-[48px] items-center max-w-[1280px] px-[64px] w-full">
+                <div class="flex flex-col gap-[16px] items-center w-full text-center">
+                    <h2 class=" font-unboundedfont-bold text-[#1c1b1b] text-[32px] tracking-[-0.32px] m-0">Testimoni Pelanggan</h2>
+                    <p class="font-normal text-[#454652] text-[16px] m-0 max-w-2xl">
+                        Pengalaman nyata dari pelanggan setia yang telah mempercayakan perjalanannya bersama kami.
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div
-                        v-for="(bus, index) in fleet.slice(0, 3)"
-                        :key="bus.id"
-                        class="group relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-lg bento-item"
-                        :class="index === 1 ? 'md:translate-y-12' : ''"
-                    >
-                        <img
-                            :src="bus.image_url || '/img/heroImg.jpg'"
-                            :alt="bus.name"
-                            class="w-full h-full object-cover md:grayscale group-hover:grayscale-0 transition-all duration-700"
-                        />
-                        <!-- Overlay: Always visible on mobile, hover on desktop -->
-                        <div
-                            class="absolute inset-0 bg-gradient-to-t from-rose-900/90 via-rose-900/20 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 md:p-8"
-                        >
-                            <h4
-                                class="text-white font-unbounded font-bold text-lg md:text-xl mb-1 md:mb-2"
-                            >
-                                {{ bus.name }}
-                            </h4>
-                            <p
-                                class="text-rose-100 text-[10px] md:text-sm leading-relaxed"
-                            >
-                                {{ bus.bus_type }} Class dengan fasilitas
-                                premium untuk kenyamanan Anda.
-                            </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-[32px] w-full">
+                    <!-- Testimonial 1 -->
+                    <div class="bg-white border border-[#e5e2e1] drop-shadow-sm rounded-[8px] p-8 flex flex-col">
+                        <div class="flex text-yellow-400 mb-6">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- LATEST NEWS SECTION (Unique Poster Style) -->
-        <section
-            v-if="latestNews && latestNews.length > 0"
-            class="py-32 bg-white dark:bg-[#080808] relative overflow-hidden"
-        >
-            <!-- Background Accents -->
-            <div
-                class="absolute top-0 right-0 w-1/3 h-full bg-rose-600/5 -skew-x-12 translate-x-1/2"
-            ></div>
-
-            <div class="max-w-7xl mx-auto px-6 relative z-10">
-                <div
-                    class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8"
-                >
-                    <div class="max-w-2xl animate-on-scroll">
-                        <h2
-                            class="text-5xl md:text-7xl font-black text-gray-900 dark:text-white font-unbounded leading-none mb-6"
-                        >
-                            NEWS & <br /><span class="text-rose-600"
-                                >POSTERS.</span
-                            >
-                        </h2>
-                        <p
-                            class="text-gray-500 dark:text-gray-400 text-lg font-medium max-w-md"
-                        >
-                            Informasi terkini dan update terbaru dari layanan
-                            Tunggal Jaya Transport.
+                        <p class="italic font-normal text-[#454652] text-[16px] leading-[24px] mb-8 grow">
+                            "Perjalanan dari Kuningan ke Jakarta terasa sangat cepat dan nyaman. AC dingin, kursi super empuk, dan supir sangat profesional. Sangat direkomendasikan!"
                         </p>
+                        <div class="flex items-center gap-4">
+                            <div class="bg-[#dfe0ff] text-[#000e5e] font-bold rounded-full w-[48px] h-[48px] flex items-center justify-center text-[16px]">R</div>
+                            <div>
+                                <p class="font-semibold text-[#1c1b1b] m-0">Rizky Ananda</p>
+                                <p class="font-normal text-[#454652] text-[14px] m-0">Rute Kuningan - Jakarta</p>
+                            </div>
+                        </div>
                     </div>
-                    <Link
-                        :href="route('frontend.news.index')"
-                        class="group flex items-center gap-4 text-rose-600 font-black font-unbounded text-sm uppercase tracking-widest animate-on-scroll"
-                    >
-                        Explore All
-                        <i
-                            class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"
-                        ></i>
-                    </Link>
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
-                    <Link
-                        v-for="(news, index) in latestNews.slice(0, 3)"
-                        :key="news.id"
-                        :href="route('frontend.news.show', news.slug)"
-                        class="group relative flex flex-col animate-on-scroll"
-                        :class="index === 1 ? 'md:mt-24' : ''"
-                    >
-                        <!-- Large Index Number -->
-                        <div
-                            class="absolute -top-12 -left-4 text-8xl font-black font-unbounded text-gray-100 dark:text-white/5 pointer-events-none group-hover:text-rose-600/10 transition-colors duration-500"
-                        >
-                            0{{ index + 1 }}
+                    <!-- Testimonial 2 -->
+                    <div class="bg-white border border-[#e5e2e1] drop-shadow-sm rounded-[8px] p-8 flex flex-col">
+                        <div class="flex text-yellow-400 mb-6">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                         </div>
-
-                        <!-- Poster Card -->
-                        <div
-                            class="relative aspect-[3/4] overflow-hidden border-[12px] border-white dark:border-[#111] shadow-2xl transition-transform duration-700 group-hover:-rotate-2 group-hover:scale-[1.02]"
-                        >
-                            <img
-                                :src="news.image_url"
-                                :alt="news.title"
-                                class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                            />
-                            <!-- Overlay Info -->
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity"
-                            ></div>
-                            <div class="absolute bottom-0 left-0 right-0 p-8">
-                                <span
-                                    class="text-[10px] font-black font-unbounded text-rose-500 uppercase tracking-widest mb-2 block"
-                                >
-                                    {{ news.category?.name || "Official" }}
-                                </span>
-                                <h3
-                                    class="text-xl font-bold font-unbounded text-white leading-tight group-hover:text-rose-400 transition-colors"
-                                >
-                                    {{ news.title }}
-                                </h3>
+                        <p class="italic font-normal text-[#454652] text-[16px] leading-[24px] mb-8 grow">
+                            "Fasilitas sleeper class-nya juara! Bisa tidur nyenyak sepanjang perjalanan. Snack yang diberikan juga enak. Pengalaman bus terbaik sejauh ini."
+                        </p>
+                        <div class="flex items-center gap-4">
+                            <div class="bg-[#ffdad6] text-[#410002] font-bold rounded-full w-[48px] h-[48px] flex items-center justify-center text-[16px]">S</div>
+                            <div>
+                                <p class="font-semibold text-[#1c1b1b] m-0">Siti Fatimah</p>
+                                <p class="font-normal text-[#454652] text-[14px] m-0">Rute Cirebon - Bandung</p>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Metadata below -->
-                        <div
-                            class="mt-8 flex items-center justify-between border-b border-gray-100 dark:border-white/10 pb-4"
-                        >
-                            <span
-                                class="text-xs font-bold text-gray-400 uppercase tracking-tighter italic"
-                            >
-                                {{
-                                    formatDate(
-                                        news.published_at || news.created_at,
-                                    )
-                                }}
-                            </span>
-                            <div
-                                class="relative w-8 h-px bg-gray-200 dark:bg-white/10 overflow-hidden"
-                            >
-                                <div
-                                    class="absolute inset-0 bg-rose-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"
-                                ></div>
+                    <!-- Testimonial 3 -->
+                    <div class="bg-white border border-[#e5e2e1] drop-shadow-sm rounded-[8px] p-8 flex flex-col">
+                        <div class="flex text-yellow-400 mb-6">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <p class="italic font-normal text-[#454652] text-[16px] leading-[24px] mb-8 grow">
+                            "Harga terjangkau tapi fasilitas berani diadu dengan yang premium. Keberangkatan selalu on-time, sangat menghargai waktu penumpang."
+                        </p>
+                        <div class="flex items-center gap-4">
+                            <div class="bg-[#f3e72b] text-[#1e1c00] font-bold rounded-full w-[48px] h-[48px] flex items-center justify-center text-[16px]">D</div>
+                            <div>
+                                <p class="font-semibold text-[#1c1b1b] m-0">Deni Saputra</p>
+                                <p class="font-normal text-[#454652] text-[14px] m-0">Rute Majalengka - Bekasi</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- BERITA & UPDATE SECTION -->
+        <div class="bg-[#fcf9f8] flex flex-col items-center py-[128px]">
+            <div class="flex flex-col gap-[48px] items-start max-w-[1280px] px-[64px] w-full">
+                <div class="flex items-end justify-between w-full">
+                    <div class="flex flex-col gap-[8px] items-start">
+                        <h2 class=" font-unboundedfont-bold text-[#1c1b1b] text-[32px] tracking-[-0.32px] m-0">Berita & Update</h2>
+                        <p class="font-normal text-[#454652] text-[16px] m-0">Informasi terbaru seputar layanan dan promo Tunggal Jaya.</p>
+                    </div>
+                    <a href="#" class="flex items-center gap-[4px] text-[#10207a] hover:underline font-semibold text-[16px]">
+                        Lihat Semua
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-[32px] w-full">
+                    <Link :href="route('frontend.news.show', news.slug)" v-for="news in latestNews" :key="news.id" class="flex flex-col gap-[24px] items-start w-full group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-[8px] w-full shadow-sm">
+                            <img :src="news.image_url" :alt="news.title" class="w-full h-[204px] object-cover group-hover:scale-105 transition-transform duration-300 bg-gray-200" />
+                            <div class="absolute top-[16px] left-[16px] bg-[#10207a] text-white px-[12px] py-[4px] rounded-[2px] font-bold text-[12px] tracking-[0.6px] uppercase">
+                                {{ news.category?.name || 'BERITA' }}
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-[8px] items-start w-full">
+                            <span class="text-[#454652] text-[16px]">{{ new Date(news.published_at || news.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) }}</span>
+                            <h3 class="font-bold text-[#1c1b1b] text-[18px] group-hover:text-[#10207a] transition-colors line-clamp-2">{{ news.title }}</h3>
+                            <p class="text-[#454652] text-[16px] m-0 line-clamp-2">{{ news.excerpt || (news.safe_content ? news.safe_content.substring(0, 100) + '...' : '') }}</p>
                         </div>
                     </Link>
                 </div>
             </div>
-        </section>
-        <section
-            class="relative py-40 bg-rose-600 overflow-hidden flex items-center justify-center"
-        >
-            <!-- Background Marquee - More visible and layered -->
-            <div
-                class="absolute inset-0 flex flex-col justify-between pointer-events-none select-none opacity-20 text-rose-900 overflow-hidden py-10"
-            >
-                <div
-                    class="text-[5rem] md:text-[10rem] font-black font-unbounded whitespace-nowrap animate-marquee leading-none"
-                >
-                    TUNGGAL JAYA TRANSPORT &bullet; KEAMANAN &bullet; KENYAMANAN
-                    &bullet;
+        </div>
+
+        <!-- ARMADA PREMIUM KAMI SECTION -->
+        <div class="bg-[#111111] flex flex-col items-center py-[128px]">
+            <div class="flex flex-col gap-[96px] items-center max-w-[1280px] px-[64px] w-full">
+                
+                <!-- Section Header -->
+                <div class="flex flex-col gap-[24px] items-center text-center w-full max-w-3xl">
+                    <div class="border border-[#767683] px-[16px] py-[6px] rounded-[12px]">
+                        <span class="font-bold text-[#c6c5d3] text-[12px] tracking-[1.2px] uppercase">ARMADA PREMIUM KAMI</span>
+                    </div>
+                    <h2 class=" font-unboundedfont-unbounded font-black text-[48px] text-white tracking-[-0.96px] m-0 leading-tight">Kemewahan dalam Setiap Perjalanan</h2>
+                    <p class=" text-[16px] text-[#e5e2e1] opacity-90 m-0 leading-relaxed">
+                        Pilih layanan yang sesuai dengan kebutuhan Anda. Dari perjalanan antarkota kelas eksekutif hingga sewa bus pariwisata premium.
+                    </p>
                 </div>
-                <div
-                    class="text-[5rem] md:text-[10rem] font-black font-unbounded whitespace-nowrap animate-marquee-reverse leading-none ml-20"
-                >
-                    &bullet; PREMIUM CLASS &bullet; EKSEKUTIF &bullet; WISATA
-                    &bullet;
+
+                <!-- Fleet Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-[64px] w-full">
+                    <!-- Kelas Eksekutif -->
+                    <div class="flex flex-col w-full group">
+                        <div class="relative h-[400px] w-full rounded-[16px] overflow-hidden mb-[32px] shadow-2xl border border-white/10">
+                            <img src="/img/primadona.webp" alt="Kelas Eksekutif" class="absolute w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                            <div class="absolute bottom-[24px] left-[24px] right-[24px]">
+                                <h3 class="font-unbounded text-white text-[24px] font-bold">Kelas Eksekutif (AKAP)</h3>
+                            </div>
+                        </div>
+                        <p class="text-[#e5e2e1] text-[16px] opacity-90 leading-[26px] mb-[24px]">
+                            Nikmati pengalaman perjalanan yang tak terlupakan dengan armada Jetbus 3+ terbaru kami. Dilengkapi dengan suspensi udara, kursi ergonomis yang luas, dan fasilitas hiburan personal untuk memastikan kenyamanan Anda dari kota asal hingga tujuan.
+                        </p>
+                        <ul class="flex flex-col gap-[12px] mb-[32px] text-white text-[16px]">
+                            <li class="flex items-center gap-[12px]">
+                                <i class="fas fa-check-circle text-[#f3e72b]"></i> Mesin Hino/Scania Terbaru
+                            </li>
+                            <li class="flex items-center gap-[12px]">
+                                <i class="fas fa-check-circle text-[#f3e72b]"></i> Fasilitas Toilet Bersih & Kabin Kedap Suara
+                            </li>
+                        </ul>
+                        <a href="#" class="border border-white hover:bg-white hover:text-black text-white px-[32px] py-[12px] rounded-[12px] font-semibold text-[14px] text-center tracking-wide uppercase transition-colors self-start">
+                            Jadwal & Tiket
+                        </a>
+                    </div>
+
+                    <!-- Bus Pariwisata -->
+                    <div class="flex flex-col w-full group">
+                        <div class="relative h-[400px] w-full rounded-[16px] overflow-hidden mb-[32px] shadow-2xl border border-white/10">
+                            <img src="/img/interiorBus.png" alt="Sewa Bus Pariwisata" class="absolute w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x400?text=Interior+Bus'" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                            <div class="absolute bottom-[24px] left-[24px] right-[24px]">
+                                <h3 class="font-unbounded text-white text-[24px] font-bold">Sewa Bus Pariwisata</h3>
+                            </div>
+                        </div>
+                        <p class="text-[#e5e2e1] text-[16px] opacity-90 leading-[26px] mb-[24px]">
+                            Hadirkan pengalaman tak terlupakan untuk rombongan Anda dengan armada Big Bus premium kami. Dilengkapi fasilitas eksekutif untuk kenyamanan maksimal sepanjang perjalanan dengan rute yang dapat disesuaikan.
+                        </p>
+                        <ul class="flex flex-col gap-[12px] mb-[32px] text-white text-[16px]">
+                            <li class="flex items-center gap-[12px]">
+                                <i class="fas fa-check-circle text-[#f3e72b]"></i> Rute Fleksibel Sesuai Itinerary
+                            </li>
+                            <li class="flex items-center gap-[12px]">
+                                <i class="fas fa-check-circle text-[#f3e72b]"></i> Leg rest, AVOD, & Toilet
+                            </li>
+                        </ul>
+                        <a href="#" class="bg-white text-black hover:bg-gray-200 px-[32px] py-[12px] rounded-[12px] font-semibold text-[14px] text-center tracking-wide uppercase transition-colors self-start shadow-md">
+                            Pesan Bus Pariwisata
+                        </a>
+                    </div>
                 </div>
             </div>
-
-            <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
-                <div
-                    class="inline-block mb-6 px-6 py-2 rounded-full border-2 border-white/30 bg-white/10 backdrop-blur-md text-white font-bold tracking-widest text-xs uppercase"
-                >
-                    Siap Berangkat?
-                </div>
-
-                <h2
-                    class="text-4xl sm:text-6xl md:text-8xl font-black font-unbounded text-white mb-8 leading-tight tracking-tight drop-shadow-lg"
-                >
-                    MULAI <br />
-                    PERJALANANMU
-                </h2>
-
-                <p
-                    class="text-xl text-rose-50 font-medium mb-12 max-w-2xl mx-auto leading-relaxed"
-                >
-                    Bergabunglah dengan ribuan penumpang yang telah merasakan
-                    kenyamanan maksimal. Pesan tiketmu sekarang, semudah satu
-                    klik.
-                </p>
-
-                <div
-                    class="flex flex-col sm:flex-row items-center justify-center gap-6"
-                >
-                    <Link
-                        ref="ctaBtn1"
-                        :href="route('frontend.booking.index')"
-                        class="w-full sm:w-auto px-12 py-6 bg-white text-rose-600 rounded-full font-black font-unbounded text-lg hover:scale-105 transition-transform shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.4)] flex items-center justify-center gap-3"
-                    >
-                        PESAN SEKARANG <i class="fas fa-paper-plane"></i>
-                    </Link>
-                    <Link
-                        ref="ctaBtn2"
-                        :href="route('frontend.fleet.index')"
-                        class="w-full sm:w-auto px-12 py-6 bg-rose-800/40 border-2 border-white/20 backdrop-blur-sm text-white rounded-full font-bold font-unbounded text-lg hover:bg-rose-800/60 transition-colors flex items-center justify-center gap-3"
-                    >
-                        Lihat Armada
-                    </Link>
-                </div>
-            </div>
-        </section>
+        </div>
     </div>
 </template>
 
 <style scoped>
-@keyframes subtle-zoom {
-    0% {
-        transform: scale(1.05);
-    }
-    100% {
-        transform: scale(1.15);
-    }
-}
-
-.animate-subtle-zoom {
-    animation: subtle-zoom 20s infinite alternate linear;
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
-}
-
-.animate-marquee {
-    animation: marquee 30s linear infinite;
-}
-
-@keyframes marquee-reverse {
-    0% {
-        transform: translateX(-50%);
-    }
-    100% {
-        transform: translateX(0);
-    }
-}
-
-.animate-marquee-reverse {
-    animation: marquee-reverse 35s linear infinite;
+/* Optional: Adding some smooth scrolling to snap containers */
+.snap-x {
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 </style>

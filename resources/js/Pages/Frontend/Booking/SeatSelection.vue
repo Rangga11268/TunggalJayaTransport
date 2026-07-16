@@ -36,62 +36,26 @@ const updateCountdown = () => {
 
 const countdownColor = computed(() => {
     const total = countdown.value.minutes * 60 + countdown.value.seconds;
-    if (total <= 120) return "text-red-500 dark:text-red-400"; // ≤ 2 menit
-    if (total <= 300) return "text-amber-500 dark:text-amber-400"; // ≤ 5 menit
-    return "text-emerald-600 dark:text-emerald-400";
+    if (total <= 120) return "text-red-600"; // ≤ 2 menit
+    if (total <= 300) return "text-amber-600"; // ≤ 5 menit
+    return "text-emerald-600";
 });
 
 const countdownBg = computed(() => {
     const total = countdown.value.minutes * 60 + countdown.value.seconds;
     if (total <= 120)
-        return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-500/20";
+        return "bg-red-50 border-red-200";
     if (total <= 300)
-        return "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-500/20";
-    return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-500/20";
+        return "bg-amber-50 border-amber-200";
+    return "bg-emerald-50 border-emerald-200";
 });
 
 const padZero = (n) => String(n).padStart(2, "0");
 
-// Facilities Data
-const facilities = [
-    { name: "Karaoke", icon: "fas fa-microphone-alt" },
-    { name: "USB Charger", icon: "fas fa-bolt" },
-    { name: "TV Android", icon: "fas fa-tv" },
-    { name: "AC", icon: "fas fa-snowflake" },
-    { name: "Reclining", icon: "fas fa-couch" },
-    { name: "Smoking", icon: "fas fa-smoking" },
-];
-
 const selectedSeats = ref([]);
 const processing = ref(false);
 const error = ref(null);
-const activeFilter = ref(null); // 'window', 'front', 'aisle'
 
-const seatFilters = [
-    { id: "window", name: "Dekat Jendela", icon: "fas fa-window-maximize" },
-    { id: "front", name: "Baris Depan", icon: "fas fa-arrow-up" },
-    { id: "aisle", name: "Dekat Lorong", icon: "fas fa-walking" },
-];
-
-const isFilterMatch = (seatNum) => {
-    if (!activeFilter.value) return false;
-
-    const rowIdx = Math.floor((seatNum - 1) / 5);
-    const colIdx = (seatNum - 1) % 5;
-
-    if (activeFilter.value === "window") {
-        return colIdx === 0 || colIdx === 4;
-    }
-    if (activeFilter.value === "front") {
-        return rowIdx < 2;
-    }
-    if (activeFilter.value === "aisle") {
-        return colIdx === 1 || colIdx === 2;
-    }
-    return false;
-};
-// Initialize selected seats from booking if available
-// ---- Beforeunload guard ----
 const onBeforeUnload = (e) => {
     if (selectedSeats.value.length > 0) {
         e.preventDefault();
@@ -145,7 +109,7 @@ const toggleSeat = (seatNum) => {
                 icon: "warning",
                 title: "Batas Kursi",
                 text: `Anda hanya memesan ${props.booking.number_of_seats} kursi.`,
-                confirmButtonColor: "#e11d48",
+                confirmButtonColor: "#10207a",
             });
         }
     }
@@ -158,7 +122,7 @@ const saveSeats = async () => {
             icon: "warning",
             title: "Kursi Belum Lengkap",
             text: `Anda baru memilih ${selectedSeats.value.length} dari ${props.booking.number_of_seats} kursi yang dipesan.`,
-            confirmButtonColor: "#e11d48",
+            confirmButtonColor: "#10207a",
         });
         return false;
     }
@@ -180,7 +144,7 @@ const saveSeats = async () => {
                 icon: "error",
                 title: "Gagal Simpan Kursi",
                 text: response.data.message || "Gagal menyimpan kursi.",
-                confirmButtonColor: "#e11d48",
+                confirmButtonColor: "#10207a",
             });
             return false;
         }
@@ -192,7 +156,7 @@ const saveSeats = async () => {
             text:
                 e.response?.data?.message ||
                 "Gagal menghubungi server untuk simpan kursi.",
-            confirmButtonColor: "#e11d48",
+            confirmButtonColor: "#10207a",
         });
         return false;
     } finally {
@@ -259,7 +223,7 @@ const processPayment = async () => {
             icon: "error",
             title: "Waktu Habis",
             text: "Waktu pemesanan Anda telah habis. Silakan buat pemesanan baru.",
-            confirmButtonColor: "#e11d48",
+            confirmButtonColor: "#10207a",
         });
         return;
     }
@@ -270,7 +234,7 @@ const processPayment = async () => {
             icon: "warning",
             title: "Kursi Belum Lengkap",
             text: `Anda baru memilih ${selectedSeats.value.length} dari ${props.booking.number_of_seats} kursi yang dipesan.`,
-            confirmButtonColor: "#e11d48",
+            confirmButtonColor: "#10207a",
         });
         return;
     }
@@ -279,7 +243,7 @@ const processPayment = async () => {
             icon: "warning",
             title: "Metode Pembayaran",
             text: "Pilih metode pembayaran.",
-            confirmButtonColor: "#e11d48",
+            confirmButtonColor: "#10207a",
         });
         return;
     }
@@ -288,7 +252,7 @@ const processPayment = async () => {
             icon: "warning",
             title: "E-Wallet",
             text: "Pilih jenis E-Wallet.",
-            confirmButtonColor: "#e11d48",
+            confirmButtonColor: "#10207a",
         });
         return;
     }
@@ -333,7 +297,7 @@ const processPayment = async () => {
                             icon: "error",
                             title: "Pembayaran Gagal",
                             text: "Terjadi kesalahan saat memproses pembayaran.",
-                            confirmButtonColor: "#e11d48",
+                            confirmButtonColor: "#10207a",
                         });
                     },
                     onClose: function () {
@@ -349,7 +313,7 @@ const processPayment = async () => {
                 icon: "error",
                 title: "Gagal",
                 text: response.data.message,
-                confirmButtonColor: "#e11d48",
+                confirmButtonColor: "#10207a",
             });
             window.addEventListener("beforeunload", onBeforeUnload);
         }
@@ -361,7 +325,7 @@ const processPayment = async () => {
             text:
                 "Gagal memproses pembayaran: " +
                 (e.response?.data?.message || e.message),
-            confirmButtonColor: "#e11d48",
+            confirmButtonColor: "#10207a",
         });
         window.addEventListener("beforeunload", onBeforeUnload);
     } finally {
@@ -383,26 +347,17 @@ const getSeatNumber = (rowIdx, colIdx) => {
     const base = rowIdx * 5;
     return base + colIdx + 1; // 1-based
 };
+
 // Helper to safely get route description
 const routeDescription = computed(() => {
     const s = props.booking?.schedule;
     const r = s?.route;
-
     if (!r) return "Info Rute Tidak Tersedia";
-
-    // Prioritize specific description if available
-    if (
-        r.description &&
-        r.description.trim() !== "-" &&
-        r.description.trim() !== ""
-    )
+    if (r.description && r.description.trim() !== "-" && r.description.trim() !== "")
         return r.description;
-
-    // Fallback to Origin - Destination
     if (r.origin && r.destination) {
         return `${r.origin} - ${r.destination}`;
     }
-
     return "Info Rute Tidak Tersedia";
 });
 
@@ -413,701 +368,253 @@ const busName = computed(() => {
 const busType = computed(() => {
     return props.booking?.schedule?.bus?.bus_type || "EXECUTIVE";
 });
+
+const formatTime = (timeStr) => {
+    if (!timeStr) return "";
+    // If it's a full ISO date string
+    if (timeStr.includes("T")) {
+        const date = new Date(timeStr);
+        if (!isNaN(date.getTime())) {
+            return date.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit', hour12: false}).replace('.', ':');
+        }
+    }
+    // If it's just "HH:mm:ss"
+    return timeStr.substring(0, 5);
+};
 </script>
 
 <template>
-    <Head title="Pilih Kursi & Pembayaran" />
+    <Head title="Pilih Kursi - Tunggal Jaya Transport" />
 
-    <!-- Header (Consistent with Booking Index) -->
-    <div
-        class="pt-24 md:pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative z-10"
-    >
-        <span
-            class="inline-block px-4 py-2 rounded-full bg-rose-600 text-white text-[10px] font-bold tracking-[0.2em] mb-6 animate-fade-in uppercase font-unbounded shadow-lg shadow-rose-600/20"
-        >
-            TUNGGAL JAYA "{{ busName }}"
-        </span>
-        <h1
-            class="font-unbounded font-black text-3xl md:text-5xl text-gray-900 dark:text-white mb-4 animate-fade-in-up leading-tight uppercase"
-        >
-            Pilih
-            <span class="text-rose-600">Kursi & Bayar</span>
-        </h1>
-        <p
-            class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in-up stagger-1 font-manrope font-medium"
-        >
-            Konfigurasi: Seat 2-3 | {{ busType }} | {{ routeDescription }}
-        </p>
-
-        <!-- Booking Expiry Countdown -->
-        <div
-            v-if="bookingExpiresAt"
-            class="mt-6 inline-flex items-center gap-3 px-6 py-3 rounded-2xl border text-sm font-manrope font-semibold transition-colors duration-500"
-            :class="countdownBg"
-        >
-            <i class="fas fa-clock" :class="countdownColor"></i>
-            <span v-if="!countdown.expired" :class="countdownColor">
-                Selesaikan pembayaran dalam
-                <span class="font-black font-unbounded tracking-wider">
-                    {{ padZero(countdown.minutes) }}:{{
-                        padZero(countdown.seconds)
-                    }}
-                </span>
-            </span>
-            <span v-else class="text-red-500 dark:text-red-400 font-black">
-                <i class="fas fa-exclamation-triangle mr-1"></i>
-                Waktu pemesanan habis — silakan buat pemesanan baru.
-            </span>
-        </div>
-    </div>
-
-    <div
-        class="bg-white dark:bg-[#050505] min-h-screen pb-24 px-4 sm:px-6 lg:px-8 relative z-20"
-    >
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left: Seat Map -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Facilities Bar -->
-                <div
-                    class="bg-white dark:bg-[#111] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden"
-                >
-                    <h3
-                        class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 font-manrope"
-                    >
-                        Fasilitas Armada
-                    </h3>
-                    <div
-                        class="flex flex-wrap gap-4 justify-center md:justify-start"
-                    >
-                        <button
-                            v-for="filter in seatFilters"
-                            :key="filter.id"
-                            @click="
-                                activeFilter =
-                                    activeFilter === filter.id
-                                        ? null
-                                        : filter.id
-                            "
-                            class="flex items-center gap-3 px-4 py-2 rounded-xl border transition-all"
-                            :class="[
-                                activeFilter === filter.id
-                                    ? 'bg-rose-600 border-rose-600 text-white shadow-lg shadow-rose-600/20'
-                                    : 'bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/5 text-gray-600 dark:text-gray-300 hover:border-rose-200',
-                            ]"
-                        >
-                            <i :class="[filter.icon, 'text-xs']"></i>
-                            <span
-                                class="text-[10px] font-bold uppercase tracking-wide font-manrope"
-                            >
-                                {{ filter.name }}
-                            </span>
-                        </button>
-                    </div>
+    <div class="bg-white min-h-screen  text-[#1c1b1b] relative pb-24">
+        
+        <div class="max-w-[1280px] mx-auto px-8 lg:px-16 pt-[140px] pb-8">
+            
+            <!-- Step Indicator -->
+            <div class="flex items-center justify-center w-full mb-12 flex-wrap gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full border border-[#c6c5d3] flex items-center justify-center text-[#454652] font-bold text-xs">1</div>
+                    <span class="font-semibold text-[#454652] text-sm tracking-wide uppercase">Schedule</span>
                 </div>
-
-                <!-- Bus Container -->
-                <div
-                    class="bg-white dark:bg-[#111] rounded-[3rem] p-4 md:p-6 shadow-xl shadow-gray-200 dark:shadow-none border border-gray-100 dark:border-white/5"
-                >
-                    <!-- Instructions -->
-                    <div class="mb-6 text-center">
-                        <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-1 uppercase tracking-widest font-unbounded">Langkah 2: Pilih Tempat Duduk</h2>
-                        <p class="text-xs text-gray-500 font-manrope">Klik kursi yang tersedia (berwarna putih) sesuai dengan jumlah penumpang yang Anda pesan.</p>
-                    </div>
-
-                    <!-- Bus Body -->
-                    <div
-                        class="bg-gray-50 dark:bg-[#080808] rounded-[2.5rem] p-4 md:p-6 relative min-h-[500px] overflow-x-auto border border-gray-200 dark:border-white/5"
-                    >
-                        <!-- Front Area -->
-                        <div
-                            class="relative flex justify-between items-start mb-12 border-b-2 border-dashed border-gray-200 dark:border-white/10 pb-6"
-                        >
-                            <!-- Door -->
-                            <div class="flex flex-col items-center opacity-60">
-                                <div
-                                    class="w-12 h-12 rounded-xl border-2 border-dashed border-gray-300 dark:border-white/20 flex items-center justify-center mb-2"
-                                >
-                                    <i
-                                        class="fas fa-door-open text-gray-400"
-                                    ></i>
-                                </div>
-                                <span
-                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-manrope"
-                                    >Pintu</span
-                                >
-                            </div>
-
-                            <!-- Driver -->
-                            <div class="flex flex-col items-center">
-                                <div
-                                    class="w-16 h-16 bg-gray-200 dark:bg-white/10 rounded-2xl flex items-center justify-center text-gray-400 dark:text-white/50 mb-2 shadow-inner"
-                                >
-                                    <i
-                                        class="fas fa-steering-wheel text-2xl"
-                                    ></i>
-                                </div>
-                                <span
-                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-manrope"
-                                    >Sopir</span
-                                >
-                            </div>
-                        </div>
-
-                        <!-- Seat Grid -->
-                        <div class="relative z-10 px-2 md:px-8 pb-12">
-                            <div
-                                class="min-w-[300px] flex flex-col items-center"
-                            >
-                                <div
-                                    v-for="r in rows"
-                                    :key="r"
-                                    class="flex items-center gap-4 md:gap-8 mb-4"
-                                >
-                                    <!-- Left Column (2 Seats) -->
-                                    <div class="flex gap-3">
-                                        <template
-                                            v-for="c in 2"
-                                            :key="`L-${r}-${c}`"
-                                        >
-                                            <div
-                                                class="relative group"
-                                                v-if="
-                                                    getSeatNumber(
-                                                        r - 1,
-                                                        c - 1,
-                                                    ) <= totalSeats
-                                                "
-                                            >
-                                                <button
-                                                    @click="
-                                                        toggleSeat(
-                                                            getSeatNumber(
-                                                                r - 1,
-                                                                c - 1,
-                                                            ),
-                                                        )
-                                                    "
-                                                    :disabled="
-                                                        isSeatOccupied(
-                                                            getSeatNumber(
-                                                                r - 1,
-                                                                c - 1,
-                                                            ),
-                                                        )
-                                                    "
-                                                    class="relative w-12 md:w-14 transition-all duration-300 focus:outline-none"
-                                                >
-                                                    <!-- New CSS Seat Visual -->
-                                                    <div
-                                                        class="w-full aspect-[4/5] rounded-xl rounded-t-3xl flex flex-col items-center justify-center relative transition-all duration-300 shadow-sm border-2 overflow-hidden"
-                                                        :class="[
-                                                            isSeatSelected(getSeatNumber(r - 1, c - 1))
-                                                                ? 'bg-rose-600 border-rose-600 shadow-lg shadow-rose-600/30 text-white -translate-y-1'
-                                                                : isSeatOccupied(getSeatNumber(r - 1, c - 1))
-                                                                  ? 'bg-gray-200 dark:bg-white/5 border-gray-300 dark:border-white/10 text-gray-400 cursor-not-allowed opacity-60'
-                                                                  : isFilterMatch(getSeatNumber(r - 1, c - 1))
-                                                                    ? 'bg-rose-50 dark:bg-rose-900/10 border-rose-400 scale-105'
-                                                                    : 'bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10 hover:border-rose-400 hover:shadow-md'
-                                                        ]"
-                                                    >
-                                                        <!-- Top inner element to simulate headrest -->
-                                                        <div class="absolute top-0 left-0 right-0 h-1/4 bg-black/5 dark:bg-white/5 opacity-50 border-b border-black/5 dark:border-white/5"></div>
-                                                        
-                                                        <div class="relative z-10 flex flex-col items-center justify-center h-full w-full pt-2">
-                                                            <i
-                                                                v-if="isSeatSelected(getSeatNumber(r - 1, c - 1))"
-                                                                class="fas fa-check text-base sm:text-lg mb-1"
-                                                            ></i>
-                                                            <span
-                                                                v-else
-                                                                class="font-black font-unbounded text-xs sm:text-sm"
-                                                                :class="[
-                                                                    isSeatOccupied(getSeatNumber(r - 1, c - 1))
-                                                                        ? 'text-gray-400'
-                                                                        : 'text-gray-700 dark:text-gray-300 group-hover:text-rose-600'
-                                                                ]"
-                                                            >
-                                                                {{ getSeatNumber(r - 1, c - 1) }}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </button>
-                                            </div>
-                                            <div
-                                                v-else
-                                                class="w-12 md:w-14"
-                                            ></div>
-                                        </template>
-                                    </div>
-
-                                    <!-- Aisle -->
-                                    <div
-                                        class="w-8 flex justify-center items-center"
-                                    >
-                                        <span
-                                            class="text-[10px] font-bold text-gray-300 dark:text-white/10 font-manrope"
-                                            >{{ r }}</span
-                                        >
-                                    </div>
-
-                                    <!-- Right Column (3 Seats) -->
-                                    <div class="flex gap-3">
-                                        <template
-                                            v-for="c in 3"
-                                            :key="`R-${r}-${c}`"
-                                        >
-                                            <div
-                                                class="relative group"
-                                                v-if="
-                                                    getSeatNumber(
-                                                        r - 1,
-                                                        c + 1,
-                                                    ) <= totalSeats
-                                                "
-                                            >
-                                                <button
-                                                    @click="
-                                                        toggleSeat(
-                                                            getSeatNumber(
-                                                                r - 1,
-                                                                c + 1,
-                                                            ),
-                                                        )
-                                                    "
-                                                    :disabled="
-                                                        isSeatOccupied(
-                                                            getSeatNumber(
-                                                                r - 1,
-                                                                c + 1,
-                                                            ),
-                                                        )
-                                                    "
-                                                    class="relative w-12 md:w-14 transition-all duration-300 focus:outline-none"
-                                                >
-                                                    <!-- New CSS Seat Visual (Right Side) -->
-                                                    <div
-                                                        class="w-full aspect-[4/5] rounded-xl rounded-t-3xl flex flex-col items-center justify-center relative transition-all duration-300 shadow-sm border-2 overflow-hidden"
-                                                        :class="[
-                                                            isSeatSelected(getSeatNumber(r - 1, c + 1))
-                                                                ? 'bg-rose-600 border-rose-600 shadow-lg shadow-rose-600/30 text-white -translate-y-1'
-                                                                : isSeatOccupied(getSeatNumber(r - 1, c + 1))
-                                                                  ? 'bg-gray-200 dark:bg-white/5 border-gray-300 dark:border-white/10 text-gray-400 cursor-not-allowed opacity-60'
-                                                                  : isFilterMatch(getSeatNumber(r - 1, c + 1))
-                                                                    ? 'bg-rose-50 dark:bg-rose-900/10 border-rose-400 scale-105'
-                                                                    : 'bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10 hover:border-rose-400 hover:shadow-md'
-                                                        ]"
-                                                    >
-                                                        <!-- Top inner element to simulate headrest -->
-                                                        <div class="absolute top-0 left-0 right-0 h-1/4 bg-black/5 dark:bg-white/5 opacity-50 border-b border-black/5 dark:border-white/5"></div>
-                                                        
-                                                        <div class="relative z-10 flex flex-col items-center justify-center h-full w-full pt-2">
-                                                            <i
-                                                                v-if="isSeatSelected(getSeatNumber(r - 1, c + 1))"
-                                                                class="fas fa-check text-base sm:text-lg mb-1"
-                                                            ></i>
-                                                            <span
-                                                                v-else
-                                                                class="font-black font-unbounded text-xs sm:text-sm"
-                                                                :class="[
-                                                                    isSeatOccupied(getSeatNumber(r - 1, c + 1))
-                                                                        ? 'text-gray-400'
-                                                                        : 'text-gray-700 dark:text-gray-300 group-hover:text-rose-600'
-                                                                ]"
-                                                            >
-                                                                {{ getSeatNumber(r - 1, c + 1) }}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </button>
-                                            </div>
-                                            <div
-                                                v-else
-                                                class="w-12 md:w-14"
-                                            ></div>
-                                        </template>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Rear Decoration -->
-                        <div
-                            class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-gray-200 dark:from-black to-transparent opacity-50"
-                        ></div>
-                    </div>
-
-                    <!-- Legend -->
-                    <div
-                        class="flex justify-center gap-8 flex-wrap mt-8 pt-8 border-t border-gray-100 dark:border-white/5"
-                    >
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 aspect-[4/5] rounded-md rounded-t-xl bg-gray-200 border-2 border-gray-300 dark:bg-white/5 dark:border-white/10 flex items-center justify-center opacity-70"
-                            >
-                                <i class="fas fa-times text-gray-400 text-[10px]"></i>
-                            </div>
-                            <span
-                                class="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-manrope"
-                                >Terisi</span
-                            >
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 aspect-[4/5] rounded-md rounded-t-xl bg-white dark:bg-[#1a1a1a] border-2 border-gray-200 dark:border-white/10 flex items-center justify-center relative overflow-hidden"
-                            >
-                                <div class="absolute top-0 left-0 right-0 h-1/4 bg-black/5 dark:bg-white/5 opacity-50 border-b border-black/5 dark:border-white/5"></div>
-                            </div>
-                            <span
-                                class="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-manrope"
-                                >Tersedia</span
-                            >
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 aspect-[4/5] rounded-md rounded-t-xl bg-rose-600 border-2 border-rose-600 shadow-md shadow-rose-600/30 flex items-center justify-center"
-                            >
-                                <i class="fas fa-check text-white text-[10px]"></i>
-                            </div>
-                            <span
-                                class="text-[10px] font-bold text-rose-600 uppercase tracking-wider font-manrope"
-                                >Pilihanmu</span
-                            >
-                        </div>
-                    </div>
+                <div class="w-16 h-px bg-[#c6c5d3]"></div>
+                <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-[#10207a] text-white flex items-center justify-center font-bold text-xs">2</div>
+                    <span class="font-bold text-[#10207a] text-sm tracking-wide uppercase">Seat Selection</span>
+                </div>
+                <div class="w-16 h-px bg-[#c6c5d3]"></div>
+                <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full border border-[#c6c5d3] flex items-center justify-center text-[#767683] font-bold text-xs">3</div>
+                    <span class="font-semibold text-[#767683] text-sm tracking-wide uppercase">Payment</span>
                 </div>
             </div>
 
-            <!-- Right: Payment & Summary -->
-            <div class="lg:col-span-1 space-y-6">
-                <!-- Summary Card (sticky disabled) -->
-                <div
-                    class="bg-white dark:bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-gray-100 dark:shadow-none border border-gray-100 dark:border-white/5 transform transition-all hover:scale-[1.01] duration-300"
-                >
-                    <h3
-                        class="font-unbounded font-bold text-lg text-gray-900 dark:text-white mb-6 flex items-center gap-3 uppercase"
-                    >
-                        <i class="fas fa-clipboard-list text-rose-600"></i>
-                        Detail Bayar
-                    </h3>
-
-                    <!-- Info Groups -->
-                    <div class="space-y-6 mb-8">
-                        <div>
-                            <span
-                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2 font-manrope"
-                                >Penumpang</span
-                            >
-                            <div
-                                class="p-3 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5"
-                            >
-                                <span
-                                    class="font-bold text-gray-900 dark:text-white font-manrope text-sm"
-                                    >{{ booking.passenger_name }}</span
-                                >
-                            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- LEFT COLUMN: Bus Layout -->
+                <div class="lg:col-span-8 flex flex-col gap-8">
+                    
+                    <!-- Legend -->
+                    <div class="bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-wrap gap-8 items-center justify-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 border border-[#c6c5d3] bg-white rounded-sm"></div>
+                            <span class="font-semibold text-sm">Available</span>
                         </div>
-
-                        <div>
-                            <span
-                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2 font-manrope"
-                                >Kursi Dipilih</span
-                            >
-                            <div class="flex flex-wrap gap-2">
-                                <span
-                                    v-if="selectedSeats.length === 0"
-                                    class="text-sm text-gray-400 italic px-2 font-manrope"
-                                    >Belum ada kursi dipilih</span
-                                >
-                                <span
-                                    v-for="seat in selectedSeats"
-                                    :key="seat"
-                                    class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-rose-600 text-white font-black text-sm shadow-lg shadow-rose-600/20 font-unbounded transition-all hover:scale-110"
-                                >
-                                    {{ seat }}
-                                </span>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 bg-[#10207a] rounded-sm"></div>
+                            <span class="font-semibold text-sm">Selected</span>
                         </div>
-
-                        <div
-                            class="pt-6 border-t border-dashed border-gray-200 dark:border-white/10"
-                        >
-                            <span
-                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2 font-manrope"
-                                >Kode Promo</span
-                            >
-                            <div class="flex gap-2">
-                                <input
-                                    v-model="promoCode"
-                                    type="text"
-                                    placeholder="Masukkan kode"
-                                    class="flex-1 px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-rose-500 outline-none uppercase font-mono transition-all disabled:opacity-50"
-                                    :disabled="promoValid"
-                                />
-                                <button
-                                    @click="validatePromo"
-                                    :disabled="
-                                        !promoCode || promoLoading || promoValid
-                                    "
-                                    class="px-3 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold rounded-xl hover:bg-rose-600 dark:hover:bg-rose-600 dark:hover:text-white transition-colors disabled:opacity-50 min-w-[80px]"
-                                >
-                                    <i
-                                        v-if="promoLoading"
-                                        class="fas fa-spinner fa-spin"
-                                    ></i>
-                                    <span v-else>{{
-                                        promoValid ? "Digunakan" : "Gunakan"
-                                    }}</span>
-                                </button>
-                            </div>
-                            <p
-                                v-if="promoMessage"
-                                class="text-xs mt-2 font-bold"
-                                :class="
-                                    promoValid
-                                        ? 'text-green-500'
-                                        : 'text-rose-500'
-                                "
-                            >
-                                {{ promoMessage }}
-                                <button
-                                    v-if="promoValid"
-                                    @click="resetPromo"
-                                    class="ml-1 underline text-gray-500"
-                                >
-                                    Hapus
-                                </button>
-                            </p>
-                        </div>
-
-                        <div
-                            class="pt-6 border-t border-dashed border-gray-200 dark:border-white/10 space-y-2"
-                        >
-                            <div class="flex justify-between items-center">
-                                <span
-                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-manrope"
-                                    >Subtotal</span
-                                >
-                                <span
-                                    class="font-bold text-gray-900 dark:text-white font-manrope"
-                                    >{{
-                                        formatCurrency(booking.total_price)
-                                    }}</span
-                                >
-                            </div>
-                            <div
-                                v-if="discountAmount > 0"
-                                class="flex justify-between items-center text-green-500"
-                            >
-                                <span
-                                    class="text-[10px] font-bold uppercase tracking-widest font-manrope"
-                                    >Diskon</span
-                                >
-                                <span class="font-bold font-manrope"
-                                    >-{{ formatCurrency(discountAmount) }}</span
-                                >
-                            </div>
-                            <div class="flex justify-between items-end pt-2">
-                                <span
-                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-manrope"
-                                    >Total Tagihan</span
-                                >
-                                <span
-                                    class="font-black text-3xl text-rose-600 tracking-tight font-unbounded"
-                                    >{{ formatCurrency(finalPrice) }}</span
-                                >
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 bg-[#ebe7e7] rounded-sm text-gray-400 flex items-center justify-center"><i class="fas fa-times text-xs"></i></div>
+                            <span class="font-semibold text-sm">Occupied</span>
                         </div>
                     </div>
 
-                    <!-- Payment Methods -->
-                    <div class="space-y-4">
-                        <h4
-                            class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 font-manrope"
-                        >
-                            Metode Pembayaran
-                        </h4>
-
-                        <!-- Transfer -->
-                        <label
-                            class="group relative flex items-center p-4 border-2 rounded-2xl cursor-pointer transition-all duration-300"
-                            :class="[
-                                paymentMethod === 'bank_transfer'
-                                    ? 'border-rose-600 bg-rose-50 dark:bg-rose-900/10'
-                                    : 'border-gray-100 dark:border-white/10 bg-white dark:bg-[#111] hover:border-rose-300 dark:hover:border-rose-800',
-                            ]"
-                        >
-                            <input
-                                type="radio"
-                                value="bank_transfer"
-                                v-model="paymentMethod"
-                                class="peer sr-only"
-                            />
-                            <div
-                                class="w-10 h-10 rounded-full flex items-center justify-center mr-4 transition-colors"
-                                :class="[
-                                    paymentMethod === 'bank_transfer'
-                                        ? 'bg-rose-200 dark:bg-rose-800 text-rose-700 dark:text-rose-100'
-                                        : 'bg-gray-100 dark:bg-white/5 text-gray-400',
-                                ]"
-                            >
-                                <i class="fas fa-university text-lg"></i>
-                            </div>
-                            <span
-                                class="font-bold text-sm font-manrope"
-                                :class="[
-                                    paymentMethod === 'bank_transfer'
-                                        ? 'text-rose-900 dark:text-rose-100'
-                                        : 'text-gray-700 dark:text-gray-300',
-                                ]"
-                                >Transfer Bank</span
-                            >
-                            <div
-                                v-if="paymentMethod === 'bank_transfer'"
-                                class="absolute right-4 w-5 h-5 rounded-full bg-rose-600 flex items-center justify-center text-white text-xs shadow-md"
-                            >
-                                <i class="fas fa-check"></i>
-                            </div>
-                        </label>
-
-                        <!-- E-Wallet -->
-                        <div
-                            class="border-2 rounded-2xl overflow-hidden transition-all duration-300"
-                            :class="[
-                                paymentMethod === 'e_wallet'
-                                    ? 'border-rose-600 bg-rose-50 dark:bg-rose-900/10'
-                                    : 'border-gray-100 dark:border-white/10 bg-white dark:bg-[#111]',
-                            ]"
-                        >
-                            <label
-                                class="flex items-center p-4 cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/5 transition-colors"
-                            >
-                                <input
-                                    type="radio"
-                                    value="e_wallet"
-                                    v-model="paymentMethod"
-                                    class="peer sr-only"
-                                />
-                                <div
-                                    class="w-10 h-10 rounded-full flex items-center justify-center mr-4 transition-colors"
-                                    :class="[
-                                        paymentMethod === 'e_wallet'
-                                            ? 'bg-rose-200 dark:bg-rose-800 text-rose-700 dark:text-rose-100'
-                                            : 'bg-gray-100 dark:bg-white/5 text-gray-400',
-                                    ]"
-                                >
-                                    <i class="fas fa-wallet text-lg"></i>
-                                </div>
-                                <span
-                                    class="font-bold text-sm font-manrope"
-                                    :class="[
-                                        paymentMethod === 'e_wallet'
-                                            ? 'text-rose-900 dark:text-rose-100'
-                                            : 'text-gray-700 dark:text-gray-300',
-                                    ]"
-                                    >E-Wallet</span
-                                >
-                                <div
-                                    v-if="paymentMethod === 'e_wallet'"
-                                    class="ml-auto w-5 h-5 rounded-full bg-rose-600 flex items-center justify-center text-white text-xs shadow-md"
-                                >
-                                    <i class="fas fa-check"></i>
-                                </div>
-                            </label>
-
-                            <div
-                                v-if="paymentMethod === 'e_wallet'"
-                                class="bg-white/50 dark:bg-black/20 p-4 space-y-3 border-t border-rose-100 dark:border-rose-900/20 animate-fade-in"
-                            >
-                                <label
-                                    v-for="wallet in [
-                                        'gopay',
-                                        'shopeepay',
-                                        'dana',
-                                    ]"
-                                    :key="wallet"
-                                    class="flex items-center justify-between p-3 rounded-xl border cursor-pointer group transition-all"
-                                    :class="[
-                                        ewalletType === wallet
-                                            ? 'bg-white dark:bg-white/10 border-rose-600 shadow-md'
-                                            : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-gray-200 dark:hover:border-white/10',
-                                    ]"
-                                >
-                                    <div class="flex items-center">
-                                        <input
-                                            type="radio"
-                                            :value="wallet"
-                                            v-model="ewalletType"
-                                            class="sr-only"
-                                        />
-                                        <img
-                                            :src="`/img/${wallet}.png`"
-                                            :alt="wallet"
-                                            class="h-6 object-contain grayscale group-hover:grayscale-0 transition-all"
-                                            :class="{
-                                                '!grayscale-0':
-                                                    ewalletType === wallet,
-                                            }"
-                                        />
-                                        <span
-                                            class="ml-3 text-xs font-bold uppercase font-manrope"
-                                            :class="[
-                                                ewalletType === wallet
-                                                    ? 'text-rose-600'
-                                                    : 'text-gray-500',
-                                            ]"
-                                        >
-                                            {{ wallet }}
-                                        </span>
+                    <!-- Bus Container -->
+                    <div class="bg-[#f6f3f2] rounded-3xl p-8 flex justify-center border border-[#c6c5d3]">
+                        <div class="bg-white border border-[#c6c5d3] rounded-3xl p-6 min-w-[300px] w-full max-w-md mx-auto relative shadow-inner">
+                            
+                            <!-- Driver & Door Area -->
+                            <div class="flex justify-between items-start border-b-2 border-dashed border-[#c6c5d3] pb-6 mb-8">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-12 h-12 border-2 border-[#c6c5d3] border-dashed rounded-lg flex items-center justify-center text-[#c6c5d3] mb-2">
+                                        <i class="fas fa-door-open"></i>
                                     </div>
-                                    <div
-                                        v-if="ewalletType === wallet"
-                                        class="text-rose-600"
-                                    >
-                                        <i class="fas fa-check-circle"></i>
+                                    <span class="text-[10px] font-bold text-[#767683] tracking-widest uppercase">Pintu</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="w-16 h-16 bg-[#f6f3f2] border border-[#c6c5d3] rounded-2xl flex items-center justify-center text-[#767683] mb-2">
+                                        <i class="fas fa-steering-wheel text-2xl"></i>
                                     </div>
-                                </label>
+                                    <span class="text-[10px] font-bold text-[#767683] tracking-widest uppercase">Sopir</span>
+                                </div>
+                            </div>
+
+                            <!-- Seat Grid -->
+                            <div class="flex flex-col gap-6 items-center">
+                                <div v-for="r in rows" :key="r" class="flex gap-12 w-full justify-center">
+                                    
+                                    <!-- Left Side (2 seats) -->
+                                    <div class="flex gap-3">
+                                        <template v-for="c in 2" :key="`L-${r}-${c}`">
+                                            <button 
+                                                v-if="getSeatNumber(r - 1, c - 1) <= totalSeats"
+                                                @click="toggleSeat(getSeatNumber(r - 1, c - 1))"
+                                                :disabled="isSeatOccupied(getSeatNumber(r - 1, c - 1))"
+                                                class="w-12 h-12 rounded-lg border flex items-center justify-center font-bold text-sm transition-colors relative"
+                                                :class="[
+                                                    isSeatOccupied(getSeatNumber(r - 1, c - 1)) 
+                                                        ? 'bg-[#ebe7e7] border-transparent text-gray-400 cursor-not-allowed'
+                                                        : isSeatSelected(getSeatNumber(r - 1, c - 1))
+                                                            ? 'bg-[#10207a] border-[#10207a] text-white'
+                                                            : 'bg-white border-[#c6c5d3] text-[#454652] hover:border-[#10207a] hover:text-[#10207a]'
+                                                ]"
+                                            >
+                                                {{ getSeatNumber(r - 1, c - 1) }}
+                                            </button>
+                                        </template>
+                                    </div>
+                                    
+                                    <!-- Aisle -->
+                                    <div class="w-4 shrink-0"></div>
+
+                                    <!-- Right Side (3 seats) -->
+                                    <div class="flex gap-3">
+                                        <template v-for="c in 3" :key="`R-${r}-${c}`">
+                                            <button 
+                                                v-if="getSeatNumber(r - 1, c + 1) <= totalSeats"
+                                                @click="toggleSeat(getSeatNumber(r - 1, c + 1))"
+                                                :disabled="isSeatOccupied(getSeatNumber(r - 1, c + 1))"
+                                                class="w-12 h-12 rounded-lg border flex items-center justify-center font-bold text-sm transition-colors relative"
+                                                :class="[
+                                                    isSeatOccupied(getSeatNumber(r - 1, c + 1)) 
+                                                        ? 'bg-[#ebe7e7] border-transparent text-gray-400 cursor-not-allowed'
+                                                        : isSeatSelected(getSeatNumber(r - 1, c + 1))
+                                                            ? 'bg-[#10207a] border-[#10207a] text-white'
+                                                            : 'bg-white border-[#c6c5d3] text-[#454652] hover:border-[#10207a] hover:text-[#10207a]'
+                                                ]"
+                                            >
+                                                {{ getSeatNumber(r - 1, c + 1) }}
+                                            </button>
+                                        </template>
+                                    </div>
+
+                                </div>
+                            </div>
+                            
+                            <!-- Exit Door -->
+                            <div class="flex justify-start items-end border-t-2 border-dashed border-[#c6c5d3] pt-6 mt-8">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-12 h-12 border-2 border-[#c6c5d3] border-dashed rounded-lg flex items-center justify-center text-[#c6c5d3] mb-2">
+                                        <i class="fas fa-door-open"></i>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-[#767683] tracking-widest uppercase">Pintu Keluar</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Journey Summary & Payment -->
+                <div class="lg:col-span-4 flex flex-col gap-6">
+                    
+                    <div class="bg-[#f6f3f2] border border-[#c6c5d3] rounded-[8px] p-6 flex flex-col gap-6 sticky top-28">
+                        <h3 class="font-bold text-[18px]">Ringkasan Perjalanan</h3>
+                        
+                        <div class="flex justify-between items-center border-b border-[#c6c5d3] pb-4">
+                            <div>
+                                <p class="font-bold text-[16px]">{{ props.booking.schedule.route.origin }} <i class="fas fa-arrow-right mx-2 text-gray-400"></i> {{ props.booking.schedule.route.destination }}</p>
+                                <p class="text-[14px] text-[#454652] mt-1">{{ busType }}</p>
                             </div>
                         </div>
 
-                        <!-- Pay Button -->
-                        <div
-                            v-if="countdown.expired"
-                            class="mt-6 p-5 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/20 text-center"
-                        >
-                            <p
-                                class="text-red-600 dark:text-red-400 font-bold font-manrope text-sm mb-3"
-                            >
-                                <i class="fas fa-clock mr-2"></i>
-                                Waktu pemesanan Anda telah habis.
-                            </p>
-                            <a
-                                :href="route('frontend.booking.index')"
-                                class="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-unbounded font-black text-xs uppercase tracking-wider transition"
-                            >
-                                <i class="fas fa-search"></i>
-                                Cari Jadwal Baru
-                            </a>
+                        <!-- Time & Date -->
+                        <div class="flex items-center gap-4 py-2">
+                            <div class="w-12 h-12 rounded-full bg-white border border-[#c6c5d3] flex items-center justify-center text-[#10207a]">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-[#1c1b1b] text-[14px]">{{ formatTime(props.booking.schedule.departure_time) }} - {{ formatTime(props.booking.schedule.arrival_time) }}</span>
+                                <span class="text-[#454652] text-[12px]">{{ props.booking.booking_date }}</span>
+                            </div>
                         </div>
-                        <button
-                            v-else
-                            @click="processPayment"
-                            :disabled="processing"
-                            class="w-full h-[68px] bg-gray-900 dark:bg-white hover:bg-rose-600 dark:hover:bg-rose-600 text-white dark:text-gray-900 hover:text-white dark:hover:text-white rounded-2xl shadow-lg shadow-gray-200 dark:shadow-none transform transition-all hover:-translate-y-1 active:scale-[0.98] font-bold flex items-center justify-center space-x-3 group font-unbounded uppercase tracking-wider text-sm mt-6"
+
+                        <!-- Seats Status -->
+                        <div class="border-t border-[#c6c5d3] pt-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-[14px] text-[#454652]">Kursi Dipilih:</span>
+                                <span class="font-bold text-[#10207a]">{{ selectedSeats.length }} / {{ props.booking.number_of_seats }}</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <div v-for="seat in selectedSeats" :key="seat" class="px-3 py-1 bg-[#dfe0ff] text-[#000e5e] rounded-[4px] font-bold text-xs">
+                                    {{ seat }}
+                                </div>
+                                <div v-if="selectedSeats.length === 0" class="text-sm text-gray-400 italic">Belum ada kursi yang dipilih</div>
+                            </div>
+                        </div>
+
+                        <!-- Timer -->
+                        <div v-if="bookingExpiresAt" class="flex flex-col gap-2 bg-white rounded-[8px] p-4 border" :class="countdownBg">
+                            <div class="flex items-center justify-between" :class="countdownColor">
+                                <span class="font-semibold text-sm">Selesaikan dalam:</span>
+                                <div class="font-bold tracking-widest text-[16px] flex items-center gap-2">
+                                    <i class="fas fa-clock"></i>
+                                    <span v-if="!countdown.expired">{{ padZero(countdown.minutes) }}:{{ padZero(countdown.seconds) }}</span>
+                                    <span v-else>Waktu Habis</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Promo Code -->
+                        <div class="flex flex-col gap-2">
+                            <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Kode Promo</label>
+                            <div class="flex gap-2">
+                                <input v-model="promoCode" type="text" placeholder="Masukkan kode promo" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] px-4 py-3 font-semibold focus:ring-2 focus:ring-[#10207a] outline-none">
+                                <button type="button" @click="validatePromo" :disabled="promoLoading || !promoCode" class="bg-[#1c1b1b] text-white px-6 py-3 rounded-[8px] font-semibold text-sm hover:bg-black transition-colors disabled:opacity-50">Terapkan</button>
+                            </div>
+                            <p v-if="promoMessage" :class="promoValid ? 'text-emerald-600' : 'text-red-500'" class="text-xs font-semibold mt-1">{{ promoMessage }}</p>
+                            <button v-if="promoValid" @click="resetPromo" class="text-xs text-red-500 font-semibold self-start hover:underline">Hapus Promo</button>
+                        </div>
+
+                        <!-- Payment Methods -->
+                        <div class="flex flex-col gap-2">
+                            <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Metode Pembayaran</label>
+                            <select v-model="paymentMethod" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] px-4 py-3 font-semibold focus:ring-2 focus:ring-[#10207a] outline-none">
+                                <option value="" disabled>Pilih Pembayaran</option>
+                                <option value="bank_transfer">Transfer Bank (Virtual Account)</option>
+                                <option value="e_wallet">E-Wallet (GoPay, Dana, ShopeePay)</option>
+                                <option value="credit_card">Kartu Kredit / Debit</option>
+                            </select>
+                            
+                            <select v-if="paymentMethod === 'e_wallet'" v-model="ewalletType" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] px-4 py-3 font-semibold focus:ring-2 focus:ring-[#10207a] outline-none mt-2">
+                                <option value="" disabled>Pilih Jenis E-Wallet</option>
+                                <option value="gopay">GoPay</option>
+                                <option value="shopeepay">ShopeePay</option>
+                                <option value="dana">DANA</option>
+                            </select>
+                        </div>
+
+                        <div class="border-t border-[#c6c5d3] pt-4 mt-2">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-normal text-[#454652]">Subtotal</span>
+                                <span class="font-semibold text-[#1c1b1b]">{{ formatCurrency(props.booking.total_price) }}</span>
+                            </div>
+                            <div v-if="discountAmount > 0" class="flex justify-between items-center mb-2 text-emerald-600">
+                                <span class="font-normal">Diskon</span>
+                                <span class="font-semibold">-{{ formatCurrency(discountAmount) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="font-bold text-[16px]">Total Bayar</span>
+                                <span class="font-black text-[#10207a] text-[24px]">{{ formatCurrency(finalPrice) }}</span>
+                            </div>
+                        </div>
+
+                        <button 
+                            @click="processPayment" 
+                            :disabled="processing || countdown.expired"
+                            class="w-full bg-[#10207a] text-white py-4 rounded-[8px] font-semibold text-[16px] hover:bg-[#0c185e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
-                            <span v-if="!processing" class="flex items-center">
-                                <span>Bayar Sekarang</span>
-                                <i
-                                    class="fas fa-lock ml-3 group-hover:scale-110 transition-transform"
-                                ></i>
-                            </span>
-                            <span
-                                v-else
-                                class="flex items-center justify-center"
-                            >
-                                <i class="fas fa-circle-notch fa-spin mr-3"></i>
-                                Memproses...
-                            </span>
+                            <i v-if="processing" class="fas fa-spinner fa-spin"></i>
+                            <span>{{ processing ? 'Memproses...' : 'Lanjut ke Pembayaran' }}</span>
                         </button>
                     </div>
                 </div>

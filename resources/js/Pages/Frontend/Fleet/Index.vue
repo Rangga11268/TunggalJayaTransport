@@ -63,7 +63,7 @@ const filteredBuses = computed(() => {
                     Armada <span class="text-rose-600">Premium</span>
                 </h1>
                 <p
-                    class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope animate-fade-in-up"
+                    class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto  animate-fade-in-up"
                     style="animation-delay: 0.2s"
                 >
                     Jelajahi pilihan armada terbaik kami yang dirancang dengan
@@ -91,7 +91,7 @@ const filteredBuses = computed(() => {
                         v-model="searchQuery"
                         type="text"
                         placeholder="Cari nama bus..."
-                        class="block w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-[#1a1a1a] border-transparent focus:border-rose-600 focus:bg-white dark:focus:bg-[#0a0a0a] focus:ring-0 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 transition-all font-manrope"
+                        class="block w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-[#1a1a1a] border-transparent focus:border-rose-600 focus:bg-white dark:focus:bg-[#0a0a0a] focus:ring-0 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 transition-all "
                     />
                 </div>
 
@@ -131,7 +131,7 @@ const filteredBuses = computed(() => {
                 >
                     Armada Tidak Ditemukan
                 </h3>
-                <p class="text-gray-500 dark:text-gray-400 font-manrope">
+                <p class="text-gray-500 dark:text-gray-400 ">
                     Silakan coba kata kunci atau filter lain.
                 </p>
                 <button
@@ -222,7 +222,7 @@ const filteredBuses = computed(() => {
                                     class="w-4 h-4 opacity-50 dark:invert"
                                 />
                                 <span
-                                    class="text-xs font-bold text-gray-700 dark:text-gray-300 font-manrope"
+                                    class="text-xs font-bold text-gray-700 dark:text-gray-300 "
                                     >{{ bus.capacity }} Seat</span
                                 >
                             </div>
@@ -233,14 +233,14 @@ const filteredBuses = computed(() => {
                                     class="fas fa-check-circle text-rose-600 text-xs"
                                 ></i>
                                 <span
-                                    class="text-xs font-bold text-gray-700 dark:text-gray-300 font-manrope"
+                                    class="text-xs font-bold text-gray-700 dark:text-gray-300 "
                                     >Ready</span
                                 >
                             </div>
                         </div>
 
                         <p
-                            class="text-sm text-gray-500 dark:text-gray-400 font-manrope leading-relaxed mb-8 flex-grow line-clamp-3"
+                            class="text-sm text-gray-500 dark:text-gray-400  leading-relaxed mb-8 flex-grow line-clamp-3"
                         >
                             {{
                                 bus.description ||
@@ -296,7 +296,7 @@ const filteredBuses = computed(() => {
                         Fasilitas <span class="text-rose-600">Premium</span>
                     </h2>
                     <p
-                        class="text-gray-400 max-w-2xl mx-auto font-manrope mb-16"
+                        class="text-gray-400 max-w-2xl mx-auto  mb-16"
                     >
                         Kami memastikan setiap perjalanan Anda dilengkapi dengan
                         fasilitas terbaik untuk menjamin kenyamanan dari awal
@@ -327,7 +327,7 @@ const filteredBuses = computed(() => {
                                 {{ facility.name }}
                             </h4>
                             <p
-                                class="text-xs text-gray-500 group-hover:text-gray-300 transition-colors font-manrope"
+                                class="text-xs text-gray-500 group-hover:text-gray-300 transition-colors "
                             >
                                 {{ facility.description }}
                             </p>

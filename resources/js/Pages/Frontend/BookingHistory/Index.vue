@@ -83,7 +83,7 @@ const getStatusBadge = (status) => {
                 Riwayat <span class="text-rose-600">Perjalanan</span>
             </h1>
             <p
-                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-manrope"
+                class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto "
             >
                 Pantau status tiket dan kelola riwayat perjalanan Anda di satu
                 tempat yang aman.
@@ -129,7 +129,7 @@ const getStatusBadge = (status) => {
                     Belum Ada {{ activeTab === 'reguler' ? 'Tiket' : 'Sewa Pariwisata' }}
                 </h3>
                 <p
-                    class="text-gray-500 dark:text-gray-400 mb-10 max-w-sm mx-auto font-manrope"
+                    class="text-gray-500 dark:text-gray-400 mb-10 max-w-sm mx-auto "
                 >
                     Sepertinya Anda belum memiliki riwayat pemesanan di kategori ini. Mulai perjalanan baru sekarang!
                 </p>
@@ -207,7 +207,7 @@ const getStatusBadge = (status) => {
                             </div>
 
                             <div
-                                class="flex flex-wrap items-center gap-6 text-sm text-gray-400 font-manrope font-bold"
+                                class="flex flex-wrap items-center gap-6 text-sm text-gray-400  font-bold"
                             >
                                 <div class="flex items-center gap-2">
                                     <i
@@ -296,7 +296,7 @@ const getStatusBadge = (status) => {
                                     </div>
                                 </div>
 
-                                <div class="flex flex-wrap items-center gap-6 text-sm text-gray-400 font-manrope font-bold">
+                                <div class="flex flex-wrap items-center gap-6 text-sm text-gray-400  font-bold">
                                     <div class="flex items-center gap-2">
                                         <i class="far fa-calendar-alt text-rose-600"></i>
                                         {{ formatDate(charter.pickup_date) }} - {{ formatDate(charter.return_date) }}
