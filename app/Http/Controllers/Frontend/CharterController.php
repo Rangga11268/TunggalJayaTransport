@@ -17,8 +17,10 @@ class CharterController extends Controller
 
     public function store(Request $request)
     {
+        $minDate = now()->addDays(3)->toDateString();
+
         $validated = $request->validate([
-            'pickup_date' => 'required|date|after_or_equal:today',
+            'pickup_date' => 'required|date|after_or_equal:' . $minDate,
             'return_date' => 'required|date|after_or_equal:pickup_date',
             'pickup_location' => 'required|string|max:255',
             'destination' => 'required|string|max:255',

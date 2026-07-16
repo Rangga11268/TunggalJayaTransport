@@ -30,8 +30,10 @@ class CharterController extends Controller
      */
     public function store(Request $request)
     {
+        $minDate = now()->addDays(3)->toDateString();
+
         $validated = $request->validate([
-            'pickup_date' => 'required|date|after_or_equal:today',
+            'pickup_date' => 'required|date|after_or_equal:' . $minDate,
             'return_date' => 'required|date|after_or_equal:pickup_date',
             'pickup_location' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
@@ -58,5 +60,37 @@ class CharterController extends Controller
             'message' => 'Permintaan sewa pariwisata berhasil dikirim. Admin akan segera memberikan penawaran harga.',
             'data' => $charter,
         ], 201);
+    }
+
+    /**
+     * Cancel a charter booking before departure.
+     */
+    public function cancel(Request $request, $id)
+    {
+        $charter = CharterBooking::where('user_id', $request->user()->id)->findOrFail($id);
+        
+        // Aturan: pembatalan maksimal sebelum jam 8 pagi pada hari keberangkatan (H)
+        $cutoffTime = \Carbon\Carbon::parse($charter->pickup_date)->startOfDay()->addHours(8); // Jam 08:00 hari H
+        
+        if (now()->greaterThanOrEqualTo($cutoffTime)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pembatalan hanya bisa dilakukan sebelum jam 08:00 pada hari keberangkatan.',
+            ], 400);
+        }
+
+        if (in_array($charter->status, ['cancelled', 'completed'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pesanan tidak dapat dibatalkan pada status ini.',
+            ], 400);
+        }
+
+        $charter->update(['status' => 'cancelled']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pesanan charter berhasil dibatalkan.',
+        ]);
     }
 }
