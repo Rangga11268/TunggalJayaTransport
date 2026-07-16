@@ -264,319 +264,139 @@ const formatTime = (timeString) => {
 <template>
     <Head title="Pemesanan Berhasil" />
 
-    <div
-        class="bg-gray-100 dark:bg-[#050505] min-h-screen pt-32 pb-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center relative overflow-hidden font-mono"
-    >
-        <!-- Success Header (Restored) -->
-        <div class="text-center mb-10 z-10">
-            <div
-                class="w-20 h-20 rounded-full bg-white dark:bg-white/10 shadow-xl shadow-rose-600/10 flex items-center justify-center mx-auto mb-6 animate-bounce-in border border-gray-200 dark:border-white/5"
-            >
-                <i
-                    v-if="booking.payment_status === 'paid'"
-                    class="fas fa-check-circle text-4xl text-rose-600"
-                ></i>
-                <i v-else class="fas fa-clock text-4xl text-yellow-500"></i>
-            </div>
+    <div class="min-h-screen bg-[#fcf9f8] pt-28 pb-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        <!-- Decorative bg -->
+        <div class="fixed top-0 left-0 w-full h-64 bg-gradient-to-b from-[#10207a]/5 to-transparent pointer-events-none"></div>
+        <div class="fixed bottom-0 right-0 w-[600px] h-[600px] bg-rose-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-            <h1
-                class="font-sans font-black text-2xl md:text-4xl text-gray-900 dark:text-white mb-2 uppercase animate-fade-in-up tracking-tight"
-            >
-                {{
-                    booking.payment_status === "paid"
-                        ? "Pemesanan Berhasil!"
-                        : "Menunggu Pembayaran"
-                }}
+        <!-- Success Header -->
+        <div class="text-center mb-10 z-10 max-w-lg">
+            <div class="w-20 h-20 rounded-full bg-white shadow-xl shadow-rose-600/10 flex items-center justify-center mx-auto mb-6 border border-[#ebe7e7]">
+                <i v-if="booking.payment_status === 'paid'" class="fas fa-check-circle text-4xl text-emerald-500"></i>
+                <i v-else class="fas fa-clock text-4xl text-amber-500"></i>
+            </div>
+            <h1 class="font-unbounded font-black text-3xl md:text-4xl text-[#1c1b1b] mb-2">
+                {{ booking.payment_status === 'paid' ? 'Pemesanan Berhasil!' : 'Menunggu Pembayaran' }}
             </h1>
-            <p
-                class="font-sans text-gray-500 dark:text-gray-400 animate-fade-in-up stagger-1"
-            >
-                {{
-                    booking.payment_status === "paid"
-                        ? "Terima kasih telah memilih Tunggal Jaya Transport."
-                        : "Mohon selesaikan pembayaran Anda."
-                }}
+            <p class="text-[#454652] text-[16px]">
+                {{ booking.payment_status === 'paid' ? 'Terima kasih telah memilih Tunggal Jaya Transport.' : 'Mohon selesaikan pembayaran Anda.' }}
             </p>
         </div>
 
         <div class="max-w-[1000px] w-full z-10">
-            <!-- Main Ticket Container (mimicking PDF style) -->
-            <div
-                ref="ticketRef"
-                class="relative w-full bg-[#f3f4f6] dark:bg-[#e5e5e5] rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[340px]"
-            >
-                <!-- Left Stub (Blue Strip) -->
-                <div
-                    class="w-full md:w-[90px] bg-[#3d5684] flex items-center justify-center relative flex-shrink-0"
-                >
-                    <div
-                        class="text-white font-mono text-xl tracking-[0.1em] transform md:-rotate-90 whitespace-nowrap py-4 md:py-0"
-                    >
-                        E - TICKET BUS
-                    </div>
+            <!-- Main Ticket Container -->
+            <div ref="ticketRef" class="relative w-full bg-[#f3f4f6] rounded-2xl shadow-2xl shadow-black/10 overflow-hidden flex flex-col md:flex-row min-h-[340px] border border-[#e5e2e1]">
+                <!-- Left Stub -->
+                <div class="w-full md:w-[90px] bg-[#3d5684] flex items-center justify-center relative flex-shrink-0">
+                    <div class="text-white font-mono text-xl tracking-[0.1em] transform md:-rotate-90 whitespace-nowrap py-4 md:py-0">E - TICKET BUS</div>
                 </div>
 
                 <!-- Ticket Body -->
                 <div class="flex-1 p-8 md:p-10 relative">
-                    <!-- Title -->
                     <div class="mb-10">
-                        <h1
-                            class="font-mono text-3xl font-bold text-black tracking-tight"
-                        >
-                            Tunggal Jaya Transport
-                        </h1>
+                        <h1 class="font-mono text-3xl font-bold text-black tracking-tight">Tunggal Jaya Transport</h1>
                     </div>
 
-                    <!-- Info Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <!-- Passenger -->
                         <div>
-                            <span
-                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >PASSENGER</span
-                            >
-                            <div
-                                class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center"
-                            >
-                                {{ booking.passenger_name.toUpperCase() }}
-                            </div>
+                            <span class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2">PASSENGER</span>
+                            <div class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center">{{ booking.passenger_name.toUpperCase() }}</div>
                         </div>
-
-                        <!-- Bus Name -->
                         <div>
-                            <span
-                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >BUS NAME</span
-                            >
-                            <div
-                                class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center"
-                            >
-                                {{ busName.toUpperCase() }}
-                            </div>
+                            <span class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2">BUS NAME</span>
+                            <div class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center">{{ busName.toUpperCase() }}</div>
                         </div>
-
-                        <!-- Date/Time -->
                         <div>
-                            <span
-                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >DATE • TIME</span
-                            >
-                            <div
-                                class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center"
-                            >
-                                {{ formatDate(booking.booking_date, "short") }}
-                                •
-                                {{
-                                    formatTime(booking.schedule?.departure_time)
-                                }}
+                            <span class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2">DATE • TIME</span>
+                            <div class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center">
+                                {{ formatDate(booking.booking_date, "short") }} • {{ formatTime(booking.schedule?.departure_time) }}
                             </div>
                         </div>
                     </div>
 
-                    <!-- Row 2 -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div>
-                            <span
-                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >SEAT</span
-                            >
-                            <div
-                                class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center"
-                            >
-                                {{ booking.seat_numbers }}
-                            </div>
+                            <span class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2">SEAT</span>
+                            <div class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center">{{ booking.seat_numbers }}</div>
                         </div>
                         <div>
-                            <span
-                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >CLASS</span
-                            >
-                            <div
-                                class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center"
-                            >
-                                {{ busType.toUpperCase() }}
-                            </div>
+                            <span class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2">CLASS</span>
+                            <div class="bg-[#e2e8f0] px-3 py-2 text-black font-bold font-mono text-base min-h-[40px] flex items-center">{{ busType.toUpperCase() }}</div>
                         </div>
                         <div>
-                            <span
-                                class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
-                                >STATUS</span
-                            >
-                            <div
-                                class="bg-[#e2e8f0] px-3 py-2 font-bold font-mono text-base min-h-[40px] flex items-center gap-2"
-                            >
-                                <span
-                                    v-if="booking.payment_status === 'paid'"
-                                    class="text-green-600 uppercase flex items-center gap-1"
-                                >
-                                    <i class="fas fa-check-circle text-xs"></i>
-                                    PAID
-                                </span>
-                                <span
-                                    v-else
-                                    class="text-yellow-600 uppercase flex items-center gap-1"
-                                >
-                                    <i class="fas fa-clock text-xs"></i>
-                                    PENDING
-                                </span>
+                            <span class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2">STATUS</span>
+                            <div class="bg-[#e2e8f0] px-3 py-2 font-bold font-mono text-base min-h-[40px] flex items-center gap-2">
+                                <span v-if="booking.payment_status === 'paid'" class="text-green-600 uppercase flex items-center gap-1"><i class="fas fa-check-circle text-xs"></i> PAID</span>
+                                <span v-else class="text-yellow-600 uppercase flex items-center gap-1"><i class="fas fa-clock text-xs"></i> PENDING</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Row 3: Price -->
                     <div class="mb-8">
-                        <span
-                            class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
-                            >TOTAL PAYMENT</span
-                        >
-                        <div
-                            class="bg-[#e2e8f0] px-3 py-2 text-rose-600 font-black font-mono text-xl min-h-[40px] flex items-center justify-between"
-                        >
-                            <span>{{
-                                formatCurrency(booking.total_price)
-                            }}</span>
-                            <span
-                                v-if="booking.discount_amount > 0"
-                                class="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded border border-green-200"
-                            >
-                                HEMAT
-                                {{ formatCurrency(booking.discount_amount) }}
+                        <span class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2">TOTAL PAYMENT</span>
+                        <div class="bg-[#e2e8f0] px-3 py-2 text-rose-600 font-black font-mono text-xl min-h-[40px] flex items-center justify-between">
+                            <span>{{ formatCurrency(booking.total_price) }}</span>
+                            <span v-if="booking.discount_amount > 0" class="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded border border-green-200">
+                                HEMAT {{ formatCurrency(booking.discount_amount) }}
                             </span>
                         </div>
                     </div>
 
-                    <!-- Route Box -->
                     <div class="mb-8">
-                        <span
-                            class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2"
-                            >ROUTE</span
-                        >
-                        <div
-                            class="bg-[#e2e8f0] px-4 py-3 w-full text-black font-bold font-mono text-lg flex items-center gap-3 border-l-4 border-rose-600"
-                        >
+                        <span class="block text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-2">ROUTE</span>
+                        <div class="bg-[#e2e8f0] px-4 py-3 w-full text-black font-bold font-mono text-lg flex items-center gap-3 border-l-4 border-rose-600">
                             {{ routeDescription.toUpperCase() }}
                         </div>
                     </div>
                 </div>
 
-                <!-- Separation Line -->
-                <div
-                    class="relative w-full md:w-[2px] h-[2px] md:h-auto bg-transparent border-t-2 md:border-t-0 md:border-l-2 border-dashed border-gray-400 flex-shrink-0 my-4 md:my-0"
-                >
-                    <!-- Cutout Circles -->
-                    <div
-                        class="absolute -left-[14px] top-[-15px] md:-top-[15px] md:-left-[15px] w-[30px] h-[30px] bg-gray-100 dark:bg-[#050505] rounded-full z-10 hidden md:block"
-                    ></div>
-                    <div
-                        class="absolute -left-[14px] bottom-[-15px] md:-bottom-[15px] md:-left-[15px] w-[30px] h-[30px] bg-gray-100 dark:bg-[#050505] rounded-full z-10 hidden md:block"
-                    ></div>
+                <!-- Separator -->
+                <div class="relative w-full md:w-[2px] h-[2px] md:h-auto bg-transparent border-t-2 md:border-t-0 md:border-l-2 border-dashed border-gray-400 flex-shrink-0 my-4 md:my-0">
+                    <div class="absolute -left-[14px] top-[-15px] md:-top-[15px] md:-left-[15px] w-[30px] h-[30px] bg-[#fcf9f8] rounded-full z-10 hidden md:block"></div>
+                    <div class="absolute -left-[14px] bottom-[-15px] md:-bottom-[15px] md:-left-[15px] w-[30px] h-[30px] bg-[#fcf9f8] rounded-full z-10 hidden md:block"></div>
                 </div>
 
-                <!-- Right Stub (Barcode) -->
-                <div
-                    class="w-full md:w-[25%] p-6 flex flex-col items-center justify-center bg-[#f3f4f6]"
-                >
-                    <span
-                        class="text-[10px] font-mono text-[#3d5684] tracking-wider mb-4"
-                        >Scan to check in</span
-                    >
-
-                    <!-- Mock Barcode Visual -->
+                <!-- Right Stub -->
+                <div class="w-full md:w-[25%] p-6 flex flex-col items-center justify-center bg-[#f3f4f6]">
+                    <span class="text-[10px] font-mono text-[#3d5684] tracking-wider mb-4">Scan to check in</span>
                     <div class="bg-white p-2 border-4 border-black mb-4">
-                        <div
-                            class="flex justify-between w-[120px] h-[80px] overflow-hidden"
-                        >
-                            <!-- Generating random bars for visual effect -->
-                            <div
-                                v-for="i in 25"
-                                :key="i"
-                                class="bg-black h-full"
-                                :style="{
-                                    width: Math.random() > 0.5 ? '4px' : '2px',
-                                    marginLeft: '2px',
-                                }"
-                            ></div>
+                        <div class="flex justify-between w-[120px] h-[80px] overflow-hidden">
+                            <div v-for="i in 25" :key="i" class="bg-black h-full" :style="{ width: Math.random() > 0.5 ? '4px' : '2px', marginLeft: '2px' }"></div>
                         </div>
                     </div>
-
-                    <span
-                        class="text-xs font-mono font-bold text-[#3d5684] tracking-widest"
-                        >ID {{ booking.booking_code }}</span
-                    >
+                    <span class="text-xs font-mono font-bold text-[#3d5684] tracking-widest">ID {{ booking.booking_code }}</span>
                 </div>
             </div>
 
-            <!-- Action Buttons Below Ticket -->
+            <!-- Action Buttons -->
             <div class="mt-12 flex flex-col sm:flex-row justify-center gap-4">
-                <Link
-                    :href="route('frontend.home')"
-                    class="btn-secondary px-8 py-4 font-mono font-bold uppercase tracking-wider text-sm flex items-center justify-center bg-gray-800 text-white rounded hover:bg-gray-700 transition"
-                >
-                    <i class="fas fa-home mr-2"></i> Home
+                <Link :href="route('frontend.home')" class="px-8 py-4 rounded-xl bg-white border border-[#e5e2e1] text-[#1c1b1b] font-bold text-[14px] tracking-wide uppercase hover:bg-gray-50 transition-all shadow-sm flex items-center justify-center gap-3">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Home
                 </Link>
 
-                <a
-                    :href="
-                        route('frontend.booking.download-ticket', booking.id)
-                    "
-                    target="_blank"
-                    class="btn-primary px-8 py-4 font-mono font-bold uppercase tracking-wider text-sm flex items-center justify-center bg-gray-900 dark:bg-black text-white rounded hover:bg-black/90 transition shadow-lg"
-                >
-                    <i class="fas fa-file-pdf mr-2"></i> PDF
+                <a :href="route('frontend.booking.download-ticket', booking.id)" target="_blank" class="px-8 py-4 rounded-xl bg-[#10207a] text-white font-bold text-[14px] tracking-wide uppercase hover:bg-[#0c185e] transition-all shadow-lg shadow-[#10207a]/20 flex items-center justify-center gap-3">
+                    <i class="fas fa-file-pdf"></i> Download PDF
                 </a>
 
-                <button
-                    @click="downloadImage"
-                    :disabled="isDownloading"
-                    class="btn-primary px-8 py-4 font-mono font-bold uppercase tracking-wider text-sm flex items-center justify-center bg-rose-600 text-white rounded hover:bg-rose-700 transition shadow-lg"
-                >
-                    <i
-                        :class="[
-                            isDownloading ? 'fa-spinner fa-spin' : 'fa-image',
-                            'fas',
-                            'mr-2',
-                        ]"
-                    ></i>
-                    {{ isDownloading ? "Saving..." : "Save to Image" }}
+                <button @click="downloadImage" :disabled="isDownloading" class="px-8 py-4 rounded-xl bg-rose-600 text-white font-bold text-[14px] tracking-wide uppercase hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20 flex items-center justify-center gap-3">
+                    <i :class="[isDownloading ? 'fa-spinner fa-spin' : 'fa-image', 'fas']"></i>
+                    {{ isDownloading ? 'Menyimpan...' : 'Simpan ke Galeri' }}
                 </button>
 
-                <button
-                    v-if="
-                        booking.payment_status !== 'paid' &&
-                        booking.midtrans_transaction_id
-                    "
-                    @click="checkPaymentStatus(booking.midtrans_transaction_id)"
-                    :disabled="isChecking"
-                    class="px-8 py-4 font-mono font-bold uppercase tracking-wider text-sm flex items-center justify-center bg-yellow-500 text-white rounded hover:bg-yellow-600 transition shadow-lg"
-                >
-                    <i
-                        :class="[
-                            'fas',
-                            isChecking ? 'fa-spinner fa-spin' : 'fa-sync-alt',
-                            'mr-2',
-                        ]"
-                    ></i>
-                    {{ isChecking ? "Checking..." : "Check Status" }}
+                <button v-if="booking.payment_status !== 'paid' && booking.midtrans_transaction_id"
+                    @click="checkPaymentStatus(booking.midtrans_transaction_id)" :disabled="isChecking"
+                    class="px-8 py-4 rounded-xl bg-amber-500 text-white font-bold text-[14px] tracking-wide uppercase hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-3">
+                    <i :class="['fas', isChecking ? 'fa-spinner fa-spin' : 'fa-sync-alt']"></i>
+                    {{ isChecking ? 'Memeriksa...' : 'Cek Status' }}
                 </button>
-
-                <!-- Auto-check indicator -->
-                <p
-                    v-if="
-                        booking.payment_status !== 'paid' &&
-                        booking.midtrans_transaction_id
-                    "
-                    class="text-xs text-gray-400 font-mono text-center w-full mt-2"
-                >
-                    <i class="fas fa-sync-alt fa-spin mr-1 text-[10px]"></i>
-                    Auto-check aktif
-                    <span v-if="lastAutoCheck">
-                        · terakhir {{ lastAutoCheck }}</span
-                    >
-                </p>
             </div>
 
-            <p class="text-center text-gray-500 font-mono text-xs mt-8">
-                Generated on {{ new Date().toLocaleString() }} <br />
+            <p v-if="booking.payment_status !== 'paid' && booking.midtrans_transaction_id" class="text-center text-gray-400 text-[12px] mt-6">
+                <i class="fas fa-sync-alt fa-spin mr-1 text-[10px]"></i>
+                Auto-check aktif <span v-if="lastAutoCheck">· terakhir {{ lastAutoCheck }}</span>
+            </p>
+
+            <p class="text-center text-gray-400 text-[12px] mt-8">
                 Simpan tiket ini sebagai bukti pembayaran yang sah.
             </p>
         </div>

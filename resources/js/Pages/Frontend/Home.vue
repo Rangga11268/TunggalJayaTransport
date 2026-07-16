@@ -50,6 +50,20 @@ const openWhatsAppInquiry = () => {
     const text = `Halo Tunggal Jaya, saya ingin bertanya tentang sewa bus pariwisata.\n\nTujuan: ${dest}\nTanggal: ${date}\nDurasi: ${charterForm.duration} Hari\n\nMohon info ketersediaan dan harganya. Terima kasih.`;
     window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(text)}`, '_blank');
 };
+
+// Fleet filter
+const fleetCategory = ref('all');
+
+const filteredFleet = computed(() => {
+    if (fleetCategory.value === 'all') return props.fleet?.slice(0, 6) || [];
+    return props.fleet?.filter(b => b.bus_category === fleetCategory.value).slice(0, 6) || [];
+});
+
+// Find first pariwisata bus with image for the armada section
+const pariwisataBusImage = computed(() => {
+    const bus = props.fleet?.find(b => b.bus_category === 'pariwisata' && b.image_url);
+    return bus?.image_url || '/img/interiorBus.png';
+});
 </script>
 
 <template>
@@ -367,6 +381,77 @@ const openWhatsAppInquiry = () => {
             </div>
         </div>
 
+        <!-- DAFTAR ARMADA SECTION -->
+        <div class="bg-[#fcf9f8] flex flex-col items-center py-[96px]">
+            <div class="flex flex-col gap-[48px] items-start max-w-[1280px] px-[64px] w-full">
+                <div class="flex items-end justify-between w-full">
+                    <div class="flex flex-col gap-[8px] items-start">
+                        <h2 class="font-unbounded font-bold text-[#1c1b1b] text-[32px] tracking-[-0.32px] m-0">Daftar Armada</h2>
+                        <p class="font-normal text-[#454652] text-[16px] m-0">Seluruh armada tunggal jaya transport.</p>
+                    </div>
+                    <Link :href="route('frontend.fleet.index')" class="flex items-center gap-[4px] text-[#10207a] hover:underline font-semibold text-[16px]">
+                        Lihat Semua
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </Link>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="flex gap-3">
+                    <button @click="fleetCategory = 'all'" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 border"
+                        :class="fleetCategory === 'all' ? 'bg-rose-600 text-white border-rose-600 shadow-lg shadow-rose-600/30' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
+                        Semua
+                    </button>
+                    <button @click="fleetCategory = 'akap'" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 border"
+                        :class="fleetCategory === 'akap' ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/30' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
+                        AKAP
+                    </button>
+                    <button @click="fleetCategory = 'pariwisata'" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 border"
+                        :class="fleetCategory === 'pariwisata' ? 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/30' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
+                        Pariwisata
+                    </button>
+                </div>
+
+                <div v-if="filteredFleet.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-[24px] w-full">
+                    <div v-for="bus in filteredFleet" :key="bus.id"
+                        class="bg-white rounded-[12px] overflow-hidden border border-[#ebe7e7] shadow-sm hover:shadow-lg transition-shadow group">
+                        <div class="relative h-[200px] overflow-hidden">
+                            <img :src="bus.image_url || '/img/noImg.png'" :alt="bus.name"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                            <div class="absolute bottom-[16px] left-[16px] right-[16px] flex items-center justify-between">
+                                <span class="text-white font-bold text-[16px]">{{ bus.name }}</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
+                                    :class="bus.bus_category === 'pariwisata' ? 'bg-purple-600 text-white' : 'bg-blue-600 text-white'">
+                                    {{ bus.bus_category === 'pariwisata' ? 'Pariwisata' : 'AKAP' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-[16px]">
+                            <div class="flex items-center gap-3 text-[13px] text-gray-500 mb-[10px]">
+                                <span>{{ bus.bus_type }}</span>
+                                <span>&middot;</span>
+                                <span>{{ bus.capacity }} Kursi</span>
+                                <span>&middot;</span>
+                                <span class="font-mono">{{ bus.plate_number }}</span>
+                            </div>
+                            <p class="text-[14px] text-gray-600 leading-relaxed line-clamp-2 mb-[14px]">
+                                {{ bus.description || 'Armada premium dengan fasilitas terbaik.' }}
+                            </p>
+                            <Link :href="bus.bus_category === 'pariwisata' ? route('frontend.charter.index') : route('frontend.booking.index')"
+                                class="text-[#10207a] font-semibold text-[13px] hover:underline flex items-center gap-1">
+                                {{ bus.bus_category === 'pariwisata' ? 'Sewa Sekarang' : 'Pesan Tiket' }}
+                                <i class="fas fa-arrow-right text-xs"></i>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="w-full text-center py-12 text-gray-400">
+                    <i class="fas fa-bus text-4xl mb-4 opacity-30"></i>
+                    <p>Tidak ada armada ditemukan.</p>
+                </div>
+            </div>
+        </div>
+
         <!-- ARMADA PREMIUM KAMI SECTION -->
         <div class="bg-[#111111] flex flex-col items-center py-[128px]">
             <div class="flex flex-col gap-[96px] items-center max-w-[1280px] px-[64px] w-full">
@@ -376,8 +461,8 @@ const openWhatsAppInquiry = () => {
                     <div class="border border-[#767683] px-[16px] py-[6px] rounded-[12px]">
                         <span class="font-bold text-[#c6c5d3] text-[12px] tracking-[1.2px] uppercase">ARMADA PREMIUM KAMI</span>
                     </div>
-                    <h2 class=" font-unboundedfont-unbounded font-black text-[48px] text-white tracking-[-0.96px] m-0 leading-tight">Kemewahan dalam Setiap Perjalanan</h2>
-                    <p class=" text-[16px] text-[#e5e2e1] opacity-90 m-0 leading-relaxed">
+                    <h2 class="font-unbounded font-black text-[48px] text-white tracking-[-0.96px] m-0 leading-tight">Kemewahan dalam Setiap Perjalanan</h2>
+                    <p class="text-[16px] text-[#e5e2e1] opacity-90 m-0 leading-relaxed">
                         Pilih layanan yang sesuai dengan kebutuhan Anda. Dari perjalanan antarkota kelas eksekutif hingga sewa bus pariwisata premium.
                     </p>
                 </div>
@@ -404,15 +489,15 @@ const openWhatsAppInquiry = () => {
                                 <i class="fas fa-check-circle text-[#f3e72b]"></i> Fasilitas Toilet Bersih & Kabin Kedap Suara
                             </li>
                         </ul>
-                        <a href="#" class="border border-white hover:bg-white hover:text-black text-white px-[32px] py-[12px] rounded-[12px] font-semibold text-[14px] text-center tracking-wide uppercase transition-colors self-start">
-                            Jadwal & Tiket
-                        </a>
+                        <Link :href="route('frontend.booking.index')" class="border border-white hover:bg-white hover:text-black text-white px-[32px] py-[12px] rounded-[12px] font-semibold text-[14px] text-center tracking-wide uppercase transition-colors self-start">
+                            Cek Jadwal & Tiket
+                        </Link>
                     </div>
 
                     <!-- Bus Pariwisata -->
                     <div class="flex flex-col w-full group">
                         <div class="relative h-[400px] w-full rounded-[16px] overflow-hidden mb-[32px] shadow-2xl border border-white/10">
-                            <img src="/img/interiorBus.png" alt="Sewa Bus Pariwisata" class="absolute w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x400?text=Interior+Bus'" />
+                            <img :src="pariwisataBusImage" alt="Sewa Bus Pariwisata" class="absolute w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                             <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
                             <div class="absolute bottom-[24px] left-[24px] right-[24px]">
                                 <h3 class="font-unbounded text-white text-[24px] font-bold">Sewa Bus Pariwisata</h3>
@@ -429,10 +514,23 @@ const openWhatsAppInquiry = () => {
                                 <i class="fas fa-check-circle text-[#f3e72b]"></i> Leg rest, AVOD, & Toilet
                             </li>
                         </ul>
-                        <a href="#" class="bg-white text-black hover:bg-gray-200 px-[32px] py-[12px] rounded-[12px] font-semibold text-[14px] text-center tracking-wide uppercase transition-colors self-start shadow-md">
-                            Pesan Bus Pariwisata
-                        </a>
+                        <Link :href="route('frontend.charter.index')" class="bg-white text-black hover:bg-gray-200 px-[32px] py-[12px] rounded-[12px] font-semibold text-[14px] text-center tracking-wide uppercase transition-colors self-start shadow-md">
+                            Pesan Sekarang
+                        </Link>
                     </div>
+                </div>
+
+                <!-- CTA Row -->
+                <div class="flex flex-col md:flex-row items-center gap-[24px] w-full justify-center">
+                    <Link :href="route('frontend.booking.index')" class="bg-white text-black hover:bg-gray-200 px-[40px] py-[16px] rounded-[14px] font-bold text-[16px] tracking-wide uppercase transition-colors shadow-xl">
+                        <i class="fas fa-ticket-alt mr-2"></i> Pesan Tiket AKAP
+                    </Link>
+                    <Link :href="route('frontend.charter.index')" class="border border-white hover:bg-white hover:text-black text-white px-[40px] py-[16px] rounded-[14px] font-bold text-[16px] tracking-wide uppercase transition-colors">
+                        <i class="fas fa-bus mr-2"></i> Sewa Bus Pariwisata
+                    </Link>
+                    <Link :href="route('frontend.fleet.index')" class="border border-[#767683] hover:border-white text-[#c6c5d3] hover:text-white px-[40px] py-[16px] rounded-[14px] font-bold text-[16px] tracking-wide uppercase transition-colors">
+                        <i class="fas fa-info-circle mr-2"></i> Lihat Armada
+                    </Link>
                 </div>
             </div>
         </div>

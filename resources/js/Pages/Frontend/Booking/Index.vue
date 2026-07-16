@@ -21,6 +21,7 @@ const form = useForm({
     class: props.filters.class ? props.filters.class.split(",") : [],
     time: props.filters.time ? props.filters.time.split(",") : [],
 });
+const showAvailableOnly = ref(true);
 
 // Local reactive state (no Inertia reload)
 const localSchedules = ref(props.schedules || []);
@@ -45,7 +46,8 @@ const hasActiveFilters = computed(() => {
         form.destination ||
         form.date ||
         form.class.length > 0 ||
-        form.time.length > 0
+        form.time.length > 0 ||
+        !showAvailableOnly.value
     );
 });
 
@@ -57,7 +59,8 @@ const resetFilters = async () => {
     form.date = "";
     form.class = [];
     form.time = [];
-    sortBy.value = "earliest";
+    sortBy.value = "availability";
+    showAvailableOnly.value = true;
 
     try {
         isSearching.value = true;
@@ -79,12 +82,12 @@ const resetFilters = async () => {
 };
 
 // Sort state
-const sortBy = ref("earliest");
+const sortBy = ref("availability");
 
 // Min date = hari ini (prevent past dates)
 const todayDate = computed(() => new Date().toISOString().split("T")[0]);
 
-// Client-side filter: class & time (tanpa server request)
+// Client-side filter: class, time & departure status
 const filteredSchedules = computed(() => {
     if (!localSchedules.value) return [];
     let result = [...localSchedules.value];
@@ -107,6 +110,11 @@ const filteredSchedules = computed(() => {
         });
     }
 
+    // Filter only available (not departed)
+    if (showAvailableOnly.value) {
+        result = result.filter((s) => !s.has_departed);
+    }
+
     return result;
 });
 
@@ -127,6 +135,8 @@ const displaySchedules = computed(() => {
             };
             return parseDur(a.duration) - parseDur(b.duration);
         });
+    } else if (sortBy.value === "availability") {
+        list.sort((a, b) => getAvailableSeats(b) - getAvailableSeats(a));
     } else {
         // "earliest" — sort by departure_time
         list.sort((a, b) =>
@@ -285,6 +295,14 @@ watch(
                     </div>
 
                     <div class="border-t border-[#c6c5d3] pt-6 flex flex-col gap-4">
+                        <h4 class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Status Keberangkatan</h4>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="checkbox" v-model="showAvailableOnly" class="w-4 h-4 rounded border-[#767683] text-[#10207a] focus:ring-[#10207a]">
+                            <span class="font-normal text-[#1c1b1b] text-[14px] group-hover:text-[#10207a]">Hanya tersedia</span>
+                        </label>
+                    </div>
+
+                    <div class="border-t border-[#c6c5d3] pt-6 flex flex-col gap-4">
                         <h4 class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Kelas Bus</h4>
                         <div class="flex flex-col gap-3">
                             <label class="flex items-center gap-3 cursor-pointer group">
@@ -313,6 +331,7 @@ watch(
                         <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Urutkan:</label>
                         <select v-model="sortBy" class="bg-transparent border-none font-semibold text-[#10207a] cursor-pointer outline-none text-[14px]">
                             <option value="earliest">Waktu Paling Awal</option>
+                            <option value="availability">Ketersediaan Kursi</option>
                             <option value="cheapest">Harga Termurah</option>
                             <option value="fastest">Durasi Tercepat</option>
                         </select>
