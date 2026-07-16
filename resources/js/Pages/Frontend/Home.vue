@@ -64,6 +64,60 @@ const pariwisataBusImage = computed(() => {
     const bus = props.fleet?.find(b => b.bus_category === 'pariwisata' && b.image_url);
     return bus?.image_url || '/img/interiorBus.png';
 });
+
+// Google Reviews
+const reviews = [
+    { name: "Alifah Tasya hanie", stars: 5, text: "ASSALAIKUM" },
+    { name: "Fahmi Ror", stars: 5, text: null },
+    { name: "Richard Phillip Pardamean Hutabarat", stars: 5, text: null },
+    { name: "Lipi Yana", stars: 5, text: null },
+    { name: "Faiz Dwi", stars: 5, text: null },
+    { name: "Yazid Bassid", stars: 5, text: null },
+    { name: "Alvaro Zulkarnaen", stars: 5, text: null },
+    { name: "Rizky Handi Nugraha", stars: 5, text: null },
+    { name: "Yadi Ncex", stars: 5, text: null },
+    { name: "Pemuda idaman", stars: 5, text: null },
+    { name: "The Flower", stars: 5, text: null },
+    { name: "Beben Junior", stars: 5, text: null },
+    { name: "Rifka Rifki", stars: 5, text: null },
+    { name: "Indiya Wibawa", stars: 5, text: null },
+    { name: "daw sty", stars: 5, text: null },
+    { name: "Edy Grahamas", stars: 5, text: null },
+    { name: "Mirna Wati", stars: 5, text: null },
+    { name: "Anak Kecil", stars: 5, text: null },
+    { name: "Rumah Burung Cendet", stars: 5, text: null },
+    { name: "Yani Suryani", stars: 5, text: null },
+    { name: "arisareni", stars: 4, text: "Nyenengin anak, 50rb perbangku keliling kota kuningan.. Mantap lah" },
+    { name: "muter muter", stars: 4, text: "Rame banget. Selain banyak pemburu bus artis, banyak pedagang juga di sekitar lokasi. Kendaraan banyak parkir di pinggir jalan. Pas ke sana, garasinya lagi kosong." },
+    { name: "Dedi Erwanto", stars: 4, text: "Banyak yang jualan kalau Sabtu dan Minggu, terutama jual stiker bus, anak jadi suka" },
+    { name: "Endarto Dany", stars: 4, text: "Luas garasinya, ada toilet mushola nya. Busnya bagus2, krunya ramah." },
+    { name: "Arjun Dwi", stars: 4, text: "Lumayan lah ketemu dua bis masih nyari kids panda JB 5" },
+    { name: "Apen Supendi", stars: 4, text: "Harusnya jangan ditutup, biar anak-anak bisa bermain" },
+    { name: "Neneng Nurhinda", stars: 4, text: "Bis nya bagus tapi jarang ngasih stiker" },
+    { name: "Sendadiprana Amar", stars: 4, text: "Lokasi di daerah kuningan dekat dengan objek wisata J&J" },
+    { name: "Siti Maysaroh", stars: 4, text: "Daya pernah ketemu bentas" },
+    { name: "Ardi Art", stars: 4, text: "Garasi bis rasa tempat wisata." },
+    { name: "Muhammad Irsad", stars: 4, text: "Tempat kumpul bocil basuri mania" },
+    { name: "Uswatun Hasanah", stars: 4, text: "Tunggal jaya debes" },
+    { name: "kvieth 19", stars: 3, text: "Banyak bocil rusuh disana pas saya ke sana cuma ada neptun doang baju nya mahak banget! Topi 75 digarasi pas saturn ke cerbon jualan topi cuma 15 kok!" },
+    { name: "Raffrad", stars: 3, text: "Wisata kreatif dan inovatif, dgn sasaran anak2 pengemar telolet." },
+    { name: "Ahmad hasan", stars: 3, text: "Po tunggaljaya transport juragan88" },
+    { name: "Kang Choen", stars: 3, text: "Buat naek telolet, tapi gak tiap hari ada." },
+    { name: "Ari Fahrurrozi", stars: 3, text: "Kurang luas" },
+    { name: "O Ke", stars: 3, text: "PRADANA TRANS PAPA MUDA" },
+];
+
+const activeReviews = computed(() => {
+    return reviews.filter(r => r.text).slice(0, 20);
+});
+
+const getStars = (count) => {
+    return Array(5).fill(0).map((_, i) => i < count);
+};
+
+const getInitial = (name) => {
+    return name.charAt(0).toUpperCase();
+};
 </script>
 
 <template>
@@ -287,66 +341,58 @@ const pariwisataBusImage = computed(() => {
         </div>
 
         <!-- TESTIMONIALS SECTION -->
-        <div class="bg-[#f6f3f2] border-y border-[#ebe7e7] flex flex-col items-center py-[96px]">
-            <div class="flex flex-col gap-[48px] items-center max-w-[1280px] px-[64px] w-full">
-                <div class="flex flex-col gap-[16px] items-center w-full text-center">
-                    <h2 class=" font-unboundedfont-bold text-[#1c1b1b] text-[32px] tracking-[-0.32px] m-0">Testimoni Pelanggan</h2>
-                    <p class="font-normal text-[#454652] text-[16px] m-0 max-w-2xl">
-                        Pengalaman nyata dari pelanggan setia yang telah mempercayakan perjalanannya bersama kami.
-                    </p>
+        <div class="bg-[#fcf9f8] overflow-hidden py-16">
+            <div class="text-center mb-10 px-4">
+                <span class="inline-block px-3 py-1 rounded-full bg-white border border-[#ebe7e7] text-[#10207a] text-[9px] font-bold tracking-widest uppercase mb-3 shadow-sm">Google Reviews</span>
+                <h2 class="font-unbounded font-bold text-[28px] text-[#1c1b1b]">Apa Kata Mereka</h2>
+                <p class="text-[#454652] text-[14px] mt-1">Pengalaman nyata dari pelanggan setia Tunggal Jaya Transport.</p>
+            </div>
+
+            <!-- Row 1 - scroll kiri -->
+            <div class="relative overflow-hidden mb-6">
+                <div class="flex gap-4 animate-scroll-left">
+                    <template v-for="i in 3" :key="'r1-'+i">
+                        <div v-for="r in activeReviews" :key="r.name + i"
+                            class="flex-shrink-0 w-[320px] bg-white border border-[#ebe7e7] rounded-[12px] p-5 shadow-sm">
+                            <div class="flex items-center gap-1 mb-2">
+                                <i v-for="(filled, s) in getStars(r.stars)" :key="s"
+                                    class="text-[11px]" :class="filled ? 'fas fa-star text-amber-400' : 'far fa-star text-gray-300'"></i>
+                            </div>
+                            <p v-if="r.text" class="text-[13px] text-[#454652] leading-relaxed line-clamp-3 mb-3">"{{ r.text }}"</p>
+                            <p v-else class="text-[13px] text-gray-400 italic mb-3">Tidak ada komentar</p>
+                            <div class="flex items-center gap-2.5 pt-2 border-t border-[#ebe7e7]">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+                                    :class="r.stars >= 5 ? 'bg-green-600' : r.stars >= 4 ? 'bg-lime-600' : 'bg-amber-500'">
+                                    {{ getInitial(r.name) }}
+                                </div>
+                                <span class="text-sm font-semibold text-[#1c1b1b] truncate">{{ r.name }}</span>
+                            </div>
+                        </div>
+                    </template>
                 </div>
+            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-[32px] w-full">
-                    <!-- Testimonial 1 -->
-                    <div class="bg-white border border-[#e5e2e1] drop-shadow-sm rounded-[8px] p-8 flex flex-col">
-                        <div class="flex text-yellow-400 mb-6">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                        <p class="italic font-normal text-[#454652] text-[16px] leading-[24px] mb-8 grow">
-                            "Perjalanan dari Kuningan ke Jakarta terasa sangat cepat dan nyaman. AC dingin, kursi super empuk, dan supir sangat profesional. Sangat direkomendasikan!"
-                        </p>
-                        <div class="flex items-center gap-4">
-                            <div class="bg-[#dfe0ff] text-[#000e5e] font-bold rounded-full w-[48px] h-[48px] flex items-center justify-center text-[16px]">R</div>
-                            <div>
-                                <p class="font-semibold text-[#1c1b1b] m-0">Rizky Ananda</p>
-                                <p class="font-normal text-[#454652] text-[14px] m-0">Rute Kuningan - Jakarta</p>
+            <!-- Row 2 - scroll kanan -->
+            <div class="relative overflow-hidden">
+                <div class="flex gap-4 animate-scroll-right">
+                    <template v-for="i in 3" :key="'r2-'+i">
+                        <div v-for="r in [...activeReviews].reverse()" :key="r.name + 'rev' + i"
+                            class="flex-shrink-0 w-[320px] bg-white border border-[#ebe7e7] rounded-[12px] p-5 shadow-sm">
+                            <div class="flex items-center gap-1 mb-2">
+                                <i v-for="(filled, s) in getStars(r.stars)" :key="s"
+                                    class="text-[11px]" :class="filled ? 'fas fa-star text-amber-400' : 'far fa-star text-gray-300'"></i>
+                            </div>
+                            <p v-if="r.text" class="text-[13px] text-[#454652] leading-relaxed line-clamp-3 mb-3">"{{ r.text }}"</p>
+                            <p v-else class="text-[13px] text-gray-400 italic mb-3">Tidak ada komentar</p>
+                            <div class="flex items-center gap-2.5 pt-2 border-t border-[#ebe7e7]">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+                                    :class="r.stars >= 5 ? 'bg-green-600' : r.stars >= 4 ? 'bg-lime-600' : 'bg-amber-500'">
+                                    {{ getInitial(r.name) }}
+                                </div>
+                                <span class="text-sm font-semibold text-[#1c1b1b] truncate">{{ r.name }}</span>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Testimonial 2 -->
-                    <div class="bg-white border border-[#e5e2e1] drop-shadow-sm rounded-[8px] p-8 flex flex-col">
-                        <div class="flex text-yellow-400 mb-6">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                        <p class="italic font-normal text-[#454652] text-[16px] leading-[24px] mb-8 grow">
-                            "Fasilitas sleeper class-nya juara! Bisa tidur nyenyak sepanjang perjalanan. Snack yang diberikan juga enak. Pengalaman bus terbaik sejauh ini."
-                        </p>
-                        <div class="flex items-center gap-4">
-                            <div class="bg-[#ffdad6] text-[#410002] font-bold rounded-full w-[48px] h-[48px] flex items-center justify-center text-[16px]">S</div>
-                            <div>
-                                <p class="font-semibold text-[#1c1b1b] m-0">Siti Fatimah</p>
-                                <p class="font-normal text-[#454652] text-[14px] m-0">Rute Cirebon - Bandung</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Testimonial 3 -->
-                    <div class="bg-white border border-[#e5e2e1] drop-shadow-sm rounded-[8px] p-8 flex flex-col">
-                        <div class="flex text-yellow-400 mb-6">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <p class="italic font-normal text-[#454652] text-[16px] leading-[24px] mb-8 grow">
-                            "Harga terjangkau tapi fasilitas berani diadu dengan yang premium. Keberangkatan selalu on-time, sangat menghargai waktu penumpang."
-                        </p>
-                        <div class="flex items-center gap-4">
-                            <div class="bg-[#f3e72b] text-[#1e1c00] font-bold rounded-full w-[48px] h-[48px] flex items-center justify-center text-[16px]">D</div>
-                            <div>
-                                <p class="font-semibold text-[#1c1b1b] m-0">Deni Saputra</p>
-                                <p class="font-normal text-[#454652] text-[14px] m-0">Rute Majalengka - Bekasi</p>
-                            </div>
-                        </div>
-                    </div>
+                    </template>
                 </div>
             </div>
         </div>
@@ -537,10 +583,34 @@ const pariwisataBusImage = computed(() => {
 </template>
 
 <style scoped>
-/* Optional: Adding some smooth scrolling to snap containers */
 .snap-x {
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+}
+
+@keyframes scrollLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@keyframes scrollRight {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+}
+
+.animate-scroll-left {
+    animation: scrollLeft 60s linear infinite;
+    width: fit-content;
+}
+
+.animate-scroll-right {
+    animation: scrollRight 60s linear infinite;
+    width: fit-content;
+}
+
+.animate-scroll-left:hover,
+.animate-scroll-right:hover {
+    animation-play-state: paused;
 }
 </style>
