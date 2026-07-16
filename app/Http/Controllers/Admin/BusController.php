@@ -51,8 +51,9 @@ class BusController extends Controller
         $conductors = Conductor::where('status', 'active')->get();
         $assignedDrivers = $this->getAssignedDrivers();
         $assignedConductors = $this->getAssignedConductors();
+        $busTypes = Bus::distinct()->pluck('bus_type')->filter()->values();
         
-        return Inertia::render('Admin/Buses/Create', compact('drivers', 'conductors', 'assignedDrivers', 'assignedConductors'));
+        return Inertia::render('Admin/Buses/Create', compact('drivers', 'conductors', 'assignedDrivers', 'assignedConductors', 'busTypes'));
     }
 
     
@@ -141,13 +142,15 @@ class BusController extends Controller
         $conductors = Conductor::where('status', 'active')->get();
         $assignedDrivers = $this->getAssignedDrivers($bus->id);
         $assignedConductors = $this->getAssignedConductors($bus->id);
+        $busTypes = Bus::distinct()->pluck('bus_type')->filter()->values();
         
         return Inertia::render('Admin/Buses/Edit', [
             'bus' => $bus,
             'drivers' => $drivers,
             'conductors' => $conductors,
             'assignedDrivers' => $assignedDrivers,
-            'assignedConductors' => $assignedConductors
+            'assignedConductors' => $assignedConductors,
+            'busTypes' => $busTypes,
         ]);
     }
 

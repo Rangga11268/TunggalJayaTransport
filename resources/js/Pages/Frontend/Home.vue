@@ -398,15 +398,15 @@ const pariwisataBusImage = computed(() => {
                 <!-- Category Filter -->
                 <div class="flex gap-3">
                     <button @click="fleetCategory = 'all'" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 border"
-                        :class="fleetCategory === 'all' ? 'bg-rose-600 text-white border-rose-600 shadow-lg shadow-rose-600/30' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
+                        :class="fleetCategory === 'all' ? 'bg-[#10207a] text-white border-[#10207a] shadow-lg shadow-[#10207a]/30' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
                         Semua
                     </button>
                     <button @click="fleetCategory = 'akap'" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 border"
-                        :class="fleetCategory === 'akap' ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/30' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
+                        :class="fleetCategory === 'akap' ? 'bg-[#10207a] text-white border-[#10207a] shadow-lg shadow-[#10207a]/30' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
                         AKAP
                     </button>
                     <button @click="fleetCategory = 'pariwisata'" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 border"
-                        :class="fleetCategory === 'pariwisata' ? 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/30' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
+                        :class="fleetCategory === 'pariwisata' ? 'bg-[#10207a] text-white border-[#10207a] shadow-lg shadow-[#10207a]/30' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'">
                         Pariwisata
                     </button>
                 </div>
@@ -420,8 +420,7 @@ const pariwisataBusImage = computed(() => {
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                             <div class="absolute bottom-[16px] left-[16px] right-[16px] flex items-center justify-between">
                                 <span class="text-white font-bold text-[16px]">{{ bus.name }}</span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
-                                    :class="bus.bus_category === 'pariwisata' ? 'bg-purple-600 text-white' : 'bg-blue-600 text-white'">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-[#10207a] text-white">
                                     {{ bus.bus_category === 'pariwisata' ? 'Pariwisata' : 'AKAP' }}
                                 </span>
                             </div>

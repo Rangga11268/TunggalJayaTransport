@@ -8,6 +8,7 @@ const props = defineProps({
     conductors: Array,
     assignedDrivers: Array,
     assignedConductors: Array,
+    busTypes: Array,
 });
 
 const form = useForm({
@@ -25,6 +26,22 @@ const form = useForm({
 });
 
 const imagePreview = ref(null);
+
+const busTypeOptions = computed(() => {
+    if (form.bus_category === 'pariwisata') {
+        return [
+            { value: 'Big Bus (Leg Rest)', label: 'Big Bus (Leg Rest)' },
+            { value: 'Big Bus (Biasa)', label: 'Big Bus (Biasa)' },
+        ];
+    }
+    return [
+        { value: 'Economy', label: 'Economy' },
+        { value: 'VIP', label: 'VIP' },
+        { value: 'Executive', label: 'Executive' },
+        { value: 'Super Executive', label: 'Super Executive' },
+        { value: 'Sleeper', label: 'Sleeper' },
+    ];
+});
 
 const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -162,13 +179,7 @@ const availableConductors = computed(() => {
                                 <option value="" disabled>
                                     Pilih Tipe Bus
                                 </option>
-                                <option value="Economy">Economy</option>
-                                <option value="VIP">VIP</option>
-                                <option value="Executive">Executive</option>
-                                <option value="Super Executive">
-                                    Super Executive
-                                </option>
-                                <option value="Sleeper">Sleeper</option>
+                                <option v-for="opt in busTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                             </select>
                             <p
                                 v-if="form.errors.bus_type"

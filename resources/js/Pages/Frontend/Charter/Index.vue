@@ -4,8 +4,11 @@ import { Head, useForm, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 import Swal from "sweetalert2";
 
+defineOptions({ layout: FrontendLayout });
+
 const props = defineProps({
     auth: Object,
+    pariwisataBuses: Array,
 });
 
 const form = useForm({
@@ -47,147 +50,142 @@ const submit = () => {
 <template>
     <Head title="Sewa Pariwisata" />
 
-    <FrontendLayout>
-        <!-- Hero Section -->
-        <div class="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 z-0 bg-gray-900">
-                <img src="/img/heroImg.jpg" alt="Tunggal Jaya Pariwisata" class="w-full h-full object-cover object-center filter brightness-[0.35] contrast-125" />
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-transparent dark:from-[#050505]"></div>
-            </div>
-            
-            <div class="relative z-10 text-center px-4 max-w-4xl mx-auto mt-20">
-                <span class="inline-block py-2 px-5 rounded-full bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold tracking-widest uppercase mb-6 backdrop-blur-md shadow-lg">
-                    Layanan Eksklusif
-                </span>
-                <h1 class="text-5xl md:text-7xl font-black text-white font-unbounded mb-6 leading-tight drop-shadow-2xl">
-                    Sewa Bus Pariwisata
-                </h1>
-                <p class="text-xl text-gray-200 mb-12 max-w-2xl mx-auto font-medium drop-shadow-md">
-                    Armada eksklusif Tunggal Jaya Transport siap menemani perjalanan wisata Anda dengan kenyamanan dan keamanan tingkat tinggi.
-                </p>
-                <a href="#form-sewa" class="inline-flex items-center justify-center gap-3 px-10 py-5 bg-rose-600 hover:bg-rose-700 text-white rounded-full font-black text-lg transition-all hover:scale-105 active:scale-95 shadow-[0_10px_40px_-10px_rgba(225,29,72,0.8)]">
-                    Pesan Sekarang <i class="fas fa-arrow-down"></i>
-                </a>
-            </div>
+    <div class="bg-[#fcf9f8] min-h-screen">
+        <!-- Hero -->
+        <div class="relative pt-28 pb-12 px-4 sm:px-6 lg:px-8 text-center">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-white border border-[#ebe7e7] text-[#10207a] text-[11px] font-bold tracking-widest uppercase mb-5 shadow-sm">
+                Layanan Eksklusif
+            </span>
+            <h1 class="font-unbounded font-black text-4xl md:text-6xl text-[#1c1b1b] mb-4">
+                Sewa Bus Pariwisata
+            </h1>
+            <p class="text-[#454652] text-[16px] max-w-2xl mx-auto">
+                Armada eksklusif Tunggal Jaya Transport siap menemani perjalanan wisata Anda dengan kenyamanan dan keamanan tingkat tinggi.
+            </p>
+            <a href="#form-sewa" class="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-[#10207a] text-white rounded-xl font-bold text-[15px] hover:bg-[#0c185e] transition-all shadow-lg shadow-[#10207a]/20">
+                Pesan Sekarang <i class="fas fa-arrow-down"></i>
+            </a>
         </div>
 
-        <div class="bg-gray-50 dark:bg-[#050505] min-h-screen">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10" id="form-sewa">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
-                    <!-- Info Section -->
-                    <div class="lg:col-span-5">
-                        <h2 class="text-4xl font-black font-unbounded text-gray-900 dark:text-white mb-10 leading-tight">Keunggulan<br/><span class="text-rose-600">Armada Kami</span></h2>
-                        
-                        <div class="space-y-10">
-                            <div class="flex gap-6 items-start group">
-                                <div class="w-16 h-16 rounded-3xl bg-white dark:bg-[#111] border border-gray-100 dark:border-white/5 text-rose-600 flex items-center justify-center shrink-0 shadow-xl group-hover:bg-rose-600 group-hover:text-white transition-all duration-300">
-                                    <i class="fas fa-bus text-2xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-3 font-unbounded">Armada Terbaru</h3>
-                                    <p class="text-gray-500 dark:text-gray-400 leading-relaxed font-medium">Semua bus kami adalah keluaran terbaru dengan fasilitas AC, TV, Karaoke, dan bagasi luas. Ada pilihan Big Bus dengan Leg Rest.</p>
-                                </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24" id="form-sewa">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <!-- Info -->
+                <div class="lg:col-span-5">
+                    <h2 class="font-unbounded font-bold text-[#1c1b1b] text-[28px] mb-8">Keunggulan<br/>Armada Kami</h2>
+                    <div class="space-y-8">
+                        <div class="flex gap-5 items-start">
+                            <div class="w-14 h-14 rounded-xl bg-white border border-[#ebe7e7] flex items-center justify-center shrink-0 shadow-sm">
+                                <i class="fas fa-bus text-lg text-[#10207a]"></i>
                             </div>
-                            
-                            <div class="flex gap-6 items-start group">
-                                <div class="w-16 h-16 rounded-3xl bg-white dark:bg-[#111] border border-gray-100 dark:border-white/5 text-rose-600 flex items-center justify-center shrink-0 shadow-xl group-hover:bg-rose-600 group-hover:text-white transition-all duration-300">
-                                    <i class="fas fa-user-tie text-2xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-3 font-unbounded">Kru Profesional</h3>
-                                    <p class="text-gray-500 dark:text-gray-400 leading-relaxed font-medium">Pengemudi dan kernet berpengalaman, ramah, dan sangat menguasai berbagai rute pariwisata di Indonesia.</p>
-                                </div>
+                            <div>
+                                <h3 class="font-bold text-[#1c1b1b] text-[18px] mb-1.5">Armada Terbaru</h3>
+                                <p class="text-[#454652] text-[14px] leading-relaxed">Semua bus kami adalah keluaran terbaru dengan fasilitas AC, TV, Karaoke, dan bagasi luas. Ada pilihan Big Bus dengan Leg Rest.</p>
                             </div>
-                            
-                            <div class="flex gap-6 items-start group">
-                                <div class="w-16 h-16 rounded-3xl bg-white dark:bg-[#111] border border-gray-100 dark:border-white/5 text-rose-600 flex items-center justify-center shrink-0 shadow-xl group-hover:bg-rose-600 group-hover:text-white transition-all duration-300">
-                                    <i class="fas fa-shield-alt text-2xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-3 font-unbounded">Aman & Terawat</h3>
-                                    <p class="text-gray-500 dark:text-gray-400 leading-relaxed font-medium">Perawatan rutin selalu kami lakukan sebelum dan sesudah perjalanan untuk menjamin keselamatan penumpang.</p>
-                                </div>
+                        </div>
+                        <div class="flex gap-5 items-start">
+                            <div class="w-14 h-14 rounded-xl bg-white border border-[#ebe7e7] flex items-center justify-center shrink-0 shadow-sm">
+                                <i class="fas fa-user-tie text-lg text-[#10207a]"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-[#1c1b1b] text-[18px] mb-1.5">Kru Profesional</h3>
+                                <p class="text-[#454652] text-[14px] leading-relaxed">Pengemudi dan kernet berpengalaman, ramah, dan sangat menguasai berbagai rute pariwisata di Indonesia.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-5 items-start">
+                            <div class="w-14 h-14 rounded-xl bg-white border border-[#ebe7e7] flex items-center justify-center shrink-0 shadow-sm">
+                                <i class="fas fa-shield-alt text-lg text-[#10207a]"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-[#1c1b1b] text-[18px] mb-1.5">Aman & Terawat</h3>
+                                <p class="text-[#454652] text-[14px] leading-relaxed">Perawatan rutin selalu kami lakukan sebelum dan sesudah perjalanan untuk menjamin keselamatan penumpang.</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Form Section -->
-                    <div class="lg:col-span-7">
-                        <div class="bg-white dark:bg-[#111] p-10 md:p-14 rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl">
-                            <h3 class="text-3xl font-black font-unbounded text-gray-900 dark:text-white mb-2">Minta Penawaran Harga</h3>
-                            <p class="text-gray-500 dark:text-gray-400 mb-10 font-medium">Lengkapi form berikut dan tim kami akan memberikan penawaran harga terbaik untuk perjalanan Anda.</p>
-                            
-                            <form @submit.prevent="submit" class="space-y-8">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div class="space-y-3">
-                                        <label class="block text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Tanggal Jemput <span class="text-rose-600">*</span></label>
-                                        <div class="relative">
-                                            <input v-model="form.pickup_date" type="date" required class="w-full pl-5 pr-12 py-4 bg-gray-50 dark:bg-black/50 border-2 border-gray-100 dark:border-white/5 rounded-2xl focus:ring-0 focus:border-rose-600 dark:focus:border-rose-600 dark:text-white font-medium outline-none transition-colors" />
-                                        </div>
+                <!-- Form -->
+                <div class="lg:col-span-7">
+                    <div class="bg-white border border-[#ebe7e7] rounded-[12px] p-8 md:p-10 shadow-sm">
+                        <h3 class="font-unbounded font-bold text-[#1c1b1b] text-[24px] mb-1.5">Minta Penawaran Harga</h3>
+                        <p class="text-[#454652] text-[14px] mb-8">Lengkapi form berikut dan tim kami akan memberikan penawaran harga terbaik untuk perjalanan Anda.</p>
+                        
+                        <form @submit.prevent="submit" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Tanggal Jemput <span class="text-[#10207a]">*</span></label>
+                                    <input v-model="form.pickup_date" type="date" required
+                                        class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Tanggal Selesai <span class="text-[#10207a]">*</span></label>
+                                    <input v-model="form.return_date" type="date" required
+                                        class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Kota Penjemputan <span class="text-[#10207a]">*</span></label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                                        <i class="fas fa-map-marker-alt text-sm"></i>
                                     </div>
-                                    <div class="space-y-3">
-                                        <label class="block text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Tanggal Selesai <span class="text-rose-600">*</span></label>
-                                        <input v-model="form.return_date" type="date" required class="w-full pl-5 pr-12 py-4 bg-gray-50 dark:bg-black/50 border-2 border-gray-100 dark:border-white/5 rounded-2xl focus:ring-0 focus:border-rose-600 dark:focus:border-rose-600 dark:text-white font-medium outline-none transition-colors" />
+                                    <input v-model="form.pickup_location" type="text" placeholder="Misal: Jakarta Selatan" required
+                                        class="w-full pl-10 pr-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Kota / Tempat Tujuan <span class="text-[#10207a]">*</span></label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                                        <i class="fas fa-location-arrow text-sm"></i>
+                                    </div>
+                                    <input v-model="form.destination" type="text" placeholder="Misal: Bandung, Lembang" required
+                                        class="w-full pl-10 pr-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Pilih Bus <span class="text-[#10207a]">*</span></label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                                        <i class="fas fa-bus text-sm"></i>
+                                    </div>
+                                    <select v-model="form.bus_type_requested"
+                                        class="w-full pl-10 pr-10 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all appearance-none">
+                                        <option value="" disabled>Pilih bus...</option>
+                                        <option v-for="bus in pariwisataBuses" :key="bus.id" :value="bus.name + ' - ' + bus.capacity + ' Seat'">
+                                            {{ bus.name }} — {{ bus.capacity }} Kursi ({{ bus.bus_type }})
+                                        </option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                                        <i class="fas fa-chevron-down text-sm"></i>
                                     </div>
                                 </div>
+                                <p v-if="!pariwisataBuses || pariwisataBuses.length === 0" class="text-xs text-amber-600 mt-1.5">
+                                    <i class="fas fa-info-circle mr-1"></i> Belum ada bus pariwisata terdaftar. Hubungi admin.
+                                </p>
+                            </div>
 
-                                <div class="space-y-3">
-                                    <label class="block text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Kota Penjemputan <span class="text-rose-600">*</span></label>
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                                            <i class="fas fa-map-marker-alt text-gray-400"></i>
-                                        </div>
-                                        <input v-model="form.pickup_location" type="text" placeholder="Misal: Jakarta Selatan" required class="w-full pl-12 pr-5 py-4 bg-gray-50 dark:bg-black/50 border-2 border-gray-100 dark:border-white/5 rounded-2xl focus:ring-0 focus:border-rose-600 dark:focus:border-rose-600 dark:text-white font-medium outline-none transition-colors" />
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Catatan Tambahan <span class="text-gray-400 font-normal">(Opsional)</span></label>
+                                <textarea v-model="form.notes" rows="3" placeholder="Misal: Minta disediakan bantal selimut, atau titik jemput spesifik..."
+                                    class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all resize-none"></textarea>
+                            </div>
 
-                                <div class="space-y-3">
-                                    <label class="block text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Kota / Tempat Tujuan <span class="text-rose-600">*</span></label>
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                                            <i class="fas fa-location-arrow text-gray-400"></i>
-                                        </div>
-                                        <input v-model="form.destination" type="text" placeholder="Misal: Bandung, Lembang" required class="w-full pl-12 pr-5 py-4 bg-gray-50 dark:bg-black/50 border-2 border-gray-100 dark:border-white/5 rounded-2xl focus:ring-0 focus:border-rose-600 dark:focus:border-rose-600 dark:text-white font-medium outline-none transition-colors" />
-                                    </div>
-                                </div>
-
-                                <div class="space-y-3">
-                                    <label class="block text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Pilih Tipe Bus <span class="text-rose-600">*</span></label>
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                                            <i class="fas fa-bus text-gray-400"></i>
-                                        </div>
-                                        <select v-model="form.bus_type_requested" class="w-full pl-12 pr-5 py-4 bg-gray-50 dark:bg-black/50 border-2 border-gray-100 dark:border-white/5 rounded-2xl focus:ring-0 focus:border-rose-600 dark:focus:border-rose-600 dark:text-white font-medium outline-none transition-colors appearance-none">
-                                            <option value="Big Bus">Big Bus (50 Seat)</option>
-                                            <option value="Big Bus (Leg Rest)">Big Bus VIP (Leg Rest)</option>
-                                            <option value="Medium Bus">Medium Bus (31 Seat)</option>
-                                        </select>
-                                        <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
-                                            <i class="fas fa-chevron-down text-gray-400"></i>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-3">
-                                    <label class="block text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Catatan Tambahan <span class="text-gray-400 normal-case">(Opsional)</span></label>
-                                    <textarea v-model="form.notes" rows="4" placeholder="Misal: Minta disediakan bantal selimut, atau titik jemput spesifik..." class="w-full px-5 py-4 bg-gray-50 dark:bg-black/50 border-2 border-gray-100 dark:border-white/5 rounded-2xl focus:ring-0 focus:border-rose-600 dark:focus:border-rose-600 dark:text-white font-medium outline-none transition-colors resize-none"></textarea>
-                                </div>
-
-                                <div class="pt-4">
-                                    <button type="submit" :disabled="form.processing" class="w-full py-5 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-lg font-unbounded transition-all hover:scale-[1.02] shadow-[0_10px_30px_-10px_rgba(225,29,72,0.6)] disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-3">
-                                        <span v-if="form.processing"><i class="fas fa-spinner fa-spin"></i> Memproses...</span>
-                                        <span v-else>Kirim Permintaan <i class="fas fa-paper-plane ml-2"></i></span>
-                                    </button>
-                                    <p class="text-sm text-center text-gray-400 mt-4 font-medium">
-                                        <i class="fas fa-info-circle mr-1 text-gray-300"></i> Tidak ada biaya untuk meminta penawaran harga.
-                                    </p>
-                                </div>
-                            </form>
-                        </div>
+                            <button type="submit" :disabled="form.processing"
+                                class="w-full py-4 bg-[#10207a] text-white rounded-xl font-bold text-[15px] hover:bg-[#0c185e] transition-all shadow-lg shadow-[#10207a]/20 disabled:opacity-50 flex items-center justify-center gap-2">
+                                <span v-if="form.processing"><i class="fas fa-spinner fa-spin"></i> Memproses...</span>
+                                <span v-else>Kirim Permintaan <i class="fas fa-paper-plane"></i></span>
+                            </button>
+                            <p class="text-xs text-center text-gray-400 mt-3">
+                                <i class="fas fa-info-circle mr-1"></i> Tidak ada biaya untuk meminta penawaran harga.
+                            </p>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </FrontendLayout>
+    </div>
 </template>
 

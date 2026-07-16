@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bus;
 use App\Models\CharterBooking;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,7 +13,13 @@ class CharterController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Frontend/Charter/Index');
+        $pariwisataBuses = Bus::where('bus_category', 'pariwisata')
+            ->select('id', 'name', 'bus_type', 'capacity', 'description')
+            ->get();
+
+        return Inertia::render('Frontend/Charter/Index', [
+            'pariwisataBuses' => $pariwisataBuses,
+        ]);
     }
 
     public function store(Request $request)
