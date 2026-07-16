@@ -108,7 +108,7 @@ const reviews = [
 ];
 
 const activeReviews = computed(() => {
-    return reviews.filter(r => r.text).slice(0, 20);
+    return reviews.filter(r => r.text && r.stars >= 4).slice(0, 20);
 });
 
 const getStars = (count) => {
