@@ -26,204 +26,72 @@ const formatDate = (dateString) => {
 <template>
     <Head :title="article.title" />
 
-    <div class="bg-white dark:bg-[#050505] min-h-screen font-sans">
-        <!-- Hero Header -->
-        <div class="relative h-[60vh] min-h-[500px] overflow-hidden">
-            <img
-                :src="article.image_url"
-                :alt="article.title"
-                class="absolute inset-0 w-full h-full object-cover"
-            />
-            <div
-                class="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/60 to-transparent"
-            ></div>
-
-            <div class="absolute inset-0 flex items-center">
-                <div
-                    class="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 mt-20"
-                >
-                    <Link
-                        :href="route('frontend.news.index')"
-                        class="inline-flex items-center text-white/60 hover:text-white mb-8 transition-colors group"
-                    >
-                        <i
-                            class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"
-                        ></i>
-                        <span
-                            class="font-bold font-unbounded text-xs uppercase tracking-widest"
-                            >Kembali ke Berita</span
-                        >
+    <div class="min-h-screen bg-[#fcf9f8]">
+        <!-- Hero -->
+        <div class="relative h-[50vh] min-h-[400px] overflow-hidden">
+            <img :src="article.image_url" :alt="article.title" class="absolute inset-0 w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-t from-[#1c1b1b] via-black/50 to-transparent"></div>
+            <div class="absolute inset-0 flex items-end">
+                <div class="max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+                    <Link :href="route('frontend.news.index')"
+                        class="inline-flex items-center text-white/70 hover:text-white mb-6 transition-colors text-sm">
+                        <i class="fas fa-arrow-left mr-2"></i> Kembali ke Berita
                     </Link>
-
-                    <div class="mb-6 animate-fade-in-up">
-                        <span
-                            class="inline-block px-4 py-2 bg-rose-600/90 backdrop-blur-sm text-white text-[10px] font-bold rounded-xl uppercase tracking-widest font-unbounded border border-rose-500/50 shadow-xl shadow-rose-600/20"
-                        >
-                            {{ article.category?.name || "Umum" }}
+                    <div class="mb-4">
+                        <span class="inline-block px-3 py-1 rounded-lg bg-[#10207a]/90 text-white text-[10px] font-bold uppercase tracking-wider">
+                            {{ article.category?.name || 'Umum' }}
                         </span>
                     </div>
-
-                    <h1
-                        class="text-2xl sm:text-5xl md:text-6xl font-black text-white leading-tight mb-8 font-unbounded animate-fade-in-up"
-                        style="animation-delay: 0.1s"
-                    >
-                        {{ article.title }}
-                    </h1>
-
-                    <div
-                        class="flex flex-wrap items-center gap-6 text-gray-300 animate-fade-in-up"
-                        style="animation-delay: 0.2s"
-                    >
-                        <div
-                            class="flex items-center bg-white/10 backdrop-blur-md rounded-full px-4 py-2 border border-white/10"
-                        >
-                            <i
-                                class="fas fa-user-circle text-rose-500 mr-2 text-lg"
-                            ></i>
-                            <span class="font-bold text-sm ">{{
-                                article.author?.name || "Admin"
-                            }}</span>
-                        </div>
-                        <div
-                            class="flex items-center bg-white/10 backdrop-blur-md rounded-full px-4 py-2 border border-white/10"
-                        >
-                            <i
-                                class="far fa-calendar-alt text-rose-500 mr-2"
-                            ></i>
-                            <span class="font-bold text-sm ">{{
-                                formatDate(
-                                    article.published_at || article.created_at,
-                                )
-                            }}</span>
-                        </div>
+                    <h1 class="text-2xl sm:text-4xl md:text-5xl font-bold text-white leading-tight font-unbounded">{{ article.title }}</h1>
+                    <div class="flex items-center gap-4 mt-4 text-white/80 text-sm">
+                        <span><i class="far fa-user-circle mr-1.5"></i>{{ article.author?.name || 'Admin' }}</span>
+                        <span><i class="far fa-calendar-alt mr-1.5"></i>{{ formatDate(article.published_at || article.created_at) }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <!-- Content -->
                 <div class="lg:col-span-8">
-                    <!-- Article Body -->
-                    <div
-                        class="prose prose-base md:prose-lg prose-rose dark:prose-invert max-w-none  text-gray-800 dark:text-gray-200"
-                    >
-                        <!-- Content is sanitized server-side with allowlist of safe tags -->
-                        <div v-html="article.safe_content"></div>
-                    </div>
+                    <div class="text-[#454652] text-[15px] leading-relaxed" v-html="article.safe_content"></div>
 
-                    <!-- Share & Tags -->
-                    <div
-                        class="mt-16 pt-8 border-t border-gray-100 dark:border-white/10"
-                    >
-                        <p
-                            class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-6 uppercase tracking-widest font-unbounded"
-                        >
-                            Bagikan Artikel Ini
-                        </p>
-                        <div class="flex gap-4">
-                            <button
-                                class="w-12 h-12 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-                            >
-                                <i class="fab fa-facebook-f text-lg"></i>
-                            </button>
-                            <button
-                                class="w-12 h-12 rounded-full bg-[#1DA1F2] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-                            >
-                                <i class="fab fa-twitter text-lg"></i>
-                            </button>
-                            <button
-                                class="w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-                            >
-                                <i class="fab fa-whatsapp text-lg"></i>
-                            </button>
-                            <button
-                                class="w-12 h-12 rounded-full bg-gray-900 dark:bg-gray-700 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-                            >
-                                <i class="fas fa-link text-lg"></i>
-                            </button>
+                    <div class="mt-12 pt-6 border-t border-[#ebe7e7]">
+                        <p class="text-xs font-bold text-[#454652] uppercase tracking-wider mb-4">Bagikan Artikel Ini</p>
+                        <div class="flex gap-3">
+                            <button class="w-10 h-10 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:scale-105 transition-transform text-sm"><i class="fab fa-facebook-f"></i></button>
+                            <button class="w-10 h-10 rounded-full bg-[#1DA1F2] text-white flex items-center justify-center hover:scale-105 transition-transform text-sm"><i class="fab fa-twitter"></i></button>
+                            <button class="w-10 h-10 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:scale-105 transition-transform text-sm"><i class="fab fa-whatsapp"></i></button>
+                            <button class="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center hover:scale-105 transition-transform text-sm"><i class="fas fa-link"></i></button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Sidebar -->
-                <div class="lg:col-span-4 space-y-12">
-                    <!-- Related News -->
-                    <div class="relative">
-                        <div
-                            class="bg-gray-50 dark:bg-[#111] rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-2xl shadow-gray-200 dark:shadow-none"
-                        >
-                            <h3
-                                class="text-lg font-black text-gray-900 dark:text-white mb-6 flex items-center font-unbounded"
-                            >
-                                <span
-                                    class="w-1.5 h-6 bg-rose-600 rounded-full mr-3"
-                                ></span>
-                                Artikel Terkait
-                            </h3>
-
-                            <div class="space-y-6">
-                                <Link
-                                    v-for="related in relatedArticles"
-                                    :key="related.id"
-                                    :href="
-                                        route(
-                                            'frontend.news.show',
-                                            related.slug,
-                                        )
-                                    "
-                                    class="flex group items-start gap-4"
-                                >
-                                    <div
-                                        class="w-20 h-20 flex-shrink-0 rounded-2xl overflow-hidden relative"
-                                    >
-                                        <img
-                                            :src="related.image_url"
-                                            :alt="related.title"
-                                            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                                        />
-                                    </div>
-                                    <div class="flex-1">
-                                        <span
-                                            class="inline-block text-[10px] text-rose-600 font-bold uppercase tracking-wider mb-1 font-unbounded"
-                                            >{{ related.category?.name }}</span
-                                        >
-                                        <h4
-                                            class="text-sm font-bold text-gray-900 dark:text-white line-clamp-2 group-hover:text-rose-600 transition-colors  leading-normal"
-                                        >
-                                            {{ related.title }}
-                                        </h4>
-                                        <span
-                                            class="text-xs text-gray-500 dark:text-gray-400 mt-2 block "
-                                            >{{
-                                                formatDate(
-                                                    related.published_at ||
-                                                        related.created_at,
-                                                )
-                                            }}</span
-                                        >
-                                    </div>
-                                </Link>
-
-                                <div
-                                    v-if="relatedArticles.length === 0"
-                                    class="text-gray-500 text-sm  text-center py-4"
-                                >
-                                    Tidak ada artikel terkait ditemukan.
+                <div class="lg:col-span-4">
+                    <div class="bg-white border border-[#ebe7e7] rounded-[12px] p-6 shadow-sm">
+                        <h3 class="font-bold text-[15px] text-[#1c1b1b] mb-5 flex items-center">
+                            <span class="w-1 h-5 bg-[#10207a] rounded-full mr-3"></span>
+                            Artikel Terkait
+                        </h3>
+                        <div class="space-y-5">
+                            <Link v-for="related in relatedArticles" :key="related.id"
+                                :href="route('frontend.news.show', related.slug)"
+                                class="flex group items-start gap-3">
+                                <div class="w-16 h-16 flex-shrink-0 rounded-[10px] overflow-hidden">
+                                    <img :src="related.image_url" :alt="related.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                 </div>
-                            </div>
-
-                            <div
-                                class="mt-8 pt-6 border-t border-gray-200 dark:border-white/10 text-center"
-                            >
-                                <Link
-                                    :href="route('frontend.news.index')"
-                                    class="text-xs font-bold font-unbounded text-rose-600 hover:text-rose-500 uppercase tracking-widest"
-                                >
-                                    Lihat Semua Berita
-                                </Link>
-                            </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="inline-block text-[10px] text-[#10207a] font-bold uppercase tracking-wider mb-1">{{ related.category?.name }}</span>
+                                    <h4 class="text-sm font-bold text-[#1c1b1b] group-hover:text-[#10207a] transition-colors line-clamp-2 leading-snug">{{ related.title }}</h4>
+                                    <span class="text-xs text-[#454652] mt-1 block">{{ formatDate(related.published_at || related.created_at) }}</span>
+                                </div>
+                            </Link>
+                            <div v-if="!relatedArticles || relatedArticles.length === 0" class="text-sm text-gray-400 text-center py-4">Tidak ada artikel terkait.</div>
+                        </div>
+                        <div class="mt-6 pt-5 border-t border-[#ebe7e7] text-center">
+                            <Link :href="route('frontend.news.index')" class="text-xs font-bold text-[#10207a] uppercase tracking-wider hover:underline">Lihat Semua Berita</Link>
                         </div>
                     </div>
                 </div>
