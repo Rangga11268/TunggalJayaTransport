@@ -72,8 +72,8 @@ const submit = () => {
                                         <div class="relative">
                                             <input :type="showPassword ? 'text' : 'password'" v-model="form.password" required placeholder="••••••••"
                                                 class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-sm text-[#1c1b1b] outline-none transition-all pr-10" />
-                                            <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                                <i :class="['fas text-sm', showPassword ? 'fa-eye-slash' : 'fa-eye']"></i>
+                                            <button type="button" @click="showPassword = !showPassword" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-200/50 text-gray-400">
+                                                <i :class="['fas text-xs', showPassword ? 'fa-eye-slash' : 'fa-eye']"></i>
                                             </button>
                                         </div>
                                         <p v-if="form.errors.password" class="mt-1 text-xs text-red-600 font-semibold">{{ form.errors.password }}</p>
@@ -83,8 +83,8 @@ const submit = () => {
                                         <div class="relative">
                                             <input :type="showConfirmPassword ? 'text' : 'password'" v-model="form.password_confirmation" required placeholder="••••••••"
                                                 class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-sm text-[#1c1b1b] outline-none transition-all pr-10" />
-                                            <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                                <i :class="['fas text-sm', showConfirmPassword ? 'fa-eye-slash' : 'fa-eye']"></i>
+                                            <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-200/50 text-gray-400">
+                                                <i :class="['fas text-xs', showConfirmPassword ? 'fa-eye-slash' : 'fa-eye']"></i>
                                             </button>
                                         </div>
                                         <p v-if="form.errors.password_confirmation" class="mt-1 text-xs text-red-600 font-semibold">{{ form.errors.password_confirmation }}</p>
