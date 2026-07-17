@@ -63,6 +63,13 @@ class PhoneVerificationController extends Controller
         ]);
 
         if (!empty($validated['phone'])) {
+            // Check if phone is already used by another user
+            $existingUser = User::where('phone', $validated['phone'])->where('id', '!=', $user->id)->first();
+            if ($existingUser) {
+                return redirect()->back()->withErrors([
+                    'phone' => 'Nomor telepon ini sudah terdaftar oleh pengguna lain.',
+                ])->withInput();
+            }
             $user->update(['phone' => $validated['phone']]);
             $user->refresh();
         }

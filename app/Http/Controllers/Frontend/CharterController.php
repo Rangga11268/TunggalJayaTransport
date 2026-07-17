@@ -28,6 +28,7 @@ class CharterController extends Controller
 
         $validated = $request->validate([
             'pickup_date' => 'required|date|after_or_equal:' . $minDate,
+            'pickup_time' => 'required|date_format:H:i',
             'return_date' => 'required|date|after_or_equal:pickup_date',
             'pickup_location' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
@@ -42,6 +43,7 @@ class CharterController extends Controller
             'user_id' => $request->user()->id,
             'bus_type_requested' => $validated['bus_type_requested'] ?? 'Big Bus',
             'pickup_date' => $validated['pickup_date'],
+            'pickup_time' => $validated['pickup_time'],
             'return_date' => $validated['return_date'],
             'pickup_location' => $validated['pickup_location'],
             'destination' => $validated['destination'],
