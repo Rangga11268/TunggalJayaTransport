@@ -1,43 +1,23 @@
 <script setup>
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
-import { useMagnetic } from "@/Composables/useMagnetic";
 import { ref } from "vue";
 
 defineOptions({ layout: FrontendLayout });
 
 const props = defineProps({
-    status: {
-        type: String,
-    },
-    debugOtp: {
-        type: [String, Number],
-        default: null,
-    },
-    debugIdentifier: {
-        type: String,
-        default: null,
-    },
-    // true when Google user has no phone number on record
-    needsPhone: {
-        type: Boolean,
-        default: false,
-    },
+    status: { type: String },
+    debugOtp: { type: [String, Number], default: null },
+    debugIdentifier: { type: String, default: null },
+    needsPhone: { type: Boolean, default: false },
 });
 
-const submitBtn = ref(null);
-useMagnetic(submitBtn);
-
-// Track whether OTP has been sent (step 1 → step 2)
-// If status or debugOtp is already present (e.g. page refresh), skip to step 2
 const otpSent = ref(!!(props.status || props.debugOtp));
 const selectedMethod = ref("whatsapp");
+const otpDigits = ref(['', '', '', '', '', '']);
+const otpRefs = ref([]);
 
-// Form for sending OTP (step 1)
-// phone field used only when needsPhone === true && method === 'whatsapp'
 const sendForm = useForm({ method: "whatsapp", phone: "" });
-
-// Form for verifying OTP (step 2)
 const verifyForm = useForm({ otp: "", method: "whatsapp" });
 
 const setMethod = (method) => {
@@ -49,378 +29,184 @@ const setMethod = (method) => {
 const sendOtp = () => {
     sendForm.post(route("verification.phone.send"), {
         preserveScroll: true,
-        onSuccess: () => {
-            otpSent.value = true;
-        },
+        onSuccess: () => { otpSent.value = true; },
     });
 };
 
+const onOtpInput = (index, event) => {
+    const val = event.target.value;
+    // Only allow single digit
+    const digit = val.replace(/\D/g, '').slice(0, 1);
+    otpDigits.value[index] = digit;
+    
+    // Auto focus next
+    if (digit && index < 5) {
+        otpRefs.value[index + 1]?.focus();
+    }
+    
+    // Update form otp
+    verifyForm.otp = otpDigits.value.join('');
+};
+
+const onOtpKeydown = (index, event) => {
+    if (event.key === 'Backspace' && !otpDigits.value[index] && index > 0) {
+        otpRefs.value[index - 1]?.focus();
+    }
+    if (event.key === 'ArrowLeft' && index > 0) {
+        otpRefs.value[index - 1]?.focus();
+    }
+    if (event.key === 'ArrowRight' && index < 5) {
+        otpRefs.value[index + 1]?.focus();
+    }
+};
+
+const onOtpPaste = (event) => {
+    const paste = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    if (!paste) return;
+    event.preventDefault();
+    paste.split('').forEach((d, i) => {
+        if (i < 6) otpDigits.value[i] = d;
+    });
+    verifyForm.otp = otpDigits.value.join('');
+    const nextIndex = Math.min(paste.length, 5);
+    otpRefs.value[nextIndex]?.focus();
+};
+
 const submit = () => {
+    if (verifyForm.otp.length < 6) return;
     verifyForm.post(route("verification.phone.verify"), {
-        onFinish: () => verifyForm.reset("otp"),
+        onFinish: () => {
+            verifyForm.reset("otp");
+            otpDigits.value = ['', '', '', '', '', ''];
+        },
     });
 };
 
 const resendOtp = () => {
     sendForm.post(route("verification.phone.resend"), {
         preserveScroll: true,
-        onSuccess: () => {
-            otpSent.value = true;
-        },
+        onSuccess: () => { otpSent.value = true; },
     });
 };
 </script>
 
 <template>
-    <Head title="Verifikasi Telepon - TUJAGO (Tunggal Jaya Go)" />
+    <Head title="Verifikasi Akun" />
 
-    <div
-        class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gray-50 dark:bg-gray-950"
-    >
-        <!-- Left Side: Visual -->
-        <div
-            class="relative hidden lg:flex flex-col justify-center items-center bg-white dark:bg-black overflow-hidden border-r border-gray-200 dark:border-white/5"
-        >
-            <div class="absolute inset-0">
-                <div
-                    class="absolute inset-0 bg-[url('/img/hero-bus.jpg')] bg-cover bg-center opacity-40 scale-110 animate-slow-zoom"
-                ></div>
-                <div
-                    class="absolute inset-0 bg-gradient-to-br from-white dark:from-black via-white/90 dark:via-black/80 to-brand-red/20"
-                ></div>
+    <div class="min-h-screen bg-[#fcf9f8] flex flex-col justify-center items-center p-4 sm:p-8 pt-32">
+        <div class="w-full max-w-md">
+            <!-- Logo / Header -->
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 rounded-2xl bg-[#10207a]/10 flex items-center justify-center mx-auto mb-5">
+                    <i class="fas fa-shield-alt text-2xl text-[#10207a]"></i>
+                </div>
+                <h1 class="font-unbounded font-black text-2xl text-[#1c1b1b]">Verifikasi Akun</h1>
+                <p class="text-[#454652] text-sm mt-1">Pilih metode verifikasi untuk mengirimkan kode OTP.</p>
             </div>
 
-            <div class="relative z-10 text-center px-12">
-                <div class="mb-12 flex justify-center">
-                    <div
-                        class="w-32 h-32 rounded-full bg-gray-100 dark:bg-white/5 backdrop-blur-xl flex items-center justify-center border border-gray-300 dark:border-white/10 shadow-[0_0_50px_rgba(220,38,38,0.2)]"
-                    >
-                        <i
-                            class="fas fa-shield-alt text-6xl text-brand-red drop-shadow-lg"
-                        ></i>
+            <!-- Method Tabs -->
+            <div class="flex p-1 bg-white border border-[#ebe7e7] rounded-[12px] mb-6 shadow-sm">
+                <button @click="setMethod('whatsapp')"
+                    class="flex-1 py-3 rounded-[10px] text-xs font-bold uppercase tracking-wider transition-all"
+                    :class="selectedMethod === 'whatsapp' ? 'bg-[#10207a] text-white shadow-sm' : 'text-[#454652] hover:text-[#1c1b1b]'">
+                    <i class="fab fa-whatsapp mr-1.5"></i> WhatsApp
+                </button>
+                <button @click="setMethod('email')"
+                    class="flex-1 py-3 rounded-[10px] text-xs font-bold uppercase tracking-wider transition-all"
+                    :class="selectedMethod === 'email' ? 'bg-[#10207a] text-white shadow-sm' : 'text-[#454652] hover:text-[#1c1b1b]'">
+                    <i class="fas fa-envelope mr-1.5"></i> Email
+                </button>
+            </div>
+
+            <!-- Status Message -->
+            <div v-if="status"
+                class="p-4 rounded-[10px] bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold flex items-center gap-2.5 mb-4">
+                <i class="fas fa-check-circle"></i> <span>{{ status }}</span>
+            </div>
+
+            <!-- Debug OTP -->
+            <div v-if="debugOtp"
+                class="p-4 rounded-[10px] bg-amber-50 border border-amber-200 text-amber-800 text-sm mb-4">
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-bug text-xs"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">DEBUG — OTP</span>
+                </div>
+                <p class="font-bold text-lg tracking-[0.3em] font-mono">{{ debugOtp }}</p>
+                <p v-if="debugIdentifier" class="text-xs text-amber-600 mt-1">Tujuan: {{ debugIdentifier }}</p>
+            </div>
+
+            <!-- Error Message -->
+            <div v-if="sendForm.errors.phone || sendForm.errors.otp || sendForm.errors.method"
+                class="p-4 rounded-[10px] bg-red-50 border border-red-200 text-red-700 text-sm font-semibold flex items-start gap-2.5 mb-4">
+                <i class="fas fa-exclamation-circle mt-0.5"></i>
+                <span>{{ sendForm.errors.phone || sendForm.errors.otp || sendForm.errors.method }}</span>
+            </div>
+
+            <!-- STEP 1: Send OTP -->
+            <div v-if="!otpSent" class="space-y-5">
+                <div v-if="needsPhone && selectedMethod === 'whatsapp'">
+                    <label class="text-xs font-bold text-[#454652] mb-1.5 block">Nomor WhatsApp</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                            <i class="fab fa-whatsapp text-sm"></i>
+                        </div>
+                        <input id="phone" type="tel" v-model="sendForm.phone" placeholder="Contoh: 08123456789"
+                            class="w-full pl-10 pr-4 py-3.5 bg-white border border-[#e5e2e1] focus:border-[#10207a] focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all placeholder:text-gray-400" />
                     </div>
                 </div>
-                <h2
-                    class="text-4xl font-black text-gray-900 dark:text-white mb-6 font-unbounded tracking-tighter uppercase"
-                >
-                    AMANKAN <span class="text-brand-red">AKUN</span>
-                </h2>
-                <p
-                    class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-md mx-auto font-manrope font-medium"
-                >
-                    Verifikasi nomor telepon atau email Anda untuk meningkatkan
-                    keamanan akun dan akses layanan prioritas TUJAGO.
+                <p class="text-sm text-[#454652] text-center">
+                    Klik tombol untuk mengirim kode OTP ke
+                    <strong>{{ selectedMethod === 'whatsapp' ? 'WhatsApp' : 'Email' }}</strong> Anda.
                 </p>
-            </div>
-        </div>
-
-        <!-- Right Side: Form -->
-        <div
-            class="flex flex-col justify-center items-center p-6 sm:p-12 pt-32 lg:pt-32 relative overflow-hidden bg-white dark:bg-gray-950"
-        >
-            <!-- Decorative Background Element -->
-            <div
-                class="absolute -top-24 -right-24 w-96 h-96 bg-brand-red/5 dark:bg-brand-red/10 rounded-full blur-[100px]"
-            ></div>
-
-            <div class="w-full max-w-md space-y-8 relative z-10">
-                <!-- Mobile Header -->
-                <div class="lg:hidden text-center mb-12">
-                    <div
-                        class="inline-flex w-20 h-20 rounded-full bg-gray-100 dark:bg-white/5 items-center justify-center mb-6 border border-gray-300 dark:border-white/10 shadow-xl"
-                    >
-                        <i
-                            class="fas fa-shield-alt text-3xl text-brand-red"
-                        ></i>
-                    </div>
-                    <h2
-                        class="text-3xl font-black text-gray-900 dark:text-white font-unbounded tracking-tighter"
-                    >
-                        VERIFIKASI <span class="text-brand-red">AKUN</span>
-                    </h2>
-                </div>
-
-                <div class="text-center lg:text-left">
-                    <h2
-                        class="hidden lg:block text-4xl font-black text-gray-900 dark:text-white mb-3 font-unbounded tracking-tighter"
-                    >
-                        VERIFIKASI <span class="text-brand-red">AKUN</span>
-                    </h2>
-                    <p
-                        class="text-gray-600 dark:text-gray-400 font-manrope font-medium tracking-wide"
-                    >
-                        Pilih metode verifikasi untuk mengirimkan kode OTP.
-                    </p>
-                </div>
-
-                <!-- Method Selection Tabs -->
-                <div
-                    class="flex p-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl mb-6"
-                >
-                    <button
-                        @click="setMethod('whatsapp')"
-                        class="flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 font-unbounded uppercase tracking-wider"
-                        :class="
-                            selectedMethod === 'whatsapp'
-                                ? 'bg-brand-red text-white shadow-lg'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                        "
-                    >
-                        <i class="fab fa-whatsapp mr-2"></i> WhatsApp
-                    </button>
-                    <button
-                        @click="setMethod('email')"
-                        class="flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 font-unbounded uppercase tracking-wider"
-                        :class="
-                            selectedMethod === 'email'
-                                ? 'bg-brand-red text-white shadow-lg'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                        "
-                    >
-                        <i class="fas fa-envelope mr-2"></i> Email
-                    </button>
-                </div>
-
-                <!-- Status Message -->
-                <div
-                    v-if="status"
-                    class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm font-bold font-manrope flex items-center"
-                >
-                    <i class="fas fa-check-circle mr-3"></i>
-                    <span>{{ status }}</span>
-                </div>
-
-                <!-- Debug OTP Alert -->
-                <div
-                    v-if="debugOtp"
-                    class="p-4 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-500/20 text-yellow-800 dark:text-yellow-400 text-sm font-manrope"
-                >
-                    <div class="flex items-center mb-2">
-                        <i class="fas fa-bug mr-2"></i>
-                        <span
-                            class="font-black uppercase text-[10px] tracking-widest font-unbounded"
-                            >DEBUG MODE — OTP tidak dikirim ke perangkat
-                            nyata</span
-                        >
-                    </div>
-                    <p class="mb-1">
-                        Kode OTP:
-                        <strong
-                            class="text-yellow-900 dark:text-white text-lg tracking-[0.3em] font-unbounded"
-                            >{{ debugOtp }}</strong
-                        >
-                    </p>
-                    <p
-                        v-if="debugIdentifier"
-                        class="text-xs text-yellow-700 dark:text-yellow-500"
-                    >
-                        Tujuan:
-                        <span class="font-semibold">{{ debugIdentifier }}</span>
-                    </p>
-                </div>
-
-                <!-- STEP 1: Send OTP -->
-                <div v-if="!otpSent" class="mt-8 space-y-6">
-                    <!-- Phone number input: shown only for Google users (needsPhone) using WhatsApp method -->
-                    <div v-if="needsPhone && selectedMethod === 'whatsapp'">
-                        <label
-                            for="phone"
-                            class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
-                            >Nomor WhatsApp</label
-                        >
-                        <div class="relative group">
-                            <div
-                                class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-brand-red transition-colors"
-                            >
-                                <i class="fab fa-whatsapp"></i>
-                            </div>
-                            <input
-                                id="phone"
-                                type="tel"
-                                v-model="sendForm.phone"
-                                autocomplete="tel"
-                                placeholder="Contoh: 08123456789"
-                                class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-5 pl-12 pr-5 text-gray-900 dark:text-white font-manrope font-semibold focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600"
-                            />
-                        </div>
-                        <p
-                            v-if="sendForm.errors.phone"
-                            class="mt-2 text-xs font-bold text-brand-red font-manrope"
-                        >
-                            {{ sendForm.errors.phone }}
-                        </p>
-                    </div>
-
-                    <!-- Info text -->
-                    <p
-                        class="text-sm text-gray-500 dark:text-gray-400 font-manrope text-center"
-                    >
-                        <span
-                            v-if="needsPhone && selectedMethod === 'whatsapp'"
-                        >
-                            Masukkan nomor WhatsApp Anda, lalu kami kirimkan
-                            kode OTP untuk verifikasi.
-                        </span>
-                        <span v-else>
-                            Klik tombol di bawah untuk mengirim kode OTP ke
-                            <span
-                                class="font-bold text-gray-800 dark:text-white"
-                            >
-                                {{
-                                    selectedMethod === "whatsapp"
-                                        ? "WhatsApp"
-                                        : "Email"
-                                }}
-                            </span>
-                            Anda.
-                        </span>
-                    </p>
-
-                    <button
-                        @click="sendOtp"
-                        :disabled="sendForm.processing"
-                        class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 dark:hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
-                    >
-                        <span v-if="!sendForm.processing">
-                            <i class="fas fa-paper-plane mr-2"></i>
-                            KIRIM KODE OTP
-                        </span>
-                        <span v-else class="flex items-center justify-center">
-                            <i class="fas fa-circle-notch fa-spin mr-3"></i>
-                            MENGIRIM...
-                        </span>
-                    </button>
-                    <div
-                        v-if="
-                            sendForm.errors.otp ||
-                            sendForm.errors.method ||
-                            sendForm.errors.phone
-                        "
-                        class="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm font-manrope flex items-start gap-3"
-                    >
-                        <i
-                            class="fas fa-exclamation-circle mt-0.5 shrink-0"
-                        ></i>
-                        <span class="font-semibold">
-                            {{
-                                sendForm.errors.otp ||
-                                sendForm.errors.method ||
-                                sendForm.errors.phone
-                            }}
-                        </span>
-                    </div>
-                </div>
-
-                <!-- STEP 2: Verify OTP -->
-                <form
-                    v-if="otpSent"
-                    @submit.prevent="submit"
-                    class="mt-8 space-y-8"
-                >
-                    <div>
-                        <label
-                            for="otp"
-                            class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] font-unbounded mb-3 ml-1"
-                            >Kode OTP (via
-                            {{
-                                selectedMethod === "email"
-                                    ? "Email"
-                                    : "WhatsApp"
-                            }})</label
-                        >
-                        <div class="relative group">
-                            <div
-                                class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-brand-red transition-colors"
-                            >
-                                <i
-                                    class="fas"
-                                    :class="
-                                        selectedMethod === 'email'
-                                            ? 'fa-envelope-open-text'
-                                            : 'fa-mobile-alt'
-                                    "
-                                ></i>
-                            </div>
-                            <input
-                                id="otp"
-                                type="text"
-                                v-model="verifyForm.otp"
-                                required
-                                autofocus
-                                autocomplete="one-time-code"
-                                class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-5 pl-12 pr-5 text-gray-900 dark:text-white font-unbounded focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all tracking-[0.5em] text-center text-2xl font-black placeholder:text-gray-400 dark:placeholder:text-gray-700 placeholder:tracking-normal"
-                                placeholder="······"
-                                maxlength="6"
-                            />
-                        </div>
-                        <p
-                            class="mt-2 text-xs font-bold text-brand-red font-manrope"
-                            v-if="verifyForm.errors.otp"
-                        >
-                            {{ verifyForm.errors.otp }}
-                        </p>
-                    </div>
-
-                    <div class="space-y-6 pt-2">
-                        <button
-                            ref="submitBtn"
-                            type="submit"
-                            :disabled="verifyForm.processing"
-                            class="w-full py-5 bg-brand-red text-white rounded-2xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 dark:hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
-                        >
-                            <span v-if="!verifyForm.processing"
-                                >VERIFIKASI SEKARANG</span
-                            >
-                            <span
-                                v-else
-                                class="flex items-center justify-center"
-                            >
-                                <i class="fas fa-circle-notch fa-spin mr-3"></i>
-                                MEMPROSES...
-                            </span>
-                        </button>
-
-                        <div class="text-center">
-                            <button
-                                type="button"
-                                @click="resendOtp"
-                                :disabled="sendForm.processing"
-                                class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest hover:text-brand-red dark:hover:text-brand-red transition-colors font-unbounded"
-                            >
-                                <i class="fas fa-redo-alt mr-2"></i> Kirim Ulang
-                                OTP
-                            </button>
-                            <p
-                                v-if="sendForm.errors.otp"
-                                class="mt-2 text-xs font-semibold text-brand-red font-manrope"
-                            >
-                                <i class="fas fa-clock mr-1"></i>
-                                {{ sendForm.errors.otp }}
-                            </p>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Logout Link -->
-                <div class="text-center mt-12">
-                    <Link
-                        :href="route('logout')"
-                        method="post"
-                        as="button"
-                        class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest hover:text-gray-900 dark:hover:text-white transition-colors font-unbounded"
-                    >
-                        KELUAR AKUN
-                    </Link>
-                </div>
+                <button @click="sendOtp" :disabled="sendForm.processing"
+                    class="w-full py-4 bg-[#10207a] text-white rounded-[10px] font-bold text-sm hover:bg-[#0c185e] transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2">
+                    <span v-if="!sendForm.processing"><i class="fas fa-paper-plane"></i> Kirim Kode OTP</span>
+                    <span v-else><i class="fas fa-circle-notch fa-spin"></i> Mengirim...</span>
+                </button>
             </div>
 
-            <!-- Footer -->
-            <div
-                class="mt-16 text-center text-[10px] text-gray-600 dark:text-gray-400 font-black font-unbounded uppercase tracking-[0.3em] pb-12"
-            >
-                &copy; {{ new Date().getFullYear() }} TUJAGO &bull; TUNGGAL JAYA
-                GO
+            <!-- STEP 2: Verify OTP -->
+            <form v-if="otpSent" @submit.prevent="submit" class="space-y-5">
+                <div>
+                    <label class="text-xs font-bold text-[#454652] mb-3 block text-center">Masukkan kode OTP 6 digit</label>
+                    <div class="flex gap-2.5 justify-center" @paste="onOtpPaste">
+                        <input v-for="(_, i) in 6" :key="i"
+                            :ref="el => { if (el) otpRefs[i] = el; }"
+                            :value="otpDigits[i]"
+                            @input="onOtpInput(i, $event)"
+                            @keydown="onOtpKeydown(i, $event)"
+                            type="text" inputmode="numeric" maxlength="1"
+                            class="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-bold bg-white border-2 rounded-[10px] outline-none transition-all"
+                            :class="otpDigits[i] ? 'border-[#10207a] shadow-sm' : 'border-[#e5e2e1] focus:border-[#10207a]'"
+                            autocomplete="off" />
+                    </div>
+                    <p v-if="verifyForm.errors.otp" class="mt-2 text-xs font-semibold text-red-600 text-center">{{ verifyForm.errors.otp }}</p>
+                </div>
+                <button type="submit" :disabled="verifyForm.processing || verifyForm.otp.length < 6"
+                    class="w-full py-4 bg-[#10207a] text-white rounded-[10px] font-bold text-sm hover:bg-[#0c185e] transition-all shadow-sm disabled:opacity-40 flex items-center justify-center gap-2">
+                    <span v-if="!verifyForm.processing"><i class="fas fa-check-circle"></i> Verifikasi</span>
+                    <span v-else><i class="fas fa-circle-notch fa-spin"></i> Memproses...</span>
+                </button>
+                <div class="text-center">
+                    <button type="button" @click="resendOtp" :disabled="sendForm.processing"
+                        class="text-xs font-semibold text-[#454652] hover:text-[#10207a] transition-colors">
+                        <i class="fas fa-redo-alt mr-1"></i> Kirim Ulang OTP
+                    </button>
+                    <p v-if="sendForm.errors.otp" class="mt-1.5 text-xs text-red-600">{{ sendForm.errors.otp }}</p>
+                </div>
+            </form>
+
+            <!-- Logout -->
+            <div class="text-center mt-10">
+                <Link :href="route('logout')" method="post" as="button"
+                    class="text-xs font-semibold text-[#454652] hover:text-red-600 transition-colors">
+                    Keluar Akun
+                </Link>
             </div>
+
+            <p class="text-center text-[10px] text-[#454652] font-semibold uppercase tracking-wider mt-8 pb-4">
+                &copy; {{ new Date().getFullYear() }} Tunggal Jaya Transport
+            </p>
         </div>
     </div>
 </template>
