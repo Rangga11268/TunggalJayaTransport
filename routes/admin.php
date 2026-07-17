@@ -26,76 +26,75 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:' . App\Models
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Test route for role verification (DISABLED IN PRODUCTION)
     if (app()->environment('local', 'development', 'testing')) {
         Route::get('/test-roles', [DashboardController::class, 'testRoles'])->name('test-roles');
     }
 
-
-
-    // Urusan Bus (Manager jadwal boleh akses)
-    Route::resource('buses', BusController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
+    // Buses — bulk-delete BEFORE resource
     Route::delete('/buses/bulk-delete', [BusController::class, 'bulkDestroy'])->name('buses.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
-
-    // Cek plat nomor ada ga via AJAX
+    Route::resource('buses', BusController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
     Route::get('/buses/check-plate/{plateNumber}', [BusController::class, 'checkPlateNumber'])->name('buses.check-plate');
 
-    // Atur Rute
+    // Routes
+    Route::delete('/routes/bulk-delete', [RouteController::class, 'bulkDestroy'])->name('routes.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
     Route::resource('routes', RouteController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
-    Route::get('/routes/geocode', [RouteController::class, 'geocode'])->name('routes.geocode')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
+    Route::get('/routes/geocode', [RouteController::class, 'geocode'])->name('routes.geocode');
 
-    // Kelola Jadwal
+    // Schedules
+    Route::delete('/schedules/bulk-delete', [ScheduleController::class, 'bulkDestroy'])->name('schedules.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
     Route::resource('schedules', ScheduleController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
-    Route::post('/schedules/{schedule}/create-next-day', [ScheduleController::class, 'createNextDaySchedule'])->name('schedules.create-next-day')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
-    Route::delete('/schedules/bulk/delete', [ScheduleController::class, 'bulkDestroy'])->name('schedules.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
+    Route::post('/schedules/{schedule}/create-next-day', [ScheduleController::class, 'createNextDaySchedule'])->name('schedules.create-next-day');
 
     // Dashboard Jadwal
-    Route::get('/schedule-management', [ScheduleManagementController::class, 'index'])->name('schedule-management.index')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
-    Route::get('/schedule-management/{id}', [ScheduleManagementController::class, 'show'])->name('schedule-management.show')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
+    Route::get('/schedule-management', [ScheduleManagementController::class, 'index'])->name('schedule-management.index');
+    Route::get('/schedule-management/{id}', [ScheduleManagementController::class, 'show'])->name('schedule-management.show');
 
-
-
-    // Data Booking (Khusus admin yang megang duit/tiket)
+    // Bookings
+    Route::delete('/bookings/bulk-delete', [BookingController::class, 'bulkDestroy'])->name('bookings.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
     Route::resource('bookings', BookingController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN);
-    
-    // Data Sewa Pariwisata
+
+    // Charter Bookings
+    Route::delete('/charter-bookings/bulk-delete', [CharterBookingController::class, 'bulkDestroy'])->name('charter-bookings.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
     Route::resource('charter-bookings', CharterBookingController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN);
 
-    // Fitur Berita
-    Route::post('news/upload-image', [NewsController::class, 'uploadImage'])->name('news.upload-image')->middleware('role:' . App\Models\User::ROLE_ADMIN);
+    // News
+    Route::post('news/upload-image', [NewsController::class, 'uploadImage'])->name('news.upload-image');
+    Route::delete('/news/bulk-delete', [NewsController::class, 'bulkDestroy'])->name('news.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
     Route::resource('news', NewsController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN);
 
-    // Kode Promo
+    // Promo Codes
+    Route::delete('/promo-codes/bulk-delete', [App\Http\Controllers\Admin\PromoCodeController::class, 'bulkDestroy'])->name('promo-codes.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
     Route::resource('promo-codes', App\Http\Controllers\Admin\PromoCodeController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN);
 
-    // Kategori
+    // Categories
+    Route::delete('/categories/bulk-delete', [CategoryController::class, 'bulkDestroy'])->name('categories.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
     Route::resource('categories', CategoryController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN);
 
-
-
-    // Kelola User
+    // Users
     Route::resource('users', UserController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN);
 
-    // Kelola Pelanggan
-    Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('customers.index')->middleware('role:' . App\Models\User::ROLE_ADMIN);
-    Route::get('/customers/{email}', [App\Http\Controllers\Admin\CustomerController::class, 'show'])->name('customers.show')->middleware('role:' . App\Models\User::ROLE_ADMIN);
+    // Customers
+    Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('customers.index');
+    Route::get('/customers/{email}', [App\Http\Controllers\Admin\CustomerController::class, 'show'])->name('customers.show');
 
-    // Data Supir
+    // Drivers
+    Route::delete('/drivers/bulk-delete', [DriverController::class, 'bulkDestroy'])->name('drivers.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
     Route::resource('drivers', DriverController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN);
 
-    // Data Kondektur
+    // Conductors
+    Route::delete('/conductors/bulk-delete', [ConductorController::class, 'bulkDestroy'])->name('conductors.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
     Route::resource('conductors', ConductorController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN);
 
-    // Laporan (Admin & Manager bisa liat)
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
-    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales')->middleware('role:' . App\Models\User::ROLE_ADMIN);
-    Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('reports.occupancy')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
-    Route::get('/reports/custom', [ReportController::class, 'custom'])->name('reports.custom')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
-    Route::post('/reports/custom', [ReportController::class, 'generateCustom'])->name('reports.custom.generate')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
-    Route::get('/reports/custom/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.custom.export.pdf')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
-    Route::get('/reports/custom/export/excel', [ReportController::class, 'exportExcel'])->name('reports.custom.export.excel')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('reports.occupancy');
+    Route::get('/reports/custom', [ReportController::class, 'custom'])->name('reports.custom');
+    Route::post('/reports/custom', [ReportController::class, 'generateCustom'])->name('reports.custom.generate');
+    Route::get('/reports/custom/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.custom.export.pdf');
+    Route::get('/reports/custom/export/excel', [ReportController::class, 'exportExcel'])->name('reports.custom.export.excel');
 
-    // Settings (only admins can manage settings)
-    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index')->middleware('role:' . App\Models\User::ROLE_ADMIN);
-    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update')->middleware('role:' . App\Models\User::ROLE_ADMIN);
+    // Settings
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 });

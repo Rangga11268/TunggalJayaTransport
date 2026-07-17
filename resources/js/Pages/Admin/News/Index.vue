@@ -4,6 +4,7 @@ import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import { ref, computed, watch } from "vue";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { useBulkDelete } from "@/Composables/useBulkDelete.js";
 
 const props = defineProps({
     articles: Object,
@@ -11,10 +12,24 @@ const props = defineProps({
 });
 
 const search = ref(props.filters?.search || "");
-const localArticles = ref(props.articles); // Reactive local state for articles data
+const localArticles = ref(props.articles);
+const { selectedIds, selectAll } = useBulkDelete(localArticles);
 let timeout = null;
 
-// Search via Axios (No Inertia Reload)
+const bulkDelete = () => {
+    if (selectedIds.value.length === 0) return;
+    Swal.fire({ title: `Hapus ${selectedIds.value.length} artikel?`, text: "Data yang dihapus tidak dapat dikembalikan!", icon: "warning",
+        showCancelButton: true, confirmButtonColor: "#d33", cancelButtonColor: "#3085d6",
+        confirmButtonText: "Ya, hapus semua!", cancelButtonText: "Batal",
+    }).then((r) => { if (r.isConfirmed) {
+        axios.post(route("admin.news.bulk-destroy"), { ids: selectedIds.value, _method: "DELETE" })
+            .then(() => {
+                Swal.fire({ icon: "success", title: "Berhasil!", text: `${selectedIds.value.length} artikel dihapus.`, timer: 1500, showConfirmButton: false });
+                localArticles.value = { ...localArticles.value, data: localArticles.value.data.filter(d => !selectedIds.value.includes(d.id)), total: localArticles.value.total - selectedIds.value.length };
+                selectedIds.value = [];
+            }).catch(() => Swal.fire({ icon: "error", title: "Gagal!", text: "Terjadi kesalahan." }));
+    }});
+};// Search via Axios (No Inertia Reload)
 watch(search, (value) => {
     clearTimeout(timeout);
     timeout = setTimeout(async () => {
@@ -69,12 +84,11 @@ const deleteArticle = (id) => {
     }).then((result) => {
         if (result.isConfirmed) {
             router.delete(route("admin.news.destroy", id), {
+                preserveScroll: true,
                 onSuccess: () => {
-                    Swal.fire(
-                        "Terhapus!",
-                        "Artikel berhasil dihapus.",
-                        "success",
-                    );
+                    localArticles.value = { ...localArticles.value, data: localArticles.value.data.filter(d => d.id !== id), total: localArticles.value.total - 1 };
+                    selectedIds.value = selectedIds.value.filter(sid => sid !== id);
+                    Swal.fire("Terhapus!", "Artikel berhasil dihapus.", "success");
                 },
             });
         }
@@ -125,8 +139,11 @@ const formatDate = (dateString) => {
                     </div>
                 </div>
 
-                <Link
-                    :href="route('admin.news.create')"
+                <button v-if="selectedIds.length > 0" @click="bulkDelete"
+                    class="px-4 py-2.5 rounded-xl bg-red-600 text-white font-semibold shadow-sm hover:bg-red-700 transition-all flex items-center gap-2 whitespace-nowrap text-sm">
+                    <i class="fas fa-trash-alt"></i> Hapus ({{ selectedIds.length }})
+                </button>
+                <Link :href="route('admin.news.create')"
                     class="px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 flex items-center gap-2 whitespace-nowrap"
                 >
                     <i class="fas fa-plus"></i>
@@ -145,6 +162,9 @@ const formatDate = (dateString) => {
                         class="bg-gray-50/50 dark:bg-gray-900/20 text-gray-500 dark:text-gray-400 text-xs uppercase font-bold tracking-wider"
                     >
                         <tr>
+                            <th class="px-4 py-4 w-10">
+                                <input type="checkbox" v-model="selectAll" class="w-4 h-4 rounded border-gray-300 text-brand-red focus:ring-brand-red cursor-pointer" />
+                            </th>
                             <th class="px-6 py-4">Judul</th>
                             <th class="px-6 py-4">Kategori</th>
                             <th class="px-6 py-4">Status</th>
@@ -155,11 +175,12 @@ const formatDate = (dateString) => {
                     <tbody
                         class="divide-y divide-gray-100 dark:divide-gray-700/50"
                     >
-                        <tr
-                            v-for="article in localArticles?.data"
-                            :key="article.id"
+                        <tr v-for="article in localArticles?.data" :key="article.id"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
-                        >
+                            :class="{'bg-brand-red/5': selectedIds.includes(article.id)}">
+                            <td class="px-4 py-4">
+                                <input type="checkbox" :value="article.id" v-model="selectedIds" class="w-4 h-4 rounded border-gray-300 text-brand-red focus:ring-brand-red cursor-pointer" />
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-4">
                                     <div
@@ -253,7 +274,7 @@ const formatDate = (dateString) => {
                         </tr>
                         <tr v-if="localArticles?.data?.length === 0">
                             <td
-                                colspan="5"
+                                colspan="6"
                                 class="px-6 py-12 text-center text-gray-400"
                             >
                                 <div class="flex flex-col items-center">

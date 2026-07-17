@@ -4,6 +4,7 @@ import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { useBulkDelete } from "@/Composables/useBulkDelete.js";
 
 const props = defineProps({
     bookings: Object,
@@ -13,7 +14,8 @@ const props = defineProps({
 const search = ref(props.filters?.search || "");
 const status = ref(props.filters?.status || "all");
 const paymentStatus = ref(props.filters?.payment_status || "all");
-const localBookings = ref(props.bookings); // Reactive local state for bookings data
+const localBookings = ref(props.bookings);
+const { selectedIds, selectAll } = useBulkDelete(localBookings);
 
 let timeout = null;
 
@@ -77,6 +79,21 @@ const fetchPage = async (url) => {
     }
 };
 
+const bulkDelete = () => {
+    if (selectedIds.value.length === 0) return;
+    Swal.fire({ title: `Hapus ${selectedIds.value.length} booking?`, text: "Data yang dihapus tidak dapat dikembalikan!", icon: "warning",
+        showCancelButton: true, confirmButtonColor: "#d33", cancelButtonColor: "#3085d6",
+        confirmButtonText: "Ya, hapus semua!", cancelButtonText: "Batal",
+    }).then((r) => { if (r.isConfirmed) {
+        axios.post(route("admin.bookings.bulk-destroy"), { ids: selectedIds.value, _method: "DELETE" })
+            .then(() => {
+                Swal.fire({ icon: "success", title: "Berhasil!", text: `${selectedIds.value.length} booking dihapus.`, timer: 1500, showConfirmButton: false });
+                localBookings.value = { ...localBookings.value, data: localBookings.value.data.filter(d => !selectedIds.value.includes(d.id)), total: localBookings.value.total - selectedIds.value.length };
+                selectedIds.value = [];
+            }).catch(() => Swal.fire({ icon: "error", title: "Gagal!", text: "Terjadi kesalahan." }));
+    }});
+};
+
 const deleteBooking = (id) => {
     Swal.fire({
         title: "Hapus Pemesanan?",
@@ -90,8 +107,10 @@ const deleteBooking = (id) => {
     }).then((result) => {
         if (result.isConfirmed) {
             router.delete(route("admin.bookings.destroy", id), {
+                preserveScroll: true,
                 onSuccess: () => {
-                    // Success handled by layout flash message
+                    localBookings.value = { ...localBookings.value, data: localBookings.value.data.filter(d => d.id !== id), total: localBookings.value.total - 1 };
+                    selectedIds.value = selectedIds.value.filter(sid => sid !== id);
                 },
             });
         }
@@ -218,6 +237,7 @@ const translateStatus = (status) => {
                     </div>
                 </div>
 
+                <button v-if="selectedIds.length > 0" @click="bulkDelete" class="px-4 py-2.5 rounded-xl bg-red-600 text-white font-semibold shadow-sm hover:bg-red-700 transition-all flex items-center gap-2 whitespace-nowrap text-sm"><i class="fas fa-trash-alt"></i> Hapus ({{ selectedIds.length }})</button>
                 <Link
                     :href="route('admin.bookings.create')"
                     class="px-4 sm:px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap text-sm sm:text-base"
@@ -237,6 +257,9 @@ const translateStatus = (status) => {
                         class="bg-gray-50/50 dark:bg-gray-900/20 text-gray-500 dark:text-gray-400 text-xs uppercase font-bold tracking-wider"
                     >
                         <tr>
+                            <th class="px-4 py-4 w-10">
+                                <input type="checkbox" v-model="selectAll" class="w-4 h-4 rounded border-gray-300 text-brand-red focus:ring-brand-red cursor-pointer" />
+                            </th>
                             <th class="px-6 py-4">Kode & Tanggal</th>
                             <th class="px-6 py-4">Penumpang</th>
                             <th class="px-6 py-4">Rute & Bus</th>
@@ -249,11 +272,12 @@ const translateStatus = (status) => {
                     <tbody
                         class="divide-y divide-gray-100 dark:divide-gray-700/50"
                     >
-                        <tr
-                            v-for="booking in localBookings?.data"
-                            :key="booking.id"
+                        <tr v-for="booking in localBookings?.data" :key="booking.id"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
-                        >
+                            :class="{'bg-brand-red/5': selectedIds.includes(booking.id)}">
+                            <td class="px-4 py-4">
+                                <input type="checkbox" :value="booking.id" v-model="selectedIds" class="w-4 h-4 rounded border-gray-300 text-brand-red focus:ring-brand-red cursor-pointer" />
+                            </td>
                             <td class="px-6 py-4 text-sm">
                                 <div
                                     class="font-bold text-gray-900 dark:text-white"
@@ -396,7 +420,7 @@ const translateStatus = (status) => {
                         </tr>
                         <tr v-if="localBookings?.data?.length === 0">
                             <td
-                                colspan="7"
+                                colspan="8"
                                 class="px-6 py-12 text-center text-gray-400"
                             >
                                 <div class="flex flex-col items-center">

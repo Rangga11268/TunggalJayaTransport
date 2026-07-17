@@ -68,4 +68,14 @@ class CharterBookingController extends Controller
 
         return back()->with('success', 'Data sewa pariwisata berhasil diperbarui.');
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada data dipilih.'], 400);
+        }
+        CharterBooking::whereIn('id', $ids)->delete();
+        return response()->json(['success' => true, 'message' => count($ids) . ' data berhasil dihapus.']);
+    }
 }

@@ -57,7 +57,7 @@ const bulkDelete = () => {
         cancelButtonText: "Batal",
     }).then((result) => {
         if (result.isConfirmed) {
-            axios.delete(route("admin.buses.bulk-destroy"), { data: { ids: selectedIds.value } })
+            axios.post(route("admin.buses.bulk-destroy"), { ids: selectedIds.value, _method: "DELETE" })
                 .then(() => {
                     Swal.fire({ icon: "success", title: "Berhasil!", text: `${selectedIds.value.length} bus dihapus.`, timer: 1500, showConfirmButton: false });
                     localBuses.value = {

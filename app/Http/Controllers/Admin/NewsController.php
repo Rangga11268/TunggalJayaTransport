@@ -179,4 +179,14 @@ class NewsController extends Controller
 
         return response()->json(['error' => 'No image uploaded'], 400);
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada data dipilih.'], 400);
+        }
+        NewsArticle::whereIn('id', $ids)->delete();
+        return response()->json(['success' => true, 'message' => count($ids) . ' data berhasil dihapus.']);
+    }
 }

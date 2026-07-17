@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             '/payment/webhook',
             'midtrans/callback',
+            'admin/*/bulk-delete',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
