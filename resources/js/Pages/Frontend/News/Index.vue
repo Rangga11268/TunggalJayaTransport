@@ -101,7 +101,7 @@ const fetchArticles = async (page = 1, categoryId = null) => {
                 <Link v-for="(article, index) in localArticles.data" :key="article.id"
                     :href="route('frontend.news.show', article.slug)"
                     class="bg-white rounded-[12px] overflow-hidden border border-[#ebe7e7] hover:shadow-md transition-shadow group flex flex-col">
-                    <div class="relative h-52 overflow-hidden">
+                    <div class="relative h-44 sm:h-48 lg:h-52 overflow-hidden">
                         <img :src="article.image_url" :alt="article.title"
                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>

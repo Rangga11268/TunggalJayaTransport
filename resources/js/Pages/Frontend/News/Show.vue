@@ -28,7 +28,7 @@ const formatDate = (dateString) => {
 
     <div class="min-h-screen bg-[#fcf9f8]">
         <!-- Hero -->
-        <div class="relative h-[50vh] min-h-[400px] overflow-hidden">
+        <div class="relative h-[50vh] min-h-[300px] md:min-h-[400px] overflow-hidden">
             <img :src="article.image_url" :alt="article.title" class="absolute inset-0 w-full h-full object-cover" />
             <div class="absolute inset-0 bg-gradient-to-t from-[#1c1b1b] via-black/50 to-transparent"></div>
             <div class="absolute inset-0 flex items-end">
@@ -52,7 +52,7 @@ const formatDate = (dateString) => {
         </div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
                 <!-- Content -->
                 <div class="lg:col-span-8">
                     <div class="text-[#454652] text-[15px] leading-relaxed" v-html="article.safe_content"></div>

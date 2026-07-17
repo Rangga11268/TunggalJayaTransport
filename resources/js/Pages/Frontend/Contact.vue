@@ -36,7 +36,7 @@ const submit = () => {
         </div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
                 <!-- Left: Info -->
                 <div class="space-y-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -59,7 +59,7 @@ const submit = () => {
                     </div>
 
                     <!-- Map -->
-                    <div class="relative h-[350px] rounded-[12px] overflow-hidden shadow-sm border border-[#ebe7e7]">
+                    <div class="relative h-[250px] md:h-[350px] rounded-[12px] overflow-hidden shadow-sm border border-[#ebe7e7]">
                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253840.4878845067!2d106.68942964135938!3d-6.229728025238589!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e34b9d!2sJakarta!5e0!3m2!1sen!2sid!4v1633072877145!5m2!1sen!2sid"
                             width="100%" height="100%" style="border:0; filter:grayscale(100%)" allowfullscreen="" loading="lazy"></iframe>
                         <div class="absolute bottom-4 left-4 right-4">

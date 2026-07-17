@@ -90,7 +90,7 @@ const filteredBuses = computed(() => {
                     class="mt-4 text-[#10207a] text-sm font-semibold hover:underline">Reset Filter</button>
             </div>
 
-            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[24px]">
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-[24px]">
                 <div v-for="bus in filteredBuses" :key="bus.id"
                     class="bg-white rounded-[12px] overflow-hidden border border-[#ebe7e7] shadow-sm hover:shadow-lg transition-shadow flex flex-col">
                     <div class="relative h-[200px] overflow-hidden">

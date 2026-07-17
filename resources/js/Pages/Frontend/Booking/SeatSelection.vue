@@ -388,7 +388,7 @@ const formatTime = (timeStr) => {
 
     <div class="bg-white min-h-screen  text-[#1c1b1b] relative pb-24">
         
-        <div class="max-w-[1280px] mx-auto px-8 lg:px-16 pt-[140px] pb-8">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-16 pt-[140px] pb-8">
             
             <!-- Step Indicator -->
             <div class="flex items-center justify-center w-full mb-12 flex-wrap gap-4">

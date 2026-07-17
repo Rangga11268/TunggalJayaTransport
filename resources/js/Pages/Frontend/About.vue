@@ -78,7 +78,7 @@ const toggleVideo = () => {
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <h2 class="font-unbounded font-bold text-[28px] text-[#1c1b1b] mb-6">Berawal dari Tekad Kuat</h2>
+                        <h2 class="font-unbounded font-bold text-[22px] sm:text-[24px] md:text-[28px] text-[#1c1b1b] mb-6">Berawal dari Tekad Kuat</h2>
                         <div class="space-y-4 text-[#454652] text-[15px] leading-relaxed">
                             <p>Semua bermula dari H. Asim pada tahun 1973. Tanpa modal besar, hanya bermodalkan keberanian dan sepeda onthel, beliau merintis usaha dengan berjualan ubi dari Sumatera hingga Jakarta.</p>
                             <p>Mimpi itu mahal, namun kerja keras tak pernah mengkhianati. Dengan tabungan 100 juta rupiah hasil keringat bertahun-tahun, beliau membeli satu unit bus medium. Itulah awal lahirnya Tunggal Jaya Transport.</p>
@@ -126,14 +126,14 @@ const toggleVideo = () => {
                         <div class="w-12 h-12 rounded-xl bg-[#10207a]/10 flex items-center justify-center mb-5">
                             <i class="fas fa-eye text-lg text-[#10207a]"></i>
                         </div>
-                        <h3 class="font-unbounded font-bold text-[20px] text-[#1c1b1b] mb-3">Visi Kami</h3>
+                        <h3 class="font-unbounded font-bold text-[16px] sm:text-[18px] md:text-[20px] text-[#1c1b1b] mb-3">Visi Kami</h3>
                         <p class="text-[#454652] text-[14px] leading-relaxed">"Menjadi pionir transportasi darat modern yang menghubungkan setiap sudut nusantara dengan standar keselamatan dan kenyamanan kelas dunia."</p>
                     </div>
                     <div class="bg-white border border-[#ebe7e7] rounded-[12px] p-8 shadow-sm">
                         <div class="w-12 h-12 rounded-xl bg-[#10207a]/10 flex items-center justify-center mb-5">
                             <i class="fas fa-rocket text-lg text-[#10207a]"></i>
                         </div>
-                        <h3 class="font-unbounded font-bold text-[20px] text-[#1c1b1b] mb-3">Misi Kami</h3>
+                        <h3 class="font-unbounded font-bold text-[16px] sm:text-[18px] md:text-[20px] text-[#1c1b1b] mb-3">Misi Kami</h3>
                         <ul class="space-y-3 text-[#454652] text-[14px]">
                             <li class="flex items-start gap-3">
                                 <i class="fas fa-check-circle text-[#10207a] mt-0.5 text-sm"></i>
@@ -154,7 +154,7 @@ const toggleVideo = () => {
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-10">
                     <span class="inline-block px-3 py-1 rounded-full bg-[#f6f3f2] border border-[#ebe7e7] text-[#454652] text-[9px] font-bold tracking-widest uppercase mb-3">Pusat Bantuan</span>
-                    <h2 class="font-unbounded font-bold text-[24px] text-[#1c1b1b]">Pertanyaan Umum</h2>
+                    <h2 class="font-unbounded font-bold text-[20px] sm:text-[22px] md:text-[24px] text-[#1c1b1b]">Pertanyaan Umum</h2>
                 </div>
                 <div class="space-y-3">
                     <div v-for="faq in faqs" :key="faq.id"

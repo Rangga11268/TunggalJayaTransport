@@ -39,16 +39,14 @@ const busTypes = [
 
 // Charter Form State
 const charterForm = useForm({
+    origin: "",
     destination: "",
     date: "",
-    duration: "1",
+    time: "",
 });
 
-const openWhatsAppInquiry = () => {
-    const dest = charterForm.destination || "-";
-    const date = charterForm.date || "-";
-    const text = `Halo Tunggal Jaya, saya ingin bertanya tentang sewa bus pariwisata.\n\nTujuan: ${dest}\nTanggal: ${date}\nDurasi: ${charterForm.duration} Hari\n\nMohon info ketersediaan dan harganya. Terima kasih.`;
-    window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(text)}`, '_blank');
+const submitCharter = () => {
+    charterForm.get(route('charter.index'));
 };
 
 // Fleet filter
@@ -123,125 +121,133 @@ const getInitial = (name) => {
 <template>
     <Head title="Beranda - Tunggal Jaya Transport" />
 
-    <div class="relative size-full  bg-[#fcf9f8]">
+    <div class="relative size-full bg-[#fcf9f8]">
         <!-- HERO SECTION -->
-        <div class="relative content-stretch flex items-center justify-center left-0 min-h-[800px] pb-[128px] pt-[192px] right-0 top-0">
-            <div class="absolute content-stretch flex flex-col inset-0 items-start justify-center">
-                <div class="flex-[1_0_0] min-h-px relative w-full">
-                    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                        <!-- Hero Background (Replacing local asset with original image style) -->
-                        <img class="absolute block h-full left-0 object-cover top-0 w-full z-0" src="/img/primadona.webp" alt="Hero Image" />
-                    </div>
-                </div>
-                <div class="absolute bg-gradient-to-r from-[rgba(0,0,0,0.8)] inset-0 to-[rgba(0,0,0,0)] via-1/2 via-[rgba(0,0,0,0.5)]"></div>
-                <div class="absolute bg-gradient-to-t bottom-0 from-[#fcf9f8] h-[128px] left-0 to-[rgba(252,249,248,0)] w-full"></div>
+        <div class="relative flex items-center justify-center left-0 min-h-[600px] lg:min-h-[800px] pb-20 lg:pb-[128px] pt-24 lg:pt-[160px] right-0 top-0 overflow-hidden">
+            <div class="absolute inset-0">
+                <img class="absolute block h-full w-full object-cover z-0" src="/img/primadona.webp" alt="Hero Image" />
+                <div class="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30"></div>
+                <div class="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#fcf9f8] to-transparent"></div>
             </div>
 
-            <div class="flex-[1_0_0] max-w-[1280px] w-full min-w-px relative px-16">
-                <div class="content-stretch flex flex-col gap-[24px] items-start max-w-[672px]">
-                    <div class="content-stretch flex flex-col items-start relative shrink-0 w-full">
-                        <div class="flex flex-col font-unbounded font-extrabold justify-center leading-[0] relative shrink-0 text-[56px] text-white tracking-[-1.4px] w-full">
-                            <p class="leading-[61.6px] mb-0">Perjalanan Nyaman,</p>
-                            <p class="leading-[61.6px]">Tiba Tepat Waktu</p>
-                        </div>
-                    </div>
-                    <div class="content-stretch flex flex-col items-start max-w-[576px] relative shrink-0 w-full">
-                        <div class="flex flex-col font-normal justify-center leading-[0] relative shrink-0 text-[20px] text-[rgba(255,255,255,0.9)]">
-                            <p class="leading-[30px] mb-0">Pesan tiket bus AKAP kelas eksekutif atau sewa armada bus</p>
-                            <p class="leading-[30px] mb-0">pariwisata premium untuk perjalanan yang tak terlupakan</p>
-                            <p class="leading-[30px]">bersama Tunggal Jaya.</p>
-                        </div>
-                    </div>
+            <div class="max-w-[1280px] w-full relative z-10 px-4 sm:px-6 lg:px-16">
+                <div class="flex flex-col gap-4 sm:gap-6 items-start max-w-[600px]">
+                    <h1 class="font-unbounded font-extrabold text-white leading-tight text-3xl sm:text-4xl md:text-5xl lg:text-[54px] tracking-[-0.03em]">
+                        Perjalanan Nyaman,<br>Tiba Tepat Waktu
+                    </h1>
+                    <p class="text-base sm:text-lg md:text-xl text-white/90 max-w-[540px] leading-relaxed">
+                        Pesan tiket bus AKAP kelas eksekutif atau sewa armada bus pariwisata premium untuk perjalanan yang tak terlupakan bersama Tunggal Jaya.
+                    </p>
                 </div>
 
                 <!-- Booking Console -->
-                <div class="mt-12 bg-white border border-[#f0edec] border-solid content-stretch flex flex-col gap-[24px] items-center max-w-[1000px] p-[13px] rounded-[16px] shadow-xl relative z-10 w-full">
-                    <div class="bg-[#f6f3f2] relative rounded-[8px] shrink-0">
-                        <div class="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-start p-[4px] relative size-full">
-                            <button @click="activeTab = 'reguler'" :class="[activeTab === 'reguler' ? 'bg-white drop-shadow-sm text-[#10207a]' : 'text-[#454652] hover:bg-gray-100']" class="content-stretch flex gap-[8px] items-center justify-center px-[32px] py-[12px] relative rounded-[4px] shrink-0 font-semibold text-[14px] transition-colors">
-                                <i class="fas fa-ticket-alt"></i>
+                <div class="mt-8 sm:mt-12 bg-white border border-[#f0edec] flex flex-col gap-4 sm:gap-[24px] items-center max-w-[1000px] p-3 sm:p-[13px] rounded-[16px] shadow-xl relative z-10 w-full">
+                    <div class="bg-[#f6f3f2] rounded-[8px] shrink-0 w-full">
+                        <div class="flex p-[4px] gap-1 w-full">
+                            <button @click="activeTab = 'reguler'" :class="[activeTab === 'reguler' ? 'bg-white drop-shadow-sm text-[#10207a]' : 'text-[#454652] hover:bg-gray-100']" class="flex-1 flex items-center justify-center gap-1.5 px-3 sm:px-[32px] py-[10px] sm:py-[12px] rounded-[4px] font-semibold text-[13px] sm:text-[14px] transition-colors">
+                                <i class="fas fa-ticket-alt text-xs sm:text-sm"></i>
                                 Tiket Reguler
                             </button>
-                            <button @click="activeTab = 'charter'" :class="[activeTab === 'charter' ? 'bg-white drop-shadow-sm text-[#10207a]' : 'text-[#454652] hover:bg-gray-100']" class="content-stretch flex gap-[8px] items-center justify-center px-[32px] py-[12px] relative rounded-[4px] shrink-0 font-semibold text-[14px] transition-colors">
-                                <i class="fas fa-bus"></i>
+                            <button @click="activeTab = 'charter'" :class="[activeTab === 'charter' ? 'bg-white drop-shadow-sm text-[#10207a]' : 'text-[#454652] hover:bg-gray-100']" class="flex-1 flex items-center justify-center gap-1.5 px-3 sm:px-[32px] py-[10px] sm:py-[12px] rounded-[4px] font-semibold text-[13px] sm:text-[14px] transition-colors">
+                                <i class="fas fa-bus text-xs sm:text-sm"></i>
                                 Sewa Bus
                             </button>
                         </div>
                     </div>
 
                     <!-- Search Form -->
-                    <div class="relative shrink-0 w-full">
-                        <form v-if="activeTab === 'reguler'" @submit.prevent="submitSearch" class="bg-clip-padding border-0 border-[transparent] border-solid flex gap-[16px] items-end p-[16px] relative size-full">
-                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
-                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Dari</label>
-                                <select v-model="form.origin" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-10 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer appearance-none">
+                    <div class="relative w-full">
+                        <form v-if="activeTab === 'reguler'" @submit.prevent="submitSearch" class="flex flex-col md:flex-row gap-3 md:gap-[16px] items-stretch md:items-end p-3 sm:p-[16px]">
+                            <div class="flex-1 flex flex-col gap-1.5 sm:gap-[8px]">
+                                <label class="font-bold text-[#454652] text-[11px] sm:text-[12px] tracking-[0.6px] uppercase">Dari</label>
+                                <select v-model="form.origin" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] px-3 sm:px-4 py-3 sm:py-4 font-semibold text-[#1c1b1b] text-sm focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer appearance-none">
                                     <option value="" disabled>Pilih Kota Asal</option>
                                     <option v-for="origin in origins" :key="origin" :value="origin">{{ origin }}</option>
                                 </select>
                             </div>
 
-                            <div class="flex items-center justify-center pt-8">
+                            <div class="hidden md:flex items-center justify-center pt-6 sm:pt-8">
                                 <div class="bg-[#f0edec] rounded-full p-2 text-[#454652] cursor-pointer hover:bg-gray-200">
                                     <i class="fas fa-exchange-alt"></i>
                                 </div>
                             </div>
 
-                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
-                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Ke</label>
-                                <select v-model="form.destination" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-10 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer appearance-none">
+                            <div class="flex-1 flex flex-col gap-1.5 sm:gap-[8px]">
+                                <label class="font-bold text-[#454652] text-[11px] sm:text-[12px] tracking-[0.6px] uppercase">Ke</label>
+                                <select v-model="form.destination" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] px-3 sm:px-4 py-3 sm:py-4 font-semibold text-[#1c1b1b] text-sm focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer appearance-none">
                                     <option value="" disabled>Pilih Kota Tujuan</option>
                                     <option v-for="dest in destinations" :key="dest" :value="dest">{{ dest }}</option>
                                 </select>
                             </div>
 
-                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
-                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Tanggal</label>
-                                <input v-model="form.date" type="date" :min="today" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-4 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer">
+                            <div class="flex-1 flex flex-col gap-1.5 sm:gap-[8px]">
+                                <label class="font-bold text-[#454652] text-[11px] sm:text-[12px] tracking-[0.6px] uppercase">Tanggal</label>
+                                <input v-model="form.date" type="date" :min="today" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] px-3 sm:px-4 py-3 sm:py-4 font-semibold text-[#1c1b1b] text-sm focus:ring-2 focus:ring-[#10207a] outline-none cursor-pointer">
                             </div>
 
-                            <button type="submit" class="bg-[#10207a] hover:bg-[#0c185e] text-white px-8 py-4 rounded-[8px] font-semibold text-[16px] transition-colors h-[58px] flex items-center justify-center gap-2">
+                            <button type="submit" class="bg-[#10207a] hover:bg-[#0c185e] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-[8px] font-semibold text-[14px] sm:text-[16px] transition-colors md:h-[58px] flex items-center justify-center gap-2">
                                 <i class="fas fa-search"></i>
                                 Cari
                             </button>
                         </form>
 
-                        <form v-if="activeTab === 'charter'" @submit.prevent="openWhatsAppInquiry" class="bg-clip-padding border-0 border-[transparent] border-solid flex gap-[16px] items-end p-[16px] relative size-full">
-                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
-                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Tujuan Wisata</label>
-                                <input v-model="charterForm.destination" type="text" placeholder="Contoh: Bali, Jogja..." class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-4 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none">
-                            </div>
-                            
-                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
-                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Tanggal Berangkat</label>
-                                <input v-model="charterForm.date" type="date" :min="today" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-4 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none">
+                        <form v-if="activeTab === 'charter'" @submit.prevent="submitCharter" class="flex flex-col gap-4 p-4 sm:p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                <!-- Keberangkatan -->
+                                <div class="flex flex-col gap-1.5 sm:gap-[8px]">
+                                    <label class="font-bold text-[#454652] text-[11px] sm:text-[12px] tracking-[0.6px] uppercase">Kota Keberangkatan</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                                            <i class="fas fa-map-marker-alt text-sm"></i>
+                                        </div>
+                                        <input v-model="charterForm.origin" type="text" placeholder="Pilih kota keberangkatan" required
+                                            class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-10 pr-4 py-3 sm:py-4 font-semibold text-[#1c1b1b] text-sm focus:ring-2 focus:ring-[#10207a] outline-none">
+                                    </div>
+                                </div>
+                                
+                                <!-- Tujuan -->
+                                <div class="flex flex-col gap-1.5 sm:gap-[8px]">
+                                    <label class="font-bold text-[#454652] text-[11px] sm:text-[12px] tracking-[0.6px] uppercase">Kota Tujuan</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                                            <i class="fas fa-location-arrow text-sm"></i>
+                                        </div>
+                                        <input v-model="charterForm.destination" type="text" placeholder="Pilih kota tujuan" required
+                                            class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-10 pr-4 py-3 sm:py-4 font-semibold text-[#1c1b1b] text-sm focus:ring-2 focus:ring-[#10207a] outline-none">
+                                    </div>
+                                </div>
+                                
+                                <!-- Tanggal Mulai -->
+                                <div class="flex flex-col gap-1.5 sm:gap-[8px]">
+                                    <label class="font-bold text-[#454652] text-[11px] sm:text-[12px] tracking-[0.6px] uppercase">Tanggal Mulai Sewa</label>
+                                    <input v-model="charterForm.date" type="date" :min="today" required
+                                        class="w-full bg-white border border-[#c6c5d3] rounded-[8px] px-3 sm:px-4 py-3 sm:py-4 font-semibold text-[#1c1b1b] text-sm focus:ring-2 focus:ring-[#10207a] outline-none">
+                                </div>
+
+                                <!-- Jam Mulai -->
+                                <div class="flex flex-col gap-1.5 sm:gap-[8px]">
+                                    <label class="font-bold text-[#454652] text-[11px] sm:text-[12px] tracking-[0.6px] uppercase">Jam Mulai Sewa</label>
+                                    <input v-model="charterForm.time" type="time" required
+                                        class="w-full bg-white border border-[#c6c5d3] rounded-[8px] px-3 sm:px-4 py-3 sm:py-4 font-semibold text-[#1c1b1b] text-sm focus:ring-2 focus:ring-[#10207a] outline-none">
+                                </div>
                             </div>
 
-                            <div class="flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px">
-                                <label class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Durasi (Hari)</label>
-                                <select v-model="charterForm.duration" class="w-full bg-white border border-[#c6c5d3] rounded-[8px] pl-4 pr-10 py-4 font-semibold text-[#1c1b1b] focus:ring-2 focus:ring-[#10207a] outline-none appearance-none">
-                                    <option value="1">1 Hari</option>
-                                    <option value="2">2 Hari</option>
-                                    <option value="3">3 Hari</option>
-                                    <option value="4">4+ Hari</option>
-                                </select>
-                            </div>
-
-                            <button type="submit" class="bg-[#25D366] hover:bg-[#128C7E] text-white px-8 py-4 rounded-[8px] font-semibold text-[16px] transition-colors h-[58px] flex items-center justify-center gap-2">
-                                <i class="fab fa-whatsapp text-lg"></i>
-                                Tanya Admin
+                            <button type="submit" class="w-full mt-2 bg-[#25D366] hover:bg-[#128C7E] text-white py-3 sm:py-4 rounded-[8px] font-bold text-[14px] sm:text-[16px] transition-colors md:h-[58px] flex items-center justify-center gap-2">
+                                <i class="fas fa-search text-lg"></i>
+                                Cari Bus Wisata
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
-        </div>
+        </div>  
 
         <!-- POPULAR ROUTES SECTION -->
-        <div class="bg-[#f8f9fa] flex flex-col items-center py-[128px]">
-            <div class="flex flex-col gap-[48px] items-start max-w-[1280px] px-[64px] w-full">
+        <div class="bg-[#f8f9fa] flex flex-col items-center py-16 md:py-24 lg:py-32">
+            <div class="flex flex-col gap-6 md:gap-10 lg:gap-[48px] items-start max-w-[1280px] px-4 sm:px-6 lg:px-16 w-full">
                 <div class="flex items-end justify-between w-full">
                     <div class="flex flex-col gap-[8px] items-start">
-                        <h2 class="font-unbounded font-bold text-[#1c1b1b] text-[32px] tracking-[-0.32px] m-0">Rute Perjalanan Populer</h2>
+                        <h2 class="font-unbounded font-bold text-[#1c1b1b] text-[24px] sm:text-[28px] md:text-[32px] tracking-[-0.32px] m-0">Rute Perjalanan Populer</h2>
                         <p class="font-normal text-[#454652] text-[16px] m-0">Pilihan destinasi favorit penumpang kami.</p>
                     </div>
                     <div class="flex gap-[8px] items-start hidden sm:flex">
@@ -251,9 +257,9 @@ const getInitial = (name) => {
                 </div>
 
                 <div class="w-full overflow-x-auto pb-8 snap-x">
-                    <div class="flex gap-[24px] w-max">
+                    <div class="flex gap-3 md:gap-[24px] w-max">
                         <div v-for="item in featuredRoutes" :key="item.id"
-                            class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[360px] flex flex-col p-6 snap-center">
+                            class="bg-white border border-[#ebe7e7] drop-shadow-sm rounded-[8px] w-[280px] sm:w-[320px] md:w-[360px] flex flex-col p-4 sm:p-6 snap-center">
                             <div class="flex items-center justify-between w-full mb-6">
                                 <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">{{ item.bus_type || 'Executive' }}</span>
                                 <i class="fas fa-star text-yellow-400"></i>
@@ -270,10 +276,11 @@ const getInitial = (name) => {
                                 <Link :href="route('frontend.booking.index', { origin: item.origin, destination: item.destination })" class="mt-4 w-full bg-[#10207a] text-white py-3 rounded-[8px] font-semibold text-[14px] text-center block hover:bg-[#0c185e] transition-colors">
                                     Pesan Tiket
                                 </Link>
-                            </div>
-                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
             </div>
         </div>
 
@@ -333,9 +340,100 @@ const getInitial = (name) => {
                 </div>
             </div>
         </div>
+        <!-- CARA PEMESANAN SECTION -->
+        <div class="bg-white py-12 md:py-16 lg:py-20">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-16">
+                <div class="text-center mb-10 md:mb-12">
+                    <span class="inline-block px-3 py-1 rounded-full bg-[#f6f3f2] border border-[#ebe7e7] text-[#454652] text-[9px] font-bold tracking-widest uppercase mb-3">Panduan</span>
+                    <h2 class="font-unbounded font-bold text-[24px] sm:text-[28px] md:text-[32px] text-[#1c1b1b]">Cara Pemesanan Tiket</h2>
+                    <p class="text-[#454652] text-sm sm:text-base mt-1">Ikuti langkah mudah berikut untuk memesan tiket atau sewa bus.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                    <!-- Tiket Reguler -->
+                    <div class="bg-[#fcf9f8] border border-[#ebe7e7] rounded-[12px] p-6 md:p-8">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-[10px] bg-[#10207a]/10 flex items-center justify-center">
+                                <i class="fas fa-ticket-alt text-sm text-[#10207a]"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-[16px] text-[#1c1b1b]">Tiket Reguler AKAP</h3>
+                                <p class="text-xs text-[#454652]">Perjalanan antarkota</p>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div class="flex gap-4">
+                                <div class="w-7 h-7 rounded-full bg-[#10207a] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</div>
+                                <div>
+                                    <p class="font-semibold text-sm text-[#1c1b1b]">Cari Jadwal</p>
+                                    <p class="text-xs text-[#454652] mt-0.5">Pilih kota asal, tujuan, dan tanggal keberangkatan.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-7 h-7 rounded-full bg-[#10207a] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</div>
+                                <div>
+                                    <p class="font-semibold text-sm text-[#1c1b1b]">Pilih Jadwal & Kursi</p>
+                                    <p class="text-xs text-[#454652] mt-0.5">Pilih jadwal favorit dan tentukan kursi Anda.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-7 h-7 rounded-full bg-[#10207a] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">3</div>
+                                <div>
+                                    <p class="font-semibold text-sm text-[#1c1b1b]">Bayar & Dapatkan Tiket</p>
+                                    <p class="text-xs text-[#454652] mt-0.5">Bayar via transfer/QRIS dan unduh e-tiket Anda.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <Link :href="route('frontend.booking.index')" class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[#10207a] hover:underline">
+                            Pesan Tiket <i class="fas fa-arrow-right text-xs"></i>
+                        </Link>
+                    </div>
+
+                    <!-- Sewa Pariwisata -->
+                    <div class="bg-[#fcf9f8] border border-[#ebe7e7] rounded-[12px] p-6 md:p-8">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-[10px] bg-[#10207a]/10 flex items-center justify-center">
+                                <i class="fas fa-bus text-sm text-[#10207a]"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-[16px] text-[#1c1b1b]">Sewa Bus Pariwisata</h3>
+                                <p class="text-xs text-[#454652]">Perjalanan rombongan & wisata</p>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div class="flex gap-4">
+                                <div class="w-7 h-7 rounded-full bg-[#10207a] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</div>
+                                <div>
+                                    <p class="font-semibold text-sm text-[#1c1b1b]">Isi Form Permintaan</p>
+                                    <p class="text-xs text-[#454652] mt-0.5">Tentukan tujuan, tanggal, dan durasi sewa.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-7 h-7 rounded-full bg-[#10207a] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</div>
+                                <div>
+                                    <p class="font-semibold text-sm text-[#1c1b1b]">Dapatkan Penawaran</p>
+                                    <p class="text-xs text-[#454652] mt-0.5">Tim kami akan menghubungi dengan penawaran harga.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-7 h-7 rounded-full bg-[#10207a] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">3</div>
+                                <div>
+                                    <p class="font-semibold text-sm text-[#1c1b1b]">Konfirmasi & Berangkat</p>
+                                    <p class="text-xs text-[#454652] mt-0.5">Setujui penawaran dan nikmati perjalanan.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <Link :href="route('frontend.charter.index')" class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[#10207a] hover:underline">
+                            Sewa Sekarang <i class="fas fa-arrow-right text-xs"></i>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- BERITA & UPDATE SECTION -->
-        <div class="bg-[#fcf9f8] flex flex-col items-center py-[128px]">
-            <div class="flex flex-col gap-[48px] items-start max-w-[1280px] px-[64px] w-full">
+        <div class="bg-[#fcf9f8] flex flex-col items-center py-16 md:py-24 lg:py-32">
+            <div class="flex flex-col gap-6 md:gap-10 lg:gap-[48px] items-start max-w-[1280px] px-4 sm:px-6 lg:px-16 w-full">
                 <div class="flex items-end justify-between w-full">
                     <div class="flex flex-col gap-[8px] items-start">
                         <h2 class=" font-unboundedfont-bold text-[#1c1b1b] text-[32px] tracking-[-0.32px] m-0">Berita & Update</h2>
@@ -346,7 +444,7 @@ const getInitial = (name) => {
                         <i class="fas fa-chevron-right text-xs"></i>
                     </a>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-[32px] w-full">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-[32px] w-full">
                     <Link :href="route('frontend.news.show', news.slug)" v-for="news in latestNews" :key="news.id" class="flex flex-col gap-[24px] items-start w-full group cursor-pointer">
                         <div class="relative overflow-hidden rounded-[8px] w-full shadow-sm">
                             <img :src="news.image_url" :alt="news.title" class="w-full h-[204px] object-cover group-hover:scale-105 transition-transform duration-300 bg-gray-200" />
@@ -365,11 +463,11 @@ const getInitial = (name) => {
         </div>
 
         <!-- DAFTAR ARMADA SECTION -->
-        <div class="bg-[#fcf9f8] flex flex-col items-center py-[96px]">
-            <div class="flex flex-col gap-[48px] items-start max-w-[1280px] px-[64px] w-full">
+        <div class="bg-[#fcf9f8] flex flex-col items-center py-12 md:py-16 lg:py-24">
+            <div class="flex flex-col gap-6 md:gap-10 lg:gap-[48px] items-start max-w-[1280px] px-4 sm:px-6 lg:px-16 w-full">
                 <div class="flex items-end justify-between w-full">
                     <div class="flex flex-col gap-[8px] items-start">
-                        <h2 class="font-unbounded font-bold text-[#1c1b1b] text-[32px] tracking-[-0.32px] m-0">Daftar Armada</h2>
+                        <h2 class="font-unbounded font-bold text-[#1c1b1b] text-[24px] sm:text-[28px] md:text-[32px] tracking-[-0.32px] m-0">Daftar Armada</h2>
                         <p class="font-normal text-[#454652] text-[16px] m-0">Seluruh armada tunggal jaya transport.</p>
                     </div>
                     <Link :href="route('frontend.fleet.index')" class="flex items-center gap-[4px] text-[#10207a] hover:underline font-semibold text-[16px]">
@@ -394,7 +492,7 @@ const getInitial = (name) => {
                     </button>
                 </div>
 
-                <div v-if="filteredFleet.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-[24px] w-full">
+                <div v-if="filteredFleet.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-[24px] w-full">
                     <div v-for="bus in filteredFleet" :key="bus.id"
                         class="bg-white rounded-[12px] overflow-hidden border border-[#ebe7e7] shadow-sm hover:shadow-lg transition-shadow group">
                         <div class="relative h-[200px] overflow-hidden">
@@ -435,29 +533,29 @@ const getInitial = (name) => {
         </div>
 
         <!-- ARMADA PREMIUM KAMI SECTION -->
-        <div class="bg-[#111111] flex flex-col items-center py-[128px]">
-            <div class="flex flex-col gap-[96px] items-center max-w-[1280px] px-[64px] w-full">
+        <div class="bg-[#111111] flex flex-col items-center py-16 md:py-24 lg:py-32">
+            <div class="flex flex-col gap-8 md:gap-16 lg:gap-[96px] items-center max-w-[1280px] px-4 sm:px-6 lg:px-16 w-full">
                 
                 <!-- Section Header -->
                 <div class="flex flex-col gap-[24px] items-center text-center w-full max-w-3xl">
                     <div class="border border-[#767683] px-[16px] py-[6px] rounded-[12px]">
                         <span class="font-bold text-[#c6c5d3] text-[12px] tracking-[1.2px] uppercase">ARMADA PREMIUM KAMI</span>
                     </div>
-                    <h2 class="font-unbounded font-black text-[48px] text-white tracking-[-0.96px] m-0 leading-tight">Kemewahan dalam Setiap Perjalanan</h2>
+                    <h2 class="font-unbounded font-black text-[28px] sm:text-[36px] md:text-[40px] lg:text-[48px] text-white tracking-[-0.96px] m-0 leading-tight">Kemewahan dalam Setiap Perjalanan</h2>
                     <p class="text-[16px] text-[#e5e2e1] opacity-90 m-0 leading-relaxed">
                         Pilih layanan yang sesuai dengan kebutuhan Anda. Dari perjalanan antarkota kelas eksekutif hingga sewa bus pariwisata premium.
                     </p>
                 </div>
 
                 <!-- Fleet Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-[64px] w-full">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-[64px] w-full">
                     <!-- Kelas Eksekutif -->
                     <div class="flex flex-col w-full group">
                         <div class="relative h-[400px] w-full rounded-[16px] overflow-hidden mb-[32px] shadow-2xl border border-white/10">
                             <img src="/img/primadona.webp" alt="Kelas Eksekutif" class="absolute w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                             <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
                             <div class="absolute bottom-[24px] left-[24px] right-[24px]">
-                                <h3 class="font-unbounded text-white text-[24px] font-bold">Kelas Eksekutif (AKAP)</h3>
+                                <h3 class="font-unbounded text-white text-[18px] sm:text-[20px] md:text-[24px] font-bold">Kelas Eksekutif (AKAP)</h3>
                             </div>
                         </div>
                         <p class="text-[#e5e2e1] text-[16px] opacity-90 leading-[26px] mb-[24px]">
@@ -482,7 +580,7 @@ const getInitial = (name) => {
                             <img :src="pariwisataBusImage" alt="Sewa Bus Pariwisata" class="absolute w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                             <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
                             <div class="absolute bottom-[24px] left-[24px] right-[24px]">
-                                <h3 class="font-unbounded text-white text-[24px] font-bold">Sewa Bus Pariwisata</h3>
+                                <h3 class="font-unbounded text-white text-[18px] sm:text-[20px] md:text-[24px] font-bold">Sewa Bus Pariwisata</h3>
                             </div>
                         </div>
                         <p class="text-[#e5e2e1] text-[16px] opacity-90 leading-[26px] mb-[24px]">
@@ -516,7 +614,6 @@ const getInitial = (name) => {
                 </div>
             </div>
         </div>
-    </div>
 </template>
 
 <style scoped>

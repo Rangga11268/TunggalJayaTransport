@@ -354,7 +354,7 @@ watch(
                 <div v-else class="flex flex-col gap-6">
                     <div v-for="schedule in displaySchedules" :key="schedule.id" class="bg-white border border-[#ebe7e7] rounded-[16px] p-5 flex flex-col md:flex-row gap-5 hover:shadow-lg transition-shadow">
                         <!-- Bus Image -->
-                        <div class="w-full md:w-[160px] h-[140px] rounded-[12px] overflow-hidden bg-[#f6f3f2] flex-shrink-0">
+                        <div class="w-full md:w-[160px] h-[100px] sm:h-[120px] md:h-[140px] rounded-[12px] overflow-hidden bg-[#f6f3f2] flex-shrink-0">
                             <img :src="schedule.bus?.image_url || '/img/noImg.png'" :alt="schedule.bus?.name"
                                 class="w-full h-full object-cover" />
                         </div>

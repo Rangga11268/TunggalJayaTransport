@@ -1,129 +1,47 @@
 <script setup>
 import { computed } from "vue";
-import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import { Link, useForm, usePage } from "@inertiajs/vue3";
 
-defineProps({
-    mustVerifyEmail: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
-});
+defineProps({ mustVerifyEmail: Boolean, status: String });
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user || { name: "", email: "" });
 
-const form = useForm({
-    name: user.value.name,
-    email: user.value.email,
-});
+const form = useForm({ name: user.value.name, email: user.value.email });
 </script>
 
 <template>
     <section>
-        <header class="mb-8">
-            <h2
-                class="text-xl font-black text-gray-900 dark:text-white font-unbounded"
-            >
-                Informasi Profil
-            </h2>
-            <p
-                class="mt-2 text-sm text-gray-500 dark:text-gray-400 "
-            >
-                Perbarui informasi akun dan alamat email resmi Anda.
-            </p>
-        </header>
+        <h2 class="font-bold text-[18px] text-[#1c1b1b] mb-1">Informasi Profil</h2>
+        <p class="text-[13px] text-[#454652] mb-6">Perbarui informasi akun Anda.</p>
 
-        <form
-            @submit.prevent="form.patch(route('profile.update'))"
-            class="space-y-6"
-        >
+        <form @submit.prevent="form.patch(route('profile.update'))" class="space-y-5">
             <div>
-                <label
-                    for="name"
-                    class="block text-[10px] font-black text-gray-400 uppercase tracking-widest font-unbounded mb-2"
-                    >Nama Lengkap</label
-                >
-                <input
-                    id="name"
-                    type="text"
-                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all  text-gray-900 dark:text-white"
-                    v-model="form.name"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
-                <InputError class="mt-2" :message="form.errors.name" />
+                <label class="text-xs font-bold text-[#454652] mb-1.5 block">Nama Lengkap</label>
+                <input type="text" v-model="form.name" required
+                    class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
+                <p v-if="form.errors.name" class="mt-1 text-xs text-red-600">{{ form.errors.name }}</p>
             </div>
-
             <div>
-                <label
-                    for="email"
-                    class="block text-[10px] font-black text-gray-400 uppercase tracking-widest font-unbounded mb-2"
-                    >Alamat Email</label
-                >
-                <input
-                    id="email"
-                    type="email"
-                    class="w-full px-5 py-4 rounded-xl bg-gray-50 dark:bg-black/50 border-gray-100 dark:border-white/5 focus:border-rose-500 focus:ring-rose-500/20 transition-all  text-gray-900 dark:text-white"
-                    v-model="form.email"
-                    required
-                    autocomplete="username"
-                />
-                <InputError class="mt-2" :message="form.errors.email" />
+                <label class="text-xs font-bold text-[#454652] mb-1.5 block">Alamat Email</label>
+                <input type="email" v-model="form.email" required
+                    class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
+                <p v-if="form.errors.email" class="mt-1 text-xs text-red-600">{{ form.errors.email }}</p>
             </div>
 
-            <div v-if="mustVerifyEmail && user.email_verified_at === null">
-                <div
-                    class="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20"
-                >
-                    <p
-                        class="text-xs text-amber-700 dark:text-amber-400  font-bold"
-                    >
-                        Email Anda belum diverifikasi.
-                        <Link
-                            :href="route('verification.send')"
-                            method="post"
-                            as="button"
-                            class="underline hover:text-amber-800 transition-colors"
-                        >
-                            Kirim ulang email verifikasi.
-                        </Link>
-                    </p>
-
-                    <div
-                        v-show="status === 'verification-link-sent'"
-                        class="mt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400"
-                    >
-                        Tautan verifikasi baru telah dikirim.
-                    </div>
-                </div>
+            <div v-if="mustVerifyEmail && user.email_verified_at === null"
+                class="p-4 rounded-[10px] bg-amber-50 border border-amber-200 text-amber-700 text-sm">
+                <p>Email belum diverifikasi. <Link :href="route('verification.send')" method="post" as="button" class="underline font-semibold hover:text-amber-800">Kirim ulang</Link>.</p>
+                <p v-show="status === 'verification-link-sent'" class="mt-1 text-emerald-600 font-semibold">Tautan verifikasi telah dikirim.</p>
             </div>
 
-            <div class="flex items-center gap-6 pt-4">
-                <button
-                    type="submit"
-                    :disabled="form.processing"
-                    class="px-8 py-4 bg-rose-600 text-white font-black font-unbounded text-xs rounded-xl shadow-lg shadow-rose-600/30 hover:bg-rose-700 transition-all active:scale-95 disabled:opacity-50"
-                >
-                    Simpan Perubahan
+            <div class="flex items-center gap-4 pt-2">
+                <button type="submit" :disabled="form.processing"
+                    class="px-6 py-3 bg-[#10207a] text-white rounded-[10px] font-bold text-[13px] hover:bg-[#0c185e] transition-all shadow-sm disabled:opacity-50">
+                    Simpan
                 </button>
-
-                <Transition
-                    enter-active-class="transition ease-in-out"
-                    enter-from-class="opacity-0"
-                    leave-active-class="transition ease-in-out"
-                    leave-to-class="opacity-0"
-                >
-                    <p
-                        v-if="form.recentlySuccessful"
-                        class="text-xs text-emerald-600 dark:text-emerald-400 font-black font-unbounded uppercase tracking-widest"
-                    >
-                        Tersimpan!
-                    </p>
+                <Transition enter-active-class="transition" enter-from-class="opacity-0" leave-active-class="transition" leave-to-class="opacity-0">
+                    <p v-if="form.recentlySuccessful" class="text-xs text-emerald-600 font-semibold uppercase">Tersimpan!</p>
                 </Transition>
             </div>
         </form>

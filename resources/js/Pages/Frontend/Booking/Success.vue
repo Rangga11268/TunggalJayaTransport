@@ -267,7 +267,7 @@ const formatTime = (timeString) => {
     <div class="min-h-screen bg-[#fcf9f8] pt-28 pb-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
         <!-- Decorative bg -->
         <div class="fixed top-0 left-0 w-full h-64 bg-gradient-to-b from-[#10207a]/5 to-transparent pointer-events-none"></div>
-        <div class="fixed bottom-0 right-0 w-[600px] h-[600px] bg-rose-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="fixed bottom-0 right-0 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-rose-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
         <!-- Success Header -->
         <div class="text-center mb-10 z-10 max-w-lg">

@@ -11,11 +11,14 @@ const props = defineProps({
     pariwisataBuses: Array,
 });
 
+const urlParams = new URLSearchParams(window.location.search);
+
 const form = useForm({
-    pickup_date: "",
+    pickup_date: urlParams.get('date') || "",
+    pickup_time: urlParams.get('time') || "",
     return_date: "",
-    pickup_location: "",
-    destination: "",
+    pickup_location: urlParams.get('origin') || "",
+    destination: urlParams.get('destination') || "",
     bus_type_requested: "Big Bus",
     notes: "",
 });
@@ -68,17 +71,17 @@ const submit = () => {
         </div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24" id="form-sewa">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
                 <!-- Info -->
                 <div class="lg:col-span-5">
-                    <h2 class="font-unbounded font-bold text-[#1c1b1b] text-[28px] mb-8">Keunggulan<br/>Armada Kami</h2>
+                    <h2 class="font-unbounded font-bold text-[#1c1b1b] text-[22px] sm:text-[24px] md:text-[28px] mb-8">Keunggulan<br/>Armada Kami</h2>
                     <div class="space-y-8">
                         <div class="flex gap-5 items-start">
                             <div class="w-14 h-14 rounded-xl bg-white border border-[#ebe7e7] flex items-center justify-center shrink-0 shadow-sm">
                                 <i class="fas fa-bus text-lg text-[#10207a]"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-[#1c1b1b] text-[18px] mb-1.5">Armada Terbaru</h3>
+                                <h3 class="font-bold text-[#1c1b1b] text-[15px] sm:text-[16px] md:text-[18px] mb-1.5">Armada Terbaru</h3>
                                 <p class="text-[#454652] text-[14px] leading-relaxed">Semua bus kami adalah keluaran terbaru dengan fasilitas AC, TV, Karaoke, dan bagasi luas. Ada pilihan Big Bus dengan Leg Rest.</p>
                             </div>
                         </div>
@@ -87,7 +90,7 @@ const submit = () => {
                                 <i class="fas fa-user-tie text-lg text-[#10207a]"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-[#1c1b1b] text-[18px] mb-1.5">Kru Profesional</h3>
+                                <h3 class="font-bold text-[#1c1b1b] text-[15px] sm:text-[16px] md:text-[18px] mb-1.5">Kru Profesional</h3>
                                 <p class="text-[#454652] text-[14px] leading-relaxed">Pengemudi dan kernet berpengalaman, ramah, dan sangat menguasai berbagai rute pariwisata di Indonesia.</p>
                             </div>
                         </div>
@@ -96,7 +99,7 @@ const submit = () => {
                                 <i class="fas fa-shield-alt text-lg text-[#10207a]"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-[#1c1b1b] text-[18px] mb-1.5">Aman & Terawat</h3>
+                                <h3 class="font-bold text-[#1c1b1b] text-[15px] sm:text-[16px] md:text-[15px] sm:text-[16px] md:text-[18px] mb-1.5">Aman & Terawat</h3>
                                 <p class="text-[#454652] text-[14px] leading-relaxed">Perawatan rutin selalu kami lakukan sebelum dan sesudah perjalanan untuk menjamin keselamatan penumpang.</p>
                             </div>
                         </div>
@@ -110,10 +113,15 @@ const submit = () => {
                         <p class="text-[#454652] text-[14px] mb-8">Lengkapi form berikut dan tim kami akan memberikan penawaran harga terbaik untuk perjalanan Anda.</p>
                         
                         <form @submit.prevent="submit" class="space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                                 <div>
                                     <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Tanggal Jemput <span class="text-[#10207a]">*</span></label>
                                     <input v-model="form.pickup_date" type="date" required
+                                        class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Jam Jemput <span class="text-[#10207a]">*</span></label>
+                                    <input v-model="form.pickup_time" type="time" required
                                         class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
                                 </div>
                                 <div>

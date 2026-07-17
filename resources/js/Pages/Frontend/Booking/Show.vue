@@ -88,7 +88,7 @@ const busType = computed(() => {
 
     <div class="bg-gray-50 dark:bg-[#050505] min-h-screen text-gray-900 dark:text-white relative pb-24 font-sans selection:bg-blue-600 selection:text-white">
         
-        <div class="max-w-[1200px] mx-auto px-6 lg:px-8 pt-[140px] pb-12">
+        <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-[140px] pb-12">
             
             <!-- Step Indicator -->
             <div class="flex items-center justify-center w-full mb-16 flex-wrap gap-4">
