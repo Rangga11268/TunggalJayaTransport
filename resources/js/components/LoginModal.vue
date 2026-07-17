@@ -2,133 +2,98 @@
 import { useForm, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 
-const props = defineProps({
-    show: Boolean,
-});
-
+const props = defineProps({ show: Boolean });
 const emit = defineEmits(["close", "switchToRegister"]);
-
 const showPassword = ref(false);
 
-const form = useForm({
-    login: "",
-    password: "",
-    remember: false,
-});
+const form = useForm({ login: "", password: "", remember: false });
 
 const submit = () => {
     form.post(route("login"), {
         preserveScroll: true,
-        onSuccess: () => {
-            form.reset();
-            emit("close");
-        },
+        onSuccess: () => { form.reset(); emit("close"); },
         onFinish: () => form.reset("password"),
     });
 };
 </script>
 
 <template>
-    <transition
-        enter-active-class="transition duration-300 ease-out"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition duration-200 ease-in"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-    >
-        <div v-if="show" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-0">
-            <!-- Modal Backdrop -->
-            <div class="fixed inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" @click="emit('close')"></div>
-
-            <!-- Modal Content -->
-            <transition
-                enter-active-class="transition duration-300 ease-out"
-                enter-from-class="opacity-0 translate-y-8 scale-95"
-                enter-to-class="opacity-100 translate-y-0 scale-100"
-                leave-active-class="transition duration-200 ease-in"
-                leave-from-class="opacity-100 translate-y-0 scale-100"
-                leave-to-class="opacity-0 translate-y-8 scale-95"
-            >
-                <div v-if="show" class="relative bg-white dark:bg-[#111] w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 dark:border-white/10">
-                    
-                    <!-- Close Button -->
-                    <button @click="emit('close')" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-white/5 text-gray-500 hover:text-brand-red transition-colors z-20">
-                        <i class="fas fa-times"></i>
-                    </button>
-
-                    <!-- Decorative Blob -->
-                    <div class="absolute -top-24 -right-24 w-64 h-64 bg-brand-red/10 rounded-full blur-[80px] pointer-events-none"></div>
-
-                    <div class="p-8 relative z-10">
-                        <div class="text-center mb-8">
-                            <div class="w-16 h-16 mx-auto bg-brand-red/10 rounded-2xl flex items-center justify-center mb-4">
-                                <i class="fas fa-user-circle text-3xl text-brand-red"></i>
+    <teleport to="body">
+        <transition enter-active-class="transition duration-300 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100"
+            leave-active-class="transition duration-200 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+            <div v-if="show" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/30 backdrop-blur-sm" @click="emit('close')"></div>
+                <transition enter-active-class="transition duration-300 ease-out" enter-from-class="opacity-0 translate-y-8 scale-95"
+                    enter-to-class="opacity-100 translate-y-0 scale-100"
+                    leave-active-class="transition duration-200 ease-in" leave-from-class="opacity-100 translate-y-0 scale-100"
+                    leave-to-class="opacity-0 translate-y-8 scale-95">
+                    <div v-if="show" class="relative bg-white w-full max-w-md rounded-[12px] shadow-xl border border-[#ebe7e7]">
+                        <button @click="emit('close')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#f6f3f2] text-gray-500 hover:text-gray-700 transition-colors z-20">
+                            <i class="fas fa-times text-sm"></i>
+                        </button>
+                        <div class="p-6 md:p-8">
+                            <div class="text-center mb-6">
+                                <div class="w-12 h-12 mx-auto bg-[#10207a]/10 rounded-xl flex items-center justify-center mb-3">
+                                    <i class="fas fa-user-circle text-2xl text-[#10207a]"></i>
+                                </div>
+                                <h2 class="text-xl font-bold text-[#1c1b1b]">Masuk Akun</h2>
+                                <p class="text-sm text-[#454652] mt-1">Masuk untuk melanjutkan pesanan.</p>
                             </div>
-                            <h2 class="text-2xl font-black text-gray-900 dark:text-white font-unbounded tracking-tighter">MASUK <span class="text-brand-red">AKUN</span></h2>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 font-manrope mt-2">Masuk untuk melanjutkan pesanan Anda.</p>
-                        </div>
 
-                        <form @submit.prevent="submit" class="space-y-5">
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] font-unbounded mb-2 ml-1">Email / Phone</label>
-                                <div class="relative group">
-                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors">
-                                        <i class="fas fa-envelope text-gray-400"></i>
+                            <form @submit.prevent="submit" class="space-y-4">
+                                <div>
+                                    <label class="text-xs font-bold text-[#454652] mb-1.5 block">Email / Telepon</label>
+                                    <input type="text" v-model="form.login" required
+                                        class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-sm text-[#1c1b1b] outline-none transition-all"
+                                        placeholder="nama@email.com" />
+                                    <p v-if="form.errors.login" class="mt-1 text-xs text-red-600 font-semibold">{{ form.errors.login }}</p>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between items-center mb-1.5">
+                                        <label class="text-xs font-bold text-[#454652]">Kata Sandi</label>
+                                        <Link :href="route('password.request')" class="text-[11px] font-semibold text-[#10207a] hover:underline">Lupa?</Link>
                                     </div>
-                                    <input type="text" v-model="form.login" required autofocus class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all" placeholder="nama@email.com" />
-                                </div>
-                                <p class="mt-1 text-xs font-bold text-brand-red font-manrope" v-if="form.errors.login">{{ form.errors.login }}</p>
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between items-center mb-2 ml-1">
-                                    <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] font-unbounded">Kata Sandi</label>
-                                    <Link :href="route('password.request')" class="text-[10px] font-black text-brand-red uppercase tracking-wider hover:text-red-500 transition-colors font-unbounded">Lupa?</Link>
-                                </div>
-                                <div class="relative group">
-                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none group-focus-within:text-brand-red transition-colors">
-                                        <i class="fas fa-lock text-gray-400"></i>
+                                    <div class="relative">
+                                        <input :type="showPassword ? 'text' : 'password'" v-model="form.password" required
+                                            class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-sm text-[#1c1b1b] outline-none transition-all pr-10"
+                                            placeholder="••••••••" />
+                                        <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                            <i :class="['fas text-sm', showPassword ? 'fa-eye-slash' : 'fa-eye']"></i>
+                                        </button>
                                     </div>
-                                    <input :type="showPassword ? 'text' : 'password'" v-model="form.password" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl py-3 pl-10 pr-10 text-sm text-gray-900 dark:text-white font-manrope focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all" placeholder="••••••••" />
-                                    <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-brand-red transition-colors">
-                                        <i :class="['fas', showPassword ? 'fa-eye-slash' : 'fa-eye']"></i>
-                                    </button>
+                                    <p v-if="form.errors.password" class="mt-1 text-xs text-red-600 font-semibold">{{ form.errors.password }}</p>
                                 </div>
-                                <p class="mt-1 text-xs font-bold text-brand-red font-manrope" v-if="form.errors.password">{{ form.errors.password }}</p>
-                            </div>
 
-                            <div class="flex items-center">
-                                <label class="relative flex items-center cursor-pointer group">
-                                    <input type="checkbox" v-model="form.remember" class="peer sr-only" />
-                                    <div class="h-4 w-4 rounded border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 transition-all peer-checked:bg-brand-red peer-checked:border-brand-red"></div>
-                                    <i class="fas fa-check absolute left-[2px] text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-                                    <span class="ml-2 text-xs font-semibold text-gray-500 dark:text-gray-400 font-manrope">Ingat Saya</span>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" v-model="form.remember" class="w-4 h-4 rounded border-gray-300 text-[#10207a] focus:ring-[#10207a]" />
+                                    <span class="text-xs text-[#454652]">Ingat Saya</span>
                                 </label>
+
+                                <button type="submit" :disabled="form.processing"
+                                    class="w-full py-3.5 bg-[#10207a] text-white rounded-[10px] font-bold text-sm hover:bg-[#0c185e] transition-all shadow-sm disabled:opacity-50">
+                                    <span v-if="!form.processing">Masuk</span>
+                                    <span v-else class="flex items-center justify-center gap-2"><i class="fas fa-circle-notch fa-spin"></i> Memproses...</span>
+                                </button>
+                            </form>
+
+                            <div class="relative my-5">
+                                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-[#ebe7e7]"></div></div>
+                                <div class="relative flex justify-center"><span class="bg-white px-3 text-[10px] text-[#454652] uppercase tracking-wider">Atau</span></div>
                             </div>
 
-                            <button type="submit" :disabled="form.processing" class="w-full py-3.5 mt-2 bg-brand-red text-white rounded-xl font-black font-unbounded text-xs uppercase tracking-[0.2em] shadow-lg shadow-brand-red/30 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50">
-                                <span v-if="!form.processing">MASUK SEKARANG</span>
-                                <span v-else class="flex items-center justify-center"><i class="fas fa-circle-notch fa-spin mr-2"></i> MEMPROSES...</span>
-                            </button>
-                        </form>
+                            <a href="/auth/google" class="flex items-center justify-center py-3 w-full rounded-[10px] border border-[#e5e2e1] hover:bg-[#f6f3f2] transition-colors text-sm text-[#454652] font-semibold gap-2">
+                                <i class="fab fa-google text-[#DB4437]"></i> Lanjutkan dengan Google
+                            </a>
 
-                        <div class="relative my-6">
-                            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-100 dark:border-white/5"></div></div>
-                            <div class="relative flex justify-center text-[10px]"><span class="bg-white dark:bg-[#111] px-4 text-gray-400 font-unbounded tracking-wider uppercase">ATAU</span></div>
-                        </div>
-
-                        <a href="/auth/google" class="flex items-center justify-center py-3 w-full rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
-                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="h-4 w-4 mr-3 group-hover:scale-110 transition-transform" alt="Google" />
-                            <span class="text-xs font-black text-gray-700 dark:text-gray-300 font-unbounded uppercase tracking-wider">Lanjutkan dengan Google</span>
-                        </a>
-
-                        <div class="text-center mt-6">
-                            <p class="text-xs text-gray-500 font-manrope">Belum punya akun? <button @click="emit('switchToRegister')" class="font-black text-brand-red hover:underline font-unbounded ml-1 text-[10px] uppercase">DAFTAR SEKARANG</button></p>
+                            <p class="text-center text-xs text-[#454652] mt-5">
+                                Belum punya akun?
+                                <button @click="emit('switchToRegister')" class="font-semibold text-[#10207a] hover:underline ml-1">Daftar</button>
+                            </p>
                         </div>
                     </div>
-                </div>
-            </transition>
-        </div>
-    </transition>
+                </transition>
+            </div>
+        </transition>
+    </teleport>
 </template>
