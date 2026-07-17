@@ -58,8 +58,8 @@ const submit = () => {
                                         <input :type="showPassword ? 'text' : 'password'" v-model="form.password" required
                                             class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-sm text-[#1c1b1b] outline-none transition-all pr-10"
                                             placeholder="••••••••" />
-                                        <button type="button" @click="showPassword = !showPassword" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-200/50 text-gray-400 hover:text-gray-600">
-                                            <i :class="['fas text-xs', showPassword ? 'fa-eye-slash' : 'fa-eye']"></i>
+                                        <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">
+                                            <i :class="['fas text-sm', showPassword ? 'fa-eye-slash' : 'fa-eye']"></i>
                                         </button>
                                     </div>
                                     <p v-if="form.errors.password" class="mt-1 text-xs text-red-600 font-semibold">{{ form.errors.password }}</p>
