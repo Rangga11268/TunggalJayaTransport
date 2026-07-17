@@ -312,6 +312,12 @@ const isActive = (routeName) => {
                             </transition>
                         </div>
 
+                        <Link
+                            :href="route('frontend.booking.index')"
+                            class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 bg-[#10207a] text-white hover:bg-[#0c185e] shadow-sm hover:shadow-md"
+                        >
+                            <i class="fas fa-ticket-alt mr-1.5 text-xs"></i> Pesan Tiket
+                        </Link>
 
                         <Link
                             :href="route('frontend.charter.index')"
@@ -630,8 +636,13 @@ const isActive = (routeName) => {
                         tabindex="-1"
                         class="lg:hidden absolute left-0 right-0 top-full mt-4 mx-2 bg-white/95 dark:bg-[#0a0a0a]/95 md:backdrop-blur-2xl backdrop-blur-sm rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-white/10 overflow-hidden z-50 transition-all duration-300"
                     >
-                        <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
-                            <!-- Mobile Menu Header Info (Quick Stats/Welcome) -->
+                            <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+                                <!-- Mobile CTA -->
+                                <Link :href="route('frontend.booking.index')" @click="mobileMenuOpen = false"
+                                    class="block w-full text-center py-4 bg-[#10207a] text-white rounded-[14px] font-bold text-sm hover:bg-[#0c185e] transition-all shadow-lg shadow-[#10207a]/20">
+                                    <i class="fas fa-ticket-alt mr-2"></i> Pesan Tiket Sekarang
+                                </Link>
+                                <!-- Mobile Menu Header Info (Quick Stats/Welcome) -->
                             <div
                                 class="p-6 bg-gradient-to-br from-blue-600 to-blue-700 rounded-[2rem] text-white flex items-center justify-between shadow-xl shadow-blue-600/20"
                             >
