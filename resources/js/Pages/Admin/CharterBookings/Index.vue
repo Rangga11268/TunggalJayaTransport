@@ -92,8 +92,11 @@ const getStatusText = (status) => {
                     Kelola penawaran harga, penugasan armada, dan status sewa pariwisata.
                 </p>
             </div>
-            
             <div class="flex items-center gap-3 w-full md:w-auto">
+                <Link :href="route('admin.charter-bookings.create')" class="px-4 py-2.5 bg-brand-red text-white text-sm font-medium rounded-xl hover:bg-red-700 transition-colors flex items-center gap-2 whitespace-nowrap shadow-sm shadow-red-500/20">
+                    <i class="fas fa-plus"></i> Tambah Manual
+                </Link>
+
                 <div class="relative flex-grow md:w-64 lg:w-80">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>

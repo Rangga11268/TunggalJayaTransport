@@ -18,6 +18,7 @@ const form = useForm({
     payment_method: props.charter.payment_method || "system",
     payment_status: props.charter.payment_status || "unpaid",
     payment_proof: null,
+    _method: 'put',
 });
 
 const formatRupiahString = (value) => {
@@ -63,12 +64,7 @@ const onDpChange = (event) => {
 };
 
 const submit = () => {
-    // For file uploads in put request, Inertia converts it correctly if _method is put, but better use post with _method: put
-    // Wait, Inertia handles put with files since Vue 3 / Inertia 1.0 but it's safer to use post with _method='put'
     form.post(route("admin.charter-bookings.update", props.charter.id), {
-        data: {
-            _method: 'put'
-        },
         preserveScroll: true,
     });
 };

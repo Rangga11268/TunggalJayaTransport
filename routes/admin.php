@@ -19,6 +19,8 @@ use App\Http\Controllers\Admin\CharterBookingController;
 
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER, 'phone.verified'])->group(function () {
+    Route::post('/import/{type}', [\App\Http\Controllers\Admin\ImportController::class, 'store'])->name('import.store')->middleware('role:' . \App\Models\User::ROLE_ADMIN);
+
     // Notification Routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');

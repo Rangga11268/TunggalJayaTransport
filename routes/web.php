@@ -52,6 +52,7 @@ Route::prefix('')->name('frontend.')->group(function () {
 
     // Charter Routes
     Route::get('/pariwisata', [CharterController::class, 'index'])->name('charter.index');
+    Route::get('/pariwisata/step-1', [CharterController::class, 'step1'])->name('charter.step1');
     Route::post('/pariwisata/step-1', [CharterController::class, 'storeStep1'])->name('charter.storeStep1');
     Route::get('/pariwisata/details', [CharterController::class, 'details'])->name('charter.details');
     Route::post('/pariwisata/request', [CharterController::class, 'store'])->name('charter.store');

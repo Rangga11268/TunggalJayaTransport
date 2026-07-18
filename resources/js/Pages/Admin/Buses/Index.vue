@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -11,6 +11,22 @@ const props = defineProps({
     buses: Object,
     filters: Object,
 });
+
+const importForm = useForm({ file: null });
+const importData = (e) => {
+    importForm.file = e.target.files[0];
+    if (!importForm.file) return;
+    
+    importForm.post(route('admin.import.store', 'buses'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            importForm.reset();
+            // Just reload to see changes
+            router.reload();
+            e.target.value = '';
+        }
+    });
+};
 
 const search = ref(props.filters?.search || "");
 const localBuses = ref(props.buses);
@@ -162,6 +178,12 @@ const getStatusLabel = (status) => {
                     class="px-4 py-2.5 rounded-xl bg-red-600 text-white font-semibold shadow-sm hover:bg-red-700 transition-all flex items-center gap-2 whitespace-nowrap text-sm">
                     <i class="fas fa-trash-alt"></i> Hapus ({{ selectedIds.length }})
                 </button>
+                <label class="px-5 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 flex items-center gap-2 cursor-pointer">
+                    <i class="fas fa-file-csv"></i>
+                    <span class="hidden md:inline">Import CSV</span>
+                    <input type="file" class="hidden" accept=".csv" @change="importData" />
+                </label>
+
                 <Link :href="route('admin.buses.create')"
                     class="px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold shadow-lg shadow-brand-red/30 hover:bg-red-700 hover:shadow-brand-red/50 transition-all duration-300 flex items-center gap-2 whitespace-nowrap">
                     <i class="fas fa-plus"></i>

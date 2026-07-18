@@ -37,6 +37,20 @@ class CharterController extends Controller
         ]);
     }
 
+    public function step1(Request $request)
+    {
+        $busId = $request->query('bus_id');
+        $bus = null;
+        
+        if ($busId) {
+            $bus = Bus::find($busId);
+        }
+
+        return Inertia::render('Frontend/Charter/Step1', [
+            'selectedBus' => $bus
+        ]);
+    }
+
     public function storeStep1(Request $request)
     {
         $minDate = now()->toDateString();
