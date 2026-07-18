@@ -52,7 +52,10 @@ Route::prefix('')->name('frontend.')->group(function () {
 
     // Charter Routes
     Route::get('/pariwisata', [CharterController::class, 'index'])->name('charter.index');
+    Route::post('/pariwisata/step-1', [CharterController::class, 'storeStep1'])->name('charter.storeStep1');
+    Route::get('/pariwisata/details', [CharterController::class, 'details'])->name('charter.details');
     Route::post('/pariwisata/request', [CharterController::class, 'store'])->name('charter.store');
+    Route::get('/pariwisata/success', [CharterController::class, 'success'])->name('charter.success');
 });
 
 Route::get('/dashboard', function () {
@@ -67,8 +70,11 @@ Route::middleware(['auth', 'phone.verified'])->group(function () {
     // Booking History Routes
     Route::prefix('booking-history')->name('booking-history.')->group(function () {
         Route::get('/', [App\Http\Controllers\BookingHistoryController::class, 'index'])->name('index');
+        Route::get('/charter/{id}', [App\Http\Controllers\BookingHistoryController::class, 'showCharter'])->name('charter.show');
         Route::get('/{id}', [App\Http\Controllers\BookingHistoryController::class, 'show'])->name('show');
     });
+
+    Route::post('/charter-bookings/{id}/pay', [App\Http\Controllers\BookingHistoryController::class, 'payCharter'])->name('charter-bookings.pay');
 });
 
 // Payment webhook route (must be accessible without auth)

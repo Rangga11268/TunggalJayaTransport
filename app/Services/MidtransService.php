@@ -209,40 +209,61 @@ class MidtransService
         ]);
 
         // Update status booking sesuai hasil bayar
-        $booking = $paymentHistory->booking;
-        if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
-            // Pembayaran sukses
-            $booking->update([
-                'payment_status' => 'paid',
-                'booking_status' => 'confirmed',
-                'midtrans_transaction_id' => $orderId
-            ]);
-
-            // Increment promo code usage count ONLY after payment is settled
-            // This prevents abuse (user spam apply promo then cancel)
-            if ($booking->promo_code_id) {
-                $booking->promoCode()->increment('usage_count');
+        if ($paymentHistory->charter_booking_id) {
+            $booking = $paymentHistory->charterBooking;
+            if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
+                $booking->update([
+                    'payment_status' => 'dp_paid',
+                    'status' => 'confirmed',
+                    'dp_midtrans_id' => $orderId
+                ]);
+            } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire') {
+                $booking->update([
+                    'payment_status' => 'failed',
+                    'dp_midtrans_id' => $orderId
+                ]);
+            } elseif ($transactionStatus === 'pending') {
+                $booking->update([
+                    'payment_status' => 'pending',
+                    'dp_midtrans_id' => $orderId
+                ]);
             }
+        } else {
+            $booking = $paymentHistory->booking;
+            if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
+                // Pembayaran sukses
+                $booking->update([
+                    'payment_status' => 'paid',
+                    'booking_status' => 'confirmed',
+                    'midtrans_transaction_id' => $orderId
+                ]);
 
-            // Kirim notifikasi WhatsApp e-ticket
-            try {
-                $waService = app(WhatsAppNotificationService::class);
-                $waService->sendBookingConfirmation($booking);
-            } catch (\Exception $e) {
-                Log::error('Failed to send WA notification: ' . $e->getMessage());
+                // Increment promo code usage count ONLY after payment is settled
+                // This prevents abuse (user spam apply promo then cancel)
+                if ($booking->promo_code_id) {
+                    $booking->promoCode()->increment('usage_count');
+                }
+
+                // Kirim notifikasi WhatsApp e-ticket
+                try {
+                    $waService = app(WhatsAppNotificationService::class);
+                    $waService->sendBookingConfirmation($booking);
+                } catch (\Exception $e) {
+                    Log::error('Failed to send WA notification: ' . $e->getMessage());
+                }
+            } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire') {
+                // Pembayaran gagal/kadaluarsa
+                $booking->update([
+                    'payment_status' => 'failed',
+                    'midtrans_transaction_id' => $orderId
+                ]);
+            } elseif ($transactionStatus === 'pending') {
+                // Masih nunggu dibayar
+                $booking->update([
+                    'payment_status' => 'pending',
+                    'midtrans_transaction_id' => $orderId
+                ]);
             }
-        } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire') {
-            // Pembayaran gagal/kadaluarsa
-            $booking->update([
-                'payment_status' => 'failed',
-                'midtrans_transaction_id' => $orderId
-            ]);
-        } elseif ($transactionStatus === 'pending') {
-            // Masih nunggu dibayar
-            $booking->update([
-                'payment_status' => 'pending',
-                'midtrans_transaction_id' => $orderId
-            ]);
         }
 
         return [

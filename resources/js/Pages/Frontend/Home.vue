@@ -125,7 +125,7 @@ const getInitial = (name) => {
         <!-- HERO SECTION -->
         <div class="relative flex items-center justify-center left-0 min-h-[600px] lg:min-h-[800px] pb-20 lg:pb-[128px] pt-24 lg:pt-[160px] right-0 top-0 overflow-hidden">
             <div class="absolute inset-0">
-                <img class="absolute block h-full w-full object-cover z-0" src="/img/primadona.webp" alt="Hero Image" />
+                <img class="absolute block h-full w-full object-cover z-0" src="/img/kylorenParwis.webp" alt="Hero Image" />
                 <div class="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30"></div>
                 <div class="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#fcf9f8] to-transparent"></div>
             </div>

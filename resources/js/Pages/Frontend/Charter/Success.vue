@@ -1,0 +1,114 @@
+<script setup>
+import { Head, Link } from '@inertiajs/vue3';
+import FrontendLayout from '@/Layouts/FrontendLayout.vue';
+
+defineOptions({ layout: FrontendLayout });
+</script>
+
+<template>
+    <Head title="Permintaan Terkirim - Sewa Pariwisata" />
+
+    <div class="min-h-screen bg-[#fcf9f8] pt-24 pb-20">
+        <!-- Hero Banner Header -->
+        <div class="bg-[#10207a] text-white py-12 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+            <div class="max-w-4xl mx-auto relative z-10">
+                <div class="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(16,185,129,0.4)]">
+                    <i class="fas fa-check text-4xl text-white"></i>
+                </div>
+                <h1 class="font-unbounded font-black text-3xl md:text-4xl mb-4 text-white">
+                    Permintaan Berhasil Terkirim!
+                </h1>
+                <p class="text-white/80 max-w-2xl mx-auto text-lg leading-relaxed">
+                    Terima kasih telah mempercayakan perjalanan Anda. Tim kami akan segera meninjau permintaan Anda dan menghubungi via WhatsApp untuk penawaran harga. 
+                    <br><br>
+                    Nantinya, <strong class="text-white">pembayaran DP dan Pelunasan</strong> dapat dilakukan langsung melalui sistem ini secara otomatis, atau transfer manual sesuai kesepakatan dengan Admin.
+                </p>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+                
+                <!-- Left Column: Status & Next Steps -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-white rounded-[20px] p-8 shadow-sm border border-[#ebe7e7] relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-[#10207a]/5 rounded-bl-full -z-10"></div>
+                        <h3 class="font-unbounded font-bold text-xl text-[#1c1b1b] mb-6">Langkah Selanjutnya</h3>
+                        
+                        <div class="relative border-l-2 border-gray-100 ml-4 space-y-8">
+                            <div class="relative pl-6">
+                                <div class="absolute w-4 h-4 bg-emerald-500 rounded-full -left-[9px] top-1 border-4 border-white shadow-sm"></div>
+                                <h4 class="font-bold text-[#1c1b1b]">Verifikasi Data</h4>
+                                <p class="text-sm text-[#454652] mt-1">Sistem sedang memverifikasi ketersediaan armada pada tanggal pilihan Anda.</p>
+                            </div>
+                            <div class="relative pl-6">
+                                <div class="absolute w-4 h-4 bg-gray-200 rounded-full -left-[9px] top-1 border-4 border-white shadow-sm"></div>
+                                <h4 class="font-bold text-[#1c1b1b]">Penawaran Harga</h4>
+                                <p class="text-sm text-[#454652] mt-1">Admin kami akan memberikan penawaran harga. Anda dapat mengeceknya secara berkala di halaman Riwayat Pesanan atau menunggu pesan WhatsApp dari kami.</p>
+                            </div>
+                            <div class="relative pl-6">
+                                <div class="absolute w-4 h-4 bg-gray-200 rounded-full -left-[9px] top-1 border-4 border-white shadow-sm"></div>
+                                <h4 class="font-bold text-[#1c1b1b]">Pembayaran DP & Pelunasan</h4>
+                                <p class="text-sm text-[#454652] mt-1">Apabila harga sudah disetujui, tekan tombol <strong>Lihat Riwayat Pesanan</strong> di bawah untuk melakukan pembayaran. <br><strong class="text-brand-red">Catatan:</strong> Batas waktu pembayaran DP adalah 1x24 jam sejak tagihan diberikan. Jika melewati batas waktu, pesanan akan otomatis dibatalkan (hangus).</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-10 flex flex-col gap-3">
+                            <Link :href="route('booking-history.index')"
+                                class="w-full py-3.5 bg-[#10207a] text-white rounded-xl font-bold text-[14px] hover:bg-[#0c185e] transition-all shadow-lg shadow-[#10207a]/20 text-center flex items-center justify-center gap-2">
+                                <span>Lihat Riwayat Pesanan</span> <i class="fas fa-arrow-right"></i>
+                            </Link>
+                            <Link :href="route('frontend.home')"
+                                class="w-full py-3.5 bg-[#f6f3f2] text-[#454652] rounded-xl font-bold text-[14px] hover:bg-gray-200 transition-all text-center">
+                                Kembali ke Beranda
+                            </Link>
+                        </div>
+                    </div>
+
+                    <!-- Customer Support -->
+                    <div class="bg-gradient-to-r from-[#10207a] to-[#1a30a8] rounded-[20px] p-6 text-white shadow-lg flex items-center gap-5">
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                            <i class="fab fa-whatsapp text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg leading-tight">Butuh Bantuan Cepat?</h4>
+                            <p class="text-white/80 text-sm mt-1">Hubungi Call Center Pariwisata Kami</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Recommendations -->
+                <div class="lg:col-span-7">
+                    <h3 class="font-unbounded font-bold text-2xl text-[#1c1b1b] mb-6">Kenapa Memilih Kami?</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Feature 1 -->
+                        <div class="bg-white rounded-[20px] overflow-hidden shadow-sm border border-[#ebe7e7] group hover:shadow-md transition-all">
+                            <div class="h-48 bg-gray-200 relative overflow-hidden">
+                                <img src="/img/heroImg.jpg" alt="Interior Bus" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-bold text-[#10207a]">Fasilitas Premium</div>
+                            </div>
+                            <div class="p-5">
+                                <h4 class="font-bold text-[#1c1b1b] text-lg mb-2">Kenyamanan Eksekutif</h4>
+                                <p class="text-sm text-[#454652] leading-relaxed">Nikmati perjalanan dengan kursi recliner, leg rest, AC dingin, dan hiburan audio visual di setiap armada kami.</p>
+                            </div>
+                        </div>
+
+                        <!-- Feature 2 -->
+                        <div class="bg-white rounded-[20px] overflow-hidden shadow-sm border border-[#ebe7e7] group hover:shadow-md transition-all">
+                            <div class="h-48 bg-gray-200 relative overflow-hidden">
+                                <img src="/img/blackpink.jpg" alt="Keamanan" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-bold text-[#10207a]">Keamanan Terjamin</div>
+                            </div>
+                            <div class="p-5">
+                                <h4 class="font-bold text-[#1c1b1b] text-lg mb-2">Perawatan Rutin 100%</h4>
+                                <p class="text-sm text-[#454652] leading-relaxed">Seluruh armada menjalani inspeksi ketat sebelum berangkat oleh tim mekanik berpengalaman kami.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

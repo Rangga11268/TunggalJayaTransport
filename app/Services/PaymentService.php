@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Booking;
+use App\Models\CharterBooking;
 use App\Models\PaymentHistory;
 use Illuminate\Support\Facades\DB;
 
@@ -101,6 +102,114 @@ class PaymentService
                 'snap_token' => $result['snap_token'],
                 'redirect_url' => $result['redirect_url'],
                 'booking' => $booking,
+                'payment_history' => $paymentHistory
+            ];
+        }
+
+        return $result;
+    }
+
+    public function processCharterPayment($charterId, $paymentMethod = 'gopay', $type = 'dp')
+    {
+        $charter = CharterBooking::with('user', 'assignedBus')->findOrFail($charterId);
+
+        if ($type === 'dp' && ($charter->payment_status === 'paid' || $charter->payment_status === 'dp_paid' || $charter->payment_status === 'partial')) {
+            return [
+                'status' => 'error',
+                'message' => 'DP has already been paid'
+            ];
+        }
+
+        if ($type === 'pelunasan' && $charter->payment_status === 'paid') {
+            return [
+                'status' => 'error',
+                'message' => 'Booking has already been fully paid'
+            ];
+        }
+
+        if ($charter->down_payment <= 0 && $type === 'dp') {
+            return [
+                'status' => 'error',
+                'message' => 'DP amount not set by admin'
+            ];
+        }
+
+        $amount = 0;
+        $orderIdPrefix = '';
+        $itemName = '';
+
+        if ($type === 'dp') {
+            $amount = $charter->down_payment;
+            $orderIdPrefix = '_DP_';
+            $itemName = 'DP Sewa Bus - ';
+        } elseif ($type === 'pelunasan') {
+            $amount = $charter->total_price - $charter->down_payment;
+            $orderIdPrefix = '_PELUNASAN_';
+            $itemName = 'Pelunasan Sewa Bus - ';
+        } elseif ($type === 'full') {
+            $amount = $charter->total_price;
+            $orderIdPrefix = '_FULL_';
+            $itemName = 'Bayar Penuh Sewa Bus - ';
+        }
+
+        $phone = preg_replace('/[^0-9]/', '', $charter->user->phone ?? '08000000000');
+        $phone = substr($phone, 0, 19);
+
+        $orderData = [
+            'transaction_details' => [
+                'order_id' => $charter->charter_code . $orderIdPrefix . time(),
+                'gross_amount' => (int) $amount,
+            ],
+            'customer_details' => [
+                'first_name' => substr($charter->user->name, 0, 50),
+                'email' => trim($charter->user->email),
+                'phone' => $phone,
+            ],
+            'item_details' => [
+                [
+                    'id' => strtoupper($type) . '-' . substr((string)$charter->id, 0, 46),
+                    'price' => (int) $amount,
+                    'quantity' => 1,
+                    'name' => $itemName . substr($charter->destination, 0, 30),
+                ]
+            ],
+            'custom_field1' => (string)$charter->id,
+            'custom_field2' => 'charter_' . $type
+        ];
+
+        $orderData['enabled_payments'] = $this->getEnabledPayments($paymentMethod);
+        
+        $result = $this->midtransService->createTransaction($orderData);
+
+        if ($result['status'] === 'success') {
+            $paymentHistory = PaymentHistory::create([
+                'charter_booking_id' => $charter->id,
+                'transaction_id' => $orderData['transaction_details']['order_id'],
+                'payment_method' => $paymentMethod,
+                'gross_amount' => $amount,
+                'transaction_status' => 'pending',
+                'fraud_status' => 'accept',
+                'payment_url' => $result['redirect_url'],
+                'metadata' => json_encode([
+                    'charter_code' => $charter->charter_code,
+                    'user_id' => $charter->user_id,
+                    'type' => 'charter_' . $type
+                ])
+            ]);
+
+            $updateData = ['payment_status' => 'pending'];
+            if ($type === 'dp') {
+                $updateData['dp_midtrans_id'] = $orderData['transaction_details']['order_id'];
+            } else {
+                $updateData['final_midtrans_id'] = $orderData['transaction_details']['order_id'];
+            }
+            $charter->update($updateData);
+
+            return [
+                'status' => 'success',
+                'snap_token' => $result['snap_token'],
+                'redirect_url' => $result['redirect_url'],
+                'booking' => $charter,
                 'payment_history' => $paymentHistory
             ];
         }

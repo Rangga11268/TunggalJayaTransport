@@ -11,6 +11,7 @@ class PaymentHistory extends Model
 
     protected $fillable = [
         'booking_id',
+        'charter_booking_id',
         'transaction_id',
         'payment_method',
         'gross_amount',
@@ -27,5 +28,10 @@ class PaymentHistory extends Model
     public function booking()
     {
         return $this->belongsTo(Booking::class);
+    }
+
+    public function charterBooking()
+    {
+        return $this->belongsTo(CharterBooking::class);
     }
 }

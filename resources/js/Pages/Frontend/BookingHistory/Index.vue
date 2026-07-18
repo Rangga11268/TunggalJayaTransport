@@ -55,6 +55,75 @@ const getStatusBadge = (status) => {
         default: return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700";
     }
 };
+
+import { router } from "@inertiajs/vue3";
+import axios from "axios";
+import Swal from "sweetalert2";
+import { onMounted } from "vue";
+
+onMounted(() => {
+    // Load Midtrans Snap script
+    const script = document.createElement("script");
+    script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+    script.setAttribute("data-client-key", import.meta.env.VITE_MIDTRANS_CLIENT_KEY);
+    document.head.appendChild(script);
+});
+
+const isProcessingPayment = ref(false);
+
+const payCharterDp = async (charterId) => {
+    if (isProcessingPayment.value) return;
+    
+    isProcessingPayment.value = true;
+    try {
+        const response = await axios.post(route('charter-bookings.pay', charterId));
+        
+        if (response.data.status === 'success' && response.data.snap_token) {
+            window.snap.pay(response.data.snap_token, {
+                onSuccess: function (result) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Pembayaran Berhasil!",
+                        text: "DP Sewa Bus Anda telah berhasil dibayarkan.",
+                        confirmButtonColor: "#10207a",
+                    }).then(() => {
+                        router.reload();
+                    });
+                },
+                onPending: function (result) {
+                    Swal.fire({
+                        icon: "info",
+                        title: "Menunggu Pembayaran",
+                        text: "Silakan selesaikan pembayaran Anda.",
+                        confirmButtonColor: "#10207a",
+                    }).then(() => {
+                        router.reload();
+                    });
+                },
+                onError: function (result) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Pembayaran Gagal",
+                        text: "Terjadi kesalahan saat memproses pembayaran.",
+                        confirmButtonColor: "#10207a",
+                    });
+                },
+                onClose: function () {
+                    // Canceled
+                }
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.response?.data?.message || "Gagal memproses pembayaran.",
+            confirmButtonColor: "#10207a",
+        });
+    } finally {
+        isProcessingPayment.value = false;
+    }
+};
 </script>
 
 <template>
@@ -214,10 +283,25 @@ const getStatusBadge = (status) => {
                             </div>
 
                             <div class="flex flex-row md:flex-col items-center md:items-end justify-between md:border-l md:border-[#ebe7e7] md:pl-6 w-full md:w-auto gap-4 md:gap-3">
-                                <div class="text-right">
-                                    <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider">Total / DP</div>
-                                    <div class="text-lg font-bold text-[#10207a] font-unbounded">{{ charter.total_price > 0 ? formatCurrency(charter.total_price) : 'Menunggu' }}</div>
-                                    <div v-if="charter.down_payment > 0" class="text-[11px] text-[#454652]">DP: {{ formatCurrency(charter.down_payment) }}</div>
+                                <div class="text-right w-full md:w-auto flex justify-between md:flex-col items-center md:items-end gap-4 md:gap-2">
+                                    <div>
+                                        <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider">Total / DP</div>
+                                        <div class="text-lg font-bold text-[#10207a] font-unbounded">{{ charter.total_price > 0 ? formatCurrency(charter.total_price) : 'Menunggu' }}</div>
+                                        <div v-if="charter.down_payment > 0" class="text-[11px] text-[#454652]">DP: {{ formatCurrency(charter.down_payment) }}</div>
+                                    </div>
+                                    
+                                    <div class="flex gap-2">
+                                        <button v-if="charter.status === 'quoted' && charter.down_payment > 0 && ['pending', 'unpaid'].includes(charter.payment_status)"
+                                            @click="payCharterDp(charter.id)"
+                                            :disabled="isProcessingPayment"
+                                            class="px-5 py-2.5 bg-emerald-600 text-white rounded-[10px] font-bold text-[12px] hover:bg-emerald-700 transition-all shadow-sm text-center whitespace-nowrap disabled:opacity-70">
+                                            {{ isProcessingPayment ? 'Memproses...' : 'Bayar DP' }}
+                                        </button>
+                                        <Link :href="route('booking-history.charter.show', charter.id)"
+                                            class="px-5 py-2.5 bg-[#10207a] text-white rounded-[10px] font-bold text-[12px] hover:bg-[#0c185e] transition-all shadow-sm text-center whitespace-nowrap">
+                                            Detail
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>

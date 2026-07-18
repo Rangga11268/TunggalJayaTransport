@@ -57,11 +57,47 @@ class CharterBookingController extends Controller
             'down_payment' => 'nullable|numeric|min:0',
             'assigned_bus_id' => 'nullable|exists:buses,id',
             'status' => 'required|in:pending,quoted,confirmed,completed,cancelled',
+            'payment_method' => 'nullable|in:system,manual',
+            'payment_status' => 'nullable|in:unpaid,pending,partial,dp_paid,paid,failed',
+            'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
+        if (!empty($validated['assigned_bus_id'])) {
+            $overlapping = CharterBooking::where('id', '!=', $id)
+                ->where('assigned_bus_id', $validated['assigned_bus_id'])
+                ->where(function($q) {
+                    $q->where('payment_status', 'dp_paid')
+                      ->orWhere('payment_status', 'paid')
+                      ->orWhere('payment_status', 'partial')
+                      ->orWhere('status', 'confirmed')
+                      ->orWhere('status', 'completed');
+                })
+                ->where('status', '!=', 'cancelled')
+                ->where(function ($query) use ($charter) {
+                    $query->whereBetween('pickup_date', [$charter->pickup_date, $charter->return_date])
+                        ->orWhereBetween('return_date', [$charter->pickup_date, $charter->return_date])
+                        ->orWhere(function ($q) use ($charter) {
+                            $q->where('pickup_date', '<=', $charter->pickup_date)
+                              ->where('return_date', '>=', $charter->return_date);
+                        });
+                })
+                ->exists();
+
+            if ($overlapping) {
+                return back()->withErrors(['assigned_bus_id' => 'Bus ini tidak bisa dipilih karena sudah dipesan (DP Lunas) oleh penyewa lain pada tanggal tersebut.']);
+            }
+        }
+
         // If price is set, automatically change status to quoted if it was pending
-        if ($charter->status === 'pending' && $validated['total_price'] > 0) {
+        if ($charter->status === 'pending' && isset($validated['total_price']) && $validated['total_price'] > 0) {
             $validated['status'] = 'quoted';
+        }
+
+        if ($request->hasFile('payment_proof')) {
+            $file = $request->file('payment_proof');
+            $filename = 'proof_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/proofs'), $filename);
+            $validated['payment_proof'] = 'uploads/proofs/' . $filename;
         }
 
         $charter->update($validated);
