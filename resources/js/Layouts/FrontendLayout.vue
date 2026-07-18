@@ -221,82 +221,12 @@ const isActive = (routeName) => {
                 >
                     <!-- Left Navigation -->
                     <div class="hidden lg:flex items-center space-x-2 flex-1">
-                        <!-- Dropdown Layanan -->
-                        <div
-                            class="relative h-full flex items-center"
-                            @mouseenter="hoveredMenu = 'services'"
-                            @mouseleave="hoveredMenu = null"
-                        >
-                            <button
-                                class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-2 group"
-                                :class="
-                                    hoveredMenu === 'services' ||
-                                    isServicesActive
-                                        ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/10'
-                                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
-                                "
-                            >
-                                Layanan
-                                <i
-                                    class="fas fa-chevron-down text-[10px] transition-transform duration-300"
-                                    :class="{
-                                        'rotate-180':
-                                            hoveredMenu === 'services',
-                                    }"
-                                ></i>
-                            </button>
-
-                            <!-- Services Mega Menu -->
-                            <transition
-                                enter-active-class="transition duration-300 ease-out"
-                                enter-from-class="opacity-0 translate-y-4 scale-95"
-                                enter-to-class="opacity-100 translate-y-0 scale-100"
-                                leave-active-class="transition duration-200 ease-in"
-                                leave-from-class="opacity-100 translate-y-0 scale-100"
-                                leave-to-class="opacity-0 translate-y-4 scale-95"
-                            >
-                                <div
-                                    v-if="hoveredMenu === 'services'"
-                                    class="absolute left-0 top-full mt-2 w-[500px] bg-white dark:bg-[#0a0a0a] rounded-[2rem] shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-50 p-2"
-                                >
-                                    <div class="grid grid-cols-12 gap-2">
-                                        <!-- Links List -->
-                                        <div class="col-span-12 space-y-1">
-                                            <Link
-                                                v-for="link in serviceLinks"
-                                                :key="link.href"
-                                                :href="route(link.href)"
-                                                class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all group/link"
-                                            >
-                                                <div
-                                                    class="w-12 h-12 rounded-xl bg-gray-50 dark:bg-[#111] flex items-center justify-center text-gray-400 group-hover/link:bg-blue-600 group-hover/link:text-white transition-all shadow-sm"
-                                                >
-                                                    <i
-                                                        :class="link.icon"
-                                                        class="text-lg"
-                                                    ></i>
-                                                </div>
-                                                <div class="flex-1">
-                                                    <div
-                                                        class="text-sm font-black font-unbounded text-gray-900 dark:text-white group-hover/link:text-blue-600 transition-colors"
-                                                    >
-                                                        {{ link.name }}
-                                                    </div>
-                                                    <div
-                                                        class="text-xs text-gray-500 dark:text-gray-400 font-manrope font-medium"
-                                                    >
-                                                        {{ link.note }}
-                                                    </div>
-                                                </div>
-                                                <i
-                                                    class="fas fa-arrow-right text-[10px] text-gray-300 group-hover/link:text-blue-600 transform transition-all -translate-x-2 group-hover/link:translate-x-0 opacity-0 group-hover/link:opacity-100"
-                                                ></i>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </div>
-                            </transition>
-                        </div>
+                        <!-- Dropdown Layanan jadi link langsung -->
+                        <Link :href="route('frontend.fleet.index')"
+                            class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300"
+                            :class="isActive('frontend.fleet.index') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'">
+                            <i class="fas fa-bus mr-1.5 text-xs"></i> Armada
+                        </Link>
 
                         <div class="relative" @mouseenter="hoveredPesan = true" @mouseleave="hoveredPesan = false">
                             <button class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 bg-[#10207a] text-white hover:bg-[#0c185e] shadow-sm hover:shadow-md flex items-center gap-1.5">
@@ -653,38 +583,12 @@ const isActive = (routeName) => {
                                     <i class="fas fa-bus text-xl"></i>
                                 </div>
                             </div>
-                            <div class="mb-2">
-                                <button
-                                    @click="mobileServicesOpen = !mobileServicesOpen"
-                                    class="w-full flex items-center justify-between px-6 py-3 group"
-                                >
-                                    <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-widest font-unbounded text-left mb-0">
-                                        Layanan
-                                    </h3>
-                                    <div class="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-blue-600 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
-                                        <i :class="mobileServicesOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] transition-transform duration-300"></i>
-                                    </div>
-                                </button>
-                                <div v-show="mobileServicesOpen" class="space-y-1 px-2 pb-2 origin-top">
-                                    <Link
-                                        v-for="link in serviceLinks"
-                                        :key="link.href"
-                                        :href="route(link.href)"
-                                        @click="mobileMenuOpen = false"
-                                        class="flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold transition-all duration-200"
-                                        :class="
-                                            isActive(link.href)
-                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                                : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5'
-                                        "
-                                    >
-                                        <i
-                                            :class="link.icon"
-                                            class="text-lg opacity-70"
-                                        ></i>
-                                        {{ link.name }}
-                                    </Link>
-                                </div>
+                            <div class="space-y-1">
+                                <Link :href="route('frontend.fleet.index')" @click="mobileMenuOpen = false"
+                                    class="flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold transition-all duration-200"
+                                    :class="isActive('frontend.fleet.index') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5'">
+                                    <i class="fas fa-bus text-lg opacity-70"></i> Armada Kami
+                                </Link>
                             </div>
 
                             <div class="mb-2">
