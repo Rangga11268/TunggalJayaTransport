@@ -78,25 +78,10 @@ const hoveredPesan = ref(false);
 
 const serviceLinks = [
     {
-        name: "Pesan Tiket",
-        href: "frontend.booking.index",
-        icon: "fas fa-ticket-alt",
-        note: "Booking kursi pilihan Anda sekarang.",
-        image: "/img/pesanTiketTujago.png",
-    },
-
-    {
         name: "Armada Kami",
         href: "frontend.fleet.index",
         icon: "fas fa-bus",
         note: "Eksplorasi armada premium terbaru.",
-        image: "/img/heroImg.jpg",
-    },
-    {
-        name: "Sewa Pariwisata",
-        href: "frontend.charter.index",
-        icon: "fas fa-umbrella-beach",
-        note: "Rental bus untuk wisata rombongan.",
         image: "/img/heroImg.jpg",
     },
 ];
