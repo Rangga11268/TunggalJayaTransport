@@ -74,6 +74,7 @@ const onLeave = (el, done) => {
 
 
 const hoveredMenu = ref(null);
+const hoveredPesan = ref(false);
 
 const serviceLinks = [
     {
@@ -312,24 +313,27 @@ const isActive = (routeName) => {
                             </transition>
                         </div>
 
-                        <Link
-                            :href="route('frontend.booking.index')"
-                            class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 bg-[#10207a] text-white hover:bg-[#0c185e] shadow-sm hover:shadow-md"
-                        >
-                            <i class="fas fa-ticket-alt mr-1.5 text-xs"></i> Pesan Tiket
-                        </Link>
-
-                        <Link
-                            :href="route('frontend.charter.index')"
-                            class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300"
-                            :class="
-                                isActive('frontend.charter.index')
-                                    ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/10'
-                                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
-                            "
-                        >
-                            Pariwisata
-                        </Link>
+                        <div class="relative" @mouseenter="hoveredPesan = true" @mouseleave="hoveredPesan = false">
+                            <button class="px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 bg-[#10207a] text-white hover:bg-[#0c185e] shadow-sm hover:shadow-md flex items-center gap-1.5">
+                                <i class="fas fa-ticket-alt text-xs"></i> Pesan Tiket <i class="fas fa-chevron-down text-[10px]"></i>
+                            </button>
+                            <transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 translate-y-2"
+                                enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-150 ease-in"
+                                leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-2">
+                                <div v-if="hoveredPesan" class="absolute left-0 top-full mt-2 w-56 bg-white rounded-[12px] shadow-xl border border-[#ebe7e7] overflow-hidden z-50 p-1.5">
+                                    <Link :href="route('frontend.booking.index')" @click="hoveredPesan = false"
+                                        class="flex items-center gap-3 px-4 py-3 rounded-[10px] text-sm font-semibold text-[#1c1b1b] hover:bg-[#f6f3f2] transition-colors">
+                                        <i class="fas fa-bus text-[#10207a] text-xs w-5 text-center"></i>
+                                        Tiket AKAP
+                                    </Link>
+                                    <Link :href="route('frontend.charter.index')" @click="hoveredPesan = false"
+                                        class="flex items-center gap-3 px-4 py-3 rounded-[10px] text-sm font-semibold text-[#1c1b1b] hover:bg-[#f6f3f2] transition-colors">
+                                        <i class="fas fa-umbrella-beach text-[#10207a] text-xs w-5 text-center"></i>
+                                        Sewa Bus Pariwisata
+                                    </Link>
+                                </div>
+                            </transition>
+                        </div>
                     </div>
 
                     <!-- Logo Area -->
