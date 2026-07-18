@@ -36,10 +36,24 @@
     <script type="text/javascript"
         src="https://app.{{ config('midtrans.environment') === 'sandbox' ? 'sandbox.midtrans.com' : 'midtrans.com' }}/snap/snap.js"
         data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <style>
+        #app-loader {
+            position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: #fcf9f8; z-index: 9999;
+        }
+        #app-loader::after {
+            content: ''; width: 32px; height: 32px;
+            border: 4px solid #e5e2e1; border-top-color: #10207a;
+            border-radius: 50%; animation: spin .8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 
-<body class="font-sans antialiased bg-gray-50 dark:bg-gray-900">
+<body class="font-sans antialiased bg-[#fcf9f8]">
+    <div id="app-loader"></div>
     @inertia
+    <script>document.getElementById('app-loader')&&requestAnimationFrame(()=>{let l=document.getElementById('app-loader');l&&(l.style.opacity='0',setTimeout(()=>l.remove(),200))})</script>
 </body>
 
 </html>
