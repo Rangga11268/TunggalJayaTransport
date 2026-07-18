@@ -1,4 +1,5 @@
 <script setup>
+import LoadingSpinner from "@/Components/LoadingSpinner.vue";
 import { ref, watch, nextTick, computed } from "vue";
 import { Head, Link, useForm, router } from "@inertiajs/vue3";
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
@@ -358,9 +359,7 @@ watch(
                 </div>
 
                 <!-- Loader -->
-                <div v-if="isSearching" class="py-12 flex justify-center">
-                    <div class="w-10 h-10 border-4 border-gray-200 border-t-[#10207a] rounded-full animate-spin"></div>
-                </div>
+                <LoadingSpinner v-if="isSearching" />
 
                 <!-- Empty State -->
                 <div v-else-if="displaySchedules.length === 0" class="py-20 flex flex-col items-center justify-center bg-white rounded-[16px] border border-[#f0edec]">
