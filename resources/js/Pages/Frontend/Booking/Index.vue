@@ -319,6 +319,25 @@ watch(
                             </label>
                         </div>
                     </div>
+
+                    <!-- Value Proposition -->
+                    <div class="border-t border-[#c6c5d3] pt-6 flex flex-col gap-4">
+                        <h4 class="font-bold text-[#454652] text-[12px] tracking-[0.6px] uppercase">Mengapa di Sini?</h4>
+                        <div class="flex flex-col gap-3 text-[13px] text-[#1c1b1b]">
+                            <div class="flex items-start gap-2.5">
+                                <i class="fas fa-shield-alt text-[#10207a] mt-0.5 text-sm shrink-0"></i>
+                                <span>Pemesanan aman & konfirmasi instan</span>
+                            </div>
+                            <div class="flex items-start gap-2.5">
+                                <i class="fas fa-credit-card text-[#10207a] mt-0.5 text-sm shrink-0"></i>
+                                <span>Bayar via QRIS, transfer, atau minimarket</span>
+                            </div>
+                            <div class="flex items-start gap-2.5">
+                                <i class="fas fa-ticket-alt text-[#10207a] mt-0.5 text-sm shrink-0"></i>
+                                <span>E-tiket resmi — langsung check-in di loket</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -360,13 +379,13 @@ watch(
                         </div>
                         <!-- Left Info -->
                         <div class="flex-1 flex flex-col gap-3 border-b md:border-b-0 md:border-r border-[#ebe7e7] pb-4 md:pb-0 md:pr-5">
-                            <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2 flex-wrap">
                                 <span class="bg-[#dfe0ff] text-[#000e5e] px-3 py-1 rounded-[4px] font-bold text-[12px] tracking-wider uppercase">
                                     {{ schedule.bus?.bus_type || 'Executive' }}
                                 </span>
-                                <span class="font-medium text-[#454652] text-[14px] flex items-center gap-1">
-                                    <i class="fas fa-chair text-gray-400"></i>
-                                    {{ getAvailableSeats(schedule) }} Kursi Tersedia
+                                <span v-if="getAvailableSeats(schedule) <= 5 && getAvailableSeats(schedule) > 0"
+                                    class="bg-red-100 text-red-700 px-2.5 py-1 rounded-[4px] font-bold text-[11px] tracking-wider flex items-center gap-1">
+                                    <i class="fas fa-exclamation-circle"></i> Sisa {{ getAvailableSeats(schedule) }} Kursi
                                 </span>
                             </div>
 
@@ -407,6 +426,19 @@ watch(
                                 Habis Terjual
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Rute Populer Lainnya -->
+                <div v-if="allLocations.length > 1" class="mt-10 bg-white border border-[#ebe7e7] rounded-[12px] p-5 md:p-6 shadow-sm">
+                    <h3 class="font-bold text-[#1c1b1b] text-[15px] mb-3">Mungkin Anda Tertarik</h3>
+                    <p class="text-sm text-[#454652] mb-4">Jelajahi rute populer lainnya.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <Link v-for="(origin, i) in allLocations.slice(0, 5)" :key="i"
+                            :href="route('frontend.booking.index', { origin })"
+                            class="px-4 py-2 rounded-[8px] text-sm font-semibold bg-[#f6f3f2] text-[#454652] hover:bg-[#10207a] hover:text-white transition-all border border-[#e5e2e1]">
+                            {{ origin }}
+                        </Link>
                     </div>
                 </div>
             </div>
