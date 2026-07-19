@@ -40,7 +40,10 @@ class MidtransService
             // Tambah config callback kalo belum ada
             if (!isset($orderData['callbacks'])) {
                 $bookingId = $orderData['booking_id'] ?? $orderData['custom_field1'] ?? '';
-                $callbackUrl = route('frontend.booking.success', ['id' => $bookingId]);
+                $isCharter = str_starts_with($orderData['custom_field2'] ?? '', 'charter_');
+                $callbackUrl = $isCharter
+                    ? route('booking-history.charter.show', ['id' => $bookingId])
+                    : route('frontend.booking.success', ['id' => $bookingId]);
 
                 // Log URL callback buat debug nanti
                 \Illuminate\Support\Facades\Log::info('Midtrans callback URL generated', [
