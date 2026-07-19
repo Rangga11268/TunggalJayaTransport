@@ -86,6 +86,24 @@ class BookingHistoryController extends Controller
         }
 
         $charter = \App\Models\CharterBooking::where('user_id', $user->id)->findOrFail($id);
+        $type = $request->input('type', 'dp');
+
+        // Verify payment after Snap onSuccess (for dev environments where webhook may not reach)
+        if ($type === 'verify') {
+            $transactionId = $request->input('transaction_id');
+            $midtransService = app(\App\Services\MidtransService::class);
+            $result = $midtransService->getTransactionStatus($transactionId);
+
+            if ($result['status'] === 'success' && in_array($result['transaction_status'] ?? '', ['capture', 'settlement'])) {
+                $charter->update([
+                    'payment_status' => 'dp_paid',
+                    'status' => 'confirmed',
+                    'dp_midtrans_id' => $transactionId,
+                ]);
+                return response()->json(['status' => 'success', 'message' => 'Payment verified']);
+            }
+            return response()->json(['status' => 'error', 'message' => 'Payment not confirmed yet'], 400);
+        }
 
         $charter->checkAndCancelIfExpired();
         if ($charter->status === 'cancelled') {

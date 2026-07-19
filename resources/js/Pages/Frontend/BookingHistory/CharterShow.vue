@@ -88,12 +88,15 @@ const payCharter = async (type) => {
         if (data.status === 'success' && data.snap_token) {
             window.snap.pay(data.snap_token, {
                 onSuccess: function(result) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Pembayaran Berhasil!',
-                        text: 'Terima kasih, pembayaran Anda telah kami terima.',
-                        confirmButtonColor: '#10B981',
-                    }).then(() => {
+                    // Verify and update payment status directly (for dev environments where webhook may not reach)
+                    fetch(route('charter-bookings.pay', props.charter.id), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        },
+                        body: JSON.stringify({ type: 'verify', transaction_id: result.transaction_id })
+                    }).finally(() => {
                         window.location.reload();
                     });
                 },
