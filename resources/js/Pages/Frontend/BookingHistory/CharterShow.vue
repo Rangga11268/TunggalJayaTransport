@@ -13,31 +13,41 @@ const props = defineProps({
 const timeLeft = ref("");
 let timerInterval = null;
 
+const formatCountdown = (ms) => {
+    if (ms <= 0) return { text: "Waktu Habis", expired: true };
+    const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    if (days > 0) return { text: `${days} hari ${hours} jam`, expired: false };
+    return { text: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`, expired: false };
+};
+
 onMounted(() => {
+    // DP timer: 24 jam dari updated_at
     if (props.charter.status === 'quoted' && ['pending', 'unpaid'].includes(props.charter.payment_status)) {
         const updatedTime = new Date(props.charter.updated_at).getTime();
-        const expiryTime = updatedTime + (24 * 60 * 60 * 1000); // 24 hours
-        
+        const expiryTime = updatedTime + (24 * 60 * 60 * 1000);
+
         const updateTimer = () => {
             const now = new Date().getTime();
-            const distance = expiryTime - now;
-            
-            if (distance < 0) {
-                timeLeft.value = "Waktu Habis";
-                clearInterval(timerInterval);
-                window.location.reload(); // Reload to get updated status from backend
-                return;
-            }
-            
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            
-            timeLeft.value = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const { text, expired } = formatCountdown(expiryTime - now);
+            timeLeft.value = text;
+            if (expired) { clearInterval(timerInterval); window.location.reload(); }
         };
-        
         updateTimer();
         timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    // Pelunasan timer: sampai pickup_date
+    if (props.charter.payment_status === 'dp_paid' && props.charter.pickup_date) {
+        const pickupTime = new Date(props.charter.pickup_date).getTime();
+        const updateTimer = () => {
+            const { text, expired } = formatCountdown(pickupTime - Date.now());
+            timeLeft.value = expired ? 'Jatuh tempo' : 'Lunas sebelum: ' + text;
+            if (expired) clearInterval(timerInterval);
+        };
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 60000); // update per menit
     }
     // Load Midtrans Snap script if it's not loaded yet
     if (!document.getElementById("midtrans-script")) {
@@ -292,7 +302,13 @@ const payCharter = async (type) => {
                                     </button>
                                 </div>
                                 <div v-else>
-                                    <button @click="payCharter('pelunasan')" class="w-full py-3 bg-brand-red text-white rounded-xl font-bold text-sm hover:bg-red-700 transition-all flex items-center justify-center gap-2">
+                                    <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 mb-4 text-xs">
+                                        <strong>Penting:</strong> Pelunasan harus dilakukan sebelum tanggal keberangkatan ({{ charter.pickup_date }}). Jika tidak, pesanan dapat dibatalkan.
+                                        <div v-if="timeLeft" class="mt-2 text-brand-red font-bold text-sm flex items-center gap-1.5">
+                                            <i class="far fa-clock"></i> {{ timeLeft }}
+                                        </div>
+                                    </div>
+                                    <button @click="payCharter('pelunasan')" class="w-full py-3 bg-[#10207a] text-white rounded-xl font-bold text-sm hover:bg-[#0c185e] transition-all flex items-center justify-center gap-2">
                                         Bayar Pelunasan ({{ formatCurrency(charter.total_price - charter.down_payment) }})
                                     </button>
                                 </div>
