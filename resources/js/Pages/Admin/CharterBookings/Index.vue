@@ -77,6 +77,19 @@ const getStatusText = (status) => {
         default: return status;
     }
 };
+
+const getPaymentStatusText = (status) => {
+    switch (status) {
+        case "unpaid": return "Belum Dibayar";
+        case "pending": return "Menunggu";
+        case "dp_paid": return "DP Lunas";
+        case "paid": return "Lunas";
+        case "fully_paid": return "Lunas";
+        case "partial_paid": return "DP Lunas";
+        case "failed": return "Gagal";
+        default: return status;
+    }
+};
 </script>
 
 <template>
@@ -159,7 +172,7 @@ const getStatusText = (status) => {
                                     {{ charter.total_price > 0 ? formatRupiah(charter.total_price) : 'Belum Ditentukan' }}
                                 </div>
                                 <div class="text-xs text-gray-500 mt-0.5" v-if="charter.total_price > 0">
-                                    DP: {{ formatRupiah(charter.down_payment) }} ({{ charter.payment_status }})
+                                    DP: {{ formatRupiah(charter.down_payment) }} ({{ getPaymentStatusText(charter.payment_status) }})
                                 </div>
                             </td>
                             <td class="px-6 py-4">

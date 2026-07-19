@@ -179,7 +179,7 @@ const payCharter = async (type) => {
                         <h1 class="text-2xl md:text-4xl font-bold text-[#1c1b1b] font-unbounded">{{ charter.charter_code }}</h1>
                     </div>
                     <div class="flex flex-col items-start md:items-end gap-2">
-                        <span v-if="charter.payment_status === 'paid'"
+                        <span v-if="charter.payment_status === 'paid' || charter.payment_status === 'fully_paid'"
                             class="px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-1.5">
                             <i class="fas fa-check-circle"></i> LUNAS
                         </span>
@@ -191,9 +191,13 @@ const payCharter = async (type) => {
                             class="px-4 py-1.5 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-200 flex items-center gap-1.5">
                             <i class="fas fa-times-circle"></i> DIBATALKAN
                         </span>
+                        <span v-else-if="charter.payment_status === 'failed'"
+                            class="px-4 py-1.5 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-200 flex items-center gap-1.5">
+                            <i class="fas fa-times-circle"></i> GAGAL
+                        </span>
                         <span v-else
                             class="px-4 py-1.5 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200 flex items-center gap-1.5">
-                            <i class="fas fa-hourglass-half"></i> {{ charter.payment_status ? charter.payment_status.toUpperCase() : 'BELUM BAYAR' }}
+                            <i class="fas fa-hourglass-half"></i> BELUM LUNAS
                         </span>
                         <span class="text-[11px] text-[#454652]">Dipesan {{ formatDate(charter.created_at) }}</span>
                     </div>
