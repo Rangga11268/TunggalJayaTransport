@@ -19,7 +19,8 @@ const formatCountdown = (ms) => {
     const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
     if (days > 0) return { text: `${days} hari ${hours} jam`, expired: false };
-    return { text: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`, expired: false };
+    if (hours > 0) return { text: `${hours} jam ${minutes} menit`, expired: false };
+    return { text: `${minutes} menit`, expired: false };
 };
 
 onMounted(() => {
@@ -303,7 +304,7 @@ const payCharter = async (type) => {
                                 </div>
                                 <div v-else>
                                     <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 mb-4 text-xs">
-                                        <strong>Penting:</strong> Pelunasan harus dilakukan sebelum tanggal keberangkatan ({{ charter.pickup_date }}). Jika tidak, pesanan dapat dibatalkan.
+                                        <strong>Penting:</strong> Pelunasan harus dilakukan sebelum tanggal keberangkatan ({{ formatDate(charter.pickup_date) }}). Jika tidak, pesanan dapat dibatalkan.
                                         <div v-if="timeLeft" class="mt-2 text-brand-red font-bold text-sm flex items-center gap-1.5">
                                             <i class="far fa-clock"></i> {{ timeLeft }}
                                         </div>
