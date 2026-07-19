@@ -43,7 +43,7 @@ onMounted(() => {
     if (props.charter.payment_status === 'dp_paid' && props.charter.pickup_date) {
         const deadline = new Date(props.charter.pickup_date).getTime();
         const updateTimer = () => {
-            const { text, expired } = formatCountdown(pickupTime - Date.now());
+            const { text, expired } = formatCountdown(deadline - Date.now());
             timeLeft.value = expired ? 'Jatuh tempo' : 'Lunas sebelum: ' + text;
             if (expired) clearInterval(timerInterval);
         };
