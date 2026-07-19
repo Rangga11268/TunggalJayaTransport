@@ -74,7 +74,7 @@ const formatCurrency = (value) => {
 
 const payCharter = async (type) => {
     try {
-        const response = await fetch(route('booking-history.charter-bookings.pay', props.charter.id), {
+        const response = await fetch(route('charter-bookings.pay', props.charter.id), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
