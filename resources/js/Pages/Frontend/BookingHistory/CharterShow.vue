@@ -39,9 +39,9 @@ onMounted(() => {
         timerInterval = setInterval(updateTimer, 1000);
     }
 
-    // Pelunasan timer: sampai return_date
-    if (props.charter.payment_status === 'dp_paid' && props.charter.return_date) {
-        const deadline = new Date(props.charter.return_date).getTime();
+    // Pelunasan timer: sampai pickup_date (harus lunas sebelum berangkat)
+    if (props.charter.payment_status === 'dp_paid' && props.charter.pickup_date) {
+        const deadline = new Date(props.charter.pickup_date).getTime();
         const updateTimer = () => {
             const { text, expired } = formatCountdown(pickupTime - Date.now());
             timeLeft.value = expired ? 'Jatuh tempo' : 'Lunas sebelum: ' + text;
@@ -304,7 +304,7 @@ const payCharter = async (type) => {
                                 </div>
                                 <div v-else>
                                     <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 mb-4 text-xs">
-                                        <strong>Penting:</strong> Pelunasan harus dilakukan sebelum perjalanan selesai ({{ formatDate(charter.return_date) }}). Jika tidak, pesanan dapat dibatalkan.
+                                        <strong>Penting:</strong> Pelunasan harus dilakukan sebelum keberangkatan ({{ formatDate(charter.pickup_date) }}). Jika melewati batas, pesanan dapat dibatalkan.
                                         <div v-if="timeLeft" class="mt-2 text-brand-red font-bold text-sm flex items-center gap-1.5">
                                             <i class="far fa-clock"></i> {{ timeLeft }}
                                         </div>
