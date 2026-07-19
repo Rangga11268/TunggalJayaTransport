@@ -8,6 +8,17 @@ use Illuminate\Http\Request;
 
 class PromoCodeController extends Controller
 {
+    public function index()
+    {
+        // Simple ponytail solution to get active promos
+        $promos = PromoCode::where('is_active', true)
+            ->where('valid_from', '<=', now())
+            ->where('valid_until', '>=', now())
+            ->get();
+            
+        return response()->json(['data' => $promos]);
+    }
+
     public function validateCode(Request $request)
     {
         $request->validate([

@@ -27,6 +27,12 @@ Route::prefix('auth')->group(function () {
 Route::get('/routes/origins-destinations', [RouteController::class, 'originsDestinations']);
 Route::apiResource('routes', RouteController::class)->only(['index', 'show']);
 
+Route::get('/buses', function () {
+    return response()->json(['data' => \App\Models\Bus::where('status', 'active')->get()]);
+});
+
+Route::get('/promos', [\App\Http\Controllers\API\PromoCodeController::class, 'index']);
+
 Route::get('/schedules', [ScheduleController::class, 'index']);
 Route::get('/schedules/{id}', [ScheduleController::class, 'show']);
 

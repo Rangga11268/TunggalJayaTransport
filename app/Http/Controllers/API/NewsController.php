@@ -13,7 +13,7 @@ class NewsController extends Controller
         $articles = NewsArticle::with('author:id,name')
             ->where('is_published', true)
             ->orderBy('published_at', 'desc')
-            ->get(['id', 'title', 'slug', 'excerpt', 'image', 'author_id', 'published_at']);
+            ->get(['id', 'title', 'slug', 'excerpt', 'author_id', 'published_at']);
 
         return response()->json([
             'success' => true,

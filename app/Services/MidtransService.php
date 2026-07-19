@@ -224,7 +224,7 @@ class MidtransService
                 ]);
             } elseif ($transactionStatus === 'pending') {
                 $booking->update([
-                    'payment_status' => 'pending',
+                    'payment_status' => 'unpaid',
                     'dp_midtrans_id' => $orderId
                 ]);
             }
