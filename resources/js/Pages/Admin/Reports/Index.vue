@@ -12,6 +12,13 @@ const reports = [
         color: "bg-blue-500",
     },
     {
+        title: "Laporan Pariwisata",
+        description: "Riwayat penyewaan bus charter dan total pendapatannya.",
+        icon: "fa-route",
+        route: "admin.reports.charter",
+        color: "bg-brand-red",
+    },
+    {
         title: "Laporan Okupansi",
         description: "Analisis tingkat keterisian kursi per armada dan rute.",
         icon: "fa-bus",
@@ -44,7 +51,7 @@ const reports = [
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Link
                 v-for="(report, index) in reports"
                 :key="index"

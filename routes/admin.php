@@ -90,6 +90,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:' . App\Models
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('/reports/charter', [ReportController::class, 'charter'])->name('reports.charter');
     Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('reports.occupancy');
     Route::get('/reports/custom', [ReportController::class, 'custom'])->name('reports.custom');
     Route::post('/reports/custom', [ReportController::class, 'generateCustom'])->name('reports.custom.generate');

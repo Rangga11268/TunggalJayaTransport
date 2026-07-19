@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\CharterBooking;
 use App\Models\Route as TransportRoute;
 use App\Models\Bus;
 use App\Models\Schedule;
@@ -24,12 +25,31 @@ class ReportController extends Controller
     public function sales()
     {
         // Get sales data for the last 30 days
-        $salesData = Booking::selectRaw('DATE(created_at) as date, SUM(total_price) as total')
+        $regularSalesData = Booking::selectRaw('DATE(created_at) as date, SUM(total_price) as total')
             ->where('payment_status', 'paid')
             ->where('created_at', '>=', now()->subDays(30))
             ->groupBy('date')
-            ->orderBy('date')
             ->get();
+            
+        $charterSalesData = CharterBooking::selectRaw('DATE(created_at) as date, SUM(total_price) as total')
+            ->where('payment_status', 'paid')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->get();
+            
+        // Merge and group by date
+        $mergedData = collect([...$regularSalesData, ...$charterSalesData])
+            ->groupBy('date')
+            ->map(function ($items, $date) {
+                return (object)[
+                    'date' => $date,
+                    'total' => $items->sum('total')
+                ];
+            })
+            ->sortBy('date')
+            ->values();
+
+        $salesData = $mergedData;
             
         // Format the data for the chart
         $chartData = $salesData->map(function($item) {
@@ -60,6 +80,31 @@ class ReportController extends Controller
             'salesData' => $salesData, 
             'chartData' => $chartData, 
             'recentBookings' => $recentBookings
+        ]);
+    }
+
+    public function charter()
+    {
+        $charterBookings = CharterBooking::with(['user', 'assignedBus'])
+            ->where('payment_status', 'paid')
+            ->orderBy('pickup_date', 'desc')
+            ->limit(100) // Limit to last 100 for performance on page
+            ->get()
+            ->map(function ($booking) {
+                return [
+                    'id' => $booking->id,
+                    'charter_code' => $booking->charter_code,
+                    'user_name' => $booking->user ? $booking->user->name : 'Guest',
+                    'bus_name' => $booking->assignedBus ? $booking->assignedBus->name : 'Belum Ditugaskan',
+                    'route' => $booking->pickup_location . ' - ' . $booking->destination,
+                    'pickup_date' => Carbon::parse($booking->pickup_date)->format('d M Y'),
+                    'total_price' => $booking->total_price,
+                    'created_at' => $booking->created_at->format('d M Y'),
+                ];
+            });
+
+        return Inertia::render('Admin/Reports/Charter', [
+            'charterBookings' => $charterBookings
         ]);
     }
     
