@@ -28,6 +28,10 @@ class CharterBookingController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        foreach ($charters as $c) {
+            $c->checkAndCancelIfExpired();
+        }
+
         if ($request->wantsJson()) {
             return response()->json([
                 'charters' => $charters
@@ -148,6 +152,8 @@ class CharterBookingController extends Controller
     public function show($id)
     {
         $charter = CharterBooking::with(['user', 'assignedBus'])->findOrFail($id);
+        $charter->checkAndCancelIfExpired();
+        
         $buses = Bus::where('status', 'active')->get();
 
         return Inertia::render('Admin/CharterBookings/Show', [

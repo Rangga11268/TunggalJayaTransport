@@ -56,4 +56,16 @@ class CharterBooking extends Model
     {
         return $this->hasMany(PaymentHistory::class);
     }
+
+    public function checkAndCancelIfExpired()
+    {
+        if ($this->payment_status === 'unpaid' && $this->status !== 'cancelled' && $this->created_at->copy()->addHours(24)->isPast()) {
+            $this->update([
+                'status' => 'cancelled',
+                'notes' => $this->notes . "\n[Sistem] Dibatalkan otomatis karena batas waktu pembayaran (24 jam) habis."
+            ]);
+            return true;
+        }
+        return false;
+    }
 }

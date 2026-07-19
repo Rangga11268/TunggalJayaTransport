@@ -25,6 +25,7 @@ onMounted(() => {
             if (distance < 0) {
                 timeLeft.value = "Waktu Habis";
                 clearInterval(timerInterval);
+                window.location.reload(); // Reload to get updated status from backend
                 return;
             }
             
@@ -164,6 +165,10 @@ const payCharter = async (type) => {
                             class="px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200 flex items-center gap-1.5">
                             <i class="fas fa-info-circle"></i> DP LUNAS
                         </span>
+                        <span v-else-if="charter.status === 'cancelled' || timeLeft === 'Waktu Habis'"
+                            class="px-4 py-1.5 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-200 flex items-center gap-1.5">
+                            <i class="fas fa-times-circle"></i> DIBATALKAN
+                        </span>
                         <span v-else
                             class="px-4 py-1.5 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200 flex items-center gap-1.5">
                             <i class="fas fa-hourglass-half"></i> {{ charter.payment_status ? charter.payment_status.toUpperCase() : 'BELUM BAYAR' }}
@@ -241,7 +246,14 @@ const payCharter = async (type) => {
                         </div>
 
                         <!-- Action Buttons -->
-                        <div v-if="charter.total_price > 0 && charter.payment_status !== 'paid'" class="pt-6 border-t border-[#ebe7e7]">
+                        <div v-if="charter.status === 'cancelled' || timeLeft === 'Waktu Habis'" class="pt-6 border-t border-[#ebe7e7]">
+                            <div class="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 text-sm font-bold flex items-center justify-center gap-2">
+                                <i class="fas fa-times-circle text-lg"></i> 
+                                Pemesanan Dibatalkan
+                            </div>
+                            <p class="text-xs text-center text-red-600 mt-2">Batas waktu pembayaran (24 jam) telah habis.</p>
+                        </div>
+                        <div v-else-if="charter.total_price > 0 && charter.payment_status !== 'paid'" class="pt-6 border-t border-[#ebe7e7]">
                             <div v-if="charter.payment_method === 'manual'" class="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl p-4 text-sm">
                                 <p class="font-bold mb-2"><i class="fas fa-info-circle mr-1"></i> Pembayaran Manual</p>
                                 <p class="mb-4">Silakan lakukan pembayaran sesuai kesepakatan dan kirimkan bukti transfer ke WhatsApp Admin kami. <br><br><strong>Catatan:</strong> Pembayaran DP maksimal 1x24 Jam setelah tagihan dibuat. Jika melewati batas waktu, pesanan otomatis hangus.</p>

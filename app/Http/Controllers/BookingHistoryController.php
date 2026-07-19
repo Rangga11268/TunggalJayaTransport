@@ -29,6 +29,10 @@ class BookingHistoryController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        foreach ($charterBookings as $cb) {
+            $cb->checkAndCancelIfExpired();
+        }
+
         return \Inertia\Inertia::render('Frontend/BookingHistory/Index', [
             'bookings' => $bookings,
             'charter_bookings' => $charterBookings
@@ -66,6 +70,8 @@ class BookingHistoryController extends Controller
             ->with('assignedBus')
             ->findOrFail($id);
 
+        $charter->checkAndCancelIfExpired();
+
         return \Inertia\Inertia::render('Frontend/BookingHistory/CharterShow', [
             'charter' => $charter
         ]);
@@ -80,6 +86,14 @@ class BookingHistoryController extends Controller
         }
 
         $charter = \App\Models\CharterBooking::where('user_id', $user->id)->findOrFail($id);
+
+        $charter->checkAndCancelIfExpired();
+        if ($charter->status === 'cancelled') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pemesanan sudah dibatalkan otomatis karena melewati batas waktu pembayaran.'
+            ], 400);
+        }
 
         try {
             $paymentMethod = $request->input('payment_method', 'gopay');
