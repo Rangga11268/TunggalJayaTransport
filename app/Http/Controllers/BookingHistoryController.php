@@ -95,10 +95,11 @@ class BookingHistoryController extends Controller
             $result = $midtransService->getTransactionStatus($orderId);
 
             if ($result['status'] === 'success' && in_array($result['transaction_status'] ?? '', ['capture', 'settlement'])) {
+                $isPelunasan = str_contains($orderId, '_PELUNASAN_');
                 $charter->update([
-                    'payment_status' => 'dp_paid',
+                    'payment_status' => $isPelunasan ? 'fully_paid' : 'dp_paid',
                     'status' => 'confirmed',
-                    'dp_midtrans_id' => $orderId,
+                    ($isPelunasan ? 'final_midtrans_id' : 'dp_midtrans_id') => $orderId,
                 ]);
                 return response()->json(['status' => 'success', 'message' => 'Payment verified']);
             }
