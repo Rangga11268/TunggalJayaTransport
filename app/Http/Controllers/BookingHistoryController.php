@@ -90,15 +90,15 @@ class BookingHistoryController extends Controller
 
         // Verify payment after Snap onSuccess (for dev environments where webhook may not reach)
         if ($type === 'verify') {
-            $transactionId = $request->input('transaction_id');
+            $orderId = $request->input('order_id');
             $midtransService = app(\App\Services\MidtransService::class);
-            $result = $midtransService->getTransactionStatus($transactionId);
+            $result = $midtransService->getTransactionStatus($orderId);
 
             if ($result['status'] === 'success' && in_array($result['transaction_status'] ?? '', ['capture', 'settlement'])) {
                 $charter->update([
                     'payment_status' => 'dp_paid',
                     'status' => 'confirmed',
-                    'dp_midtrans_id' => $transactionId,
+                    'dp_midtrans_id' => $orderId,
                 ]);
                 return response()->json(['status' => 'success', 'message' => 'Payment verified']);
             }

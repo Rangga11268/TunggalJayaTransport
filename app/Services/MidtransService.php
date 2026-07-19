@@ -105,8 +105,7 @@ class MidtransService
                     'gross_amount' => $grossAmount
                 ]);
 
-                // Update status booking sesuai hasil bayar
-                $booking = $paymentHistory->booking;
+                $booking = $paymentHistory->charterBooking ?? $paymentHistory->booking;
             } else {
                 // Jaga-jaga: Kalo history ga ada, coba cari booking pake order_id (booking_code)
                 // Asumsi format order_id biasanya KODBOOKING_TIMESTAMP
@@ -127,33 +126,31 @@ class MidtransService
             }
 
             if ($booking) {
-                if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
-                    // Pembayaran sukses mantap
-                    $booking->update([
-                        'payment_status' => 'paid',
-                        'booking_status' => 'confirmed', // Ensure booking is confirmed
-                        'midtrans_transaction_id' => $orderId
-                    ]);
+                $isCharter = $paymentHistory->charter_booking_id !== null;
 
-                    // Kirim notifikasi WhatsApp e-ticket
-                    try {
-                        $waService = app(WhatsAppNotificationService::class);
-                        $waService->sendBookingConfirmation($booking);
-                    } catch (\Exception $e) {
-                        Log::error('Failed to send WA notification: ' . $e->getMessage());
+                if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
+                    if ($isCharter) {
+                        $booking->update(['payment_status' => 'dp_paid', 'status' => 'confirmed']);
+                    } else {
+                        $booking->update([
+                            'payment_status' => 'paid',
+                            'booking_status' => 'confirmed',
+                            'midtrans_transaction_id' => $orderId
+                        ]);
+                    }
+
+                    if (!$isCharter) {
+                        try {
+                            $waService = app(WhatsAppNotificationService::class);
+                            $waService->sendBookingConfirmation($booking);
+                        } catch (\Exception $e) {
+                            Log::error('Failed to send WA notification: ' . $e->getMessage());
+                        }
                     }
                 } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire' || $transactionStatus === 'deny') {
-                    // Pembayaran gagal atau kadaluarsa
-                    $booking->update([
-                        'payment_status' => 'failed',
-                        'midtrans_transaction_id' => $orderId
-                    ]);
+                    $booking->update(['payment_status' => 'failed', 'midtrans_transaction_id' => $orderId]);
                 } elseif ($transactionStatus === 'pending') {
-                    // Masih nunggu dibayar
-                    $booking->update([
-                        'payment_status' => 'pending',
-                        'midtrans_transaction_id' => $orderId
-                    ]);
+                    $booking->update(['payment_status' => $isCharter ? 'pending' : 'pending', 'midtrans_transaction_id' => $orderId]);
                 }
             }
 

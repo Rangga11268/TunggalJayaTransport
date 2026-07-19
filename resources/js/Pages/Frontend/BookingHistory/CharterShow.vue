@@ -95,7 +95,7 @@ const payCharter = async (type) => {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
                         },
-                        body: JSON.stringify({ type: 'verify', transaction_id: result.transaction_id })
+                        body: JSON.stringify({ type: 'verify', order_id: result.order_id })
                     }).finally(() => {
                         window.location.reload();
                     });

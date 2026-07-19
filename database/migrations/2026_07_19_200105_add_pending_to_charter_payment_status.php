@@ -7,7 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE charter_bookings MODIFY COLUMN payment_status ENUM('unpaid', 'pending', 'partial_paid', 'fully_paid', 'failed') DEFAULT 'unpaid'");
+        DB::statement("ALTER TABLE charter_bookings MODIFY COLUMN payment_status ENUM('unpaid', 'pending', 'dp_paid', 'paid', 'partial_paid', 'fully_paid', 'failed') DEFAULT 'unpaid'");
     }
 
     public function down(): void

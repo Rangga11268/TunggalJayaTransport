@@ -11,8 +11,13 @@ class RouteController extends Controller
     public function index(): JsonResponse
     {
         $routes = BusRoute::select('id', 'name', 'origin', 'destination', 'duration', 'distance')
+            ->withMin('schedules', 'price')
             ->orderBy('origin')
-            ->get();
+            ->get()
+            ->map(function($route) {
+                $route->base_price = $route->schedules_min_price;
+                return $route;
+            });
 
         return response()->json([
             'success' => true,
