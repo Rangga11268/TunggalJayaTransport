@@ -260,7 +260,7 @@ const payCharter = async (type) => {
                                     <span class="text-[#454652]">Wajib DP (Uang Muka)</span>
                                     <span class="font-bold text-[#1c1b1b]">{{ formatCurrency(charter.down_payment) }}</span>
                                 </div>
-                                <div class="flex justify-between items-center text-sm text-brand-red font-bold">
+                                <div v-if="charter.payment_status !== 'fully_paid' && charter.payment_status !== 'paid'" class="flex justify-between items-center text-sm text-brand-red font-bold">
                                     <span>Sisa Pelunasan</span>
                                     <span>{{ formatCurrency(charter.total_price - charter.down_payment) }}</span>
                                 </div>
@@ -275,7 +275,13 @@ const payCharter = async (type) => {
                             </div>
                             <p class="text-xs text-center text-red-600 mt-2">Batas waktu pembayaran (24 jam) telah habis.</p>
                         </div>
-                        <div v-else-if="charter.total_price > 0 && charter.payment_status !== 'paid'" class="pt-6 border-t border-[#ebe7e7]">
+                        <div v-else-if="charter.payment_status === 'fully_paid' || charter.payment_status === 'paid'" class="pt-6 border-t border-[#ebe7e7]">
+                            <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl p-4 text-sm font-bold flex items-center justify-center gap-2">
+                                <i class="fas fa-check-circle text-lg"></i> 
+                                Pembayaran Lunas
+                            </div>
+                        </div>
+                        <div v-else-if="charter.total_price > 0" class="pt-6 border-t border-[#ebe7e7]">
                             <div v-if="charter.payment_method === 'manual'" class="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl p-4 text-sm">
                                 <p class="font-bold mb-2"><i class="fas fa-info-circle mr-1"></i> Pembayaran Manual</p>
                                 <p class="mb-4">Silakan lakukan pembayaran sesuai kesepakatan dan kirimkan bukti transfer ke WhatsApp Admin kami. <br><br><strong>Catatan:</strong> Pembayaran DP maksimal 1x24 Jam setelah tagihan dibuat. Jika melewati batas waktu, pesanan otomatis hangus.</p>
@@ -288,7 +294,7 @@ const payCharter = async (type) => {
                             </div>
                             
                             <div v-else class="space-y-3">
-                                <div v-if="charter.payment_status !== 'partial' && charter.payment_status !== 'dp_paid'">
+                                <div v-if="charter.payment_status !== 'partial' && charter.payment_status !== 'dp_paid' && charter.payment_status !== 'fully_paid' && charter.payment_status !== 'paid'">
                                     <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 mb-4 text-xs">
                                         <strong>Penting:</strong> Batas waktu pembayaran DP adalah 1x24 jam sejak harga diberikan. Jika tidak dibayar, pesanan akan dibatalkan otomatis.
                                         <div v-if="timeLeft" class="mt-2 text-brand-red font-bold text-sm flex items-center gap-1.5">
