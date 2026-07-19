@@ -28,6 +28,25 @@ const formatCurrency = (value) => {
     }).format(value);
 };
 
+const exportToCSV = () => {
+    if (!props.salesData || props.salesData.length === 0) {
+        alert("Tidak ada data untuk diekspor");
+        return;
+    }
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Tanggal,Total Penjualan\n";
+    props.salesData.forEach(item => {
+        csvContent += `${item.date},${item.total}\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `laporan_penjualan_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
 onMounted(() => {
     if (chartCanvas.value) {
         const ctx = chartCanvas.value.getContext("2d");
@@ -135,13 +154,22 @@ onMounted(() => {
                     Ringkasan pendapatan transaksi 30 hari terakhir.
                 </p>
             </div>
-            <Link
-                :href="route('admin.reports.index')"
-                class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all duration-300 flex items-center gap-2"
-            >
-                <i class="fas fa-arrow-left"></i>
-                <span>Kembali</span>
-            </Link>
+            <div class="flex items-center gap-3">
+                <button
+                    @click="exportToCSV"
+                    class="px-5 py-2.5 rounded-xl bg-brand-red text-white font-semibold hover:bg-red-700 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-red-500/30"
+                >
+                    <i class="fas fa-file-export"></i>
+                    <span>Export CSV</span>
+                </button>
+                <Link
+                    :href="route('admin.reports.index')"
+                    class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all duration-300 flex items-center gap-2"
+                >
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Kembali</span>
+                </Link>
+            </div>
         </div>
 
         <!-- Total Revenue Card -->

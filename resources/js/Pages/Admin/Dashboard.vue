@@ -1,8 +1,8 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
-import { computed } from "vue";
-import VueApexCharts from "vue3-apexcharts";
+import { computed, onMounted, ref } from "vue";
+import Chart from "chart.js/auto";
 
 const props = defineProps({
     totalBookings: Number,
@@ -41,128 +41,129 @@ const formatDate = (dateString) => {
     });
 };
 
-// Revenue Trend Chart Options
-const revenueTrendOptions = computed(() => ({
-    chart: {
-        type: "area",
-        height: 300,
-        toolbar: { show: false },
-        zoom: { enabled: false },
-        fontFamily: "Manrope, sans-serif",
-    },
-    colors: ["#e11d48"],
-    fill: {
-        type: "gradient",
-        gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.4,
-            opacityTo: 0.05,
-            stops: [0, 100],
-        },
-    },
-    stroke: { curve: "smooth", width: 3 },
-    dataLabels: { enabled: false },
-    xaxis: {
-        categories: props.revenueTrend?.map((item) => item.date) || [],
-        labels: { style: { colors: "#9ca3af", fontSize: "11px" } },
-        axisBorder: { show: false },
-        axisTicks: { show: false },
-    },
-    yaxis: {
-        labels: {
-            style: { colors: "#9ca3af", fontSize: "11px" },
-            formatter: (val) => formatCurrency(val),
-        },
-    },
-    grid: { borderColor: "#1f2937", strokeDashArray: 4 },
-    tooltip: {
-        theme: "dark",
-        y: { formatter: (val) => formatCurrency(val) },
-    },
-}));
+const revenueTrendCanvas = ref(null);
+const popularRoutesCanvas = ref(null);
+const peakHoursCanvas = ref(null);
 
-const revenueTrendSeries = computed(() => [
-    {
-        name: "Pendapatan",
-        data: props.revenueTrend?.map((item) => item.revenue) || [],
-    },
-]);
-
-// Popular Routes Chart Options
-const popularRoutesOptions = computed(() => ({
-    chart: {
-        type: "bar",
-        height: 250,
-        toolbar: { show: false },
-        fontFamily: "Manrope, sans-serif",
-    },
-    plotOptions: {
-        bar: { horizontal: true, borderRadius: 6, barHeight: "60%" },
-    },
-    colors: ["#3b82f6"],
-    dataLabels: { enabled: false },
-    xaxis: {
-        categories: props.popularRoutes?.map((item) => item.route) || [],
-        labels: { style: { colors: "#9ca3af", fontSize: "11px" } },
-    },
-    yaxis: {
-        labels: { style: { colors: "#9ca3af", fontSize: "11px" } },
-    },
-    grid: { borderColor: "#1f2937", strokeDashArray: 4 },
-    tooltip: {
-        theme: "dark",
-        y: {
-            formatter: (val, { dataPointIndex }) => {
-                const route = props.popularRoutes?.[dataPointIndex];
-                return `${val} Booking • ${formatCurrency(
-                    route?.revenue || 0
-                )}`;
+onMounted(() => {
+    // 1. Revenue Trend (Area chart / Line chart with fill)
+    if (revenueTrendCanvas.value && props.revenueTrend?.length) {
+        new Chart(revenueTrendCanvas.value, {
+            type: 'line',
+            data: {
+                labels: props.revenueTrend.map(item => item.date),
+                datasets: [{
+                    label: 'Pendapatan',
+                    data: props.revenueTrend.map(item => item.revenue),
+                    borderColor: '#e11d48',
+                    backgroundColor: 'rgba(225, 29, 72, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
             },
-        },
-    },
-}));
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return formatCurrency(context.raw);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { display: false },
+                    y: {
+                        ticks: {
+                            callback: function(value) {
+                                return formatCurrency(value);
+                            },
+                            font: { size: 11, family: 'Manrope' }
+                        },
+                        grid: { borderDash: [4, 4], color: '#f3f4f6' }
+                    }
+                }
+            }
+        });
+    }
 
-const popularRoutesSeries = computed(() => [
-    {
-        name: "Booking",
-        data: props.popularRoutes?.map((item) => item.bookings) || [],
-    },
-]);
+    // 2. Popular Routes (Horizontal Bar)
+    if (popularRoutesCanvas.value && props.popularRoutes?.length) {
+        new Chart(popularRoutesCanvas.value, {
+            type: 'bar',
+            data: {
+                labels: props.popularRoutes.map(item => item.route),
+                datasets: [{
+                    label: 'Booking',
+                    data: props.popularRoutes.map(item => item.bookings),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const route = props.popularRoutes[context.dataIndex];
+                                return `${context.raw} Booking • ${formatCurrency(route?.revenue || 0)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { borderDash: [4, 4], color: '#f3f4f6' },
+                        ticks: { font: { size: 11, family: 'Manrope' } }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { font: { size: 11, family: 'Manrope' } }
+                    }
+                }
+            }
+        });
+    }
 
-// Peak Hours Chart Options
-const peakHoursOptions = computed(() => ({
-    chart: {
-        type: "bar",
-        height: 200,
-        toolbar: { show: false },
-        fontFamily: "Manrope, sans-serif",
-    },
-    plotOptions: {
-        bar: { borderRadius: 4, columnWidth: "70%" },
-    },
-    colors: ["#10b981"],
-    dataLabels: { enabled: false },
-    xaxis: {
-        categories: props.peakHours?.map((item) => item.hour) || [],
-        labels: {
-            style: { colors: "#9ca3af", fontSize: "10px" },
-            rotate: -45,
-            rotateAlways: true,
-        },
-    },
-    yaxis: {
-        labels: { style: { colors: "#9ca3af", fontSize: "11px" } },
-    },
-    grid: { borderColor: "#1f2937", strokeDashArray: 4 },
-    tooltip: { theme: "dark" },
-}));
-
-const peakHoursSeries = computed(() => [
-    {
-        name: "Booking",
-        data: props.peakHours?.map((item) => item.count) || [],
-    },
-]);
+    // 3. Peak Hours (Vertical Bar)
+    if (peakHoursCanvas.value && props.peakHours?.length) {
+        new Chart(peakHoursCanvas.value, {
+            type: 'bar',
+            data: {
+                labels: props.peakHours.map(item => item.hour),
+                datasets: [{
+                    label: 'Booking',
+                    data: props.peakHours.map(item => item.count),
+                    backgroundColor: '#10b981',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 10, family: 'Manrope' } }
+                    },
+                    y: {
+                        grid: { borderDash: [4, 4], color: '#f3f4f6' },
+                        ticks: { font: { size: 11, family: 'Manrope' }, stepSize: 1 }
+                    }
+                }
+            }
+        });
+    }
+});
 </script>
 
 <template>
@@ -311,13 +312,9 @@ const peakHoursSeries = computed(() => [
                         {{ Math.abs(revenueGrowth) }}% vs minggu lalu
                     </div>
                 </div>
-                <VueApexCharts
-                    v-if="revenueTrend?.length"
-                    type="area"
-                    height="300"
-                    :options="revenueTrendOptions"
-                    :series="revenueTrendSeries"
-                />
+                <div v-if="revenueTrend?.length" class="h-[300px] relative w-full">
+                    <canvas ref="revenueTrendCanvas"></canvas>
+                </div>
                 <div
                     v-else
                     class="h-[300px] flex items-center justify-center text-gray-400"
@@ -392,13 +389,9 @@ const peakHoursSeries = computed(() => [
                         Top 5 rute berdasarkan jumlah booking
                     </p>
                 </div>
-                <VueApexCharts
-                    v-if="popularRoutes?.length"
-                    type="bar"
-                    height="250"
-                    :options="popularRoutesOptions"
-                    :series="popularRoutesSeries"
-                />
+                <div v-if="popularRoutes?.length" class="h-[250px] relative w-full">
+                    <canvas ref="popularRoutesCanvas"></canvas>
+                </div>
                 <div
                     v-else
                     class="h-[250px] flex items-center justify-center text-gray-400"
@@ -424,13 +417,9 @@ const peakHoursSeries = computed(() => [
                         Distribusi booking berdasarkan jam
                     </p>
                 </div>
-                <VueApexCharts
-                    v-if="peakHours?.length"
-                    type="bar"
-                    height="200"
-                    :options="peakHoursOptions"
-                    :series="peakHoursSeries"
-                />
+                <div v-if="peakHours?.length" class="h-[200px] relative w-full">
+                    <canvas ref="peakHoursCanvas"></canvas>
+                </div>
                 <div
                     v-else
                     class="h-[200px] flex items-center justify-center text-gray-400"
