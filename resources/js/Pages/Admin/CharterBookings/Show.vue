@@ -226,17 +226,16 @@ const formatRupiah = (value) => {
                             <option value="system">Sistem Otomatis (Midtrans)</option>
                             <option value="manual">Manual (Transfer ke Admin)</option>
                         </select>
+                        <p v-if="form.payment_method === 'system'" class="text-xs text-gray-500 mt-1">Status pembayaran otomatis diperbarui saat user membayar DP/Pelunasan via Midtrans.</p>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status Pembayaran</label>
+                    <div v-if="form.payment_method === 'manual'">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status Pembayaran (Manual)</label>
                         <select v-model="form.payment_status" class="w-full px-4 py-2 bg-white dark:bg-[#151515] border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-brand-red focus:border-brand-red text-sm dark:text-white">
                             <option value="unpaid">Belum Dibayar</option>
-                            <option value="pending">Pending (Menunggu Pembayaran)</option>
-                            <option value="partial">Dibayar Sebagian (DP)</option>
-                            <option value="dp_paid">DP Lunas (Legacy)</option>
-                            <option value="paid">Lunas</option>
-                            <option value="failed">Gagal / Dibatalkan</option>
+                            <option value="dp_paid">DP Lunas</option>
+                            <option value="fully_paid">Lunas</option>
+                            <option value="failed">Gagal</option>
                         </select>
                     </div>
 

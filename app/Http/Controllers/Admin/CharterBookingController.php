@@ -72,7 +72,7 @@ class CharterBookingController extends Controller
             'total_price' => 'required|numeric|min:0',
             'down_payment' => 'nullable|numeric|min:0',
             'status' => 'required|in:pending,quoted,confirmed,completed,cancelled',
-            'payment_status' => 'required|in:unpaid,pending,partial,dp_paid,paid,failed',
+            'payment_status' => 'required|in:unpaid,dp_paid,fully_paid,failed',
             'payment_method' => 'nullable|in:system,manual',
             'notes' => 'nullable|string',
         ]);
@@ -172,7 +172,7 @@ class CharterBookingController extends Controller
             'assigned_bus_id' => 'nullable|exists:buses,id',
             'status' => 'required|in:pending,quoted,confirmed,completed,cancelled',
             'payment_method' => 'nullable|in:system,manual',
-            'payment_status' => 'nullable|in:unpaid,pending,partial,dp_paid,paid,failed',
+            'payment_status' => 'nullable|in:unpaid,dp_paid,fully_paid,failed',
             'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
@@ -181,6 +181,7 @@ class CharterBookingController extends Controller
                 ->where('assigned_bus_id', $validated['assigned_bus_id'])
                 ->where(function($q) {
                     $q->where('payment_status', 'dp_paid')
+                      ->orWhere('payment_status', 'fully_paid')
                       ->orWhere('payment_status', 'paid')
                       ->orWhere('payment_status', 'partial')
                       ->orWhere('status', 'confirmed')
