@@ -43,8 +43,7 @@ class ScheduleController extends Controller
         }
 
         $schedules = $query->get()->filter(function ($schedule) use ($searchDate) {
-            if ($schedule->hasDeparted($searchDate)) return false;
-            if (!$schedule->isAvailableForBooking($searchDate)) return false;
+            if ($schedule->status !== 'active') return false;
 
             if ($schedule->is_daily && !empty($schedule->days_of_week)) {
                 $dayName = $searchDate->format('l');
