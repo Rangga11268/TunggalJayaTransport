@@ -42,10 +42,10 @@ class Schedule extends Model
         // Pas load data, ubah jam ke WIB biar ga pusing
         static::retrieved(function ($schedule) {
             if ($schedule->departure_time instanceof Carbon) {
-                $schedule->departure_time = $schedule->departure_time->setTimezone('Asia/Jakarta');
+                $schedule->departure_time = $schedule->departure_time->shiftTimezone('Asia/Jakarta');
             }
             if ($schedule->arrival_time instanceof Carbon) {
-                $schedule->arrival_time = $schedule->arrival_time->setTimezone('Asia/Jakarta');
+                $schedule->arrival_time = $schedule->arrival_time->shiftTimezone('Asia/Jakarta');
             }
         });
     }
