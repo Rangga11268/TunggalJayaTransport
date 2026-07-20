@@ -242,6 +242,22 @@ const getInitial = (name) => {
             </div>
         </div>  
 
+        <div v-if="page.props.auth?.user" class="px-4 sm:px-6 lg:px-16 max-w-[1280px] mx-auto mt-6">
+            <Link :href="route('booking-history.index')"
+                class="flex items-center justify-between bg-white border border-[#ebe7e7] rounded-[12px] px-5 py-4 shadow-sm hover:shadow-md transition-all">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-[10px] bg-[#10207a]/10 flex items-center justify-center">
+                        <i class="fas fa-history text-sm text-[#10207a]"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-sm text-[#1c1b1b]">Pesanan Saya</p>
+                        <p class="text-xs text-[#454652]">Lihat riwayat tiket & sewa bus</p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-gray-300 text-sm"></i>
+            </Link>
+        </div>
+
         <!-- POPULAR ROUTES SECTION -->
         <div class="bg-[#f8f9fa] flex flex-col items-center py-16 md:py-24 lg:py-32">
             <div class="flex flex-col gap-6 md:gap-10 lg:gap-[48px] items-start max-w-[1280px] px-4 sm:px-6 lg:px-16 w-full">
