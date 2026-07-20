@@ -38,16 +38,6 @@ class Schedule extends Model
     protected static function boot()
     {
         parent::boot();
-
-        // Pas load data, ubah jam ke WIB biar ga pusing
-        static::retrieved(function ($schedule) {
-            if ($schedule->departure_time instanceof Carbon) {
-                $schedule->departure_time = $schedule->departure_time->shiftTimezone('Asia/Jakarta');
-            }
-            if ($schedule->arrival_time instanceof Carbon) {
-                $schedule->arrival_time = $schedule->arrival_time->shiftTimezone('Asia/Jakarta');
-            }
-        });
     }
 
     public function bus()
@@ -148,11 +138,10 @@ class Schedule extends Model
             }
         } else {
             // Jadwal biasa, easy peasy
-            $departureTime = $this->departure_time;
+            $departureTime = $this->departure_time instanceof Carbon ? $this->departure_time->copy()->shiftTimezone('Asia/Jakarta') : Carbon::parse($this->departure_time)->shiftTimezone('Asia/Jakarta');
         }
 
-        // Convert ke WIB
-        return $departureTime->setTimezone('Asia/Jakarta');
+        return $departureTime;
     }
 
 
@@ -176,10 +165,10 @@ class Schedule extends Model
                 }
             }
         } else {
-            $arrivalTime = $this->arrival_time;
+            $arrivalTime = $this->arrival_time instanceof Carbon ? $this->arrival_time->copy()->shiftTimezone('Asia/Jakarta') : Carbon::parse($this->arrival_time)->shiftTimezone('Asia/Jakarta');
         }
 
-        return $arrivalTime->setTimezone('Asia/Jakarta');
+        return $arrivalTime;
     }
 
 
@@ -199,11 +188,11 @@ class Schedule extends Model
 
         // Jadwal biasa
         if ($this->departure_time instanceof Carbon) {
-            return $this->departure_time->isPast();
+            return $this->departure_time->copy()->shiftTimezone('Asia/Jakarta')->isPast();
         }
 
         try {
-            $departureTime = Carbon::parse($this->departure_time);
+            $departureTime = Carbon::parse($this->departure_time)->shiftTimezone('Asia/Jakarta');
             return $departureTime->isPast();
         } catch (\Exception $e) {
             return false;
