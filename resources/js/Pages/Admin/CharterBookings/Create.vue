@@ -29,6 +29,7 @@ const form = useForm({
     return_date: '',
     pickup_location: '',
     destination: '',
+    passenger_count: '',
     total_price: 0,
     down_payment: 0,
     status: 'completed',
@@ -130,6 +131,9 @@ const submit = () => {
 
                             <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Bus <span class="text-red-500">*</span></label>
                             <input type="number" v-model="form.bus_count" required min="1" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red mb-4" />
+
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total Penumpang Keseluruhan <span class="text-gray-400 font-normal text-xs">(Semua bus digabung)</span></label>
+                            <input type="number" v-model="form.passenger_count" min="1" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red mb-4" placeholder="Misal: 100" />
 
                             <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Armada (Opsional, bisa lebih dari 1)</label>
                             <select multiple v-model="form.assigned_bus_ids" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red min-h-[120px]">

@@ -200,12 +200,12 @@ const submit = () => {
                             <!-- Other Details -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
                                 <div>
-                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Estimasi Jumlah Penumpang <span class="text-[#10207a]">*</span></label>
+                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Total Penumpang Keseluruhan <span class="text-gray-400 font-normal text-xs">(Semua bus digabung)</span> <span class="text-[#10207a]">*</span></label>
                                     <div class="relative">
                                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                                             <i class="fas fa-users text-sm"></i>
                                         </div>
-                                        <input v-model="form.passenger_count" type="number" min="1" required placeholder="Berapa orang yang ikut?"
+                                        <input v-model="form.passenger_count" type="number" min="1" required placeholder="Total penumpang dari seluruh armada..."
                                             class="w-full pl-10 pr-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
                                     </div>
                                 </div>
