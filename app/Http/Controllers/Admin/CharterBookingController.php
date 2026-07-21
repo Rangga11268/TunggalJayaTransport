@@ -80,6 +80,29 @@ class CharterBookingController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $pickupDate = $validated['pickup_date'];
+        $returnDate = $validated['return_date'];
+
+        // Limit bus_count logic
+        $overlappingBookingsCount = CharterBooking::where('status', '!=', 'cancelled')
+            ->where(function ($query) use ($pickupDate, $returnDate) {
+                $query->whereBetween('pickup_date', [$pickupDate, $returnDate])
+                    ->orWhereBetween('return_date', [$pickupDate, $returnDate])
+                    ->orWhere(function ($q) use ($pickupDate, $returnDate) {
+                        $q->where('pickup_date', '<=', $pickupDate)
+                          ->where('return_date', '>=', $returnDate);
+                    });
+            })
+            ->sum('bus_count');
+
+        $totalPariwisataBuses = Bus::where('bus_category', 'pariwisata')->where('status', 'active')->count();
+        $availableBuses = max(0, $totalPariwisataBuses - $overlappingBookingsCount);
+
+        $requestedCount = $validated['bus_count'] ?? (!empty($validated['assigned_bus_ids']) ? count($validated['assigned_bus_ids']) : 1);
+        if ($requestedCount > $availableBuses) {
+            return back()->withErrors(['bus_count' => "Maaf, saat ini hanya tersedia {$availableBuses} unit bus pariwisata pada tanggal tersebut. Total bus yang diminta ({$requestedCount}) melebihi ketersediaan."])->withInput();
+        }
+
         if (!empty($validated['assigned_bus_ids'])) {
             $overlapping = CharterBooking::where('id', '!=', 0)
                 ->whereHas('buses', function($q) use ($validated) {

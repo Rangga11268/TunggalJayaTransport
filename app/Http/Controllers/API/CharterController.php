@@ -38,8 +38,34 @@ class CharterController extends Controller
             'pickup_location' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
             'bus_type_requested' => 'nullable|string|max:255',
+            'bus_count' => 'nullable|integer|min:1',
             'notes' => 'nullable|string',
         ]);
+
+        $pickupDate = $validated['pickup_date'];
+        $returnDate = $validated['return_date'];
+        
+        $overlappingBookingsCount = \App\Models\CharterBooking::where('status', '!=', 'cancelled')
+            ->where(function ($query) use ($pickupDate, $returnDate) {
+                $query->whereBetween('pickup_date', [$pickupDate, $returnDate])
+                    ->orWhereBetween('return_date', [$pickupDate, $returnDate])
+                    ->orWhere(function ($q) use ($pickupDate, $returnDate) {
+                        $q->where('pickup_date', '<=', $pickupDate)
+                          ->where('return_date', '>=', $returnDate);
+                    });
+            })
+            ->sum('bus_count');
+
+        $totalPariwisataBuses = \App\Models\Bus::where('bus_category', 'pariwisata')->where('status', 'active')->count();
+        $availableBuses = max(0, $totalPariwisataBuses - $overlappingBookingsCount);
+
+        $requestedCount = $validated['bus_count'] ?? 1;
+        if ($requestedCount > $availableBuses) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Maaf, saat ini hanya tersedia {$availableBuses} unit bus pariwisata pada tanggal tersebut.",
+            ], 400);
+        }
 
         $charterCode = 'CHRT-' . strtoupper(Str::random(8));
 
@@ -47,6 +73,7 @@ class CharterController extends Controller
             'charter_code' => $charterCode,
             'user_id' => $request->user()->id,
             'bus_type_requested' => $validated['bus_type_requested'] ?? 'Big Bus',
+            'bus_count' => $requestedCount,
             'pickup_date' => $validated['pickup_date'],
             'return_date' => $validated['return_date'],
             'pickup_location' => $validated['pickup_location'],
