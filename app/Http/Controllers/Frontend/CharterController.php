@@ -40,9 +40,11 @@ class CharterController extends Controller
     public function step1(Request $request)
     {
         $busType = $request->query('bus_type');
+        $bookingData = $request->session()->get('charter_step1');
 
         return Inertia::render('Frontend/Charter/Step1', [
-            'selectedBusType' => $busType
+            'selectedBusType' => $busType,
+            'bookingData' => $bookingData
         ]);
     }
 
@@ -57,8 +59,13 @@ class CharterController extends Controller
             'return_date' => 'required|date|after_or_equal:pickup_date',
             'pickup_location' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
-            'bus_type_requested' => 'nullable|string|max:255',
-            'bus_count' => 'nullable|integer|min:1',
+            'bus_requests' => 'required|array|min:1',
+            'bus_requests.*.type' => 'required|string',
+            'bus_requests.*.count' => 'required|integer|min:1',
+            'bus_requests.*.count' => 'required|integer|min:1',
+            'bus_requests.*.with_legrest' => 'boolean',
+            'bus_requests.*.seat_configuration' => 'nullable|string',
+            'passenger_count' => 'required|integer|min:1',
         ]);
 
         $pickupDate = $validated['pickup_date'];
@@ -78,9 +85,9 @@ class CharterController extends Controller
         $totalPariwisataBuses = \App\Models\Bus::where('bus_category', 'pariwisata')->where('status', 'active')->count();
         $availableBuses = max(0, $totalPariwisataBuses - $overlappingBookingsCount);
 
-        $requestedCount = $validated['bus_count'] ?? 1;
+        $requestedCount = collect($validated['bus_requests'])->sum('count');
         if ($requestedCount > $availableBuses) {
-            return back()->withErrors(['bus_count' => "Maaf, saat ini hanya tersedia {$availableBuses} unit bus pariwisata pada tanggal tersebut."])->withInput();
+            return back()->withErrors(['bus_requests' => "Maaf, saat ini hanya tersedia {$availableBuses} unit bus pariwisata pada tanggal tersebut."])->withInput();
         }
 
         $request->session()->put('charter_step1', $validated);
@@ -118,9 +125,12 @@ class CharterController extends Controller
             'destination_lat' => 'nullable|numeric',
             'destination_lng' => 'nullable|numeric',
             'destination_address' => 'nullable|string',
-            'bus_type_requested' => 'nullable|string|max:255',
-            'bus_count' => 'nullable|integer|min:1',
-            'passenger_count' => 'nullable|integer|min:1',
+            'bus_requests' => 'required|array|min:1',
+            'bus_requests.*.type' => 'required|string',
+            'bus_requests.*.count' => 'required|integer|min:1',
+            'bus_requests.*.with_legrest' => 'boolean',
+            'bus_requests.*.seat_configuration' => 'nullable|string',
+            'passenger_count' => 'required|integer|min:1',
             'notes' => 'nullable|string',
         ]);
 
@@ -141,9 +151,9 @@ class CharterController extends Controller
         $totalPariwisataBuses = \App\Models\Bus::where('bus_category', 'pariwisata')->where('status', 'active')->count();
         $availableBuses = max(0, $totalPariwisataBuses - $overlappingBookingsCount);
 
-        $requestedCount = $validated['bus_count'] ?? 1;
+        $requestedCount = collect($validated['bus_requests'])->sum('count');
         if ($requestedCount > $availableBuses) {
-            return back()->withErrors(['bus_count' => "Maaf, saat ini hanya tersedia {$availableBuses} unit bus pariwisata pada tanggal tersebut."])->withInput();
+            return back()->withErrors(['bus_requests' => "Maaf, saat ini hanya tersedia {$availableBuses} unit bus pariwisata pada tanggal tersebut."])->withInput();
         }
 
         $charterCode = 'CHRT-' . strtoupper(Str::random(8));
@@ -152,8 +162,8 @@ class CharterController extends Controller
             'charter_code' => $charterCode,
             'user_id' => $request->user()->id,
             'institution_name' => $validated['institution_name'] ?? null,
-            'bus_type_requested' => $validated['bus_type_requested'] ?? 'Big Bus',
-            'bus_count' => $validated['bus_count'] ?? 1,
+            'bus_requests' => $validated['bus_requests'],
+            'bus_count' => collect($validated['bus_requests'])->sum('count'),
             'passenger_count' => $validated['passenger_count'],
             'pickup_date' => $validated['pickup_date'],
             'pickup_time' => $validated['pickup_time'],

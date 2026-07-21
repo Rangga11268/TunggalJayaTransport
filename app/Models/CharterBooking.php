@@ -12,10 +12,14 @@ class CharterBooking extends Model
     protected $fillable = [
         'charter_code',
         'user_id',
+        'customer_name',
+        'customer_phone',
+        'customer_email',
         'institution_name',
         'bus_count',
         'assigned_bus_id',
         'bus_type_requested',
+        'bus_requests',
         'passenger_count',
         'pickup_date',
         'pickup_time',
@@ -42,6 +46,7 @@ class CharterBooking extends Model
     protected $casts = [
         'pickup_date' => 'date',
         'return_date' => 'date',
+        'bus_requests' => 'array',
     ];
 
     public function user()

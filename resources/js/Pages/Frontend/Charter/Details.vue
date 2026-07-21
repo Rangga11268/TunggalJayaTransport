@@ -19,8 +19,7 @@ const form = useForm({
     return_date: props.bookingData?.return_date || "",
     pickup_location: props.bookingData?.pickup_location || "",
     destination: props.bookingData?.destination || "",
-    bus_type_requested: props.bookingData?.bus_type_requested || "",
-    bus_count: props.bookingData?.bus_count || "",
+    bus_requests: props.bookingData?.bus_requests || [],
     institution_name: props.bookingData?.institution_name || "",
     bus_id: props.bookingData?.bus_id || null,
     
@@ -30,7 +29,7 @@ const form = useForm({
     destination_lat: null,
     destination_lng: null,
     destination_address: "",
-    passenger_count: "",
+    passenger_count: props.bookingData?.passenger_count || "",
     notes: "",
 });
 
@@ -149,7 +148,7 @@ const submit = () => {
                             </div>
                             <div class="flex justify-between pb-4 border-b border-gray-100">
                                 <span class="text-gray-500 text-sm">Armada</span>
-                                <span class="font-bold text-[#1c1b1b] text-sm">{{ form.bus_type_requested }} ({{ form.bus_count }} Unit)</span>
+                                <span class="font-bold text-[#1c1b1b] text-sm">Big Bus ({{ form.bus_requests.reduce((sum, r) => sum + r.count, 0) }} Unit)</span>
                             </div>
                             <div class="flex justify-between pb-4 border-b border-gray-100">
                                 <span class="text-gray-500 text-sm">Tanggal</span>
@@ -203,19 +202,7 @@ const submit = () => {
                                 <div ref="mapContainer" class="h-[300px] w-full rounded-xl overflow-hidden border border-[#ebe7e7] z-0 relative"></div>
                             </div>
 
-                            <!-- Other Details -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
-                                <div>
-                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Total Penumpang Keseluruhan <span class="text-gray-400 font-normal text-xs">(Semua bus digabung)</span> <span class="text-[#10207a]">*</span></label>
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                                            <i class="fas fa-users text-sm"></i>
-                                        </div>
-                                        <input v-model="form.passenger_count" type="number" min="1" required placeholder="Total penumpang dari seluruh armada..."
-                                            class="w-full pl-10 pr-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
-                                    </div>
-                                </div>
-                            </div>
+
 
                             <div>
                                 <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Catatan Tambahan <span class="text-gray-400 font-normal">(Opsional)</span></label>
@@ -223,11 +210,17 @@ const submit = () => {
                                     class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all resize-none"></textarea>
                             </div>
 
-                            <button type="submit" :disabled="form.processing"
-                                class="w-full py-4 bg-[#10207a] text-white rounded-xl font-bold text-[15px] hover:bg-[#0c185e] transition-all shadow-lg shadow-[#10207a]/20 disabled:opacity-50 flex items-center justify-center gap-2">
-                                <span v-if="form.processing"><i class="fas fa-spinner fa-spin"></i> Memproses...</span>
-                                <span v-else>Kirim Permintaan Sewa <i class="fas fa-paper-plane"></i></span>
-                            </button>
+                            <div class="flex gap-4">
+                                <Link :href="route('frontend.charter.step1')"
+                                    class="w-1/3 py-4 bg-white border border-gray-300 text-gray-700 rounded-xl font-bold text-[15px] hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+                                    Kembali
+                                </Link>
+                                <button type="submit" :disabled="form.processing"
+                                    class="w-2/3 py-4 bg-[#10207a] text-white rounded-xl font-bold text-[15px] hover:bg-[#0c185e] transition-all shadow-lg shadow-[#10207a]/20 disabled:opacity-50 flex items-center justify-center gap-2">
+                                    <span v-if="form.processing"><i class="fas fa-spinner fa-spin"></i> Memproses...</span>
+                                    <span v-else>Kirim Permintaan <i class="fas fa-paper-plane"></i></span>
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

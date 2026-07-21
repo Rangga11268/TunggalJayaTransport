@@ -3,6 +3,9 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import axios from "axios";
+import Swal from "sweetalert2";
+import { useBulkDelete } from "@/Composables/useBulkDelete.js";
+import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
     charters: Object,
@@ -11,6 +14,7 @@ const props = defineProps({
 
 const search = ref(props.filters?.search || "");
 const localCharters = ref(props.charters);
+const { selectedIds, selectAll } = useBulkDelete(localCharters);
 let timeout = null;
 
 const applyFilters = async () => {
@@ -40,6 +44,44 @@ const fetchPage = async (url) => {
         window.history.replaceState({}, "", url);
         window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {}
+};
+
+const bulkDelete = () => {
+    if (selectedIds.value.length === 0) return;
+    Swal.fire({ title: `Hapus ${selectedIds.value.length} booking?`, text: "Data yang dihapus tidak dapat dikembalikan!", icon: "warning",
+        showCancelButton: true, confirmButtonColor: "#d33", cancelButtonColor: "#3085d6",
+        confirmButtonText: "Ya, hapus semua!", cancelButtonText: "Batal",
+    }).then((r) => { if (r.isConfirmed) {
+        axios.post(route("admin.charter-bookings.bulk-destroy"), { ids: selectedIds.value, _method: "DELETE" })
+            .then(() => {
+                Swal.fire({ icon: "success", title: "Berhasil!", text: `${selectedIds.value.length} booking dihapus.`, timer: 1500, showConfirmButton: false });
+                localCharters.value = { ...localCharters.value, data: localCharters.value.data.filter(d => !selectedIds.value.includes(d.id)), total: (localCharters.value.total || localCharters.value.data.length) - selectedIds.value.length };
+                selectedIds.value = [];
+            }).catch(() => Swal.fire({ icon: "error", title: "Gagal!", text: "Terjadi kesalahan." }));
+    }});
+};
+
+const deleteCharter = (id) => {
+    Swal.fire({
+        title: "Hapus Booking?",
+        text: "Data yang dihapus tidak dapat dikembalikan!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Ya, hapus!",
+        cancelButtonText: "Batal",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(route('admin.charter-bookings.destroy', id), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    localCharters.value.data = localCharters.value.data.filter(c => c.id !== id);
+                    selectedIds.value = selectedIds.value.filter(sid => sid !== id);
+                }
+            });
+        }
+    });
 };
 
 const formatDate = (dateString) => {
@@ -121,6 +163,13 @@ const getPaymentStatusText = (status) => {
                         class="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#151515] rounded-xl focus:ring-2 focus:ring-brand-red focus:border-brand-red text-sm dark:text-white"
                     />
                 </div>
+                <button
+                    v-if="selectedIds.length > 0"
+                    @click="bulkDelete"
+                    class="px-4 py-2 bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 font-medium rounded-xl hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center gap-2 whitespace-nowrap"
+                >
+                    <i class="fas fa-trash-alt"></i> Hapus ({{ selectedIds.length }})
+                </button>
             </div>
         </div>
 
@@ -129,6 +178,9 @@ const getPaymentStatusText = (status) => {
                 <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
                     <thead class="bg-gray-50/50 dark:bg-[#1a1a1a] text-xs font-semibold uppercase text-gray-700 dark:text-gray-300">
                         <tr>
+                            <th class="px-6 py-4 w-10">
+                                <input type="checkbox" :checked="selectAll" @change="selectAll = !selectAll" class="rounded border-gray-300 text-brand-red shadow-sm focus:ring-brand-red bg-white dark:bg-[#111] dark:border-gray-700" />
+                            </th>
                             <th class="px-6 py-4">Kode / Pelanggan</th>
                             <th class="px-6 py-4">Rute & Tanggal</th>
                             <th class="px-6 py-4">Tipe Bus</th>
@@ -143,6 +195,9 @@ const getPaymentStatusText = (status) => {
                             :key="charter.id"
                             class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors"
                         >
+                            <td class="px-6 py-4">
+                                <input type="checkbox" v-model="selectedIds" :value="charter.id" class="rounded border-gray-300 text-brand-red shadow-sm focus:ring-brand-red bg-white dark:bg-[#111] dark:border-gray-700" />
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="font-medium text-gray-900 dark:text-white">
                                     {{ charter.charter_code }}
@@ -183,14 +238,21 @@ const getPaymentStatusText = (status) => {
                                     {{ getStatusText(charter.status) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-right flex justify-end gap-2">
                                 <Link
                                     :href="route('admin.charter-bookings.show', charter.id)"
-                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 transition-colors"
+                                    class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center hover:bg-brand-red hover:text-white transition-colors"
                                     title="Detail & Update"
                                 >
                                     <i class="fas fa-eye text-sm"></i>
                                 </Link>
+                                <button
+                                    @click="deleteCharter(charter.id)"
+                                    class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors"
+                                    title="Hapus"
+                                >
+                                    <i class="fas fa-trash text-sm"></i>
+                                </button>
                             </td>
                         </tr>
                         <tr v-if="localCharters.data.length === 0">

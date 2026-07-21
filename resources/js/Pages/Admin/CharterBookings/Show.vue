@@ -63,6 +63,34 @@ const onDpChange = (event) => {
     formattedDp.value = formatRupiahString(val);
 };
 
+const autoSelectBuses = () => {
+    if (!props.charter.bus_requests || props.charter.bus_requests.length === 0) return;
+    
+    let selectedIds = [];
+    let availableBuses = [...props.buses];
+
+    props.charter.bus_requests.forEach(req => {
+        let neededCount = req.count;
+        let isLegRest = req.with_legrest;
+        
+        // Cari bus yang cocok dengan kriteria (Leg Rest / Biasa)
+        let matchedBuses = availableBuses.filter(bus => {
+            let busIsLegRest = bus.bus_type.toLowerCase().includes('leg rest');
+            return isLegRest ? busIsLegRest : !busIsLegRest;
+        });
+
+        // Ambil sejumlah yang dibutuhkan
+        for (let i = 0; i < neededCount; i++) {
+            if (matchedBuses.length > i) {
+                selectedIds.push(matchedBuses[i].id);
+                availableBuses = availableBuses.filter(b => b.id !== matchedBuses[i].id);
+            }
+        }
+    });
+
+    form.assigned_bus_ids = selectedIds;
+};
+
 const submit = () => {
     form.post(route("admin.charter-bookings.update", props.charter.id), {
         preserveScroll: true,
@@ -122,15 +150,15 @@ const formatRupiah = (value) => {
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Nomor HP / WhatsApp</p>
                             <p class="font-medium text-gray-900 dark:text-white">
-                                <a v-if="charter.user?.phone" :href="'https://wa.me/' + charter.user.phone.replace(/[^0-9]/g, '').replace(/^0/, '62')" target="_blank" class="text-emerald-600 hover:underline flex items-center gap-1.5">
-                                    <i class="fab fa-whatsapp"></i> {{ charter.user.phone }}
+                                <a v-if="charter.customer_phone || charter.user?.phone" :href="'https://wa.me/' + (charter.customer_phone || charter.user.phone).replace(/[^0-9]/g, '').replace(/^0/, '62')" target="_blank" class="text-emerald-600 hover:underline flex items-center gap-1.5">
+                                    <i class="fab fa-whatsapp"></i> {{ charter.customer_phone || charter.user?.phone }}
                                 </a>
                                 <span v-else>-</span>
                             </p>
                         </div>
                         <div class="md:col-span-2">
                             <p class="text-sm text-gray-500 mb-1">Email</p>
-                            <p class="font-medium text-gray-900 dark:text-white">{{ charter.user?.email || '-' }}</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ charter.customer_email || charter.user?.email || '-' }}</p>
                         </div>
                     </div>
                 </div>
@@ -152,7 +180,20 @@ const formatRupiah = (value) => {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Tipe & Jumlah Bus Diminta</p>
-                            <p class="font-medium text-gray-900 dark:text-white mb-2">{{ charter.bus_type_requested }} <span class="text-brand-red font-bold ml-1">({{ charter.bus_count }} Unit)</span></p>
+                            <div class="mb-2">
+                                <div v-if="charter.bus_requests && charter.bus_requests.length > 0" class="space-y-1">
+                                    <div v-for="(req, index) in charter.bus_requests" :key="index" class="font-medium text-gray-900 dark:text-white">
+                                        {{ req.type }} <span class="text-brand-red font-bold ml-1">({{ req.count }} Unit)</span>
+                                        <div class="text-xs text-gray-500 font-normal mt-0.5">
+                                            <span v-if="req.with_legrest" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 mr-1">Leg Rest</span>
+                                            <span v-if="req.seat_configuration && req.seat_configuration !== 'Bebas'" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">Seat: {{ req.seat_configuration }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="font-medium text-gray-900 dark:text-white">
+                                    {{ charter.bus_type_requested || 'Big Bus' }} <span class="text-brand-red font-bold ml-1">({{ charter.bus_count }} Unit)</span>
+                                </div>
+                            </div>
                             
                             <p class="text-sm text-gray-500 mb-1">Armada Ditetapkan</p>
                             <p class="font-medium text-gray-900 dark:text-white text-sm mb-4">
@@ -200,8 +241,21 @@ const formatRupiah = (value) => {
                 
                 <form @submit.prevent="submit" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipe & Jumlah Bus Diminta</label>
-                        <input type="text" disabled :value="charter.bus_type_requested + ' (' + charter.bus_count + ' Unit)'" class="w-full px-4 py-2 bg-gray-50 dark:bg-black/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-500 text-sm" />
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Konfigurasi Bus Diminta</label>
+                        <div v-if="charter.bus_requests && charter.bus_requests.length > 0" class="space-y-2">
+                            <div v-for="(req, idx) in charter.bus_requests" :key="idx" class="flex items-center justify-between p-3 bg-gray-50 dark:bg-black/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900 dark:text-white">{{ req.type }} <span v-if="req.with_legrest" class="text-brand-red">(Leg Rest)</span></p>
+                                    <p class="text-xs text-gray-500">Konfigurasi: {{ req.seat_configuration }}</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm font-bold text-brand-red">{{ req.count }} Unit</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <input type="text" disabled :value="charter.bus_type_requested + ' (' + charter.bus_count + ' Unit)'" class="w-full px-4 py-2 bg-gray-50 dark:bg-black/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-500 text-sm" />
+                        </div>
                     </div>
 
                     <div>
@@ -216,13 +270,36 @@ const formatRupiah = (value) => {
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pilih Armada (Bisa lebih dari 1)</label>
-                        <select multiple v-model="form.assigned_bus_ids" class="w-full px-4 py-2 bg-white dark:bg-[#151515] border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-brand-red focus:border-brand-red text-sm dark:text-white min-h-[120px]">
-                            <option v-for="bus in buses" :key="bus.id" :value="bus.id">
-                                {{ bus.plate_number }} - {{ bus.name }} ({{ bus.bus_type }})
-                            </option>
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">Tahan tombol Ctrl (Windows) atau Command (Mac) untuk memilih lebih dari 1 armada.</p>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pilih Armada (Bisa lebih dari 1)</label>
+                            <button @click.prevent="autoSelectBuses" class="text-xs font-bold text-brand-red bg-brand-red/10 px-3 py-1 rounded-full hover:bg-brand-red/20 transition-all focus:outline-none">
+                                <i class="fas fa-magic mr-1"></i> Pilih Rekomendasi
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-2">
+                            <label v-for="bus in buses" :key="bus.id" 
+                                class="flex items-start p-3 border rounded-xl cursor-pointer transition-all duration-200"
+                                :class="form.assigned_bus_ids.includes(bus.id) ? 'border-brand-red bg-brand-red/5 dark:bg-brand-red/10' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 bg-white dark:bg-[#1a1a1a]'">
+                                <div class="flex-shrink-0 mt-0.5">
+                                    <input type="checkbox" :value="bus.id" v-model="form.assigned_bus_ids" 
+                                        class="w-4 h-4 text-brand-red border-gray-300 rounded focus:ring-brand-red dark:bg-black/50 dark:border-gray-600">
+                                </div>
+                                <div class="ml-3 flex-1 overflow-hidden">
+                                    <div class="flex justify-between items-center mb-1 gap-2">
+                                        <span class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ bus.name }}</span>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
+                                            :class="bus.bus_type.toLowerCase().includes('leg rest') ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'">
+                                            {{ bus.bus_type }}
+                                        </span>
+                                    </div>
+                                    <div class="text-xs text-gray-500 flex items-center gap-2">
+                                        <span><i class="fas fa-id-card mr-1"></i>{{ bus.plate_number }}</span>
+                                        <span class="text-gray-300 dark:text-gray-700">|</span>
+                                        <span><i class="fas fa-users mr-1"></i>{{ bus.capacity }} Seat</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
                         <InputError :message="form.errors.assigned_bus_ids" class="mt-2" />
                     </div>
 

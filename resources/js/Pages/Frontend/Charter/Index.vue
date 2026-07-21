@@ -52,7 +52,7 @@ const groupedBuses = computed(() => {
     return Object.values(groups);
 });
 
-const openBookingForm = (group) => {
+const openBookingForm = () => {
     if (!props.auth.user) {
         Swal.fire({
             icon: 'warning',
@@ -64,7 +64,7 @@ const openBookingForm = (group) => {
         return;
     }
     
-    router.visit(route('frontend.charter.step1', { bus_type: group.name }));
+    router.visit(route('frontend.charter.step1'));
 };
 
 const toggleCalendar = (busId) => {
@@ -88,9 +88,14 @@ const toggleCalendar = (busId) => {
             <h1 class="font-unbounded font-black text-4xl md:text-6xl text-[#1c1b1b] mb-4">
                 Sewa Bus Pariwisata
             </h1>
-            <p class="text-[#454652] text-[16px] max-w-2xl mx-auto">
+            <p class="text-[#454652] text-[16px] max-w-2xl mx-auto mb-8">
                 Armada eksklusif Tunggal Jaya Transport siap menemani perjalanan wisata Anda dengan kenyamanan dan keamanan tingkat tinggi.
             </p>
+            <div class="flex justify-center">
+                <button @click="openBookingForm()" class="px-8 py-4 bg-[#10207a] text-white rounded-xl font-bold text-[16px] hover:bg-[#0c185e] transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#10207a]/30">
+                    <i class="fas fa-bus"></i> Pesan Bus Sekarang
+                </button>
+            </div>
         </div>
 
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -141,12 +146,7 @@ const toggleCalendar = (busId) => {
                             </div>
                         </div>
                         
-                        <!-- Actions -->
-                        <div class="flex gap-3 pt-6 border-t border-[#f0edec] items-center">
-                            <button @click="openBookingForm(group)" class="w-full py-3 bg-[#10207a] text-white rounded-xl font-bold text-[14px] hover:bg-[#0c185e] transition-all flex items-center justify-center gap-2">
-                                <i class="fas fa-check-circle"></i> Pesan Tipe Bus Ini
-                            </button>
-                        </div>
+
                         
                         <!-- Expandable Calendar (Appears outside the list, shared dynamically) -->
                         <div v-for="unit in group.units" :key="'cal-' + unit.id">

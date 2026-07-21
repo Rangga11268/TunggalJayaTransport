@@ -38,8 +38,12 @@ class CharterController extends Controller
             'return_date' => 'required|date|after_or_equal:pickup_date',
             'pickup_location' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
-            'bus_type_requested' => 'nullable|string|max:255',
-            'bus_count' => 'nullable|integer|min:1',
+            'bus_requests' => 'required|array|min:1',
+            'bus_requests.*.type' => 'required|string',
+            'bus_requests.*.count' => 'required|integer|min:1',
+            'bus_requests.*.with_legrest' => 'boolean',
+            'bus_requests.*.seat_configuration' => 'nullable|string',
+            'passenger_count' => 'nullable|integer|min:1',
             'notes' => 'nullable|string',
         ]);
 
@@ -60,7 +64,7 @@ class CharterController extends Controller
         $totalPariwisataBuses = \App\Models\Bus::where('bus_category', 'pariwisata')->where('status', 'active')->count();
         $availableBuses = max(0, $totalPariwisataBuses - $overlappingBookingsCount);
 
-        $requestedCount = $validated['bus_count'] ?? 1;
+        $requestedCount = collect($validated['bus_requests'])->sum('count');
         if ($requestedCount > $availableBuses) {
             return response()->json([
                 'status' => 'error',
@@ -74,8 +78,9 @@ class CharterController extends Controller
             'charter_code' => $charterCode,
             'user_id' => $request->user()->id,
             'institution_name' => $validated['institution_name'] ?? null,
-            'bus_type_requested' => $validated['bus_type_requested'] ?? 'Big Bus',
+            'bus_requests' => $validated['bus_requests'],
             'bus_count' => $requestedCount,
+            'passenger_count' => $validated['passenger_count'] ?? null,
             'pickup_date' => $validated['pickup_date'],
             'return_date' => $validated['return_date'],
             'pickup_location' => $validated['pickup_location'],

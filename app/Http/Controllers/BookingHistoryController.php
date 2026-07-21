@@ -67,7 +67,7 @@ class BookingHistoryController extends Controller
         }
 
         $charter = \App\Models\CharterBooking::where('user_id', $user->id)
-            ->with('assignedBus')
+            ->with('buses')
             ->findOrFail($id);
 
         $charter->checkAndCancelIfExpired();

@@ -232,16 +232,49 @@ const payCharter = async (type) => {
                             </div>
                         </div>
 
-                        <!-- Bus Info -->
+                            <!-- Bus Info -->
                         <div class="grid grid-cols-1 gap-5 pt-6 border-t border-[#ebe7e7]">
+                            <!-- Requested Buses -->
                             <div>
-                                <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-1">Armada Yang Diminta</div>
-                                <div class="text-sm font-bold text-[#1c1b1b]">{{ charter.bus_type_requested || 'Bebas' }} ({{ charter.passenger_count || '-' }} Penumpang)</div>
+                                <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-2">Konfigurasi Bus Diminta</div>
+                                <div v-if="charter.bus_requests && charter.bus_requests.length > 0" class="space-y-2">
+                                    <div v-for="(req, idx) in charter.bus_requests" :key="idx" class="flex items-center justify-between">
+                                        <div class="text-sm font-bold text-[#1c1b1b]">
+                                            {{ req.type }} <span v-if="req.with_legrest" class="text-brand-red">(Leg Rest)</span>
+                                            <div class="text-xs font-normal text-[#454652] mt-0.5">Seat {{ req.seat_configuration }}</div>
+                                        </div>
+                                        <div class="text-sm font-bold text-[#10207a]">{{ req.count }} Unit</div>
+                                    </div>
+                                </div>
+                                <div v-else class="text-sm font-bold text-[#1c1b1b]">{{ charter.bus_type_requested || 'Bebas' }} ({{ charter.bus_count || 1 }} Unit)</div>
+                                <div class="text-xs font-semibold mt-2 text-[#454652]">Total Penumpang: {{ charter.passenger_count || '-' }} Orang</div>
                             </div>
-                            <div v-if="charter.assigned_bus">
+
+                            <!-- Assigned Buses -->
+                            <div v-if="charter.buses && charter.buses.length > 0" class="pt-4 border-t border-dashed border-[#ebe7e7]">
+                                <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-2">Armada Ditugaskan ({{ charter.buses.length }} Unit)</div>
+                                <div class="space-y-3">
+                                    <div v-for="bus in charter.buses" :key="bus.id" class="p-3 bg-[#f6f3f2] rounded-xl border border-[#ebe7e7]">
+                                        <div class="flex justify-between items-start mb-1">
+                                            <div class="text-sm font-bold text-[#1c1b1b]">{{ bus.name }}</div>
+                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                                :class="bus.bus_type.toLowerCase().includes('leg rest') ? 'bg-amber-100 text-amber-800' : 'bg-gray-200 text-gray-700'">
+                                                {{ bus.bus_type }}
+                                            </span>
+                                        </div>
+                                        <div class="text-xs text-[#454652] flex items-center gap-2">
+                                            <span><i class="fas fa-id-card text-[#10207a] mr-1"></i>{{ bus.plate_number }}</span>
+                                            <span class="text-gray-300">|</span>
+                                            <span><i class="fas fa-users text-[#10207a] mr-1"></i>{{ bus.capacity }} Seat</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="pt-4 border-t border-dashed border-[#ebe7e7]">
                                 <div class="text-[10px] font-bold text-[#454652] uppercase tracking-wider mb-1">Armada Ditugaskan</div>
-                                <div class="text-sm font-bold text-[#1c1b1b]">{{ charter.assigned_bus.name }} ({{ charter.assigned_bus.plate_number }})</div>
-                                <div class="text-xs text-[#10207a] font-semibold">{{ charter.assigned_bus.bus_type }}</div>
+                                <div class="text-sm text-amber-600 font-semibold bg-amber-50 p-2 rounded-lg border border-amber-100 inline-block">
+                                    <i class="fas fa-clock mr-1"></i> Menunggu Konfirmasi Admin
+                                </div>
                             </div>
                         </div>
                     </div>

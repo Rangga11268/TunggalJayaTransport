@@ -65,8 +65,12 @@ class CharterBookingController extends Controller
             'institution_name' => 'nullable|string|max:255',
             'assigned_bus_ids' => 'nullable|array',
             'assigned_bus_ids.*' => 'exists:buses,id',
-            'bus_count' => 'nullable|integer|min:1',
-            'bus_type_requested' => 'nullable|string',
+            'bus_requests' => 'required|array|min:1',
+            'bus_requests.*.type' => 'required|string',
+            'bus_requests.*.count' => 'required|integer|min:1',
+            'bus_requests.*.with_legrest' => 'boolean',
+            'bus_requests.*.seat_configuration' => 'nullable|string',
+            'passenger_count' => 'required|integer|min:1',
             'pickup_date' => 'required|date',
             'pickup_time' => 'required|string',
             'return_date' => 'required|date|after_or_equal:pickup_date',
@@ -98,7 +102,7 @@ class CharterBookingController extends Controller
         $totalPariwisataBuses = Bus::where('bus_category', 'pariwisata')->where('status', 'active')->count();
         $availableBuses = max(0, $totalPariwisataBuses - $overlappingBookingsCount);
 
-        $requestedCount = $validated['bus_count'] ?? (!empty($validated['assigned_bus_ids']) ? count($validated['assigned_bus_ids']) : 1);
+        $requestedCount = collect($validated['bus_requests'])->sum('count');
         if ($requestedCount > $availableBuses) {
             return back()->withErrors(['bus_count' => "Maaf, saat ini hanya tersedia {$availableBuses} unit bus pariwisata pada tanggal tersebut. Total bus yang diminta ({$requestedCount}) melebihi ketersediaan."])->withInput();
         }
@@ -128,31 +132,8 @@ class CharterBookingController extends Controller
             }
         } 
 
+        // No dummy user creation anymore. Just store directly in charter_bookings.
         $userId = $validated['user_id'] ?? null;
-
-        // If no user selected, create a new dummy user or find by email/phone
-        if (!$userId) {
-            $existingUser = null;
-            if (!empty($validated['customer_email'])) {
-                $existingUser = User::where('email', $validated['customer_email'])->first();
-            }
-            if (!$existingUser && !empty($validated['customer_phone'])) {
-                $existingUser = User::where('phone', $validated['customer_phone'])->first();
-            }
-
-            if ($existingUser) {
-                $userId = $existingUser->id;
-            } else {
-                $newUser = User::create([
-                    'name' => $validated['customer_name'],
-                    'email' => $validated['customer_email'] ?: (Str::slug($validated['customer_name']) . rand(100, 999) . '@offline.com'),
-                    'phone' => $validated['customer_phone'],
-                    'password' => Hash::make(Str::random(12)), // Random password
-                ]);
-                $newUser->assignRole('user');
-                $userId = $newUser->id;
-            }
-        }
 
         $busTypes = $validated['bus_type_requested'] ?? '';
         if (empty($busTypes) && !empty($validated['assigned_bus_ids'])) {
@@ -163,9 +144,13 @@ class CharterBookingController extends Controller
         $charterBooking = CharterBooking::create([
             'charter_code' => 'CHRT-' . strtoupper(Str::random(8)),
             'user_id' => $userId,
+            'customer_name' => $validated['customer_name'] ?? null,
+            'customer_email' => $validated['customer_email'] ?? null,
+            'customer_phone' => $validated['customer_phone'] ?? null,
             'institution_name' => $validated['institution_name'] ?? null,
-            'bus_type_requested' => $busTypes ?: 'Big Bus',
-            'bus_count' => $validated['bus_count'] ?? (!empty($validated['assigned_bus_ids']) ? count($validated['assigned_bus_ids']) : 1),
+            'bus_requests' => $validated['bus_requests'],
+            'bus_count' => $requestedCount,
+            'passenger_count' => $validated['passenger_count'],
             'pickup_date' => $validated['pickup_date'],
             'pickup_time' => $validated['pickup_time'],
             'return_date' => $validated['return_date'],
@@ -267,7 +252,20 @@ class CharterBookingController extends Controller
         if (empty($ids)) {
             return response()->json(['success' => false, 'message' => 'Tidak ada data dipilih.'], 400);
         }
-        CharterBooking::whereIn('id', $ids)->delete();
+        $bookings = CharterBooking::whereIn('id', $ids)->get();
+        foreach ($bookings as $booking) {
+            $booking->buses()->detach();
+            $booking->delete();
+        }
         return response()->json(['success' => true, 'message' => count($ids) . ' data berhasil dihapus.']);
+    }
+
+    public function destroy($id)
+    {
+        $charterBooking = CharterBooking::findOrFail($id);
+        $charterBooking->buses()->detach();
+        $charterBooking->delete();
+
+        return redirect()->route('admin.charter.index')->with('success', 'Data booking pariwisata berhasil dihapus.');
     }
 }

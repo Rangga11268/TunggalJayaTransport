@@ -11,20 +11,19 @@ const props = defineProps({
     buses: Array,
 });
 
-const isNewUser = ref(false);
-
 const form = useForm({
     // User fields
-    user_id: '',
     customer_name: '',
     customer_email: '',
     customer_phone: '',
     institution_name: '',
 
     // Booking fields
+    bus_requests: [
+        { type: 'Big Bus', count: 1, with_legrest: false, seat_configuration: 'Bebas' }
+    ],
     assigned_bus_ids: [],
-    bus_count: 1,
-    bus_type_requested: '',
+    passenger_count: '',
     pickup_date: '',
     pickup_time: '',
     return_date: '',
@@ -40,14 +39,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    // If not new user, clear the new user fields
-    if (!isNewUser.value) {
-        form.customer_name = '';
-        form.customer_email = '';
-        form.customer_phone = '';
-    } else {
-        form.user_id = '';
-    }
+
 
     form.post(route('admin.charter-bookings.store'), {
         preserveScroll: true,
@@ -84,28 +76,10 @@ const submit = () => {
                 <div>
                     <h3 class="text-lg font-medium text-gray-900 mb-4 border-b pb-2">1. Data Pelanggan</h3>
                     
-                    <div class="mb-4">
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" v-model="isNewUser" class="rounded border-gray-300 text-brand-red focus:ring-brand-red" />
-                            <span class="ml-2 text-sm text-gray-700">Pelanggan Baru (Belum ada di sistem)</span>
-                        </label>
-                    </div>
-
-                    <div v-if="!isNewUser" class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Pelanggan <span class="text-red-500">*</span></label>
-                        <select v-model="form.user_id" :required="!isNewUser" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red">
-                            <option value="">-- Pilih Pelanggan --</option>
-                            <option v-for="user in users" :key="user.id" :value="user.id">
-                                {{ user.name }} ({{ user.phone || user.email }})
-                            </option>
-                        </select>
-                        <div v-if="form.errors.user_id" class="text-red-500 text-xs mt-1">{{ form.errors.user_id }}</div>
-                    </div>
-
-                    <div v-if="isNewUser" class="space-y-4">
+                    <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap Pemesan <span class="text-red-500">*</span></label>
-                            <input type="text" v-model="form.customer_name" :required="isNewUser" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red" />
+                            <input type="text" v-model="form.customer_name" required class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red" />
                             <div v-if="form.errors.customer_name" class="text-red-500 text-xs mt-1">{{ form.errors.customer_name }}</div>
                         </div>
                         <div>
@@ -115,11 +89,11 @@ const submit = () => {
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">No. WhatsApp <span class="text-red-500">*</span></label>
-                            <input type="text" v-model="form.customer_phone" :required="isNewUser" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red" />
+                            <input type="text" v-model="form.customer_phone" required class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red" />
                             <div v-if="form.errors.customer_phone" class="text-red-500 text-xs mt-1">{{ form.errors.customer_phone }}</div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email (Opsional)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-gray-400 font-normal text-xs">(Opsional)</span></label>
                             <input type="email" v-model="form.customer_email" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red" />
                             <div v-if="form.errors.customer_email" class="text-red-500 text-xs mt-1">{{ form.errors.customer_email }}</div>
                         </div>
@@ -131,16 +105,48 @@ const submit = () => {
                     <h3 class="text-lg font-medium text-gray-900 mb-4 border-b pb-2">2. Data Armada & Perjalanan</h3>
                     
                     <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Bus Diminta</label>
-                            <input type="text" v-model="form.bus_type_requested" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red mb-4" placeholder="Misal: Big Bus" />
+                        <div v-for="(req, index) in form.bus_requests" :key="index" class="p-4 border border-gray-200 rounded-xl relative bg-gray-50">
+                            <h4 class="font-bold text-gray-800 text-sm mb-3 border-b border-gray-200 pb-2">Konfigurasi Bus {{ index + 1 }}</h4>
+                            <button v-if="form.bus_requests.length > 1" type="button" @click="form.bus_requests.splice(index, 1)" class="absolute top-4 right-4 text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="hidden">
+                                    <input type="hidden" v-model="req.type" value="Big Bus" />
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">Jumlah Unit (Dengan konfigurasi ini)</label>
+                                    <input v-model="req.count" type="number" min="1" required class="w-full rounded-lg border-gray-300 focus:border-brand-red text-sm" />
+                                </div>
+                                <div class="col-span-2 grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="flex items-center cursor-pointer mt-6">
+                                            <input type="checkbox" v-model="req.with_legrest" class="rounded border-gray-300 text-brand-red focus:ring-brand-red" />
+                                            <span class="ml-2 text-sm text-gray-700">Pakai Leg Rest</span>
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">Konfigurasi Kursi</label>
+                                        <select v-model="req.seat_configuration" class="w-full rounded-lg border-gray-300 focus:border-brand-red text-sm">
+                                            <option value="Bebas">Bebas (Standard)</option>
+                                            <option value="2-2">2-2 (Kanan 2, Kiri 2)</option>
+                                            <option value="3-2">3-2 (Kanan 3, Kiri 2)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" @click="form.bus_requests.push({ type: 'Big Bus', count: 1, with_legrest: false, seat_configuration: 'Bebas' })" class="w-full py-2 border border-dashed border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 text-sm">
+                            <i class="fas fa-plus mr-1"></i> Tambah Konfigurasi Berbeda (Misal: Beda Fasilitas)
+                        </button>
 
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Bus <span class="text-red-500">*</span></label>
-                            <input type="number" v-model="form.bus_count" required min="1" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red mb-4" />
-
+                        <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Total Penumpang Keseluruhan <span class="text-gray-400 font-normal text-xs">(Semua bus digabung)</span></label>
                             <input type="number" v-model="form.passenger_count" min="1" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red mb-4" placeholder="Misal: 100" />
+                        </div>
 
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Armada (Opsional, bisa lebih dari 1)</label>
                             <select multiple v-model="form.assigned_bus_ids" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red min-h-[120px]">
                                 <option v-for="bus in buses" :key="bus.id" :value="bus.id">
