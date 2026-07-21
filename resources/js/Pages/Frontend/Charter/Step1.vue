@@ -142,6 +142,7 @@ const submit = () => {
                                     <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Jumlah Bus <span class="text-[#10207a]">*</span></label>
                                     <input v-model="form.bus_count" type="number" min="1" required
                                         class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
+                                    <InputError :message="form.errors.bus_count" class="mt-2" />
                                 </div>
                             </div>
                             
