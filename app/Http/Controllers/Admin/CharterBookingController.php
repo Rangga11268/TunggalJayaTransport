@@ -46,7 +46,7 @@ class CharterBookingController extends Controller
 
     public function create()
     {
-        $buses = Bus::where('status', 'active')->get();
+        $buses = Bus::where('status', 'active')->where('bus_category', 'pariwisata')->get();
         $users = User::orderBy('name')->get();
 
         return Inertia::render('Admin/CharterBookings/Create', [
@@ -167,7 +167,7 @@ class CharterBookingController extends Controller
         $charter = CharterBooking::with(['user', 'buses'])->findOrFail($id);
         $charter->checkAndCancelIfExpired();
         
-        $buses = Bus::where('status', 'active')->get();
+        $buses = Bus::where('status', 'active')->where('bus_category', 'pariwisata')->get();
 
         return Inertia::render('Admin/CharterBookings/Show', [
             'charter' => $charter,

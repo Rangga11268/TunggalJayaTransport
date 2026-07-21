@@ -6,7 +6,7 @@ import InputError from "@/Components/InputError.vue";
 defineOptions({ layout: FrontendLayout });
 
 const props = defineProps({
-    selectedBus: Object,
+    selectedBusType: String,
     errors: Object, // Validation errors from session
 });
 
@@ -18,7 +18,7 @@ const form = useForm({
     return_date: "",
     pickup_location: urlParams.get('origin') || "",
     destination: urlParams.get('destination') || "",
-    bus_type_requested: props.selectedBus ? (props.selectedBus.name + " - " + props.selectedBus.capacity + " Seat") : "",
+    bus_type_requested: props.selectedBusType || "",
     bus_count: 1,
 });
 

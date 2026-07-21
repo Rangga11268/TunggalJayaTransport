@@ -39,15 +39,10 @@ class CharterController extends Controller
 
     public function step1(Request $request)
     {
-        $busId = $request->query('bus_id');
-        $bus = null;
-        
-        if ($busId) {
-            $bus = Bus::find($busId);
-        }
+        $busType = $request->query('bus_type');
 
         return Inertia::render('Frontend/Charter/Step1', [
-            'selectedBus' => $bus
+            'selectedBusType' => $busType
         ]);
     }
 
