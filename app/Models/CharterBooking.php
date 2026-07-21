@@ -12,6 +12,7 @@ class CharterBooking extends Model
     protected $fillable = [
         'charter_code',
         'user_id',
+        'institution_name',
         'bus_count',
         'assigned_bus_id',
         'bus_type_requested',

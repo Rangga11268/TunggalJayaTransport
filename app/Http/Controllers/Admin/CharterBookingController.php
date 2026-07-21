@@ -60,9 +60,9 @@ class CharterBookingController extends Controller
         $validated = $request->validate([
             'user_id' => 'nullable|exists:users,id',
             'customer_name' => 'required_without:user_id|string|max:255',
-            'customer_email' => 'nullable|email',
-            'customer_phone' => 'required_without:user_id|string|max:20',
-            
+            'customer_email' => 'nullable|email|max:255',
+            'customer_phone' => 'required_if:user_id,null|nullable|string|max:20',
+            'institution_name' => 'nullable|string|max:255',
             'assigned_bus_ids' => 'nullable|array',
             'assigned_bus_ids.*' => 'exists:buses,id',
             'bus_count' => 'nullable|integer|min:1',
@@ -163,6 +163,7 @@ class CharterBookingController extends Controller
         $charterBooking = CharterBooking::create([
             'charter_code' => 'CHRT-' . strtoupper(Str::random(8)),
             'user_id' => $userId,
+            'institution_name' => $validated['institution_name'] ?? null,
             'bus_type_requested' => $busTypes ?: 'Big Bus',
             'bus_count' => $validated['bus_count'] ?? (!empty($validated['assigned_bus_ids']) ? count($validated['assigned_bus_ids']) : 1),
             'pickup_date' => $validated['pickup_date'],

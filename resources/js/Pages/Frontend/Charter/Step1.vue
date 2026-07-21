@@ -18,6 +18,7 @@ const form = useForm({
     return_date: "",
     pickup_location: urlParams.get('origin') || "",
     destination: urlParams.get('destination') || "",
+    institution_name: "",
     bus_type_requested: props.selectedBusType || "",
     bus_count: 1,
 });
@@ -130,6 +131,19 @@ const submit = () => {
                                     </div>
                                     <InputError :message="form.errors.destination" class="mt-2" />
                                 </div>
+                            </div>
+                            
+                            <!-- Institution / Organisasi -->
+                            <div class="mt-5">
+                                <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Asal Instansi / Sekolah / Biro <span class="text-gray-400 font-normal">(Opsional)</span></label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                                        <i class="fas fa-building text-sm"></i>
+                                    </div>
+                                    <input v-model="form.institution_name" type="text" placeholder="Misal: SMAN 1 Jakarta / PT Maju Jaya"
+                                        class="w-full pl-10 pr-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
+                                </div>
+                                <InputError :message="form.errors.institution_name" class="mt-2" />
                             </div>
                             <!-- Custom Bus Type Requested & Count -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">

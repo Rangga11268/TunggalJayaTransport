@@ -20,6 +20,8 @@ const form = useForm({
     pickup_location: props.bookingData?.pickup_location || "",
     destination: props.bookingData?.destination || "",
     bus_type_requested: props.bookingData?.bus_type_requested || "",
+    bus_count: props.bookingData?.bus_count || "",
+    institution_name: props.bookingData?.institution_name || "",
     bus_id: props.bookingData?.bus_id || null,
     
     pickup_lat: null,
@@ -141,9 +143,13 @@ const submit = () => {
                         <h3 class="font-unbounded font-bold text-[#1c1b1b] text-xl mb-4">Ringkasan Pesanan</h3>
                         
                         <div class="space-y-4">
+                            <div v-if="form.institution_name" class="flex justify-between pb-4 border-b border-gray-100">
+                                <span class="text-gray-500 text-sm">Instansi / Sekolah</span>
+                                <span class="font-bold text-[#1c1b1b] text-sm text-right">{{ form.institution_name }}</span>
+                            </div>
                             <div class="flex justify-between pb-4 border-b border-gray-100">
                                 <span class="text-gray-500 text-sm">Armada</span>
-                                <span class="font-bold text-[#1c1b1b] text-sm">{{ form.bus_type_requested }}</span>
+                                <span class="font-bold text-[#1c1b1b] text-sm">{{ form.bus_type_requested }} ({{ form.bus_count }} Unit)</span>
                             </div>
                             <div class="flex justify-between pb-4 border-b border-gray-100">
                                 <span class="text-gray-500 text-sm">Tanggal</span>

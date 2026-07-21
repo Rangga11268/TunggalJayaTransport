@@ -114,7 +114,10 @@ const formatRupiah = (value) => {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Nama Pemesan</p>
-                            <p class="font-medium text-gray-900 dark:text-white">{{ charter.user?.name || '-' }}</p>
+                            <p class="font-medium text-gray-900 dark:text-white mb-2">{{ charter.user?.name || '-' }}</p>
+
+                            <p class="text-sm text-gray-500 mb-1 mt-4">Instansi / Organisasi</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ charter.institution_name || '-' }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Nomor HP / WhatsApp</p>

@@ -33,6 +33,7 @@ class CharterController extends Controller
         $minDate = now()->addDays(3)->toDateString();
 
         $validated = $request->validate([
+            'institution_name' => 'nullable|string|max:255',
             'pickup_date' => 'required|date|after_or_equal:' . $minDate,
             'return_date' => 'required|date|after_or_equal:pickup_date',
             'pickup_location' => 'required|string|max:255',
@@ -72,6 +73,7 @@ class CharterController extends Controller
         $charter = CharterBooking::create([
             'charter_code' => $charterCode,
             'user_id' => $request->user()->id,
+            'institution_name' => $validated['institution_name'] ?? null,
             'bus_type_requested' => $validated['bus_type_requested'] ?? 'Big Bus',
             'bus_count' => $requestedCount,
             'pickup_date' => $validated['pickup_date'],

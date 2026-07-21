@@ -19,6 +19,7 @@ const form = useForm({
     customer_name: '',
     customer_email: '',
     customer_phone: '',
+    institution_name: '',
 
     // Booking fields
     assigned_bus_ids: [],
@@ -103,9 +104,14 @@ const submit = () => {
 
                     <div v-if="isNewUser" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap Pemesan <span class="text-red-500">*</span></label>
                             <input type="text" v-model="form.customer_name" :required="isNewUser" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red" />
                             <div v-if="form.errors.customer_name" class="text-red-500 text-xs mt-1">{{ form.errors.customer_name }}</div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Instansi / Organisasi <span class="text-gray-400 font-normal text-xs">(Opsional)</span></label>
+                            <input type="text" v-model="form.institution_name" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red" placeholder="Misal: SMAN 1 Jakarta" />
+                            <div v-if="form.errors.institution_name" class="text-red-500 text-xs mt-1">{{ form.errors.institution_name }}</div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">No. WhatsApp <span class="text-red-500">*</span></label>
