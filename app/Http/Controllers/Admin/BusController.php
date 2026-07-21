@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;
+use App\Models\CharterBooking;
 
 class BusController extends Controller
 {
@@ -41,6 +42,39 @@ class BusController extends Controller
         return Inertia::render('Admin/Buses/Index', [
             'buses' => $buses,
             'filters' => $request->only(['search'])
+        ]);
+    }
+
+    public function calendar(Request $request)
+    {
+        $buses = Bus::where('status', 'active')
+            ->with(['charterBookings' => function($q) {
+                $q->where('status', '!=', 'cancelled')
+                  ->where(function($query) {
+                      $query->whereIn('payment_status', ['dp_paid', 'fully_paid', 'paid', 'partial'])
+                            ->orWhereIn('status', ['confirmed', 'completed']);
+                  });
+            }])
+            ->get();
+
+        $events = [];
+        foreach ($buses as $bus) {
+            foreach ($bus->charterBookings as $booking) {
+                $events[] = [
+                    'id' => $booking->id,
+                    'resourceId' => $bus->id,
+                    'title' => $booking->charter_code . ' (' . $booking->pickup_location . ' -> ' . $booking->destination . ')',
+                    'start' => $booking->pickup_date->format('Y-m-d') . 'T' . $booking->pickup_time,
+                    'end' => $booking->return_date->format('Y-m-d') . 'T23:59:59', // all day until end of return date
+                    'status' => $booking->status,
+                    'url' => route('admin.charter-bookings.show', $booking->id),
+                ];
+            }
+        }
+
+        return Inertia::render('Admin/Buses/Calendar', [
+            'buses' => $buses->map(function($b) { return ['id' => $b->id, 'title' => $b->name . ' (' . $b->plate_number . ')']; }),
+            'events' => $events,
         ]);
     }
 

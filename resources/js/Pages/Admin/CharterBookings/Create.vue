@@ -21,7 +21,9 @@ const form = useForm({
     customer_phone: '',
 
     // Booking fields
-    assigned_bus_id: '',
+    assigned_bus_ids: [],
+    bus_count: 1,
+    bus_type_requested: '',
     pickup_date: '',
     pickup_time: '',
     return_date: '',
@@ -123,14 +125,20 @@ const submit = () => {
                     
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Armada <span class="text-red-500">*</span></label>
-                            <select v-model="form.assigned_bus_id" required class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red">
-                                <option value="">-- Pilih Armada Bus --</option>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Bus Diminta</label>
+                            <input type="text" v-model="form.bus_type_requested" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red mb-4" placeholder="Misal: Big Bus" />
+
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Bus <span class="text-red-500">*</span></label>
+                            <input type="number" v-model="form.bus_count" required min="1" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red mb-4" />
+
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Armada (Opsional, bisa lebih dari 1)</label>
+                            <select multiple v-model="form.assigned_bus_ids" class="w-full rounded-lg border-gray-300 focus:border-brand-red focus:ring-brand-red min-h-[120px]">
                                 <option v-for="bus in buses" :key="bus.id" :value="bus.id">
                                     {{ bus.name }} - {{ bus.capacity }} Seat ({{ bus.plate_number }})
                                 </option>
                             </select>
-                            <div v-if="form.errors.assigned_bus_id" class="text-red-500 text-xs mt-1">{{ form.errors.assigned_bus_id }}</div>
+                            <p class="text-xs text-gray-500 mt-1">Tahan tombol Ctrl (Windows) atau Command (Mac) untuk memilih lebih dari 1 armada.</p>
+                            <div v-if="form.errors.assigned_bus_ids" class="text-red-500 text-xs mt-1">{{ form.errors.assigned_bus_ids }}</div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">

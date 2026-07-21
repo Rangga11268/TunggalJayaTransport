@@ -34,6 +34,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:' . App\Models
 
     // Buses — bulk-delete BEFORE resource
     Route::delete('/buses/bulk-delete', [BusController::class, 'bulkDestroy'])->name('buses.bulk-destroy')->middleware('role:' . App\Models\User::ROLE_ADMIN);
+    Route::get('/buses/calendar', [BusController::class, 'calendar'])->name('buses.calendar')->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
     Route::resource('buses', BusController::class)->middleware('role:' . App\Models\User::ROLE_ADMIN . ',' . App\Models\User::ROLE_SCHEDULE_MANAGER);
     Route::get('/buses/check-plate/{plateNumber}', [BusController::class, 'checkPlateNumber'])->name('buses.check-plate');
 

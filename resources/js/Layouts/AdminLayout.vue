@@ -512,6 +512,27 @@ watch(
                                 </span>
                             </Link>
                             <Link
+                                :href="route('admin.buses.calendar')"
+                                :class="[
+                                    'block py-2 text-sm transition-all duration-200 hover:translate-x-1',
+                                    route().current('admin.buses.calendar')
+                                        ? 'text-brand-red dark:text-white font-bold'
+                                        : 'text-gray-500 dark:text-gray-500 hover:text-brand-red dark:hover:text-white',
+                                ]"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full"
+                                        :class="
+                                            route().current('admin.buses.calendar')
+                                                ? 'bg-brand-red'
+                                                : 'bg-slate-300 dark:bg-gray-700'
+                                        "
+                                    ></span>
+                                    Kalender Armada
+                                </span>
+                            </Link>
+                            <Link
                                 :href="route('admin.routes.index')"
                                 :class="[
                                     'block py-2 text-sm transition-all duration-200 hover:translate-x-1',

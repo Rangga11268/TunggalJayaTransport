@@ -11,11 +11,11 @@ const props = defineProps({
 });
 
 const form = useForm({
-    total_price: props.charter.total_price || 0,
-    down_payment: props.charter.down_payment || 0,
-    assigned_bus_id: props.charter.assigned_bus_id || "",
-    status: props.charter.status || "pending",
-    payment_method: props.charter.payment_method || "system",
+    total_price: props.charter.total_price || '',
+    down_payment: props.charter.down_payment || '',
+    assigned_bus_ids: props.charter.buses ? props.charter.buses.map(b => b.id) : [],
+    status: props.charter.status || 'pending',
+    payment_method: props.charter.payment_method || 'manual',
     payment_status: props.charter.payment_status || "unpaid",
     payment_proof: null,
     _method: 'put',
@@ -148,8 +148,22 @@ const formatRupiah = (value) => {
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
+                            <p class="text-sm text-gray-500 mb-1">Tipe & Jumlah Bus Diminta</p>
+                            <p class="font-medium text-gray-900 dark:text-white mb-2">{{ charter.bus_type_requested }} <span class="text-brand-red font-bold ml-1">({{ charter.bus_count }} Unit)</span></p>
+                            
+                            <p class="text-sm text-gray-500 mb-1">Armada Ditetapkan</p>
+                            <p class="font-medium text-gray-900 dark:text-white text-sm mb-4">
+                                <span v-if="charter.buses && charter.buses.length > 0">
+                                    <span v-for="(bus, index) in charter.buses" :key="bus.id" class="inline-block bg-gray-100 dark:bg-gray-800 rounded px-2 py-1 mr-1 mb-1 text-xs">
+                                        {{ bus.name }} ({{ bus.plate_number }})
+                                    </span>
+                                </span>
+                                <span v-else class="text-yellow-600">Belum ada armada ditetapkan</span>
+                            </p>
+
                             <p class="text-sm text-gray-500 mb-1">Titik Jemput (Kota)</p>
                             <p class="font-medium text-gray-900 dark:text-white mb-2">{{ charter.pickup_location }}</p>
+                            
                             <p class="text-sm text-gray-500 mb-1">Alamat Lengkap Jemput</p>
                             <p class="font-medium text-gray-900 dark:text-white text-sm mb-4">{{ charter.pickup_address || '-' }}</p>
                             
@@ -183,8 +197,8 @@ const formatRupiah = (value) => {
                 
                 <form @submit.prevent="submit" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipe Bus Diminta</label>
-                        <input type="text" disabled :value="charter.bus_type_requested" class="w-full px-4 py-2 bg-gray-50 dark:bg-black/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-500 text-sm" />
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipe & Jumlah Bus Diminta</label>
+                        <input type="text" disabled :value="charter.bus_type_requested + ' (' + charter.bus_count + ' Unit)'" class="w-full px-4 py-2 bg-gray-50 dark:bg-black/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-500 text-sm" />
                     </div>
 
                     <div>
@@ -199,14 +213,14 @@ const formatRupiah = (value) => {
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pilih Armada (Opsional)</label>
-                        <select v-model="form.assigned_bus_id" class="w-full px-4 py-2 bg-white dark:bg-[#151515] border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-brand-red focus:border-brand-red text-sm dark:text-white">
-                            <option value="">Belum ditentukan</option>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pilih Armada (Bisa lebih dari 1)</label>
+                        <select multiple v-model="form.assigned_bus_ids" class="w-full px-4 py-2 bg-white dark:bg-[#151515] border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-brand-red focus:border-brand-red text-sm dark:text-white min-h-[120px]">
                             <option v-for="bus in buses" :key="bus.id" :value="bus.id">
                                 {{ bus.plate_number }} - {{ bus.name }} ({{ bus.bus_type }})
                             </option>
                         </select>
-                        <InputError :message="form.errors.assigned_bus_id" class="mt-2" />
+                        <p class="text-xs text-gray-500 mt-1">Tahan tombol Ctrl (Windows) atau Command (Mac) untuk memilih lebih dari 1 armada.</p>
+                        <InputError :message="form.errors.assigned_bus_ids" class="mt-2" />
                     </div>
 
                     <div>

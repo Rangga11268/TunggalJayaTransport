@@ -12,6 +12,7 @@ class CharterBooking extends Model
     protected $fillable = [
         'charter_code',
         'user_id',
+        'bus_count',
         'assigned_bus_id',
         'bus_type_requested',
         'passenger_count',
@@ -50,6 +51,11 @@ class CharterBooking extends Model
     public function assignedBus()
     {
         return $this->belongsTo(Bus::class, 'assigned_bus_id');
+    }
+
+    public function buses()
+    {
+        return $this->belongsToMany(Bus::class, 'charter_booking_bus', 'charter_booking_id', 'bus_id')->withTimestamps();
     }
 
     public function paymentHistories()

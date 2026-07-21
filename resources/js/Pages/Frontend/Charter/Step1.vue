@@ -19,7 +19,7 @@ const form = useForm({
     pickup_location: urlParams.get('origin') || "",
     destination: urlParams.get('destination') || "",
     bus_type_requested: props.selectedBus ? (props.selectedBus.name + " - " + props.selectedBus.capacity + " Seat") : "",
-    bus_id: props.selectedBus ? props.selectedBus.id : "",
+    bus_count: 1,
 });
 
 const submit = () => {
@@ -56,8 +56,8 @@ const submit = () => {
                         
                         <div class="space-y-4">
                             <div class="flex justify-between pb-4 border-b border-gray-100">
-                                <span class="text-gray-500 text-sm">Armada</span>
-                                <span class="font-bold text-[#1c1b1b] text-sm">{{ form.bus_type_requested || '-' }}</span>
+                                <span class="text-gray-500 text-sm">Tipe & Jumlah</span>
+                                <span class="font-bold text-[#1c1b1b] text-sm">{{ form.bus_type_requested || '-' }} ({{ form.bus_count }} Unit)</span>
                             </div>
                             <div class="flex justify-between pb-4 border-b border-gray-100">
                                 <span class="text-gray-500 text-sm">Tanggal</span>
@@ -131,17 +131,21 @@ const submit = () => {
                                     <InputError :message="form.errors.destination" class="mt-2" />
                                 </div>
                             </div>
-                            
-                            <!-- Check Bus Availability based on dates -->
-                            <div v-if="form.errors.bus_id" class="p-4 rounded-xl bg-red-50 text-red-600 border border-red-100 flex gap-3 text-sm">
-                                <i class="fas fa-exclamation-circle mt-0.5"></i>
+                            <!-- Custom Bus Type Requested & Count -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
                                 <div>
-                                    <p class="font-bold">Bus tidak tersedia pada tanggal ini!</p>
-                                    <p>{{ form.errors.bus_id }}</p>
+                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Tipe Bus (Opsional)</label>
+                                    <input v-model="form.bus_type_requested" type="text" placeholder="Misal: Big Bus"
+                                        class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Jumlah Bus <span class="text-[#10207a]">*</span></label>
+                                    <input v-model="form.bus_count" type="number" min="1" required
+                                        class="w-full px-4 py-3 bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white focus:ring-0 rounded-[10px] text-[#1c1b1b] text-sm outline-none transition-all" />
                                 </div>
                             </div>
                             
-                            <div class="pt-4 border-t border-[#f0edec] flex justify-end gap-3">
+                            <div class="pt-4 border-t border-[#f0edec] flex justify-end gap-3 mt-6">
                                 <button type="submit" :disabled="form.processing"
                                     class="w-full md:w-auto px-8 py-3 bg-[#10207a] text-white rounded-xl font-bold hover:bg-[#0c185e] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                                     <span v-if="form.processing"><i class="fas fa-spinner fa-spin"></i> Lanjut</span>

@@ -62,30 +62,8 @@ class CharterController extends Controller
             'pickup_location' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
             'bus_type_requested' => 'nullable|string|max:255',
-            'bus_id' => 'nullable|exists:buses,id',
+            'bus_count' => 'nullable|integer|min:1',
         ]);
-
-        if (!empty($validated['bus_id'])) {
-            $overlapping = CharterBooking::where('assigned_bus_id', $validated['bus_id'])
-                ->where(function($q) {
-                    $q->whereIn('payment_status', ['dp_paid', 'paid'])
-                      ->orWhereIn('status', ['confirmed', 'completed']);
-                })
-                ->where('status', '!=', 'cancelled')
-                ->where(function ($query) use ($validated) {
-                    $query->whereBetween('pickup_date', [$validated['pickup_date'], $validated['return_date']])
-                        ->orWhereBetween('return_date', [$validated['pickup_date'], $validated['return_date']])
-                        ->orWhere(function ($q) use ($validated) {
-                            $q->where('pickup_date', '<=', $validated['pickup_date'])
-                              ->where('return_date', '>=', $validated['return_date']);
-                        });
-                })
-                ->exists();
-
-            if ($overlapping) {
-                return back()->withErrors(['bus_id' => 'Bus yang Anda pilih sudah disewa (DP Lunas) oleh pelanggan lain pada rentang tanggal tersebut. Silakan pilih tanggal lain atau cek ketersediaan armada lain.'])->withInput();
-            }
-        }
 
         $request->session()->put('charter_step1', $validated);
 
@@ -122,7 +100,7 @@ class CharterController extends Controller
             'destination_lng' => 'nullable|numeric',
             'destination_address' => 'nullable|string',
             'bus_type_requested' => 'nullable|string|max:255',
-            'bus_id' => 'nullable|exists:buses,id',
+            'bus_count' => 'nullable|integer|min:1',
             'passenger_count' => 'nullable|integer|min:1',
             'notes' => 'nullable|string',
         ]);
@@ -133,7 +111,7 @@ class CharterController extends Controller
             'charter_code' => $charterCode,
             'user_id' => $request->user()->id,
             'bus_type_requested' => $validated['bus_type_requested'] ?? 'Big Bus',
-            'assigned_bus_id' => $validated['bus_id'] ?? null,
+            'bus_count' => $validated['bus_count'] ?? 1,
             'passenger_count' => $validated['passenger_count'],
             'pickup_date' => $validated['pickup_date'],
             'pickup_time' => $validated['pickup_time'],

@@ -110,7 +110,7 @@ const toggleCalendar = (busId) => {
                                 <i class="far fa-calendar-alt"></i> Cek Ketersediaan
                             </button>
                             <button @click="openBookingForm(bus)" class="w-full sm:w-1/2 py-3 bg-[#10207a] text-white rounded-xl font-bold text-[14px] hover:bg-[#0c185e] transition-all flex items-center justify-center gap-2">
-                                <i class="fas fa-check-circle"></i> Pesan Bus Ini
+                                <i class="fas fa-check-circle"></i> Pesan Tipe Bus Ini
                             </button>
                         </div>
                         

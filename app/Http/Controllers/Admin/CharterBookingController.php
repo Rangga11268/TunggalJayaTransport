@@ -63,7 +63,10 @@ class CharterBookingController extends Controller
             'customer_email' => 'nullable|email',
             'customer_phone' => 'required_without:user_id|string|max:20',
             
-            'assigned_bus_id' => 'required|exists:buses,id',
+            'assigned_bus_ids' => 'nullable|array',
+            'assigned_bus_ids.*' => 'exists:buses,id',
+            'bus_count' => 'nullable|integer|min:1',
+            'bus_type_requested' => 'nullable|string',
             'pickup_date' => 'required|date',
             'pickup_time' => 'required|string',
             'return_date' => 'required|date|after_or_equal:pickup_date',
@@ -77,28 +80,30 @@ class CharterBookingController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $overlapping = CharterBooking::where('assigned_bus_id', $validated['assigned_bus_id'])
-            ->where(function($q) {
-                $q->where('payment_status', 'dp_paid')
-                  ->orWhere('payment_status', 'paid')
-                  ->orWhere('payment_status', 'partial')
-                  ->orWhere('status', 'confirmed')
-                  ->orWhere('status', 'completed');
-            })
-            ->where('status', '!=', 'cancelled')
-            ->where(function ($query) use ($validated) {
-                $query->whereBetween('pickup_date', [$validated['pickup_date'], $validated['return_date']])
-                    ->orWhereBetween('return_date', [$validated['pickup_date'], $validated['return_date']])
-                    ->orWhere(function ($q) use ($validated) {
-                        $q->where('pickup_date', '<=', $validated['pickup_date'])
-                          ->where('return_date', '>=', $validated['return_date']);
-                    });
-            })
-            ->exists();
+        if (!empty($validated['assigned_bus_ids'])) {
+            $overlapping = CharterBooking::where('id', '!=', 0)
+                ->whereHas('buses', function($q) use ($validated) {
+                    $q->whereIn('bus_id', $validated['assigned_bus_ids']);
+                })
+                ->where(function($q) {
+                    $q->whereIn('payment_status', ['dp_paid', 'fully_paid', 'paid', 'partial'])
+                      ->orWhereIn('status', ['confirmed', 'completed']);
+                })
+                ->where('status', '!=', 'cancelled')
+                ->where(function ($query) use ($validated) {
+                    $query->whereBetween('pickup_date', [$validated['pickup_date'], $validated['return_date']])
+                        ->orWhereBetween('return_date', [$validated['pickup_date'], $validated['return_date']])
+                        ->orWhere(function ($q) use ($validated) {
+                            $q->where('pickup_date', '<=', $validated['pickup_date'])
+                              ->where('return_date', '>=', $validated['return_date']);
+                        });
+                })
+                ->exists();
 
-        if ($overlapping) {
-            return back()->withErrors(['assigned_bus_id' => 'Bus ini tidak bisa dipilih karena sudah dipesan (DP/Lunas) oleh penyewa lain pada rentang tanggal tersebut.'])->withInput();
-        }
+            if ($overlapping) {
+                return back()->withErrors(['assigned_bus_ids' => 'Satu atau lebih bus ini tidak bisa dipilih karena sudah dipesan oleh penyewa lain pada rentang tanggal tersebut.'])->withInput();
+            }
+        } 
 
         $userId = $validated['user_id'] ?? null;
 
@@ -126,13 +131,17 @@ class CharterBookingController extends Controller
             }
         }
 
-        $bus = Bus::find($validated['assigned_bus_id']);
+        $busTypes = $validated['bus_type_requested'] ?? '';
+        if (empty($busTypes) && !empty($validated['assigned_bus_ids'])) {
+            $buses = Bus::whereIn('id', $validated['assigned_bus_ids'])->get();
+            $busTypes = $buses->map(function($b) { return $b->name . ' - ' . $b->capacity . ' Seat'; })->implode(', ');
+        }
         
         $charterBooking = CharterBooking::create([
             'charter_code' => 'CHRT-' . strtoupper(Str::random(8)),
             'user_id' => $userId,
-            'assigned_bus_id' => $validated['assigned_bus_id'],
-            'bus_type_requested' => $bus->name . ' - ' . $bus->capacity . ' Seat',
+            'bus_type_requested' => $busTypes ?: 'Big Bus',
+            'bus_count' => $validated['bus_count'] ?? (!empty($validated['assigned_bus_ids']) ? count($validated['assigned_bus_ids']) : 1),
             'pickup_date' => $validated['pickup_date'],
             'pickup_time' => $validated['pickup_time'],
             'return_date' => $validated['return_date'],
@@ -146,12 +155,16 @@ class CharterBookingController extends Controller
             'notes' => $validated['notes'],
         ]);
 
+        if (!empty($validated['assigned_bus_ids'])) {
+            $charterBooking->buses()->sync($validated['assigned_bus_ids']);
+        }
+
         return redirect()->route('admin.charter-bookings.index')->with('success', 'Data sewa pariwisata berhasil ditambahkan.');
     }
 
     public function show($id)
     {
-        $charter = CharterBooking::with(['user', 'assignedBus'])->findOrFail($id);
+        $charter = CharterBooking::with(['user', 'buses'])->findOrFail($id);
         $charter->checkAndCancelIfExpired();
         
         $buses = Bus::where('status', 'active')->get();
@@ -169,23 +182,22 @@ class CharterBookingController extends Controller
         $validated = $request->validate([
             'total_price' => 'nullable|numeric|min:0',
             'down_payment' => 'nullable|numeric|min:0',
-            'assigned_bus_id' => 'nullable|exists:buses,id',
+            'assigned_bus_ids' => 'nullable|array',
+            'assigned_bus_ids.*' => 'exists:buses,id',
             'status' => 'required|in:pending,quoted,confirmed,completed,cancelled',
             'payment_method' => 'nullable|in:system,manual',
             'payment_status' => 'nullable|in:unpaid,dp_paid,fully_paid,failed',
             'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        if (!empty($validated['assigned_bus_id'])) {
+        if (!empty($validated['assigned_bus_ids'])) {
             $overlapping = CharterBooking::where('id', '!=', $id)
-                ->where('assigned_bus_id', $validated['assigned_bus_id'])
+                ->whereHas('buses', function($q) use ($validated) {
+                    $q->whereIn('bus_id', $validated['assigned_bus_ids']);
+                })
                 ->where(function($q) {
-                    $q->where('payment_status', 'dp_paid')
-                      ->orWhere('payment_status', 'fully_paid')
-                      ->orWhere('payment_status', 'paid')
-                      ->orWhere('payment_status', 'partial')
-                      ->orWhere('status', 'confirmed')
-                      ->orWhere('status', 'completed');
+                    $q->whereIn('payment_status', ['dp_paid', 'fully_paid', 'paid', 'partial'])
+                      ->orWhereIn('status', ['confirmed', 'completed']);
                 })
                 ->where('status', '!=', 'cancelled')
                 ->where(function ($query) use ($charter) {
@@ -199,7 +211,7 @@ class CharterBookingController extends Controller
                 ->exists();
 
             if ($overlapping) {
-                return back()->withErrors(['assigned_bus_id' => 'Bus ini tidak bisa dipilih karena sudah dipesan (DP Lunas) oleh penyewa lain pada tanggal tersebut.']);
+                return back()->withErrors(['assigned_bus_ids' => 'Satu atau lebih bus tidak bisa dipilih karena sudah dipesan (DP Lunas) oleh penyewa lain pada tanggal tersebut.']);
             }
         }
 
@@ -215,7 +227,12 @@ class CharterBookingController extends Controller
             $validated['payment_proof'] = 'uploads/proofs/' . $filename;
         }
 
+        unset($validated['assigned_bus_ids']);
         $charter->update($validated);
+        
+        if ($request->has('assigned_bus_ids')) {
+            $charter->buses()->sync($request->input('assigned_bus_ids', []));
+        }
 
         return back()->with('success', 'Data sewa pariwisata berhasil diperbarui.');
     }

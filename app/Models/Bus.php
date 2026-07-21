@@ -24,6 +24,11 @@ class Bus extends Model implements HasMedia
 
     protected $appends = ['image_url'];
 
+    public function activeBookings()
+    {
+        return $this->hasMany(Booking::class, 'assigned_bus_id')->where('status', 'active');
+    }
+
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
@@ -31,7 +36,7 @@ class Bus extends Model implements HasMedia
 
     public function charterBookings()
     {
-        return $this->hasMany(CharterBooking::class, 'assigned_bus_id');
+        return $this->belongsToMany(CharterBooking::class, 'charter_booking_bus', 'bus_id', 'charter_booking_id')->withTimestamps();
     }
 
     public function drivers()
