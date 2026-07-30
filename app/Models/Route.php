@@ -11,7 +11,9 @@ class Route extends Model
     protected $fillable = [
         'name',
         'origin',
+        'origin_address',
         'destination',
+        'destination_address',
         'origin_lat',
         'origin_lng',
         'destination_lat',

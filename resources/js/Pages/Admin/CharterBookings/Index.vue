@@ -206,14 +206,16 @@ const getPaymentStatusText = (status) => {
                                     {{ charter.user?.name || "User Terhapus" }}
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="font-medium text-gray-900 dark:text-white">
-                                    {{ charter.pickup_location }} <i class="fas fa-arrow-right mx-1 text-[10px] text-gray-400"></i> {{ charter.destination }}
-                                </div>
-                                <div class="text-xs text-gray-500 mt-0.5">
-                                    {{ formatDate(charter.pickup_date) }} - {{ formatDate(charter.return_date) }}
-                                </div>
-                            </td>
+                            <td class="px-6 py-4 max-w-[220px]">
+                                <div class="font-medium text-gray-900 dark:text-white truncate" :title="`${charter.pickup_location} -> ${charter.destination}`">
+                                     {{ charter.pickup_location ? charter.pickup_location.split(',')[0] : '-' }} 
+                                     <i class="fas fa-arrow-right mx-1 text-[10px] text-gray-400"></i> 
+                                     {{ charter.destination ? charter.destination.split(',')[0] : '-' }}
+                                 </div>
+                                 <div class="text-xs text-gray-500 mt-0.5">
+                                     {{ formatDate(charter.pickup_date) }} - {{ formatDate(charter.return_date) }}
+                                 </div>
+                             </td>
                             <td class="px-6 py-4">
                                 <span class="px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-medium border border-gray-200 dark:border-gray-700">
                                     {{ charter.bus_type_requested }}

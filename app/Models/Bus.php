@@ -22,6 +22,20 @@ class Bus extends Model implements HasMedia
         'year',
     ];
 
+    public static function getStandardFacilities()
+    {
+        return collect([
+            ['name' => 'Full AC Dual Blower', 'icon' => 'fas fa-snowflake', 'desc' => 'Suhu kabin teratur dan sejuk sepanjang perjalanan'],
+            ['name' => 'Audio & Karaoke Smart TV', 'icon' => 'fas fa-tv', 'desc' => 'Layar multimedia hiburan dan sistem karaoke'],
+            ['name' => 'Wi-Fi Gratis 4G', 'icon' => 'fas fa-wifi', 'desc' => 'Koneksi internet stabil untuk seluruh penumpang'],
+            ['name' => 'Toilet Bersih High-Standard', 'icon' => 'fas fa-toilet', 'desc' => 'Fasilitas toilet yang terawat di dalam bus'],
+            ['name' => 'Reclining Seat & Leg Rest', 'icon' => 'fas fa-chair', 'desc' => 'Kursi ergonomis bersandar empuk dengan sandaran kaki'],
+            ['name' => 'USB Fast Charger', 'icon' => 'fas fa-plug', 'desc' => 'Colokan pengisi daya gadget di setiap baris kursi'],
+            ['name' => 'Bantal & Selimut Steril', 'icon' => 'fas fa-[#10207a]', 'desc' => 'Perlengkapan istirahat bersih dan wangi'],
+            ['name' => 'Bagasi Ekstra Luas', 'icon' => 'fas fa-suitcase-rolling', 'desc' => 'Kapasitas bagasi barang yang aman dan besar'],
+        ]);
+    }
+
     protected $appends = ['image_url'];
 
     public function activeBookings()

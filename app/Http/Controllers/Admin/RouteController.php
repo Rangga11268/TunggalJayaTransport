@@ -46,7 +46,9 @@ class RouteController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'origin' => 'required|string|max:255',
+            'origin_address' => 'nullable|string',
             'destination' => 'required|string|max:255',
+            'destination_address' => 'nullable|string',
             'origin_lat' => 'nullable|numeric|between:-90,90',
             'origin_lng' => 'nullable|numeric|between:-180,180',
             'destination_lat' => 'nullable|numeric|between:-90,90',
@@ -87,7 +89,9 @@ class RouteController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'origin' => 'required|string|max:255',
+            'origin_address' => 'nullable|string',
             'destination' => 'required|string|max:255',
+            'destination_address' => 'nullable|string',
             'origin_lat' => 'nullable|numeric|between:-90,90',
             'origin_lng' => 'nullable|numeric|between:-180,180',
             'destination_lat' => 'nullable|numeric|between:-90,90',
@@ -161,7 +165,9 @@ class RouteController extends Controller
         return [
             'name' => $request->string('name')->toString(),
             'origin' => $request->string('origin')->toString(),
+            'origin_address' => $request->input('origin_address'),
             'destination' => $request->string('destination')->toString(),
+            'destination_address' => $request->input('destination_address'),
             'origin_lat' => $this->normalizeCoordinate($request->input('origin_lat')),
             'origin_lng' => $this->normalizeCoordinate($request->input('origin_lng')),
             'destination_lat' => $this->normalizeCoordinate($request->input('destination_lat')),

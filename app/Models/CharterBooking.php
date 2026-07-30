@@ -71,13 +71,44 @@ class CharterBooking extends Model
 
     public function checkAndCancelIfExpired()
     {
-        if ($this->payment_status === 'unpaid' && $this->status !== 'cancelled' && $this->created_at->copy()->addHours(24)->isPast()) {
+        // ponytail: naive check against Carbon::now(), works for all charter expiration checks
+        if (in_array($this->status, ['cancelled', 'completed'])) {
+            return false;
+        }
+
+        $now = \Carbon\Carbon::now();
+
+        // Calculate departure datetime if pickup_date exists
+        $departureExpired = false;
+        if ($this->pickup_date) {
+            $dateStr = $this->pickup_date instanceof \Carbon\Carbon 
+                ? $this->pickup_date->format('Y-m-d') 
+                : substr((string)$this->pickup_date, 0, 10);
+            $timeStr = $this->pickup_time ?: '00:00:00';
+            $departureTime = \Carbon\Carbon::parse("{$dateStr} {$timeStr}");
+            if ($now->greaterThanOrEqualTo($departureTime)) {
+                $departureExpired = true;
+            }
+        }
+
+        // If departure time has passed and payment is not fully completed -> Cancel immediately (takes precedence)
+        if ($departureExpired && !in_array($this->payment_status, ['paid', 'fully_paid'])) {
             $this->update([
                 'status' => 'cancelled',
-                'notes' => $this->notes . "\n[Sistem] Dibatalkan otomatis karena batas waktu pembayaran (24 jam) habis."
+                'notes' => trim($this->notes . "\n[Sistem] Dibatalkan otomatis karena jadwal keberangkatan telah lewat dan pelunasan belum diselesaikan.")
             ]);
             return true;
         }
+
+        // Standard 24h DP expiration for unpaid bookings
+        if ($this->payment_status === 'unpaid' && $this->created_at && $now->greaterThanOrEqualTo($this->created_at->copy()->addHours(24))) {
+            $this->update([
+                'status' => 'cancelled',
+                'notes' => trim($this->notes . "\n[Sistem] Dibatalkan otomatis karena batas waktu pembayaran (24 jam) habis.")
+            ]);
+            return true;
+        }
+
         return false;
     }
 }

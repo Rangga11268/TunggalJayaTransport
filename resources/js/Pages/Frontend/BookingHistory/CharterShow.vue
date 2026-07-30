@@ -99,6 +99,13 @@ const payCharter = async (type) => {
         if (data.status === 'success' && data.snap_token) {
             window.snap.pay(data.snap_token, {
                 onSuccess: function(result) {
+                    Swal.fire({
+                        title: 'Mengonfirmasi Pembayaran...',
+                        text: 'Mohon tunggu sebentar...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
                     fetch(route('charter-bookings.pay', props.charter.id), {
                         method: 'POST',
                         headers: {
@@ -110,8 +117,10 @@ const payCharter = async (type) => {
                         Swal.fire({
                             icon: 'success',
                             title: 'Pembayaran Berhasil!',
-                            text: 'Terima kasih, pembayaran Anda telah kami terima.',
-                            confirmButtonColor: '#10B981',
+                            text: type === 'pelunasan' 
+                                ? 'Pelunasan Sewa Bus Anda telah berhasil dikonfirmasi.' 
+                                : 'DP Sewa Bus Anda telah berhasil dikonfirmasi.',
+                            confirmButtonColor: '#10207a',
                         }).then(() => {
                             window.location.reload();
                         });
@@ -124,7 +133,7 @@ const payCharter = async (type) => {
                         icon: 'info',
                         title: 'Menunggu Pembayaran',
                         text: 'Silakan selesaikan pembayaran Anda.',
-                        confirmButtonColor: '#3B82F6',
+                        confirmButtonColor: '#10207a',
                     }).then(() => window.location.reload());
                 },
                 onError: function(result) {
@@ -136,7 +145,7 @@ const payCharter = async (type) => {
                     });
                 },
                 onClose: function() {
-                    console.log('Customer closed the popup without finishing the payment');
+                    window.location.reload();
                 }
             });
         } else {

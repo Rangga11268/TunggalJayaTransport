@@ -12,55 +12,26 @@ class FleetController extends Controller
     public function index()
     {
         $buses = Bus::with('media')->get();
-        // $drivers = Driver::where('status', 'active')->get(); // Not typically shown on public fleet list unless requested
-        
-        // Hardcoded facilities
-        $facilities = collect([
-            [
-                'name' => 'AC',
-                'icon' => 'fas fa-snowflake',
-                'description' => 'Pendingin ruangan untuk kenyamanan penumpang'
-            ],
-            [
-                'name' => 'TV',
-                'icon' => 'fas fa-tv',
-                'description' => 'Televisi untuk hiburan selama perjalanan'
-            ],
-            [
-                'name' => 'WiFi',
-                'icon' => 'fas fa-wifi',
-                'description' => 'Koneksi internet gratis untuk penumpang'
-            ],
-            [
-                'name' => 'Toilet',
-                'icon' => 'fas fa-toilet',
-                'description' => 'Toilet bersih dan nyaman di dalam bus'
-            ],
-            [
-                'name' => 'Recliner Seat',
-                'icon' => 'fas fa-chair',
-                'description' => 'Kursi yang bisa dimiringkan untuk kenyamanan'
-            ],
-            [
-                'name' => 'Charger',
-                'icon' => 'fas fa-plug',
-                'description' => 'Port pengisian daya untuk perangkat elektronik'
-            ],
-            [
-                'name' => 'Snack',
-                'icon' => 'fas fa-utensils',
-                'description' => 'Makanan ringan tersedia selama perjalanan'
-            ],
-            [
-                'name' => 'Air Minum',
-                'icon' => 'fas fa-glass-whiskey',
-                'description' => 'Air mineral gratis untuk penumpang'
-            ]
-        ]);
         
         return \Inertia\Inertia::render('Frontend/Fleet/Index', [
             'buses' => $buses,
-            'facilities' => $facilities
+            'facilities' => Bus::getStandardFacilities()
+        ]);
+    }
+
+    public function show($id)
+    {
+        $bus = Bus::with(['media', 'schedules.route'])->findOrFail($id);
+        
+        $relatedBuses = Bus::where('id', '!=', $id)
+            ->where('bus_category', $bus->bus_category)
+            ->limit(3)
+            ->get();
+
+        return \Inertia\Inertia::render('Frontend/Fleet/Show', [
+            'bus' => $bus,
+            'relatedBuses' => $relatedBuses,
+            'facilities' => Bus::getStandardFacilities(),
         ]);
     }
 }

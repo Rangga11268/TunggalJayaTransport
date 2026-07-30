@@ -205,23 +205,30 @@ const formatRupiah = (value) => {
                                 <span v-else class="text-yellow-600">Belum ada armada ditetapkan</span>
                             </p>
 
-                            <p class="text-sm text-gray-500 mb-1">Titik Jemput (Kota)</p>
-                            <p class="font-medium text-gray-900 dark:text-white mb-2">{{ charter.pickup_location }}</p>
+                            <p class="text-sm font-semibold text-gray-500 mb-1">Lokasi Penjemputan</p>
+                            <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 mb-4">
+                                <p class="font-bold text-gray-900 dark:text-white text-base">{{ charter.pickup_location }}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1 flex items-start gap-1.5">
+                                    <i class="fas fa-map-marker-alt text-brand-red mt-0.5"></i>
+                                    <span>{{ charter.pickup_address || 'Tidak ada detail alamat' }}</span>
+                                </p>
+                            </div>
                             
-                            <p class="text-sm text-gray-500 mb-1">Alamat Lengkap Jemput</p>
-                            <p class="font-medium text-gray-900 dark:text-white text-sm mb-4">{{ charter.pickup_address || '-' }}</p>
-                            
-                            <p class="text-sm text-gray-500 mt-2 mb-1">Tanggal Jemput</p>
+                            <p class="text-sm text-gray-500 mt-2 mb-1">Tanggal & Waktu Jemput</p>
                             <p class="font-medium text-gray-900 dark:text-white mb-2">{{ formatDate(charter.pickup_date) }} <span class="text-gray-500">({{ charter.pickup_time || '-' }})</span></p>
                             
                             <p class="text-sm text-gray-500 mt-2 mb-1">Jumlah Penumpang</p>
                             <p class="font-medium text-gray-900 dark:text-white">{{ charter.passenger_count ? charter.passenger_count + ' Orang' : '-' }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500 mb-1">Tujuan (Kota)</p>
-                            <p class="font-medium text-gray-900 dark:text-white mb-2">{{ charter.destination }}</p>
-                            <p class="text-sm text-gray-500 mb-1">Alamat Lengkap Tujuan</p>
-                            <p class="font-medium text-gray-900 dark:text-white text-sm mb-4">{{ charter.destination_address || '-' }}</p>
+                            <p class="text-sm font-semibold text-gray-500 mb-1">Lokasi Tujuan</p>
+                            <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 mb-4">
+                                <p class="font-bold text-gray-900 dark:text-white text-base">{{ charter.destination }}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1 flex items-start gap-1.5">
+                                    <i class="fas fa-flag-checkered text-brand-red mt-0.5"></i>
+                                    <span>{{ charter.destination_address || 'Tidak ada detail alamat' }}</span>
+                                </p>
+                            </div>
 
                             <p class="text-sm text-gray-500 mt-2 mb-1">Tanggal Pulang</p>
                             <p class="font-medium text-gray-900 dark:text-white">{{ formatDate(charter.return_date) }}</p>

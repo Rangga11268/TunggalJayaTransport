@@ -44,10 +44,6 @@ Route::middleware('guest')->group(function () {
 
     Route::get('auth/google/callback', [GoogleAuthController::class, 'callback'])
         ->name('auth.google.callback');
-
-    // Debug route (REMOVE in production!)
-    Route::get('debug/google-auth', [DebugGoogleAuthController::class, 'debug'])
-        ->name('debug.google-auth');
 });
 
 // Routes for authenticated users only

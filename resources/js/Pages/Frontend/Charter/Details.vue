@@ -82,9 +82,15 @@ const handleLocationSelect = (type, location) => {
     if (type === 'pickup') {
         form.pickup_lat = location.lat;
         form.pickup_lng = location.lng;
+        if (!form.pickup_address) {
+            form.pickup_address = location.name;
+        }
     } else {
         form.destination_lat = location.lat;
         form.destination_lng = location.lng;
+        if (!form.destination_address) {
+            form.destination_address = location.name;
+        }
     }
     
     nextTick(() => {
@@ -97,14 +103,24 @@ const handleLocationSelect = (type, location) => {
 };
 
 const submit = () => {
-    if (!form.pickup_lat || !form.destination_lat) {
+    if (!form.pickup_address || !form.destination_address) {
         Swal.fire({
             icon: 'warning',
-            title: 'Titik Lokasi Belum Lengkap',
-            text: 'Harap tentukan titik penjemputan dan tujuan di peta.',
+            title: 'Alamat Belum Lengkap',
+            text: 'Harap isi detail alamat penjemputan dan tujuan.',
             confirmButtonColor: '#E11D48',
         });
         return;
+    }
+
+    // Default fallback lat/lng if user typed manual custom address without selecting pin
+    if (!form.pickup_lat) {
+        form.pickup_lat = -6.2088;
+        form.pickup_lng = 106.8456;
+    }
+    if (!form.destination_lat) {
+        form.destination_lat = -6.9175;
+        form.destination_lng = 107.6191;
     }
 
     form.post(route("frontend.charter.store"), {
@@ -124,17 +140,17 @@ const submit = () => {
         <div class="pt-28 pb-8 px-4 sm:px-6 lg:px-8 text-center bg-white border-b border-[#ebe7e7]">
             <div class="max-w-3xl mx-auto">
                 <div class="flex items-center justify-center gap-4 text-sm font-bold mb-4">
-                    <Link :href="route('frontend.charter.index')" class="text-[#454652] hover:text-[#10207a] transition-colors">1. Info Dasar</Link>
+                    <span class="text-emerald-600"><i class="fas fa-check-circle mr-1"></i> 1. Info Dasar</span>
                     <i class="fas fa-chevron-right text-gray-300 text-[10px]"></i>
                     <span class="text-[#10207a]">2. Detail Penjemputan</span>
                 </div>
                 <h1 class="font-unbounded font-black text-3xl md:text-4xl text-[#1c1b1b]">
-                    Detail Perjalanan
+                    Detail Alamat & Lokasi
                 </h1>
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="max-w-7xl mx-auto mt-8 px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <!-- Summary Sidebar -->
                 <div class="lg:col-span-4 lg:order-2">
@@ -142,32 +158,26 @@ const submit = () => {
                         <h3 class="font-unbounded font-bold text-[#1c1b1b] text-xl mb-4">Ringkasan Pesanan</h3>
                         
                         <div class="space-y-4">
-                            <div v-if="form.institution_name" class="flex justify-between pb-4 border-b border-gray-100">
-                                <span class="text-gray-500 text-sm">Instansi / Sekolah</span>
-                                <span class="font-bold text-[#1c1b1b] text-sm text-right">{{ form.institution_name }}</span>
+                            <div class="flex justify-between pb-4 border-b border-gray-100">
+                                <span class="text-gray-500 text-sm">Kota Jemput</span>
+                                <span class="font-bold text-[#1c1b1b] text-sm text-right">{{ form.pickup_location || '-' }}</span>
                             </div>
                             <div class="flex justify-between pb-4 border-b border-gray-100">
-                                <span class="text-gray-500 text-sm">Armada</span>
-                                <span class="font-bold text-[#1c1b1b] text-sm">Big Bus ({{ form.bus_requests.reduce((sum, r) => sum + r.count, 0) }} Unit)</span>
+                                <span class="text-gray-500 text-sm">Kota Tujuan</span>
+                                <span class="font-bold text-[#1c1b1b] text-sm text-right">{{ form.destination || '-' }}</span>
                             </div>
                             <div class="flex justify-between pb-4 border-b border-gray-100">
                                 <span class="text-gray-500 text-sm">Tanggal</span>
                                 <span class="font-bold text-[#1c1b1b] text-sm text-right">
-                                    {{ form.pickup_date }}<br>
-                                    s/d {{ form.return_date }}
-                                </span>
-                            </div>
-                            <div class="flex justify-between pb-4 border-b border-gray-100">
-                                <span class="text-gray-500 text-sm">Rute</span>
-                                <span class="font-bold text-[#1c1b1b] text-sm text-right">
-                                    {{ form.pickup_location }} <i class="fas fa-arrow-right mx-1 text-gray-300"></i> {{ form.destination }}
+                                    {{ form.pickup_date || '-' }}<br>
+                                    s/d {{ form.return_date || '-' }}
                                 </span>
                             </div>
                         </div>
 
-                        <Link :href="route('frontend.charter.index')"
+                        <Link :href="route('frontend.charter.step1')"
                             class="w-full mt-6 py-3 border-2 border-[#10207a] text-[#10207a] rounded-xl font-bold text-[14px] hover:bg-[#10207a] hover:text-white transition-all flex items-center justify-center">
-                            Ubah Info Dasar
+                            <i class="fas fa-arrow-left mr-2"></i> Kembali ke Step 1
                         </Link>
                     </div>
                 </div>
@@ -179,20 +189,38 @@ const submit = () => {
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Alamat Lengkap Penjemputan <span class="text-[#10207a]">*</span></label>
+                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Lokasi Penjemputan <span class="text-[#10207a]">*</span></label>
                                     <LocationAutocomplete 
-                                        v-model="form.pickup_address" 
+                                        v-model="form.pickup_location" 
                                         placeholder="Cari titik penjemputan..."
                                         @select="(loc) => handleLocationSelect('pickup', loc)"
                                     />
+                                    <div class="mt-3">
+                                        <label class="block text-xs font-bold text-[#454652] mb-1">Detail Alamat / Patokan Penjemputan <span class="text-[#10207a]">*</span></label>
+                                        <textarea 
+                                            v-model="form.pickup_address" 
+                                            rows="3"
+                                            placeholder="Contoh: Jl. Ahmad Yani No. 45, RT 02 RW 03 (Depan Masjid Agung / Lobby Hotel)"
+                                            class="w-full px-3 py-2 text-xs bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white rounded-[10px] text-[#1c1b1b] outline-none transition-all resize-none"
+                                        ></textarea>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Alamat Lengkap Tujuan <span class="text-[#10207a]">*</span></label>
+                                    <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Lokasi Tujuan <span class="text-[#10207a]">*</span></label>
                                     <LocationAutocomplete 
-                                        v-model="form.destination_address" 
+                                        v-model="form.destination" 
                                         placeholder="Cari titik tujuan..."
                                         @select="(loc) => handleLocationSelect('destination', loc)"
                                     />
+                                    <div class="mt-3">
+                                        <label class="block text-xs font-bold text-[#454652] mb-1">Detail Alamat / Patokan Tujuan <span class="text-[#10207a]">*</span></label>
+                                        <textarea 
+                                            v-model="form.destination_address" 
+                                            rows="3"
+                                            placeholder="Contoh: Area Parkir Barat Pantai Pangandaran / Hotel Santika Room Ballroom"
+                                            class="w-full px-3 py-2 text-xs bg-[#f6f3f2] border border-[#e5e2e1] focus:border-[#10207a] focus:bg-white rounded-[10px] text-[#1c1b1b] outline-none transition-all resize-none"
+                                        ></textarea>
+                                    </div>
                                 </div>
                             </div>
 
@@ -201,8 +229,6 @@ const submit = () => {
                                 <h3 class="font-unbounded font-bold text-[#1c1b1b] text-sm mb-2">Preview Peta Lokasi</h3>
                                 <div ref="mapContainer" class="h-[300px] w-full rounded-xl overflow-hidden border border-[#ebe7e7] z-0 relative"></div>
                             </div>
-
-
 
                             <div>
                                 <label class="block text-sm font-bold text-[#1c1b1b] mb-1.5">Catatan Tambahan <span class="text-gray-400 font-normal">(Opsional)</span></label>

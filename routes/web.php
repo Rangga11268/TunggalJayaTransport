@@ -36,6 +36,7 @@ Route::prefix('')->name('frontend.')->group(function () {
     });
 
     Route::get('/fleet', [App\Http\Controllers\Frontend\FleetController::class, 'index'])->name('fleet.index');
+    Route::get('/fleet/{id}', [App\Http\Controllers\Frontend\FleetController::class, 'show'])->name('fleet.show');
 
     Route::get('/news', [App\Http\Controllers\Frontend\NewsController::class, 'index'])->name('news.index');
     Route::get('/news/{slug}', [App\Http\Controllers\Frontend\NewsController::class, 'show'])->name('news.show');

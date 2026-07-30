@@ -71,20 +71,38 @@ onMounted(() => {
 
 const isProcessingPayment = ref(false);
 
-const payCharterDp = async (charterId) => {
+const payCharter = async (charterId, type = 'dp') => {
     if (isProcessingPayment.value) return;
     
     isProcessingPayment.value = true;
     try {
-        const response = await axios.post(route('charter-bookings.pay', charterId));
+        const response = await axios.post(route('charter-bookings.pay', charterId), { type });
         
         if (response.data.status === 'success' && response.data.snap_token) {
             window.snap.pay(response.data.snap_token, {
-                onSuccess: function (result) {
+                onSuccess: async function (result) {
+                    Swal.fire({
+                        title: "Mengonfirmasi Pembayaran...",
+                        text: "Mohon tunggu sebentar...",
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    try {
+                        await axios.post(route('charter-bookings.pay', charterId), {
+                            type: 'verify',
+                            order_id: result.order_id
+                        });
+                    } catch (e) {
+                        console.error("Verification failed", e);
+                    }
+
                     Swal.fire({
                         icon: "success",
                         title: "Pembayaran Berhasil!",
-                        text: "DP Sewa Bus Anda telah berhasil dibayarkan.",
+                        text: type === 'pelunasan' 
+                            ? "Pelunasan Sewa Bus Anda telah berhasil dikonfirmasi." 
+                            : "DP Sewa Bus Anda telah berhasil dikonfirmasi.",
                         confirmButtonColor: "#10207a",
                     }).then(() => {
                         router.reload();
@@ -94,7 +112,7 @@ const payCharterDp = async (charterId) => {
                     Swal.fire({
                         icon: "info",
                         title: "Menunggu Pembayaran",
-                        text: "Silakan selesaikan pembayaran Anda.",
+                        text: "Silakan selesaikan pembayaran Anda via instruksi yang diberikan.",
                         confirmButtonColor: "#10207a",
                     }).then(() => {
                         router.reload();
@@ -109,7 +127,7 @@ const payCharterDp = async (charterId) => {
                     });
                 },
                 onClose: function () {
-                    // Canceled
+                    router.reload();
                 }
             });
         }
@@ -123,6 +141,15 @@ const payCharterDp = async (charterId) => {
     } finally {
         isProcessingPayment.value = false;
     }
+};
+
+const shortenLocation = (locationStr) => {
+    if (!locationStr) return '-';
+    const parts = locationStr.split(',');
+    if (parts.length > 1) {
+        return parts[0].trim();
+    }
+    return locationStr;
 };
 </script>
 
@@ -255,7 +282,7 @@ const payCharterDp = async (charterId) => {
                     <div v-for="charter in charter_bookings.data" :key="charter.id"
                         class="bg-white border border-[#ebe7e7] rounded-[12px] p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
-                            <div class="flex-grow w-full md:w-auto">
+                            <div class="flex-grow w-full md:w-auto min-w-0">
                                 <div class="flex items-center gap-2.5 mb-4 flex-wrap">
                                     <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-[#f6f3f2] text-[#454652] uppercase tracking-wider border border-[#ebe7e7]">
                                         {{ charter.charter_code }}
@@ -266,19 +293,31 @@ const payCharterDp = async (charterId) => {
                                     </span>
                                 </div>
 
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="font-bold text-[#1c1b1b] text-[18px] truncate">{{ charter.pickup_location }}</div>
+                                <div class="flex items-center gap-3 mb-4 max-w-full overflow-hidden">
+                                    <div class="font-bold text-[#1c1b1b] text-[16px] md:text-[18px] truncate" :title="charter.pickup_location">
+                                        {{ shortenLocation(charter.pickup_location) }}
+                                    </div>
                                     <div class="flex flex-col items-center shrink-0">
-                                        <div class="w-10 h-[2px] bg-[#10207a]/20 relative">
+                                        <div class="w-8 md:w-10 h-[2px] bg-[#10207a]/20 relative">
                                             <div class="absolute right-0 -top-[4px] w-[10px] h-[10px] rounded-full bg-[#10207a]"></div>
                                         </div>
                                     </div>
-                                    <div class="font-bold text-[#1c1b1b] text-[18px] text-right truncate">{{ charter.destination }}</div>
+                                    <div class="font-bold text-[#1c1b1b] text-[16px] md:text-[18px] text-right truncate" :title="charter.destination">
+                                        {{ shortenLocation(charter.destination) }}
+                                    </div>
                                 </div>
 
                                 <div class="flex flex-wrap items-center gap-4 text-[13px] text-[#454652]">
                                     <span class="flex items-center gap-1.5"><i class="far fa-calendar-alt text-[#10207a] text-[11px]"></i> {{ formatDate(charter.pickup_date) }} - {{ formatDate(charter.return_date) }}</span>
-                                    <span class="flex items-center gap-1.5"><i class="fas fa-bus text-[#10207a] text-[11px]"></i> {{ charter.bus_type_requested }}</span>
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="fas fa-bus text-[#10207a] text-[11px]"></i>
+                                        <template v-if="charter.bus_requests && charter.bus_requests.length > 0">
+                                            {{ charter.bus_requests.map(r => `${r.type} (${r.count} Unit)`).join(', ') }}
+                                        </template>
+                                        <template v-else>
+                                            {{ charter.bus_type_requested || 'Big Bus' }}
+                                        </template>
+                                    </span>
                                 </div>
                             </div>
 
@@ -292,10 +331,16 @@ const payCharterDp = async (charterId) => {
                                     
                                     <div class="flex gap-2">
                                         <button v-if="charter.status === 'quoted' && charter.down_payment > 0 && ['pending', 'unpaid'].includes(charter.payment_status)"
-                                            @click="payCharterDp(charter.id)"
+                                            @click="payCharter(charter.id, 'dp')"
                                             :disabled="isProcessingPayment"
-                                            class="px-5 py-2.5 bg-emerald-600 text-white rounded-[10px] font-bold text-[12px] hover:bg-emerald-700 transition-all shadow-sm text-center whitespace-nowrap disabled:opacity-70">
-                                            {{ isProcessingPayment ? 'Memproses...' : 'Bayar DP' }}
+                                            class="px-5 py-2.5 bg-emerald-600 text-white rounded-[10px] font-bold text-[12px] hover:bg-emerald-700 transition-all shadow-sm text-center whitespace-nowrap disabled:opacity-70 flex items-center gap-1.5">
+                                            <i class="fas fa-credit-card"></i> {{ isProcessingPayment ? 'Memproses...' : 'Bayar DP' }}
+                                        </button>
+                                        <button v-if="charter.payment_status === 'dp_paid' && charter.status !== 'cancelled' && charter.status !== 'completed'"
+                                            @click="payCharter(charter.id, 'pelunasan')"
+                                            :disabled="isProcessingPayment"
+                                            class="px-5 py-2.5 bg-blue-600 text-white rounded-[10px] font-bold text-[12px] hover:bg-blue-700 transition-all shadow-sm text-center whitespace-nowrap disabled:opacity-70 flex items-center gap-1.5">
+                                            <i class="fas fa-money-bill-wave"></i> {{ isProcessingPayment ? 'Memproses...' : 'Bayar Pelunasan' }}
                                         </button>
                                         <Link :href="route('booking-history.charter.show', charter.id)"
                                             class="px-5 py-2.5 bg-[#10207a] text-white rounded-[10px] font-bold text-[12px] hover:bg-[#0c185e] transition-all shadow-sm text-center whitespace-nowrap">
