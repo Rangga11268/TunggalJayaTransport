@@ -23,6 +23,16 @@ class BookingController extends Controller
         $this->paymentService = $paymentService;
     }
 
+    /**
+     * @OA\Get(
+     *      path="/bookings",
+     *      operationId="getUserBookings",
+     *      tags={"Booking Tiket AKAP"},
+     *      summary="Riwayat Pemesanan Tiket User",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(response=200, description="Daftar tiket pengguna")
+     * )
+     */
     public function index(Request $request): JsonResponse
     {
         $bookings = Booking::with('schedule.route', 'schedule.bus')
@@ -36,6 +46,18 @@ class BookingController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/bookings/{id}",
+     *      operationId="getBookingDetail",
+     *      tags={"Booking Tiket AKAP"},
+     *      summary="Detail Pemesanan Tiket",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="Detail tiket"),
+     *      @OA\Response(response=404, description="Tidak ditemukan")
+     * )
+     */
     public function show($id): JsonResponse
     {
         $booking = Booking::with('schedule.route', 'schedule.bus')

@@ -17,6 +17,28 @@ class AuthController extends Controller
 {
     public function __construct(private readonly OtpService $otpService) {}
 
+    /**
+     * @OA\Post(
+     *      path="/auth/register",
+     *      operationId="registerUser",
+     *      tags={"Auth"},
+     *      summary="Register Penumpang Baru",
+     *      description="Mendaftar akun pelanggan baru untuk aplikasi mobile & web",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"name","email","phone","password","password_confirmation"},
+     *              @OA\Property(property="name", type="string", example="Ahmad Budi"),
+     *              @OA\Property(property="email", type="string", format="email", example="budi@example.com"),
+     *              @OA\Property(property="phone", type="string", example="081234567890"),
+     *              @OA\Property(property="password", type="string", format="password", example="Password123!"),
+     *              @OA\Property(property="password_confirmation", type="string", format="password", example="Password123!")
+     *          )
+     *      ),
+     *      @OA\Response(response=201, description="Registrasi berhasil"),
+     *      @OA\Response(response=422, description="Validasi gagal")
+     * )
+     */
     public function register(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -57,6 +79,25 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * @OA\Post(
+     *      path="/auth/login",
+     *      operationId="loginUser",
+     *      tags={"Auth"},
+     *      summary="Login Penumpang",
+     *      description="Login menggunakan email/phone & password untuk memperoleh Bearer token",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"email","password"},
+     *              @OA\Property(property="email", type="string", example="budi@example.com"),
+     *              @OA\Property(property="password", type="string", example="Password123!")
+     *          )
+     *      ),
+     *      @OA\Response(response=200, description="Login berhasil"),
+     *      @OA\Response(response=401, description="Kredensial salah")
+     * )
+     */
     public function login(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [

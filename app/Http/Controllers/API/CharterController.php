@@ -10,7 +10,14 @@ use Illuminate\Support\Str;
 class CharterController extends Controller
 {
     /**
-     * Get the authenticated user's charter bookings history.
+     * @OA\Get(
+     *      path="/charter/history",
+     *      operationId="getCharterHistory",
+     *      tags={"Sewa Pariwisata"},
+     *      summary="Riwayat Sewa Bus Pariwisata",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(response=200, description="Daftar pengajuan sewa")
+     * )
      */
     public function index(Request $request)
     {
@@ -26,7 +33,24 @@ class CharterController extends Controller
     }
 
     /**
-     * Submit a new charter request.
+     * @OA\Post(
+     *      path="/charter/request",
+     *      operationId="requestCharter",
+     *      tags={"Sewa Pariwisata"},
+     *      summary="Pengajuan Sewa Bus Pariwisata Baru",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"pickup_date","return_date","pickup_location","destination","bus_requests"},
+     *              @OA\Property(property="pickup_location", type="string", example="Kuningan, Jawa Barat"),
+     *              @OA\Property(property="destination", type="string", example="Bali, Nusa Tenggara"),
+     *              @OA\Property(property="pickup_date", type="string", format="date", example="2026-08-10"),
+     *              @OA\Property(property="return_date", type="string", format="date", example="2026-08-15")
+     *          )
+     *      ),
+     *      @OA\Response(response=201, description="Pengajuan sewa berhasil dibuat")
+     * )
      */
     public function store(Request $request)
     {
