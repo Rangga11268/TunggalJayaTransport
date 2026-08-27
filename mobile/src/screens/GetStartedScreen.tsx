@@ -8,6 +8,7 @@ import {
   Dimensions,
   FlatList,
   Platform,
+  useWindowDimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
@@ -17,9 +18,14 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { COLORS } from '../theme/colors';
-import { Tag, Crown, Zap, ChevronRight } from 'lucide-react-native';
-
-const { width, height } = Dimensions.get('window');
+import {
+  Tag,
+  Crown,
+  Zap,
+  ChevronRight,
+  ChevronLeft,
+  ArrowRight,
+} from 'lucide-react-native';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'GetStarted'>;
 
@@ -61,13 +67,37 @@ const SLIDES: SlideItem[] = [
 
 export default function GetStartedScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const { width: windowWidth } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
 
+  // Width of each slide inside the card sheet
+  const slideWidth = Math.max(280, windowWidth - 48);
+
+  const goToSlide = (index: number) => {
+    if (index >= 0 && index < SLIDES.length) {
+      flatListRef.current?.scrollToIndex({ index, animated: true });
+      setActiveIndex(index);
+    }
+  };
+
+  const handleNext = () => {
+    if (activeIndex < SLIDES.length - 1) {
+      goToSlide(activeIndex + 1);
+    } else {
+      navigation.navigate('Register');
+    }
+  };
+
+  const handlePrev = () => {
+    if (activeIndex > 0) {
+      goToSlide(activeIndex - 1);
+    }
+  };
+
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const slideSize = event.nativeEvent.layoutMeasurement.width;
     const offset = event.nativeEvent.contentOffset.x;
-    const index = Math.round(offset / slideSize);
+    const index = Math.round(offset / slideWidth);
     if (index >= 0 && index < SLIDES.length && index !== activeIndex) {
       setActiveIndex(index);
     }
@@ -85,7 +115,7 @@ export default function GetStartedScreen() {
           resizeMode="cover"
         />
 
-        {/* Ambient Dark-to-Clear Gradient for Top Header visibility */}
+        {/* Ambient Dark Gradient for Top Header visibility */}
         <LinearGradient
           colors={['rgba(17, 24, 39, 0.65)', 'transparent']}
           style={styles.topGradient}
@@ -112,7 +142,7 @@ export default function GetStartedScreen() {
 
       {/* Bottom Solid Card Sheet (Zero noise, High contrast) */}
       <View style={styles.cardSheet}>
-        {/* Interactive 3-Slide Carousel */}
+        {/* Interactive Carousel */}
         <FlatList
           ref={flatListRef}
           data={SLIDES}
@@ -122,12 +152,19 @@ export default function GetStartedScreen() {
           showsHorizontalScrollIndicator={false}
           onScroll={onScroll}
           scrollEventThrottle={16}
+          snapToInterval={slideWidth}
+          decelerationRate="fast"
           bounces={false}
           style={styles.carousel}
+          getItemLayout={(_, index) => ({
+            length: slideWidth,
+            offset: slideWidth * index,
+            index,
+          })}
           renderItem={({ item }) => {
             const IconComp = item.badgeIcon;
             return (
-              <View style={styles.slideItem}>
+              <View style={[styles.slideItem, { width: slideWidth }]}>
                 <View style={styles.badgePill}>
                   <IconComp size={12} color={COLORS.brandRed} style={{ marginRight: 5 }} />
                   <Text style={styles.badgeText}>{item.badge}</Text>
@@ -140,22 +177,42 @@ export default function GetStartedScreen() {
           }}
         />
 
-        {/* Carousel Pagination Dots */}
-        <View style={styles.dotsRow}>
-          {SLIDES.map((_, idx) => {
-            const isActive = activeIndex === idx;
-            return (
-              <TouchableOpacity
-                key={idx}
-                activeOpacity={0.8}
-                onPress={() => {
-                  flatListRef.current?.scrollToIndex({ index: idx, animated: true });
-                  setActiveIndex(idx);
-                }}
-                style={[styles.dot, isActive ? styles.dotActive : styles.dotInactive]}
-              />
-            );
-          })}
+        {/* Navigation Controls: Prev Button + Dots + Next Button */}
+        <View style={styles.navControlsRow}>
+          {/* Prev Slide Arrow */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            disabled={activeIndex === 0}
+            onPress={handlePrev}
+            style={[styles.arrowCircle, activeIndex === 0 && styles.arrowCircleDisabled]}
+          >
+            <ChevronLeft size={18} color={activeIndex === 0 ? '#CBD5E1' : '#111827'} />
+          </TouchableOpacity>
+
+          {/* Dots Pagination (Clickable) */}
+          <View style={styles.dotsRow}>
+            {SLIDES.map((_, idx) => {
+              const isActive = activeIndex === idx;
+              return (
+                <TouchableOpacity
+                  key={idx}
+                  activeOpacity={0.8}
+                  onPress={() => goToSlide(idx)}
+                  hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}
+                  style={[styles.dot, isActive ? styles.dotActive : styles.dotInactive]}
+                />
+              );
+            })}
+          </View>
+
+          {/* Next Slide Arrow */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleNext}
+            style={styles.arrowCircle}
+          >
+            <ChevronRight size={18} color="#111827" />
+          </TouchableOpacity>
         </View>
 
         {/* Twin Action Buttons (Ergonomic 52px height) */}
@@ -279,11 +336,11 @@ const styles = StyleSheet.create({
     }),
   },
   carousel: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
   slideItem: {
-    width: width - 48,
     alignItems: 'center',
+    paddingHorizontal: 6,
   },
   badgePill: {
     flexDirection: 'row',
@@ -302,7 +359,7 @@ const styles = StyleSheet.create({
   },
   slideTitle: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 26,
+    fontSize: 25,
     color: '#111827',
     textAlign: 'center',
     marginBottom: 8,
@@ -314,14 +371,33 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     textAlign: 'center',
     lineHeight: 22,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
+  },
+  navControlsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    marginBottom: 22,
+  },
+  arrowCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#F1F4F8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  arrowCircleDisabled: {
+    opacity: 0.4,
+    backgroundColor: '#F8FAFC',
   },
   dotsRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 24,
   },
   dot: {
     height: 6,
