@@ -11,6 +11,7 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ScheduleListScreen from '../screens/ScheduleListScreen';
+import ScheduleDetailScreen from '../screens/ScheduleDetailScreen';
 import SeatSelectionScreen from '../screens/SeatSelectionScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import TicketDetailScreen from '../screens/TicketDetailScreen';
@@ -27,6 +28,7 @@ export type RootStackParamList = {
   MainTabs: { screen?: string } | undefined;
   Schedules: { origin?: string; destination?: string } | undefined;
   ScheduleList: { origin?: string; destination?: string } | undefined;
+  ScheduleDetail: { scheduleId: number };
   SeatSelection: { scheduleId: number };
   Checkout: { scheduleId: number; selectedSeats: number[]; totalPrice: number };
   TicketDetail: { bookingId: number };
@@ -80,6 +82,7 @@ export default function RootNavigator() {
         <Stack.Screen name="MainTabs" component={MainTabs} />
         <Stack.Screen name="Schedules" component={ScheduleListScreen} />
         <Stack.Screen name="ScheduleList" component={ScheduleListScreen} />
+        <Stack.Screen name="ScheduleDetail" component={ScheduleDetailScreen} />
         <Stack.Screen name="SeatSelection" component={SeatSelectionScreen} />
         <Stack.Screen name="Checkout" component={CheckoutScreen} />
         <Stack.Screen name="TicketDetail" component={TicketDetailScreen} />
