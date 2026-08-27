@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, ActivityIndicator, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -13,6 +13,29 @@ import {
 import { AuthProvider } from './src/context/AuthContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import { COLORS } from './src/theme/colors';
+
+// Global web reset to eliminate inner browser focus outline rings
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.id = 'react-native-web-focus-reset';
+  style.textContent = `
+    input, textarea, select {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      background-color: transparent !important;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    * {
+      -webkit-tap-highlight-color: transparent !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -34,7 +57,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <StatusBar style="light" backgroundColor="#0A0C10" />
+        <StatusBar style="dark" backgroundColor="#F4F6F9" />
         <RootNavigator />
       </AuthProvider>
     </SafeAreaProvider>

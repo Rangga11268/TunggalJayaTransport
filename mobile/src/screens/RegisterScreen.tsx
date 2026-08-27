@@ -405,8 +405,18 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontFamily: "PlusJakartaSans_500Medium",
+    fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
     color: "#111827",
+    color: '#111827',
+    paddingVertical: 0,
+    ...(Platform.OS === 'web'
+      ? ({
+          outlineStyle: 'none',
+          outlineWidth: 0,
+          borderWidth: 0,
+        } as any)
+      : {}),
   },
   eyeBtn: {
     padding: 6,

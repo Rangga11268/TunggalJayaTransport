@@ -508,6 +508,14 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
     color: '#111827',
+    paddingVertical: 0,
+    ...(Platform.OS === 'web'
+      ? ({
+          outlineStyle: 'none',
+          outlineWidth: 0,
+          borderWidth: 0,
+        } as any)
+      : {}),
   },
   promoInputRow: {
     flexDirection: 'row',
@@ -524,6 +532,12 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 13,
     color: '#111827',
+    ...(Platform.OS === 'web'
+      ? ({
+          outlineStyle: 'none',
+          outlineWidth: 0,
+        } as any)
+      : {}),
   },
   promoApplyBtn: {
     backgroundColor: COLORS.brandRed,
