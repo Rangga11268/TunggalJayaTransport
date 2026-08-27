@@ -402,6 +402,12 @@ class HomeController extends Controller
             ->join('bookings AS b2', function ($join) use ($currentMonth) {
                 $join->on('b2.schedule_id', '=', 'schedules.id')
                     ->whereRaw('MONTH(b2.created_at) = ?', [$currentMonth]);
+                $join->on('b2.schedule_id', '=', 'schedules.id');
+                if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
+                    $join->whereRaw('EXTRACT(MONTH FROM b2.created_at) = ?', [$currentMonth]);
+                } else {
+                    $join->whereRaw('MONTH(b2.created_at) = ?', [$currentMonth]);
+                }
             })
             ->where('schedules.status', 'active')
             ->selectRaw('schedules.id as schedule_id, count(*) as booking_count')

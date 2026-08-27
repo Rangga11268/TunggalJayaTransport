@@ -15,6 +15,7 @@ class SearchController extends Controller
         
         if (!$query) {
             return view('frontend.search.index', [
+            return \Inertia\Inertia::render('Frontend/Search/Index', [
                 'results' => [],
                 'query' => '',
                 'totalResults' => 0
