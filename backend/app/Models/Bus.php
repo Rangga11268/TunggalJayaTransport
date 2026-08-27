@@ -65,6 +65,21 @@ class Bus extends Model implements HasMedia
 
     public function getImageUrlAttribute()
     {
-        return $this->getFirstMediaUrl('buses');
+        $url = $this->getFirstMediaUrl('cover') ?: $this->getFirstMediaUrl('buses');
+        if (!empty($url)) {
+            return $url;
+        }
+
+        $nameLower = strtolower($this->name ?? '');
+        if (str_contains($nameLower, 'bisma')) return '/img/resiBisma.webp';
+        if (str_contains($nameLower, 'primadona')) return '/img/primadona.webp';
+        if (str_contains($nameLower, 'bentas')) return '/img/bentas01.webp';
+        if (str_contains($nameLower, 'kyloren') || str_contains($nameLower, 'parwis')) return '/img/kylorenParwis.webp';
+        if (str_contains($nameLower, 'bungsu')) return '/img/bungsu.webp';
+        if (str_contains($nameLower, 'jedha')) return '/img/jedha.webp';
+        if (str_contains($nameLower, 'fortuna')) return '/img/fortuna.webp';
+        if (str_contains($nameLower, 'semar')) return '/img/semar.webp';
+        
+        return '/img/heroImg.jpg';
     }
 }

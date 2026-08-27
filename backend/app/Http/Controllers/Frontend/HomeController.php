@@ -400,8 +400,6 @@ class HomeController extends Controller
         $seasonalSchedules = Booking::join('schedules', 'bookings.schedule_id', '=', 'schedules.id')
             ->join('routes', 'schedules.route_id', '=', 'routes.id')
             ->join('bookings AS b2', function ($join) use ($currentMonth) {
-                $join->on('b2.schedule_id', '=', 'schedules.id')
-                    ->whereRaw('MONTH(b2.created_at) = ?', [$currentMonth]);
                 $join->on('b2.schedule_id', '=', 'schedules.id');
                 if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
                     $join->whereRaw('EXTRACT(MONTH FROM b2.created_at) = ?', [$currentMonth]);

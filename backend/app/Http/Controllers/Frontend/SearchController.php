@@ -12,33 +12,32 @@ class SearchController extends Controller
     public function index(Request $request)
     {
         $query = $request->get('q');
-        
+
         if (!$query) {
-            return view('frontend.search.index', [
             return \Inertia\Inertia::render('Frontend/Search/Index', [
                 'results' => [],
                 'query' => '',
                 'totalResults' => 0
             ]);
         }
-        
+
         // Search in news articles
         $newsResults = NewsArticle::where('title', 'LIKE', "%{$query}%")
             ->orWhere('content', 'LIKE', "%{$query}%")
             ->orWhere('excerpt', 'LIKE', "%{$query}%")
             ->where('is_published', true)
             ->get();
-            
+
         // Search in routes
         $routeResults = BusRoute::where('name', 'LIKE', "%{$query}%")
             ->orWhere('origin', 'LIKE', "%{$query}%")
             ->orWhere('destination', 'LIKE', "%{$query}%")
             ->orWhere('description', 'LIKE', "%{$query}%")
             ->get();
-            
+
         // Combine all results
         $allResults = collect();
-        
+
         foreach ($newsResults as $news) {
             $allResults->push([
                 'type' => 'news',
@@ -48,7 +47,7 @@ class SearchController extends Controller
                 'url' => route('frontend.news.show', $news->slug)
             ]);
         }
-        
+
         foreach ($routeResults as $route) {
             $allResults->push([
                 'type' => 'route',
@@ -58,10 +57,10 @@ class SearchController extends Controller
                 'url' => route('frontend.routes.show', $route->id)
             ]);
         }
-        
+
         // Sort by relevance (this is a simple implementation)
         $results = $allResults->sortByDesc('published_at')->values();
-        
+
         return \Inertia\Inertia::render('Frontend/Search/Index', [
             'results' => $results,
             'query' => $query,

@@ -33,7 +33,7 @@ class NewsArticle extends Model implements HasMedia
         return $this->getFirstMediaUrl('cover')
             ?: $this->getFirstMediaUrl('featured_images')
             ?: $this->getFirstMediaUrl('default')
-            ?: 'https://placehold.co/800x600?text=No+Image';
+            ?: '/img/heroImg.jpg';
     }
 
     /**
