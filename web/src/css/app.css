@@ -1,0 +1,794 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    input[type="date"] {
+        position: relative;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        background: transparent;
+        bottom: 0;
+        color: transparent;
+        cursor: pointer;
+        height: auto;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: auto;
+        opacity: 0;
+    }
+
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+}
+
+/* Custom Font */
+@layer base {
+    html {
+        font-family: "Manrope", system-ui, sans-serif;
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: "Unbounded", sans-serif;
+    }
+}
+
+.font-unbounded {
+    font-family: "Unbounded", sans-serif;
+}
+
+.font-manrope {
+    font-family: "Manrope", sans-serif;
+}
+
+/* CSS Variables for Premium Theme */
+:root {
+    /* Primary Gradient Colors */
+    --primary-start: #4f46e5; /* Indigo 600 */
+    --primary-end: #7c3aed; /* Violet 600 */
+    --accent-start: #0ea5e9; /* Sky 500 */
+    --accent-end: #2563eb; /* Blue 600 */
+
+    /* Premium Gold Accents */
+    --gold-start: #f59e0b;
+    --gold-end: #b45309;
+}
+
+/* Premium Glass Effect */
+.glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+.glass-white {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
+
+.glass-dark {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Premium Gradients */
+.gradient-primary {
+    background: linear-gradient(
+        135deg,
+        var(--primary-start),
+        var(--primary-end)
+    );
+}
+
+.gradient-ocean {
+    background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+}
+
+.gradient-hero {
+    background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+}
+
+/* Text Gradients */
+.text-gradient {
+    background: linear-gradient(
+        135deg,
+        var(--primary-start),
+        var(--primary-end)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-gold {
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-ocean {
+    background: linear-gradient(135deg, #38bdf8, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Animations */
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes pulse-glow {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s infinite;
+}
+
+/* Premium Card */
+.card-premium {
+    background: white;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.card-premium:hover {
+    transform: translateY(-8px);
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.dark .card-premium {
+    background: #1e293b;
+    border-color: rgba(51, 65, 85, 0.8);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.dark .card-premium:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Premium Button */
+.btn-premium {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem 2rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    color: white;
+    background: linear-gradient(
+        135deg,
+        var(--primary-start),
+        var(--primary-end)
+    );
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    transition: all 0.3s ease;
+    letter-spacing: 0.025em;
+}
+
+.btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+    filter: brightness(1.1);
+}
+
+.btn-secondary-premium {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem 2rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    letter-spacing: 0.025em;
+}
+
+.btn-secondary-premium:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Premium Input */
+.input-premium {
+    width: 100%;
+    padding: 1rem 1.25rem 1rem 3rem;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.input-premium:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.dark .input-premium {
+    background: #0f172a;
+    border-color: #334155;
+    color: white;
+}
+
+.dark .input-premium:focus {
+    background: #1e293b;
+    border-color: #8b5cf6;
+}
+
+/* Feature Icon Box */
+.feature-icon-box {
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1.25rem;
+    transition: transform 0.3s ease;
+    color: white; /* Ensure icon is white */
+}
+
+.feature-icon-box:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Hero Pattern */
+.hero-pattern {
+    background-image:
+        radial-gradient(
+            at 0% 0%,
+            rgba(99, 102, 241, 0.15) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 100% 0%,
+            rgba(14, 165, 233, 0.15) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 100% 100%,
+            rgba(236, 72, 153, 0.15) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 0% 100%,
+            rgba(99, 102, 241, 0.15) 0px,
+            transparent 50%
+        );
+}
+
+/* Animated Blobs */
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    animation: float 10s infinite ease-in-out;
+}
+
+/* Planet Bus Theme Elements */
+.stars {
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, #eee, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 90px 40px, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 130px 80px, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0, 0, 0, 0));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: twinkle 4s infinite;
+    opacity: 0.3;
+}
+
+.planet-saturn {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.9),
+        rgba(220, 38, 38, 0.8),
+        rgba(153, 27, 27, 0.9)
+    ); /* White to Brand Red */
+    box-shadow:
+        0 0 60px -20px rgba(220, 38, 38, 0.8),
+        inset -10px -10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.planet-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(20deg) scaleY(0.3);
+    border-radius: 50%;
+    border: 30px solid rgba(255, 255, 255, 0.15);
+    border-top-color: rgba(255, 255, 255, 0.4);
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.2);
+}
+
+.planet-ring::before {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    border: 10px solid rgba(255, 255, 255, 0.05);
+}
+
+@keyframes twinkle {
+    0% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0.3;
+    }
+}
+
+@keyframes orbit {
+    from {
+        transform: rotate(0deg) translateX(150px) rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg) translateX(150px) rotate(-360deg);
+    }
+}
+
+.animate-orbit {
+    animation: orbit 20s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+.animate-spin-slow {
+    animation: spin 30s linear infinite;
+}
+
+.animate-spin-reverse-slow {
+    animation: spin 45s linear infinite reverse;
+}
+
+/* Logo Saturn Effect */
+.logo-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg) scaleY(0.35); /* Flatter for perspective */
+    width: 200%;
+    height: 200%;
+    border-radius: 50%;
+
+    /* Cosmic Ring Gradient Effect */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 2px solid #dc2626; /* Brand Red */
+    border-right: 2px solid rgba(220, 38, 38, 0.5); /* Fading Red */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 1px solid transparent;
+
+    box-shadow:
+        0 -2px 10px rgba(220, 38, 38, 0.4),
+        /* Upper glow */ inset 0 2px 5px rgba(220, 38, 38, 0.2);
+
+    transition: all 0.5s ease;
+}
+
+.logo-ring::before {
+    content: "";
+    position: absolute;
+    inset: -3px; /* Thin gap */
+    border-radius: 50%;
+    border-top: 1px solid rgba(255, 255, 255, 0.4); /* Inner highlight */
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    opacity: 0.7;
+}
+
+.logo-orbit-dot {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 6px white;
+    transform-origin: 0 50%;
+}
+
+/* 3D Spin for Logo Ring */
+@keyframes ring-spin {
+    0% {
+        transform: translate(-50%, -50%) rotate(-15deg) scaleY(0.35)
+            rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(-15deg) scaleY(0.35)
+            rotate(360deg);
+    }
+}
+
+.animate-ring-spin {
+    animation: ring-spin 10s linear infinite;
+}
+
+/* Stats Number */
+.stats-number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-family: "Playfair Display", serif;
+}
+
+/* ==========================
+   Clean Mode Overrides
+   (Minimal, modern, fewer colors/effects)
+   ========================== */
+
+:root {
+    --tujago-primary: #e11d48; /* single brand color */
+    --tujago-muted: #6b7280;
+    --tujago-bg-dark: #0b0b0b;
+}
+
+/* Tone down heavy glass and blur effects */
+.glass,
+.glass-white,
+.glass-dark {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Reduce very large shadows used by premium cards */
+.card-premium {
+    box-shadow: 0 6px 12px rgba(6, 8, 15, 0.06);
+}
+.card-premium:hover {
+    transform: none;
+    box-shadow: 0 10px 18px rgba(6, 8, 15, 0.08);
+}
+
+/* Simplify primary button: solid color, subtle shadow */
+.btn-premium {
+    background: var(--tujago-primary) !important;
+    box-shadow: 0 6px 14px rgba(225, 29, 72, 0.12) !important;
+    color: #fff !important;
+    filter: none !important;
+}
+.btn-premium:hover {
+    transform: translateY(0) !important;
+    box-shadow: 0 8px 20px rgba(225, 29, 72, 0.14) !important;
+}
+
+/* Make secondary buttons subtle */
+.btn-secondary-premium {
+    background: transparent !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    color: var(--tujago-muted) !important;
+    backdrop-filter: none !important;
+}
+
+/* Reduce hero/artistic patterns */
+.hero-pattern {
+    background: none !important;
+    opacity: 0.6 !important;
+}
+
+/* Reduce animated blobs and optional decorative planets */
+.blob {
+    filter: blur(32px) !important;
+    opacity: 0.25 !important;
+    animation-duration: 14s !important;
+}
+.planet-bus,
+.planet-saturn,
+.planet-ring {
+    display: none !important;
+}
+
+/* Reduce heavy backdrop blur utility globally on mobile */
+.backdrop-blur-2xl {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+}
+
+/* Shorter animations for a snappier, less flashy feel */
+.animate-float {
+    animation-duration: 4s !important;
+}
+.animate-pulse-glow {
+    animation-duration: 1.5s !important;
+}
+.animate-orbit {
+    animation-duration: 30s !important;
+}
+
+/* Text and input contrast improvements */
+.input-premium {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+}
+.dark .input-premium {
+    background: #071317 !important;
+    color: #e6eef9 !important;
+}
+
+/* Make headings and small labels slightly more neutral */
+h1,
+h2,
+h3 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+.text-muted {
+    color: var(--tujago-muted) !important;
+}
+
+/* Reduce decorative gradients used by utilities */
+.gradient-primary {
+    background: var(--tujago-primary) !important;
+}
+
+/* ==========================
+   Accessibility / Neutral UI Overrides
+   - Ensure the auth divider supports light/dark backgrounds
+   - Remove excessive hover transforms and shadows on buttons
+   - Disable group-hover image scaling for social buttons
+   ========================== */
+
+/* Reduce and neutralize hover effects globally for buttons/interactive cards */
+button,
+a[class*="rounded-"],
+.btn-premium,
+.btn-secondary-premium,
+.card-premium,
+.feature-icon-box {
+    transition:
+        background-color 0.12s ease,
+        color 0.12s ease !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+button:hover,
+a:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Prevent grouped elements from scaling icons/images on hover (social buttons) */
+.group:hover img,
+.group:hover svg,
+.group:hover .fa,
+.group:hover .fab {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Keep active/pressed feedback subtle */
+button:active,
+a:active {
+    transform: scale(0.995) !important;
+}
+
+/* Specific: disable hover/movement for login submit and any element with this utility */
+.no-hover-effect {
+    transition: none !important;
+    transform: none !important;
+}
+.no-hover-effect:hover,
+.no-hover-effect:focus,
+.no-hover-effect:active {
+    background-color: var(--tujago-primary) !important;
+    box-shadow: none !important;
+    transform: none !important;
+    filter: none !important;
+}
+
+/* Globally neutralize 'follow-mouse' transforms if any remain (safety) */
+[class*="magnetic"],
+.magnetic,
+.magnetic * {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* ===== Auth Divider (Light/Dark Support, Consolidated) ===== */
+.auth-divider {
+    display: inline-block !important;
+    position: relative !important;
+    z-index: 10 !important;
+    background: #f9fafb !important;
+    color: #6b7280 !important;
+    padding: 0.375rem 1rem !important;
+    border-radius: 0.25rem !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background-image: none !important;
+    background-clip: padding-box !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+    font-size: 0.625rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.15em !important;
+}
+
+.dark .auth-divider {
+    background: #0b0f17 !important;
+    color: #9ca3af !important;
+}
+
+/* Divider container: ensure clean rendering and proper stacking */
+.auth-divider {
+    /* Re-apply parent section bg to override inherited gray-50 */
+}
+
+.relative.my-10 > .absolute {
+    /* Ensure line sits behind span */
+    z-index: 0 !important;
+}
+
+/* ===== Social Buttons (Light/Dark Support, Consolidated) ===== */
+.social-btn {
+    background: #ffffff !important;
+    color: #374151 !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1rem !important;
+    transition: background-color 0.1s ease !important;
+    cursor: pointer !important;
+}
+
+.social-btn:hover {
+    background: #f5f5f5 !important;
+    transform: none !important;
+}
+
+.social-btn img,
+.social-btn svg,
+.social-btn .fab,
+.social-btn .fa {
+    transform: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    color: currentColor !important;
+}
+
+.dark .social-btn {
+    background: rgba(255, 255, 255, 0.03) !important;
+    color: #d1d5db !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark .social-btn:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.social-btn.disabled,
+.social-btn[aria-disabled="true"] {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    filter: grayscale(0.6) !important;
+    pointer-events: none !important;
+}
+
+.social-btn.disabled .fab,
+.social-btn[aria-disabled="true"] .fab {
+    color: rgba(156, 163, 175, 0.9) !important;
+}
+
+/* Custom Verification Alert Animations */
+@keyframes shimmer-progress {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(300%);
+    }
+}
+
+.animate-shimmer-progress {
+    animation: shimmer-progress 3s infinite linear;
+}

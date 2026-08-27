@@ -1,0 +1,1 @@
+{"name":"Tunggal Jaya Transport","short_name":"Tunggal Jaya","description":"Layanan Pemesanan Tiket Bus Premium","start_url":"/build/","display":"standalone","background_color":"#ffffff","theme_color":"#e11d48","lang":"en","scope":"/build/","orientation":"portrait","icons":[{"src":"/img/logoNoBg.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}

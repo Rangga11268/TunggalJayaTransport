@@ -1,0 +1,332 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Tunggal Jaya Transport REST API Documentation",
+        "description": "Dokumentasi OpenAPI / Swagger Resmi Layanan Pemesanan Tiket AKAP & Sewa Pariwisata Tunggal Jaya Transport.",
+        "contact": {
+            "email": "info@tunggaljayatransport.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api",
+            "description": "Local Development Server"
+        }
+    ],
+    "paths": {
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register Penumpang Baru",
+                "description": "Mendaftar akun pelanggan baru untuk aplikasi mobile & web",
+                "operationId": "registerUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "phone",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Ahmad Budi"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "budi@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "081234567890"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Password123!"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Password123!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registrasi berhasil"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login Penumpang",
+                "description": "Login menggunakan email/phone & password untuk memperoleh Bearer token",
+                "operationId": "loginUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "budi@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Password123!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login berhasil"
+                    },
+                    "401": {
+                        "description": "Kredensial salah"
+                    }
+                }
+            }
+        },
+        "/bookings": {
+            "get": {
+                "tags": [
+                    "Booking Tiket AKAP"
+                ],
+                "summary": "Riwayat Pemesanan Tiket User",
+                "operationId": "getUserBookings",
+                "responses": {
+                    "200": {
+                        "description": "Daftar tiket pengguna"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/bookings/{id}": {
+            "get": {
+                "tags": [
+                    "Booking Tiket AKAP"
+                ],
+                "summary": "Detail Pemesanan Tiket",
+                "operationId": "getBookingDetail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail tiket"
+                    },
+                    "404": {
+                        "description": "Tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/charter/history": {
+            "get": {
+                "tags": [
+                    "Sewa Pariwisata"
+                ],
+                "summary": "Riwayat Sewa Bus Pariwisata",
+                "operationId": "getCharterHistory",
+                "responses": {
+                    "200": {
+                        "description": "Daftar pengajuan sewa"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/charter/request": {
+            "post": {
+                "tags": [
+                    "Sewa Pariwisata"
+                ],
+                "summary": "Pengajuan Sewa Bus Pariwisata Baru",
+                "operationId": "requestCharter",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "pickup_date",
+                                    "return_date",
+                                    "pickup_location",
+                                    "destination",
+                                    "bus_requests"
+                                ],
+                                "properties": {
+                                    "pickup_location": {
+                                        "type": "string",
+                                        "example": "Kuningan, Jawa Barat"
+                                    },
+                                    "destination": {
+                                        "type": "string",
+                                        "example": "Bali, Nusa Tenggara"
+                                    },
+                                    "pickup_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-08-10"
+                                    },
+                                    "return_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-08-15"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pengajuan sewa berhasil dibuat"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/routes": {
+            "get": {
+                "tags": [
+                    "Master Data"
+                ],
+                "summary": "Daftar Rute Bus AKAP",
+                "description": "Mendapatkan daftar seluruh rute beserta estimasi harga dasar",
+                "operationId": "getRoutes",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil rute"
+                    }
+                }
+            }
+        },
+        "/routes/{id}": {
+            "get": {
+                "tags": [
+                    "Master Data"
+                ],
+                "summary": "Detail Rute Bus",
+                "operationId": "getRouteDetail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil detail rute"
+                    },
+                    "404": {
+                        "description": "Rute tidak ditemukan"
+                    }
+                }
+            }
+        },
+        "/routes/origins-destinations": {
+            "get": {
+                "tags": [
+                    "Master Data"
+                ],
+                "summary": "Autocomplete Kota Asal & Tujuan",
+                "description": "Mendapatkan daftar unik nama kota asal dan kota tujuan untuk form pencarian",
+                "operationId": "getOriginsDestinations",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil daftar kota"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Masukkan token Sanctum di sini (Format: Bearer {token})",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Booking Tiket AKAP",
+            "description": "Booking Tiket AKAP"
+        },
+        {
+            "name": "Sewa Pariwisata",
+            "description": "Sewa Pariwisata"
+        },
+        {
+            "name": "Master Data",
+            "description": "Master Data"
+        }
+    ]
+}
