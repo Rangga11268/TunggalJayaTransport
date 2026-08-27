@@ -24,7 +24,7 @@ export default function FloatingTabBar({ state, descriptors, navigation }: Botto
           };
 
           const renderIcon = () => {
-            const color = isFocused ? '#FFFFFF' : COLORS.textMuted;
+            const color = isFocused ? '#FFFFFF' : '#64748B';
             const size = 20;
 
             switch (route.name) {
@@ -65,7 +65,7 @@ export default function FloatingTabBar({ state, descriptors, navigation }: Botto
 const styles = StyleSheet.create({
   floatingWrapper: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 28 : 20,
+    bottom: Platform.OS === 'ios' ? 26 : 18,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -75,26 +75,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#13161C',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 40,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: '#E2E8F0',
     width: '78%',
     maxWidth: 320,
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.5,
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.12,
         shadowRadius: 18,
       },
       android: {
-        elevation: 14,
+        elevation: 8,
       },
       web: {
-        boxShadow: '0px 14px 28px rgba(0, 0, 0, 0.65)',
+        boxShadow: '0px 10px 25px rgba(15, 23, 42, 0.12)',
       },
     }),
   },
@@ -111,14 +111,14 @@ const styles = StyleSheet.create({
       ios: {
         shadowColor: COLORS.brandRed,
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5,
+        shadowOpacity: 0.35,
         shadowRadius: 8,
       },
       android: {
         elevation: 6,
       },
       web: {
-        boxShadow: '0px 4px 14px rgba(255, 26, 53, 0.55)',
+        boxShadow: '0px 4px 14px rgba(230, 0, 35, 0.4)',
       },
     }),
   },

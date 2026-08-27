@@ -91,7 +91,6 @@ export default function ScheduleDetailScreen() {
   const depTime = schedule?.departure_time ? schedule.departure_time.substring(0, 5) : '07:00';
   const arrTime = schedule?.arrival_time ? schedule.arrival_time.substring(0, 5) : '13:00';
 
-  // Choose bus image based on unit name
   const getImageSource = () => {
     const name = (busName || '').toLowerCase();
     if (name.includes('primadona')) return require('../../assets/images/primadona.webp');
@@ -110,8 +109,8 @@ export default function ScheduleDetailScreen() {
           resizeMode="cover"
         />
         <LinearGradient
-          colors={['rgba(10, 12, 16, 0.7)', 'transparent', 'rgba(10, 12, 16, 0.95)', '#0A0C10']}
-          locations={[0, 0.35, 0.75, 1]}
+          colors={['rgba(17, 24, 39, 0.4)', 'transparent', 'rgba(17, 24, 39, 0.9)']}
+          locations={[0, 0.35, 1]}
           style={styles.heroGradient}
         >
           {/* Header Navigation Bar */}
@@ -170,7 +169,7 @@ export default function ScheduleDetailScreen() {
                 onPress={() => setActiveTab(t.id as any)}
                 style={[styles.tabPill, isActive ? styles.tabPillActive : styles.tabPillInactive]}
               >
-                <IconComp size={15} color={isActive ? '#FFFFFF' : COLORS.textSecondary} />
+                <IconComp size={15} color={isActive ? '#FFFFFF' : '#4B5563'} />
                 <Text style={[styles.tabPillText, isActive ? styles.tabPillTextActive : styles.tabPillTextInactive]}>
                   {t.label}
                 </Text>
@@ -405,9 +404,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(22, 26, 34, 0.75)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -424,7 +421,7 @@ const styles = StyleSheet.create({
   routeHeaderLeft: {},
   badgeLine: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255, 26, 53, 0.25)',
+    backgroundColor: COLORS.brandRed,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
@@ -433,7 +430,7 @@ const styles = StyleSheet.create({
   badgeLineText: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 11,
-    color: COLORS.brandRed,
+    color: '#FFFFFF',
   },
   routeHeaderTitle: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
@@ -444,7 +441,7 @@ const styles = StyleSheet.create({
   routeHeaderSub: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: 'rgba(255, 255, 255, 0.85)',
     marginTop: 2,
   },
   routeHeaderRight: {
@@ -466,14 +463,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   routeHeaderPrice: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 18,
     color: '#FFFFFF',
   },
   routeHeaderPriceSub: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: COLORS.textMuted,
+    color: 'rgba(255, 255, 255, 0.8)',
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -496,34 +493,45 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.brandRed,
   },
   tabPillInactive: {
-    backgroundColor: '#161922',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
   },
   tabPillText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 13,
   },
   tabPillTextActive: {
     color: '#FFFFFF',
   },
   tabPillTextInactive: {
-    color: COLORS.textSecondary,
+    color: '#4B5563',
   },
   sectionContainer: {
     gap: 16,
   },
   card: {
-    backgroundColor: '#14171F',
+    backgroundColor: '#FFFFFF',
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   cardTitle: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#111827',
     marginBottom: 14,
   },
   specsGrid: {
@@ -533,20 +541,20 @@ const styles = StyleSheet.create({
   },
   specBox: {
     width: '47%',
-    backgroundColor: '#1C202A',
+    backgroundColor: '#F1F4F8',
     borderRadius: 12,
     padding: 12,
   },
   specLabel: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 11,
-    color: COLORS.textMuted,
+    color: '#6B7280',
     marginBottom: 4,
   },
   specValue: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   timelineWrapper: {
     paddingLeft: 4,
@@ -573,7 +581,7 @@ const styles = StyleSheet.create({
   timelineLine: {
     width: 2,
     height: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: '#CBD5E1',
     marginLeft: 6,
     marginVertical: 4,
   },
@@ -583,18 +591,18 @@ const styles = StyleSheet.create({
   timelineTime: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 13,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   timelinePlace: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#111827',
     marginTop: 2,
   },
   timelineSub: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 11,
-    color: COLORS.textMuted,
+    color: '#6B7280',
     marginTop: 2,
   },
   facilitiesGrid: {
@@ -608,7 +616,7 @@ const styles = StyleSheet.create({
   facilityName: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
   },
   crewRow: {
     flexDirection: 'row',
@@ -619,7 +627,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#1E232E',
+    backgroundColor: '#EEF2F6',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -629,19 +637,21 @@ const styles = StyleSheet.create({
   crewName: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   crewSub: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#6B7280',
     marginTop: 2,
   },
   dealItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#1B1F27',
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
     padding: 14,
     borderRadius: 14,
     marginBottom: 10,
@@ -650,7 +660,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: 'rgba(255, 26, 53, 0.15)',
+    backgroundColor: 'rgba(230, 0, 35, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -660,45 +670,45 @@ const styles = StyleSheet.create({
   dealTitle: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   dealDesc: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
     marginTop: 2,
   },
   reviewsOverview: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-    backgroundColor: '#14171F',
+    backgroundColor: '#FFFFFF',
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
   },
   reviewScoreBig: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 36,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   reviewScoreStars: {
-    color: '#FFB800',
+    color: '#D97706',
     fontSize: 16,
   },
   reviewScoreCount: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#6B7280',
     marginTop: 2,
   },
   reviewCard: {
-    backgroundColor: '#14171F',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
   },
   reviewCardHeader: {
     flexDirection: 'row',
@@ -708,22 +718,22 @@ const styles = StyleSheet.create({
   reviewCardAuthor: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   reviewCardDate: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 11,
-    color: COLORS.textMuted,
+    color: '#9CA3AF',
   },
   reviewCardStars: {
-    color: '#FFB800',
+    color: '#D97706',
     fontSize: 12,
     marginBottom: 6,
   },
   reviewCardText: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
     lineHeight: 19,
   },
   bottomBarWrapper: {
@@ -745,11 +755,11 @@ const styles = StyleSheet.create({
       ios: {
         shadowColor: COLORS.brandRed,
         shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.5,
+        shadowOpacity: 0.35,
         shadowRadius: 14,
       },
       android: {
-        elevation: 10,
+        elevation: 8,
       },
     }),
   },
@@ -788,4 +798,3 @@ const styles = StyleSheet.create({
     color: COLORS.brandRed,
   },
 });
-

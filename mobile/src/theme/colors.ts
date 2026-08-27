@@ -1,82 +1,85 @@
 export const COLORS = {
-  // Deep Obsidian Dark Palette
-  bgDark: '#0A0C10',
-  bgSurface: '#12151B',
-  bgCard: '#161A22',
-  bgCardHover: '#1C212C',
-  bgPill: '#1B1F27',
-  bgElevated: '#202531',
+  // Warm Alabaster Luxury Light Palette
+  bgDark: '#F4F6F9',        // Soft Alabaster Mist Canvas (not harsh white)
+  bgSurface: '#FFFFFF',     // Pure Card Surface for clean elevation
+  bgCard: '#FFFFFF',        // Card Container
+  bgCardHover: '#F8FAFC',   // Subtle Card Hover
+  bgPill: '#EEF2F6',        // Muted Pill / Input Background
+  bgElevated: '#FFFFFF',    // Elevated modals / popups
+  bgInput: '#F1F4F8',       // Form input background
 
-  // Brand Red Accents (Matching RedBus Luxury Palette)
-  brandRed: '#FF1A35',
-  brandRedDark: '#D6001F',
-  brandRedGlow: 'rgba(255, 26, 53, 0.35)',
-  brandRedLight: 'rgba(255, 26, 53, 0.15)',
+  // Brand Red Accents (Tunggal Jaya / RedBus Signature Crimson)
+  brandRed: '#E60023',
+  brandRedDark: '#C4001E',
+  brandRedGlow: 'rgba(230, 0, 35, 0.22)',
+  brandRedLight: 'rgba(230, 0, 35, 0.08)',
 
-  // Text Hierarchy
-  textPrimary: '#FFFFFF',
-  textSecondary: '#9AA0AC',
-  textMuted: '#5C6370',
-  textDisabled: '#3B4048',
+  // Text Hierarchy (Soft Charcoal for zero eye-strain)
+  textPrimary: '#111827',   // Deep Obsidian Charcoal
+  textSecondary: '#4B5563', // Slate Gray
+  textMuted: '#9CA3AF',     // Subtle placeholder gray
+  textDisabled: '#D1D5DB',  // Disabled text
 
   // Accents & Badges
-  accentGold: '#FFB800',
-  accentGreen: '#00D664',
-  accentBlue: '#2D81FF',
+  accentGold: '#D97706',
+  accentGreen: '#059669',
+  accentBlue: '#2563EB',
 
-  // Subtle Borders
-  borderLight: 'rgba(255, 255, 255, 0.08)',
-  borderMedium: 'rgba(255, 255, 255, 0.14)',
-  borderRed: 'rgba(255, 26, 53, 0.45)',
+  // Crisp Hairline Borders
+  borderLight: '#E2E8F0',
+  borderMedium: '#CBD5E1',
+  borderRed: 'rgba(230, 0, 35, 0.45)',
 
-  // Overlays
-  overlayDark: 'rgba(10, 12, 16, 0.85)',
-  glassBg: 'rgba(22, 26, 34, 0.82)',
+  // Shadows & Overlays
+  shadowSoft: 'rgba(0, 0, 0, 0.05)',
+  shadowMedium: 'rgba(0, 0, 0, 0.1)',
+  overlayDark: 'rgba(17, 24, 39, 0.65)',
+  glassBg: 'rgba(255, 255, 255, 0.9)',
 };
 
 export const GRADIENTS = {
-  redPrimary: ['#FF1A35', '#D6001F'] as const,
-  heroOverlay: ['transparent', 'rgba(10, 12, 16, 0.6)', '#0A0C10'] as const,
-  cardGlow: ['#1E232E', '#14171E'] as const,
-  darkSheet: ['rgba(18, 21, 27, 0.95)', '#0A0C10'] as const,
+  redPrimary: ['#FF1A35', '#E60023'] as const,
+  heroOverlay: ['transparent', 'rgba(244, 246, 249, 0.6)', '#F4F6F9'] as const,
+  cardGlow: ['#FFFFFF', '#F8FAFC'] as const,
+  darkSheet: ['rgba(255, 255, 255, 0.95)', '#F4F6F9'] as const,
 };
 
-// Comprehensive token mapping for 100% type-safety & backwards compatibility
+// Full token mapping for backward compatibility and type-safety
 export const Colors = {
   background: COLORS.bgDark,
   card: COLORS.bgCard,
   surface: COLORS.bgSurface,
-  surfaceCard: '#161A22',
-  surfaceContainer: '#12151B',
-  surfaceElevated: '#202531',
-  surfaceHighest: '#1F2430',
+  surfaceCard: COLORS.bgCard,
+  surfaceContainer: COLORS.bgPill,
+  surfaceElevated: COLORS.bgElevated,
+  surfaceHighest: '#E2E8F0',
   primary: COLORS.brandRed,
-  primaryLight: 'rgba(255, 26, 53, 0.15)',
-  primaryContainer: 'rgba(255, 26, 53, 0.15)',
-  primaryGlow: 'rgba(255, 26, 53, 0.35)',
+  primaryLight: COLORS.brandRedLight,
+  primaryContainer: COLORS.brandRedLight,
+  primaryGlow: COLORS.brandRedGlow,
   secondary: COLORS.accentGold,
   text: COLORS.textPrimary,
   textPrimary: COLORS.textPrimary,
   textSecondary: COLORS.textSecondary,
-  textMuted: COLORS.textMuted,
+  textMuted: COLORS.textSecondary,
   textLight: COLORS.textMuted,
   border: COLORS.borderLight,
   borderLight: COLORS.borderLight,
   borderMedium: COLORS.borderMedium,
   borderActive: COLORS.borderRed,
   success: COLORS.accentGreen,
-  successContainer: 'rgba(0, 214, 100, 0.15)',
+  successContainer: 'rgba(5, 150, 105, 0.12)',
   warning: COLORS.accentGold,
-  warningContainer: 'rgba(255, 184, 0, 0.15)',
+  warningContainer: 'rgba(217, 119, 6, 0.12)',
   error: COLORS.brandRed,
-  errorContainer: 'rgba(255, 26, 53, 0.15)',
+  errorContainer: COLORS.brandRedLight,
   info: COLORS.accentBlue,
-  infoContainer: 'rgba(45, 129, 255, 0.15)',
+  infoContainer: 'rgba(37, 99, 235, 0.12)',
   gold: COLORS.accentGold,
-  seatAvailable: '#1C212B',
+  seatAvailable: '#FFFFFF',
   seatSelected: COLORS.brandRed,
-  seatOccupied: '#2A2E38',
-  seatDisabled: '#161922',
+  seatOccupied: '#E2E8F0',
+  seatDisabled: '#F1F4F8',
 };
 
 export const Radius = {

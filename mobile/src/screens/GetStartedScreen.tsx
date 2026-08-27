@@ -48,9 +48,9 @@ export default function GetStartedScreen() {
           </TouchableOpacity>
         </SafeAreaView>
 
-        {/* Gradient Transition into Dark Card */}
+        {/* Gradient Transition into Warm Alabaster Card */}
         <LinearGradient
-          colors={['transparent', 'rgba(10, 12, 16, 0.4)', 'rgba(10, 12, 16, 0.95)', '#0A0C10']}
+          colors={['transparent', 'rgba(244, 246, 249, 0.4)', 'rgba(244, 246, 249, 0.95)', '#F4F6F9']}
           locations={[0, 0.35, 0.65, 1]}
           style={styles.bottomGradient}
         >
@@ -115,35 +115,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.6)',
   },
   logoIcon: {
-    width: 22,
-    height: 22,
+    width: 20,
+    height: 20,
     borderRadius: 6,
-    backgroundColor: 'rgba(255, 26, 53, 0.2)',
+    backgroundColor: 'rgba(230, 0, 35, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   logoRedDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 9,
+    height: 9,
+    borderRadius: 4.5,
     backgroundColor: COLORS.brandRed,
   },
   brandName: {
     fontFamily: 'PlusJakartaSans_700Bold',
-    fontSize: 20,
-    color: '#FFFFFF',
+    fontSize: 17,
+    color: '#111827',
     letterSpacing: -0.3,
   },
   skipButton: {
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.6)',
   },
   skipText: {
-    fontFamily: 'PlusJakartaSans_500Medium',
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 13,
+    color: '#4B5563',
   },
   bottomGradient: {
     paddingHorizontal: 24,
@@ -154,9 +164,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 26,
-    color: '#FFFFFF',
+    color: '#111827',
     textAlign: 'center',
     marginBottom: 8,
     letterSpacing: -0.4,
@@ -164,7 +174,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
     textAlign: 'center',
     lineHeight: 22,
     paddingHorizontal: 16,
@@ -180,7 +190,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    backgroundColor: '#CBD5E1',
   },
   dotActive: {
     width: 18,
@@ -197,16 +207,27 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#1E222B',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
     justifyContent: 'center',
     alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   loginBtnText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   joinBtn: {
     flex: 1,
@@ -219,7 +240,7 @@ const styles = StyleSheet.create({
       ios: {
         shadowColor: COLORS.brandRed,
         shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.45,
+        shadowOpacity: 0.35,
         shadowRadius: 10,
       },
       android: {
@@ -228,7 +249,7 @@ const styles = StyleSheet.create({
     }),
   },
   joinBtnText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 15,
     color: '#FFFFFF',
   },

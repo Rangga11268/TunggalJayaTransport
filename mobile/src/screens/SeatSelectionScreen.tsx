@@ -52,7 +52,6 @@ export default function SeatSelectionScreen() {
       const found = list.find((s: any) => s.id === scheduleId) || list[0];
       setSchedule(found);
 
-      // Check departure time validity (User requirement: bus departed cannot pick seats)
       if (found) {
         const now = new Date();
         const schedDate = found.departure_date ? new Date(found.departure_date) : new Date();
@@ -105,7 +104,6 @@ export default function SeatSelectionScreen() {
     });
   };
 
-  // Generate standard 30-seat layout (Rows 1 to 8, 2-2 configuration)
   const totalCapacity = schedule?.bus?.capacity || 30;
   const rowsCount = Math.ceil(totalCapacity / 4);
 
@@ -118,7 +116,7 @@ export default function SeatSelectionScreen() {
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
         >
-          <ArrowLeft size={18} color="#FFFFFF" />
+          <ArrowLeft size={18} color="#111827" />
         </TouchableOpacity>
 
         <View style={styles.topBarCenter}>
@@ -134,7 +132,7 @@ export default function SeatSelectionScreen() {
       {/* Bus Departure Warning Notice if departed */}
       {isDeparted && (
         <View style={styles.departedBanner}>
-          <ShieldAlert size={18} color="#FF3B30" />
+          <ShieldAlert size={18} color="#E60023" />
           <Text style={styles.departedText}>
             Bus ini telah diberangkatkan. Anda hanya dapat melihat ketersediaan.
           </Text>
@@ -171,7 +169,7 @@ export default function SeatSelectionScreen() {
               <Text style={styles.cockpitText}>PINTU MASUK</Text>
             </View>
             <View style={styles.driverSeat}>
-              <Compass size={18} color={COLORS.textMuted} />
+              <Compass size={18} color="#6B7280" />
               <Text style={styles.driverText}>DRIVER</Text>
             </View>
           </View>
@@ -292,19 +290,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: COLORS.bgSurface,
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    borderBottomColor: '#E2E8F0',
   },
   backBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#161922',
+    backgroundColor: '#F4F6F9',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: '#E2E8F0',
   },
   topBarCenter: {
     alignItems: 'center',
@@ -312,28 +310,28 @@ const styles = StyleSheet.create({
   topBarTitle: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   topBarSub: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
     marginTop: 2,
   },
   departedBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: 'rgba(255, 59, 48, 0.15)',
+    backgroundColor: 'rgba(230, 0, 35, 0.08)',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 59, 48, 0.3)',
+    borderBottomColor: 'rgba(230, 0, 35, 0.2)',
   },
   departedText: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 12,
-    color: '#FF453A',
+    color: COLORS.brandRed,
     flex: 1,
   },
   legendContainer: {
@@ -341,9 +339,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 24,
     paddingVertical: 14,
-    backgroundColor: '#12151B',
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+    borderBottomColor: '#E2E8F0',
   },
   legendItem: {
     flexDirection: 'row',
@@ -356,20 +354,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   seatAvailable: {
-    backgroundColor: '#1C212B',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#CBD5E1',
   },
   seatSelected: {
     backgroundColor: COLORS.brandRed,
   },
   seatOccupied: {
-    backgroundColor: '#2A2E38',
+    backgroundColor: '#E2E8F0',
   },
   legendLabel: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
   },
   scrollContent: {
     paddingHorizontal: 24,
@@ -379,11 +377,22 @@ const styles = StyleSheet.create({
   cabinFrame: {
     width: '100%',
     maxWidth: 340,
-    backgroundColor: '#13161D',
+    backgroundColor: '#FFFFFF',
     borderRadius: 24,
     borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: '#E2E8F0',
     padding: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.06,
+        shadowRadius: 14,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   cockpitRow: {
     flexDirection: 'row',
@@ -394,13 +403,13 @@ const styles = StyleSheet.create({
   doorArea: {
     paddingHorizontal: 10,
     paddingVertical: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#F1F4F8',
     borderRadius: 8,
   },
   cockpitText: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 10,
-    color: COLORS.textMuted,
+    color: '#6B7280',
   },
   driverSeat: {
     flexDirection: 'row',
@@ -408,17 +417,17 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#F1F4F8',
     borderRadius: 8,
   },
   driverText: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 10,
-    color: COLORS.textMuted,
+    color: '#6B7280',
   },
   dividerLine: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: '#E2E8F0',
     marginBottom: 18,
   },
   cabinRow: {
@@ -442,45 +451,45 @@ const styles = StyleSheet.create({
   aisleText: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 11,
-    color: COLORS.textMuted,
+    color: '#9CA3AF',
   },
   seatBox: {
     width: 44,
     height: 44,
     borderRadius: 10,
-    backgroundColor: '#1B202A',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#CBD5E1',
     justifyContent: 'center',
     alignItems: 'center',
   },
   seatBoxOccupied: {
-    backgroundColor: '#242832',
+    backgroundColor: '#E2E8F0',
     borderColor: 'transparent',
-    opacity: 0.4,
+    opacity: 0.6,
   },
   seatBoxSelected: {
     backgroundColor: COLORS.brandRed,
-    borderColor: '#FFFFFF',
+    borderColor: COLORS.brandRed,
     ...Platform.select({
       ios: {
         shadowColor: COLORS.brandRed,
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5,
+        shadowOpacity: 0.35,
         shadowRadius: 8,
       },
       android: {
-        elevation: 6,
+        elevation: 5,
       },
     }),
   },
   seatNumber: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 12,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   seatNumberOccupied: {
-    color: COLORS.textMuted,
+    color: '#9CA3AF',
   },
   seatNumberSelected: {
     color: '#FFFFFF',
@@ -495,24 +504,24 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+    borderTopColor: '#E2E8F0',
   },
   toiletBox: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#F1F4F8',
     borderRadius: 8,
   },
   backExitBox: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#F1F4F8',
     borderRadius: 8,
   },
   toiletText: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 10,
-    color: COLORS.textMuted,
+    color: '#6B7280',
   },
   bottomBarWrapper: {
     position: 'absolute',
@@ -524,21 +533,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#161922',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
+    borderColor: '#E2E8F0',
     paddingVertical: 12,
     paddingHorizontal: 18,
     borderRadius: 36,
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: '#0F172A',
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.6,
-        shadowRadius: 16,
+        shadowOpacity: 0.12,
+        shadowRadius: 18,
       },
       android: {
-        elevation: 10,
+        elevation: 8,
       },
     }),
   },
@@ -546,12 +555,12 @@ const styles = StyleSheet.create({
   bottomSeatsLabel: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
   },
   bottomTotalPrice: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 17,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   checkoutBtn: {
     flexDirection: 'row',
@@ -563,8 +572,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   checkoutBtnDisabled: {
-    backgroundColor: '#2A2E38',
-    opacity: 0.6,
+    backgroundColor: '#CBD5E1',
   },
   checkoutBtnText: {
     fontFamily: 'PlusJakartaSans_700Bold',

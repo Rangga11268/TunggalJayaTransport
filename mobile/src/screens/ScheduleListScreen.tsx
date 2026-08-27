@@ -42,7 +42,6 @@ export default function ScheduleListScreen() {
   const [schedules, setSchedules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedRouteFilter, setSelectedRouteFilter] = useState('all');
 
   useEffect(() => {
     fetchSchedules();
@@ -78,7 +77,7 @@ export default function ScheduleListScreen() {
           </View>
 
           <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn}>
-            <Bell size={18} color="#FFFFFF" />
+            <Bell size={18} color="#111827" />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -98,7 +97,7 @@ export default function ScheduleListScreen() {
             resizeMode="cover"
           />
           <LinearGradient
-            colors={['rgba(10, 12, 16, 0.4)', 'rgba(10, 12, 16, 0.95)']}
+            colors={['rgba(17, 24, 39, 0.3)', 'rgba(17, 24, 39, 0.88)']}
             style={styles.bannerGradient}
           >
             <View style={styles.bannerBadge}>
@@ -130,7 +129,6 @@ export default function ScheduleListScreen() {
               const arrTime = item.arrival_time ? item.arrival_time.substring(0, 5) : '15:00';
               const price = Number(item.price || 180000).toLocaleString('id-ID');
 
-              // Map photo based on unit name
               const nameLower = (busName || '').toLowerCase();
               let thumbSource = require('../../assets/images/resiBisma.webp');
               if (nameLower.includes('primadona')) thumbSource = require('../../assets/images/primadona.webp');
@@ -155,7 +153,7 @@ export default function ScheduleListScreen() {
                     </View>
 
                     <Text style={styles.scheduleRouteText}>
-                      <MapPin size={12} color={COLORS.textMuted} /> {origin} ↔ {destination}
+                      <MapPin size={12} color="#6B7280" /> {origin} ↔ {destination}
                     </Text>
 
                     <Text style={styles.scheduleTimeText}>
@@ -191,9 +189,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgDark,
   },
   topBar: {
-    backgroundColor: COLORS.bgSurface,
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    borderBottomColor: '#E2E8F0',
   },
   topBarContent: {
     flexDirection: 'row',
@@ -205,24 +203,24 @@ const styles = StyleSheet.create({
   topBarTitle: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 20,
-    color: '#FFFFFF',
+    color: '#111827',
     letterSpacing: -0.3,
   },
   topBarSub: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
     marginTop: 2,
   },
   iconBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#161922',
+    backgroundColor: '#F4F6F9',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: '#E2E8F0',
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -233,8 +231,19 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
     marginBottom: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   bannerImage: {
     width: '100%',
@@ -259,15 +268,15 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   bannerTitle: {
-    fontFamily: 'PlusJakartaSans_700Bold',
-    fontSize: 16,
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontSize: 17,
     color: '#FFFFFF',
     marginBottom: 2,
   },
   bannerSubtitle: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 11,
-    color: COLORS.textSecondary,
+    color: 'rgba(255, 255, 255, 0.85)',
   },
   listSection: {
     gap: 12,
@@ -281,22 +290,33 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   sectionSub: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: COLORS.textMuted,
+    color: '#6B7280',
   },
   scheduleCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#14171F',
+    backgroundColor: '#FFFFFF',
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
     padding: 12,
     gap: 14,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   scheduleImage: {
     width: 74,
@@ -315,29 +335,29 @@ const styles = StyleSheet.create({
   scheduleTitle: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   ratingBadge: {
-    backgroundColor: 'rgba(255, 184, 0, 0.15)',
+    backgroundColor: 'rgba(217, 119, 6, 0.1)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
   },
   ratingBadgeText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 10,
-    color: '#FFB800',
+    color: '#D97706',
   },
   scheduleRouteText: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
     marginBottom: 4,
   },
   scheduleTimeText: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
     marginBottom: 6,
   },
   priceRow: {
@@ -345,14 +365,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   schedulePriceText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   schedulePriceSub: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 11,
-    color: COLORS.textMuted,
+    color: '#6B7280',
   },
   chevronBox: {
     width: 36,

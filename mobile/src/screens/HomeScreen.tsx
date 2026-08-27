@@ -97,12 +97,12 @@ export default function HomeScreen() {
         {/* Top App Bar */}
         <View style={styles.headerBar}>
           <TouchableOpacity activeOpacity={0.7} style={styles.iconCircle}>
-            <Menu size={20} color="#FFFFFF" />
+            <Menu size={20} color="#111827" />
           </TouchableOpacity>
 
           <View style={styles.headerRight}>
             <TouchableOpacity activeOpacity={0.7} style={styles.iconCircle}>
-              <Bell size={18} color="#FFFFFF" />
+              <Bell size={18} color="#111827" />
               <View style={styles.badgeDot} />
             </TouchableOpacity>
 
@@ -169,7 +169,7 @@ export default function HomeScreen() {
                 }}
                 style={[styles.categoryChip, isActive ? styles.categoryChipActive : styles.categoryChipInactive]}
               >
-                <IconComp size={16} color={isActive ? '#FFFFFF' : COLORS.textSecondary} />
+                <IconComp size={16} color={isActive ? '#FFFFFF' : '#4B5563'} />
                 <Text style={[styles.categoryText, isActive ? styles.categoryTextActive : styles.categoryTextInactive]}>
                   {cat.label}
                 </Text>
@@ -178,10 +178,10 @@ export default function HomeScreen() {
           })}
         </ScrollView>
 
-        {/* Featured Hero Card (Matching Mockup Card) */}
+        {/* Featured Hero Card (Warm Alabaster Light Luxury) */}
         <View style={styles.heroCardContainer}>
           <LinearGradient
-            colors={['#181C26', '#12151D']}
+            colors={['#FFFFFF', '#F8FAFC']}
             style={styles.heroCard}
           >
             {/* Left Content */}
@@ -255,7 +255,7 @@ export default function HomeScreen() {
               resizeMode="cover"
             />
             <LinearGradient
-              colors={['transparent', 'rgba(10, 12, 16, 0.95)']}
+              colors={['transparent', 'rgba(17, 24, 39, 0.88)']}
               style={styles.storyGradient}
             >
               <Text style={styles.storyTitle}>Dive into Luxury Journey</Text>
@@ -278,7 +278,7 @@ export default function HomeScreen() {
               resizeMode="cover"
             />
             <LinearGradient
-              colors={['transparent', 'rgba(10, 12, 16, 0.95)']}
+              colors={['transparent', 'rgba(17, 24, 39, 0.88)']}
               style={styles.storyGradient}
             >
               <Text style={styles.storyTitle}>Sewa Bus Pariwisata</Text>
@@ -290,7 +290,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ScrollView>
 
-        {/* Popular Schedules List */}
+        {/* Popular Routes List */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Popular Routes</Text>
           <TouchableOpacity
@@ -314,7 +314,7 @@ export default function HomeScreen() {
               <TouchableOpacity
                 key={item.id || idx}
                 activeOpacity={0.85}
-                onPress={() => navigation.navigate('SeatSelection', { scheduleId: item.id })}
+                onPress={() => navigation.navigate('ScheduleDetail', { scheduleId: item.id })}
                 style={styles.scheduleCard}
               >
                 <Image
@@ -346,26 +346,34 @@ export default function HomeScreen() {
           <Text style={styles.amenitiesTitle}>Fasilitas Standar Eksekutif</Text>
           <View style={styles.amenitiesGrid}>
             <View style={styles.amenityItem}>
-              <Wifi size={18} color={COLORS.brandRed} />
+              <View style={styles.amenityIconCircle}>
+                <Wifi size={16} color={COLORS.brandRed} />
+              </View>
               <Text style={styles.amenityText}>Free 4G Wi-Fi</Text>
             </View>
             <View style={styles.amenityItem}>
-              <Tv size={18} color={COLORS.brandRed} />
+              <View style={styles.amenityIconCircle}>
+                <Tv size={16} color={COLORS.brandRed} />
+              </View>
               <Text style={styles.amenityText}>Smart TV &amp; Audio</Text>
             </View>
             <View style={styles.amenityItem}>
-              <Coffee size={18} color={COLORS.brandRed} />
+              <View style={styles.amenityIconCircle}>
+                <Coffee size={16} color={COLORS.brandRed} />
+              </View>
               <Text style={styles.amenityText}>Snack &amp; Air</Text>
             </View>
             <View style={styles.amenityItem}>
-              <ShieldCheck size={18} color={COLORS.brandRed} />
-              <Text style={styles.amenityText}>Kru Tersertifikasi</Text>
+              <View style={styles.amenityIconCircle}>
+                <ShieldCheck size={16} color={COLORS.brandRed} />
+              </View>
+              <Text style={styles.amenityText}>Kru Resmi</Text>
             </View>
           </View>
         </View>
 
         {/* Bottom Spacing for Floating Tab Bar */}
-        <View style={{ height: 100 }} />
+        <View style={{ height: 110 }} />
       </ScrollView>
     </View>
   );
@@ -396,11 +404,22 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#161922',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
     justifyContent: 'center',
     alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   badgeDot: {
     position: 'absolute',
@@ -433,36 +452,47 @@ const styles = StyleSheet.create({
   headline: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 28,
-    color: '#FFFFFF',
+    color: '#111827',
     lineHeight: 34,
     letterSpacing: -0.5,
   },
   headlineSub: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 24,
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: '#4B5563',
   },
   locationCapsule: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#161922',
+    backgroundColor: '#FFFFFF',
     borderRadius: 30,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
     paddingLeft: 20,
     paddingRight: 6,
     paddingVertical: 6,
     marginBottom: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   locationText: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
   },
   locationBold: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-    color: '#FFFFFF',
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#111827',
   },
   locationRedBtn: {
     width: 38,
@@ -491,7 +521,7 @@ const styles = StyleSheet.create({
       ios: {
         shadowColor: COLORS.brandRed,
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.4,
+        shadowOpacity: 0.35,
         shadowRadius: 8,
       },
       android: {
@@ -500,19 +530,19 @@ const styles = StyleSheet.create({
     }),
   },
   categoryChipInactive: {
-    backgroundColor: '#161922',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
   },
   categoryText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 13,
   },
   categoryTextActive: {
     color: '#FFFFFF',
   },
   categoryTextInactive: {
-    color: COLORS.textSecondary,
+    color: '#4B5563',
   },
   heroCardContainer: {
     marginBottom: 26,
@@ -520,10 +550,21 @@ const styles = StyleSheet.create({
   heroCard: {
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
     padding: 20,
     flexDirection: 'row',
     overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.08,
+        shadowRadius: 14,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   heroLeft: {
     flex: 1.1,
@@ -534,20 +575,20 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   heroBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: '#EEF2F6',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
   heroBadgeText: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#4B5563',
   },
   heroTitle: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 22,
-    color: '#FFFFFF',
+    color: '#111827',
     lineHeight: 28,
     marginBottom: 16,
     letterSpacing: -0.4,
@@ -556,13 +597,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#0F1218',
+    backgroundColor: '#F1F4F8',
     borderRadius: 20,
     paddingHorizontal: 6,
     paddingVertical: 5,
     width: '95%',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderColor: '#E2E8F0',
   },
   slideIconBox: {
     width: 32,
@@ -575,14 +616,14 @@ const styles = StyleSheet.create({
   slideArrowText: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.4)',
+    color: '#9CA3AF',
     letterSpacing: 2,
   },
   slideEndIcon: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(255, 26, 53, 0.15)',
+    backgroundColor: 'rgba(230, 0, 35, 0.12)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -603,9 +644,9 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   sectionTitle: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: '#111827',
     letterSpacing: -0.3,
   },
   viewAllBtn: {
@@ -613,9 +654,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   viewAllText: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 13,
-    color: COLORS.textMuted,
+    color: COLORS.brandRed,
   },
   whatsNewScroll: {
     gap: 14,
@@ -627,7 +668,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
   },
   storyImage: {
     width: '100%',
@@ -649,18 +690,18 @@ const styles = StyleSheet.create({
   storySubtitle: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 11,
-    color: COLORS.textSecondary,
+    color: 'rgba(255, 255, 255, 0.8)',
     marginBottom: 8,
   },
   storyPill: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 10,
   },
   storyPillText: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 10,
     color: '#FFFFFF',
   },
@@ -671,12 +712,23 @@ const styles = StyleSheet.create({
   scheduleCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#14171F',
+    backgroundColor: '#FFFFFF',
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
     padding: 12,
     gap: 14,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   scheduleBusThumb: {
     width: 68,
@@ -689,59 +741,70 @@ const styles = StyleSheet.create({
   scheduleRoute: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#111827',
     marginBottom: 2,
   },
   scheduleBusName: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
     marginBottom: 6,
   },
   schedulePrice: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   schedulePerPerson: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 11,
-    color: COLORS.textMuted,
+    color: '#6B7280',
   },
   scheduleAction: {
     alignItems: 'flex-end',
     gap: 8,
   },
   ratingBadge: {
-    backgroundColor: 'rgba(255, 184, 0, 0.15)',
+    backgroundColor: 'rgba(217, 119, 6, 0.1)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
   },
   ratingText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 11,
-    color: '#FFB800',
+    color: '#D97706',
   },
   chevronCircle: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#1E222C',
+    backgroundColor: COLORS.brandRed,
     justifyContent: 'center',
     alignItems: 'center',
   },
   amenitiesCard: {
-    backgroundColor: '#14171F',
+    backgroundColor: '#FFFFFF',
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#E2E8F0',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   amenitiesTitle: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#111827',
     marginBottom: 14,
   },
   amenitiesGrid: {
@@ -752,9 +815,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
+  amenityIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(230, 0, 35, 0.08)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   amenityText: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 11,
-    color: COLORS.textSecondary,
+    color: '#4B5563',
   },
 });
