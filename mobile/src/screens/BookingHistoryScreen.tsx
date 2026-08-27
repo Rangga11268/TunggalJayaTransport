@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -8,10 +7,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors, Radius } from '../theme/colors';
-import api from '../api/client';
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors, Radius } from "../theme/colors";
@@ -19,18 +14,15 @@ import api from "../api/client";
 import {
   Calendar,
   Bus,
-  Sparkles,
   Compass,
   ChevronRight,
   Receipt,
   CheckCircle2,
   Clock,
-} from 'lucide-react-native';
 } from "lucide-react-native";
 
 export default function BookingHistoryScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<'akap' | 'charter'>('akap');
   const [activeTab, setActiveTab] = useState<"akap" | "charter">("akap");
   const [bookings, setBookings] = useState<any[]>([]);
   const [charters, setCharters] = useState<any[]>([]);
@@ -41,8 +33,6 @@ export default function BookingHistoryScreen({ navigation }: any) {
     try {
       setLoading(true);
       const [bookingsRes, chartersRes] = await Promise.all([
-        api.get('/bookings').catch(() => ({ data: { data: [] } })),
-        api.get('/charter/history').catch(() => ({ data: { data: [] } })),
         api.get("/bookings").catch(() => ({ data: { data: [] } })),
         api.get("/charter/history").catch(() => ({ data: { data: [] } })),
       ]);
@@ -50,7 +40,6 @@ export default function BookingHistoryScreen({ navigation }: any) {
       setBookings(bookingsRes.data?.data || []);
       setCharters(chartersRes.data?.data || []);
     } catch (e) {
-      console.error('Error fetching history:', e);
       console.error("Error fetching history:", e);
     } finally {
       setLoading(false);
@@ -72,22 +61,18 @@ export default function BookingHistoryScreen({ navigation }: any) {
       {/* Tabs */}
       <View style={styles.tabsContainer}>
         <TouchableOpacity
-          style={[styles.tabBtn, activeTab === 'akap' && styles.tabBtnActive]}
-          onPress={() => setActiveTab('akap')}
           style={[styles.tabBtn, activeTab === "akap" && styles.tabBtnActive]}
           onPress={() => setActiveTab("akap")}
           activeOpacity={0.8}
         >
           <Bus
             size={14}
-            color={activeTab === 'akap' ? '#FFFFFF' : Colors.textSecondary}
             color={activeTab === "akap" ? "#FFFFFF" : Colors.textSecondary}
             style={{ marginRight: 6 }}
           />
           <Text
             style={[
               styles.tabBtnText,
-              activeTab === 'akap' && styles.tabBtnTextActive,
               activeTab === "akap" && styles.tabBtnTextActive,
             ]}
           >
@@ -96,8 +81,6 @@ export default function BookingHistoryScreen({ navigation }: any) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.tabBtn, activeTab === 'charter' && styles.tabBtnActive]}
-          onPress={() => setActiveTab('charter')}
           style={[
             styles.tabBtn,
             activeTab === "charter" && styles.tabBtnActive,
@@ -105,17 +88,14 @@ export default function BookingHistoryScreen({ navigation }: any) {
           onPress={() => setActiveTab("charter")}
           activeOpacity={0.8}
         >
-          <Sparkles
           <Compass
             size={14}
-            color={activeTab === 'charter' ? '#FFFFFF' : Colors.textSecondary}
             color={activeTab === "charter" ? "#FFFFFF" : Colors.textSecondary}
             style={{ marginRight: 6 }}
           />
           <Text
             style={[
               styles.tabBtnText,
-              activeTab === 'charter' && styles.tabBtnTextActive,
               activeTab === "charter" && styles.tabBtnTextActive,
             ]}
           >
@@ -140,7 +120,6 @@ export default function BookingHistoryScreen({ navigation }: any) {
       >
         {loading ? (
           <ActivityIndicator color={Colors.primary} style={{ marginTop: 30 }} />
-        ) : activeTab === 'akap' ? (
         ) : activeTab === "akap" ? (
           bookings.length > 0 ? (
             bookings.map((item, idx) => (
@@ -148,7 +127,6 @@ export default function BookingHistoryScreen({ navigation }: any) {
                 key={idx}
                 style={styles.historyCard}
                 onPress={() =>
-                  navigation.navigate('TicketDetail', {
                   navigation.navigate("TicketDetail", {
                     booking: item,
                     schedule: item.schedule,
@@ -163,26 +141,21 @@ export default function BookingHistoryScreen({ navigation }: any) {
                   </Text>
                   <View style={styles.statusPill}>
                     <Text style={styles.statusText}>
-                      {item.payment_status?.toUpperCase() || 'LUNAS'}
                       {item.payment_status?.toUpperCase() || "LUNAS"}
                     </Text>
                   </View>
                 </View>
 
                 <Text style={styles.routeText}>
-                  {item.schedule?.route?.origin_city || 'Kuningan'} ➔{' '}
-                  {item.schedule?.route?.destination_city || 'Jakarta'}
                   {item.schedule?.route?.origin_city || "Kuningan"} ➔{" "}
                   {item.schedule?.route?.destination_city || "Jakarta"}
                 </Text>
 
                 <View style={styles.cardFooter}>
                   <Text style={styles.dateText}>
-                    {item.departure_date || '2026-08-27'}
                     {item.departure_date || "2026-08-27"}
                   </Text>
                   <Text style={styles.priceText}>
-                    Rp {Number(item.total_amount || 130000).toLocaleString('id-ID')}
                     Rp{" "}
                     {Number(item.total_amount || 130000).toLocaleString(
                       "id-ID",
@@ -209,23 +182,19 @@ export default function BookingHistoryScreen({ navigation }: any) {
                 </Text>
                 <View style={styles.statusPill}>
                   <Text style={styles.statusText}>
-                    {item.status?.toUpperCase() || 'MENUNGGU KONFIRMASI'}
                     {item.status?.toUpperCase() || "MENUNGGU KONFIRMASI"}
                   </Text>
                 </View>
               </View>
               <Text style={styles.routeText}>
-                {item.pickup_location || 'Kuningan'} ➔ {item.destination || 'Bandung'}
                 {item.pickup_location || "Kuningan"} ➔{" "}
                 {item.destination || "Bandung"}
               </Text>
               <View style={styles.cardFooter}>
                 <Text style={styles.dateText}>
-                  {item.start_date || '2026-09-01'} ({item.bus_count || 1} Unit)
                   {item.start_date || "2026-09-01"} ({item.bus_count || 1} Unit)
                 </Text>
                 <Text style={styles.priceText}>
-                  Rp {Number(item.total_price || 3500000).toLocaleString('id-ID')}
                   Rp{" "}
                   {Number(item.total_price || 3500000).toLocaleString("id-ID")}
                 </Text>
@@ -234,7 +203,6 @@ export default function BookingHistoryScreen({ navigation }: any) {
           ))
         ) : (
           <View style={styles.emptyBox}>
-            <Sparkles size={48} color={Colors.textMuted} />
             <Compass size={48} color={Colors.textMuted} />
             <Text style={styles.emptyTitle}>Belum Ada Sewa Pariwisata</Text>
             <Text style={styles.emptyDesc}>
@@ -261,13 +229,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '900',
-    color: '#FFFFFF',
     fontWeight: "900",
     color: "#FFFFFF",
   },
   tabsContainer: {
-    flexDirection: 'row',
     flexDirection: "row",
     backgroundColor: Colors.surfaceCard,
     paddingHorizontal: 20,
@@ -276,9 +241,6 @@ const styles = StyleSheet.create({
   },
   tabBtn: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -295,12 +257,9 @@ const styles = StyleSheet.create({
   tabBtnText: {
     color: Colors.textSecondary,
     fontSize: 12,
-    fontWeight: '700',
     fontWeight: "700",
   },
   tabBtnTextActive: {
-    color: '#FFFFFF',
-    fontWeight: '800',
     color: "#FFFFFF",
     fontWeight: "800",
   },
@@ -313,9 +272,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -324,7 +280,6 @@ const styles = StyleSheet.create({
   bookingCode: {
     color: Colors.textMuted,
     fontSize: 11,
-    fontWeight: '800',
     fontWeight: "800",
   },
   statusPill: {
@@ -336,21 +291,15 @@ const styles = StyleSheet.create({
   statusText: {
     color: Colors.success,
     fontSize: 10,
-    fontWeight: '800',
     fontWeight: "800",
   },
   routeText: {
-    color: '#FFFFFF',
     color: "#FFFFFF",
     fontSize: 15,
-    fontWeight: '800',
     fontWeight: "800",
     marginBottom: 10,
   },
   cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -365,27 +314,22 @@ const styles = StyleSheet.create({
   priceText: {
     color: Colors.primary,
     fontSize: 14,
-    fontWeight: '900',
     fontWeight: "900",
   },
   emptyBox: {
-    alignItems: 'center',
     alignItems: "center",
     marginTop: 60,
     paddingHorizontal: 30,
   },
   emptyTitle: {
-    color: '#FFFFFF',
     color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: '800',
     fontWeight: "800",
     marginTop: 16,
   },
   emptyDesc: {
     color: Colors.textSecondary,
     fontSize: 12,
-    textAlign: 'center',
     textAlign: "center",
     marginTop: 6,
     lineHeight: 18,
