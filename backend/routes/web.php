@@ -85,6 +85,7 @@ Route::post('/payment/webhook', [App\Http\Controllers\PaymentController::class, 
 // Web API Documentation
 Route::get('/docs/api', function () {
     return view('docs.api');
+    return redirect('/api/documentation');
 })->name('docs.api');
 
 // API Routes (Manual definition since api.php might not be standard)
