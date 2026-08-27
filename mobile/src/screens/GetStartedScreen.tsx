@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
+  Image,
   TouchableOpacity,
   Dimensions,
+  FlatList,
   Platform,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,81 +17,166 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { COLORS } from '../theme/colors';
+import { Tag, Crown, Zap, ChevronRight } from 'lucide-react-native';
 
-const { height, width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'GetStarted'>;
 
+interface SlideItem {
+  id: string;
+  badge: string;
+  badgeIcon: any;
+  title: string;
+  subtitle: string;
+  image: any;
+}
+
+const SLIDES: SlideItem[] = [
+  {
+    id: '1',
+    badge: 'PROMO SPESIAL',
+    badgeIcon: Tag,
+    title: 'Cashback & Offer',
+    subtitle: 'Dapatkan diskon eksklusif, cashback voucher tiket, dan kumpulkan TJ Poin di setiap perjalanan Anda.',
+    image: require('../../assets/images/bentas01.webp'),
+  },
+  {
+    id: '2',
+    badge: 'ARMADA MEWAH',
+    badgeIcon: Crown,
+    title: 'Executive Comfort',
+    subtitle: 'Rasakan kenyamanan perjalanan antarkota dengan kursi leg rest ergonomis, full AC, dan toilet higienis.',
+    image: require('../../assets/images/resiBisma.webp'),
+  },
+  {
+    id: '3',
+    badge: 'INSTANT BOOKING',
+    badgeIcon: Zap,
+    title: 'Pesan Tiket Mudah',
+    subtitle: 'Pilih nomor kursi favorit langsung di denah bus, bayar praktis dengan QRIS realtime tanpa antre.',
+    image: require('../../assets/images/kylorenParwis.webp'),
+  },
+];
+
 export default function GetStartedScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
+
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const slideSize = event.nativeEvent.layoutMeasurement.width;
+    const offset = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offset / slideSize);
+    if (index >= 0 && index < SLIDES.length && index !== activeIndex) {
+      setActiveIndex(index);
+    }
+  };
+
+  const currentSlide = SLIDES[activeIndex] || SLIDES[0];
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require('../../assets/images/heroImg.jpg')}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      >
-        {/* Top Header */}
-        <SafeAreaView edges={['top']} style={styles.topHeader}>
-          <View style={styles.brandRow}>
-            <View style={styles.logoIcon}>
-              <View style={styles.logoRedDot} />
-            </View>
-            <Text style={styles.brandName}>
-              <Text style={{ color: COLORS.brandRed }}>Tunggal</Text> Jaya
-            </Text>
-          </View>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => navigation.replace('MainTabs')}
-            style={styles.skipButton}
-          >
-            <Text style={styles.skipText}>Skip &gt;</Text>
-          </TouchableOpacity>
-        </SafeAreaView>
+      {/* Top 58% Hero Image Stage */}
+      <View style={styles.heroStage}>
+        <Image
+          source={currentSlide.image}
+          style={styles.heroImage}
+          resizeMode="cover"
+        />
 
-        {/* Gradient Transition into Warm Alabaster Card */}
+        {/* Ambient Dark-to-Clear Gradient for Top Header visibility */}
         <LinearGradient
-          colors={['transparent', 'rgba(244, 246, 249, 0.4)', 'rgba(244, 246, 249, 0.95)', '#F4F6F9']}
-          locations={[0, 0.35, 0.65, 1]}
-          style={styles.bottomGradient}
+          colors={['rgba(17, 24, 39, 0.65)', 'transparent']}
+          style={styles.topGradient}
         >
-          {/* Bottom Card Content */}
-          <View style={styles.bottomCard}>
-            <Text style={styles.title}>Cashback &amp; Offer</Text>
-            <Text style={styles.subtitle}>
-              Dapatkan akses ke promo eksklusif, diskon tiket, dan perjalanan bus eksekutif ternyaman.
-            </Text>
-
-            {/* Carousel Dots */}
-            <View style={styles.dotsRow}>
-              <View style={[styles.dot, styles.dotActive]} />
-              <View style={styles.dot} />
-              <View style={styles.dot} />
+          <SafeAreaView edges={['top']} style={styles.topHeader}>
+            <View style={styles.brandCapsule}>
+              <View style={styles.brandRedDot} />
+              <Text style={styles.brandTitle}>
+                <Text style={{ color: COLORS.brandRed }}>Tunggal</Text> Jaya
+              </Text>
             </View>
 
-            {/* Twin Action Buttons */}
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.loginBtn}
-                onPress={() => navigation.navigate('Login')}
-              >
-                <Text style={styles.loginBtnText}>Log in</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.joinBtn}
-                onPress={() => navigation.navigate('Register')}
-              >
-                <Text style={styles.joinBtnText}>Join</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.replace('MainTabs')}
+              style={styles.skipBtn}
+            >
+              <Text style={styles.skipText}>Lewati</Text>
+              <ChevronRight size={14} color="#111827" />
+            </TouchableOpacity>
+          </SafeAreaView>
         </LinearGradient>
-      </ImageBackground>
+      </View>
+
+      {/* Bottom Solid Card Sheet (Zero noise, High contrast) */}
+      <View style={styles.cardSheet}>
+        {/* Interactive 3-Slide Carousel */}
+        <FlatList
+          ref={flatListRef}
+          data={SLIDES}
+          keyExtractor={(item) => item.id}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          bounces={false}
+          style={styles.carousel}
+          renderItem={({ item }) => {
+            const IconComp = item.badgeIcon;
+            return (
+              <View style={styles.slideItem}>
+                <View style={styles.badgePill}>
+                  <IconComp size={12} color={COLORS.brandRed} style={{ marginRight: 5 }} />
+                  <Text style={styles.badgeText}>{item.badge}</Text>
+                </View>
+
+                <Text style={styles.slideTitle}>{item.title}</Text>
+                <Text style={styles.slideSubtitle}>{item.subtitle}</Text>
+              </View>
+            );
+          }}
+        />
+
+        {/* Carousel Pagination Dots */}
+        <View style={styles.dotsRow}>
+          {SLIDES.map((_, idx) => {
+            const isActive = activeIndex === idx;
+            return (
+              <TouchableOpacity
+                key={idx}
+                activeOpacity={0.8}
+                onPress={() => {
+                  flatListRef.current?.scrollToIndex({ index: idx, animated: true });
+                  setActiveIndex(idx);
+                }}
+                style={[styles.dot, isActive ? styles.dotActive : styles.dotInactive]}
+              />
+            );
+          })}
+        </View>
+
+        {/* Twin Action Buttons (Ergonomic 52px height) */}
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            style={styles.loginBtn}
+            onPress={() => navigation.navigate('Login')}
+          >
+            <Text style={styles.loginBtnText}>Log in</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            style={styles.joinBtn}
+            onPress={() => navigation.navigate('Register')}
+          >
+            <Text style={styles.joinBtnText}>Join</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
@@ -96,118 +184,167 @@ export default function GetStartedScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.bgDark,
+    backgroundColor: '#F4F6F9',
   },
-  backgroundImage: {
+  heroStage: {
     flex: 1,
     width: '100%',
+    position: 'relative',
+    backgroundColor: '#1E293B',
+  },
+  heroImage: {
+    width: '100%',
     height: '100%',
-    justifyContent: 'space-between',
+  },
+  topGradient: {
+    ...StyleSheet.absoluteFillObject,
+    paddingHorizontal: 20,
   },
   topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: Platform.OS === 'android' ? 16 : 8,
+    paddingTop: Platform.OS === 'android' ? 14 : 6,
   },
-  brandRow: {
+  brandCapsule: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.6)',
+    borderColor: '#E2E8F0',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
-  logoIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: 6,
-    backgroundColor: 'rgba(230, 0, 35, 0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logoRedDot: {
-    width: 9,
-    height: 9,
-    borderRadius: 4.5,
+  brandRedDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: COLORS.brandRed,
   },
-  brandName: {
-    fontFamily: 'PlusJakartaSans_700Bold',
-    fontSize: 17,
+  brandTitle: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontSize: 16,
     color: '#111827',
     letterSpacing: -0.3,
   },
-  skipButton: {
-    paddingVertical: 6,
+  skipBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
     paddingHorizontal: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    borderRadius: 18,
+    paddingVertical: 8,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.6)',
+    borderColor: '#E2E8F0',
   },
   skipText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 13,
-    color: '#4B5563',
+    color: '#111827',
   },
-  bottomGradient: {
+  cardSheet: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    paddingTop: 24,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 28,
     paddingHorizontal: 24,
-    paddingBottom: Platform.OS === 'ios' ? 44 : 32,
-    paddingTop: 60,
+    marginTop: -28,
+    borderTopWidth: 1,
+    borderColor: '#E2E8F0',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: -8 },
+        shadowOpacity: 0.08,
+        shadowRadius: 18,
+      },
+      android: {
+        elevation: 10,
+      },
+    }),
   },
-  bottomCard: {
+  carousel: {
+    marginBottom: 16,
+  },
+  slideItem: {
+    width: width - 48,
     alignItems: 'center',
   },
-  title: {
+  badgePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(230, 0, 35, 0.08)',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 14,
+    marginBottom: 10,
+  },
+  badgeText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 11,
+    color: COLORS.brandRed,
+    letterSpacing: 0.5,
+  },
+  slideTitle: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 26,
     color: '#111827',
     textAlign: 'center',
     marginBottom: 8,
-    letterSpacing: -0.4,
+    letterSpacing: -0.5,
   },
-  subtitle: {
+  slideSubtitle: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 14,
     color: '#4B5563',
     textAlign: 'center',
     lineHeight: 22,
-    paddingHorizontal: 16,
-    marginBottom: 20,
+    paddingHorizontal: 12,
   },
   dotsRow: {
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 28,
+    gap: 8,
+    marginBottom: 24,
   },
   dot: {
-    width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#CBD5E1',
   },
   dotActive: {
-    width: 18,
-    height: 6,
-    borderRadius: 3,
+    width: 24,
     backgroundColor: COLORS.brandRed,
+  },
+  dotInactive: {
+    width: 6,
+    backgroundColor: '#CBD5E1',
   },
   buttonRow: {
     flexDirection: 'row',
     width: '100%',
-    gap: 12,
+    gap: 14,
   },
   loginBtn: {
     flex: 1,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F1F4F8',
     borderWidth: 1,
     borderColor: '#E2E8F0',
     justifyContent: 'center',
@@ -215,12 +352,12 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#0F172A',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
       },
       android: {
-        elevation: 2,
+        elevation: 1,
       },
     }),
   },
