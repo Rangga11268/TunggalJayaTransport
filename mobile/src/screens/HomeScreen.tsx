@@ -38,13 +38,15 @@ import {
   X,
   Crown,
   Phone,
+  Calendar,
+  Gift,
 } from 'lucide-react-native';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { COLORS } from '../theme/colors';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../api/client';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -52,7 +54,6 @@ export default function HomeScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { user, logout } = useAuth();
 
-  const [activeCategory, setActiveCategory] = useState('bus');
   const [schedules, setSchedules] = useState<any[]>([]);
   const [articles, setArticles] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -60,12 +61,44 @@ export default function HomeScreen() {
   const [selectedOrigin, setSelectedOrigin] = useState('Jakarta');
   const [selectedDestination, setSelectedDestination] = useState('Kuningan');
 
-  const categories = [
-    { id: 'bus', label: 'Bus Tickets', icon: Bus },
-    { id: 'charter', label: 'Pariwisata', icon: Compass },
-    { id: 'promo', label: 'Vouchers', icon: Ticket },
-    { id: 'history', label: 'Riwayat', icon: Receipt },
-    { id: 'help', label: 'Bantuan', icon: HelpCircle },
+  // Prominent Quick Links directly on the Homepage
+  const quickLinks = [
+    {
+      id: 'schedules',
+      title: 'Tiket Bus AKAP',
+      subtitle: 'Jadwal & Kursi',
+      icon: Bus,
+      iconColor: '#E60023',
+      bgColor: 'rgba(230, 0, 35, 0.08)',
+      action: () => navigation.navigate('Schedules'),
+    },
+    {
+      id: 'charter',
+      title: 'Sewa Pariwisata',
+      subtitle: 'Carter Rombongan',
+      icon: Compass,
+      iconColor: '#2563EB',
+      bgColor: 'rgba(37, 99, 235, 0.08)',
+      action: () => navigation.navigate('Charter'),
+    },
+    {
+      id: 'history',
+      title: 'Riwayat Pesanan',
+      subtitle: 'Cek E-Tiket',
+      icon: Receipt,
+      iconColor: '#059669',
+      bgColor: 'rgba(5, 150, 105, 0.08)',
+      action: () => navigation.navigate('MainTabs', { screen: 'BookingHistory' } as any),
+    },
+    {
+      id: 'promo',
+      title: 'Voucher Promo',
+      subtitle: 'Diskon s.d 50%',
+      icon: Gift,
+      iconColor: '#D97706',
+      bgColor: 'rgba(217, 119, 6, 0.08)',
+      action: () => navigation.navigate('Promo'),
+    },
   ];
 
   const fetchHomeData = async () => {
@@ -184,37 +217,36 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* Category Filter Chips (Smooth Swipable Horizontal Carousel) */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesRow}
-        >
-          {categories.map((cat) => {
-            const isActive = activeCategory === cat.id;
-            const IconComp = cat.icon;
-            return (
-              <TouchableOpacity
-                key={cat.id}
-                activeOpacity={0.8}
-                onPress={() => {
-                  setActiveCategory(cat.id);
-                  if (cat.id === 'bus') navigation.navigate('Schedules');
-                  if (cat.id === 'charter') navigation.navigate('Charter');
-                  if (cat.id === 'promo') navigation.navigate('Promo');
-                  if (cat.id === 'history') navigation.navigate('MainTabs', { screen: 'BookingHistory' } as any);
-                  if (cat.id === 'help') navigation.navigate('MainTabs', { screen: 'Help' } as any);
-                }}
-                style={[styles.categoryChip, isActive ? styles.categoryChipActive : styles.categoryChipInactive]}
-              >
-                <IconComp size={16} color={isActive ? '#FFFFFF' : '#4B5563'} />
-                <Text style={[styles.categoryText, isActive ? styles.categoryTextActive : styles.categoryTextInactive]}>
-                  {cat.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+        {/* PROMINENT QUICK ACTIONS GRID ON HOMEPAGE (4 Primary Cards) */}
+        <View style={styles.quickSection}>
+          <View style={styles.sectionHeaderNoMargin}>
+            <Text style={styles.sectionTitle}>Layanan Utama</Text>
+            <Text style={styles.sectionSub}>Akses Cepat</Text>
+          </View>
+
+          <View style={styles.quickGrid}>
+            {quickLinks.map((item) => {
+              const IconComp = item.icon;
+              return (
+                <TouchableOpacity
+                  key={item.id}
+                  activeOpacity={0.85}
+                  onPress={item.action}
+                  style={styles.quickCard}
+                >
+                  <View style={[styles.quickIconCircle, { backgroundColor: item.bgColor }]}>
+                    <IconComp size={22} color={item.iconColor} />
+                  </View>
+                  <View style={styles.quickContent}>
+                    <Text style={styles.quickTitle}>{item.title}</Text>
+                    <Text style={styles.quickSubtitle}>{item.subtitle}</Text>
+                  </View>
+                  <ChevronRight size={16} color="#9CA3AF" />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
 
         {/* Featured Hero Card (Warm Alabaster Light Luxury) */}
         <View style={styles.heroCardContainer}>
@@ -680,49 +712,77 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  categoriesRow: {
-    flexDirection: 'row',
-    gap: 10,
-    paddingRight: 24,
-    marginBottom: 22,
+
+  // Prominent Quick Actions Grid
+  quickSection: {
+    marginBottom: 24,
   },
-  categoryChip: {
+  sectionHeaderNoMargin: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontSize: 18,
+    color: '#111827',
+    letterSpacing: -0.3,
+  },
+  sectionSub: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  quickGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  quickCard: {
+    width: (width - 52) / 2,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 24,
-  },
-  categoryChipActive: {
-    backgroundColor: COLORS.brandRed,
+    gap: 10,
     ...Platform.select({
       ios: {
-        shadowColor: COLORS.brandRed,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.35,
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.05,
         shadowRadius: 8,
       },
       android: {
-        elevation: 4,
+        elevation: 2,
       },
     }),
   },
-  categoryChipInactive: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+  quickIconCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  categoryText: {
+  quickContent: {
+    flex: 1,
+  },
+  quickTitle: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 13,
+    color: '#111827',
+    marginBottom: 2,
   },
-  categoryTextActive: {
-    color: '#FFFFFF',
+  quickSubtitle: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 10,
+    color: '#6B7280',
   },
-  categoryTextInactive: {
-    color: '#4B5563',
-  },
+
   heroCardContainer: {
     marginBottom: 26,
   },
@@ -821,12 +881,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 14,
-  },
-  sectionTitle: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 18,
-    color: '#111827',
-    letterSpacing: -0.3,
   },
   viewAllBtn: {
     paddingVertical: 4,
