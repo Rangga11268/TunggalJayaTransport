@@ -7,64 +7,77 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  ActivityIndicator,
+  Platform,
   RefreshControl,
-  FlatList,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors, Radius } from '../theme/colors';
-import { useAuth } from '../context/AuthContext';
-import api from '../api/client';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   Menu,
   Bell,
   MapPin,
-  ArrowRight,
-  Sparkles,
   Bus,
-  Tag,
-  Star,
-  Clock,
+  Compass,
+  Ticket,
   ChevronRight,
+  Sparkles,
+  CreditCard,
+  ArrowRight,
   ShieldCheck,
   Wifi,
   Tv,
   Coffee,
 } from 'lucide-react-native';
+import { RootStackParamList } from '../navigation/RootNavigator';
+import { COLORS } from '../theme/colors';
+import { useAuth } from '../context/AuthContext';
+import apiClient from '../api/client';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-export default function HomeScreen({ navigation }: any) {
-  const insets = useSafeAreaInsets();
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+export default function HomeScreen() {
+  const navigation = useNavigation<NavigationProp>();
   const { user } = useAuth();
 
-  const [selectedCategory, setSelectedCategory] = useState('bus');
+  const [activeCategory, setActiveCategory] = useState('bus');
   const [schedules, setSchedules] = useState<any[]>([]);
-  const [news, setNews] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [articles, setArticles] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedOrigin, setSelectedOrigin] = useState('Jakarta');
+  const [selectedDestination, setSelectedDestination] = useState('Kuningan');
 
   const categories = [
-    { id: 'bus', title: 'Bus Tickets', icon: Bus },
-    { id: 'charter', title: 'Sewa Pariwisata', icon: Sparkles },
-    { id: 'promo', title: 'Promo & Kupon', icon: Tag },
+    { id: 'bus', label: 'Bus Tickets', icon: Bus },
+    { id: 'charter', label: 'Pariwisata', icon: Compass },
+    { id: 'promo', label: 'Vouchers', icon: Ticket },
   ];
 
   const fetchHomeData = async () => {
     try {
-      setLoading(true);
-      const [schedulesRes, newsRes] = await Promise.all([
-        api.get('/schedules').catch(() => ({ data: { data: [] } })),
-        api.get('/news').catch(() => ({ data: { data: [] } })),
+      const [schedRes, newsRes] = await Promise.allSettled([
+        apiClient.get('/schedules'),
+        apiClient.get('/news'),
       ]);
 
-      setSchedules(schedulesRes.data?.data || []);
-      setNews(newsRes.data?.data || []);
+      if (schedRes.status === 'fulfilled' && schedRes.value.data) {
+        const list = Array.isArray(schedRes.value.data)
+          ? schedRes.value.data
+          : schedRes.value.data.data || [];
+        setSchedules(list.slice(0, 4));
+      }
+
+      if (newsRes.status === 'fulfilled' && newsRes.value.data) {
+        const list = Array.isArray(newsRes.value.data)
+          ? newsRes.value.data
+          : newsRes.value.data.data || [];
+        setArticles(list.slice(0, 3));
+      }
     } catch (e) {
-      console.error('Error fetching home data:', e);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+      console.log('Error loading home data:', e);
     }
   };
 
@@ -72,86 +85,67 @@ export default function HomeScreen({ navigation }: any) {
     fetchHomeData();
   }, []);
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    fetchHomeData();
-  };
-
-  // Helper check if departed today
-  const isBusDeparted = (departureTimeStr: string) => {
-    try {
-      if (!departureTimeStr) return false;
-      const parts = departureTimeStr.split(':');
-      if (parts.length < 2) return false;
-      const now = new Date();
-      const dep = new Date();
-      dep.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
-      return now > dep;
-    } catch {
-      return false;
-    }
+    await fetchHomeData();
+    setRefreshing(false);
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingTop: insets.top + 12, paddingBottom: 110 },
-        ]}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
-        }
-      >
-        {/* Top App Bar (Explore / Menu / Notification / Avatar) */}
-        <View style={styles.topBar}>
-          <View style={styles.leftTopBar}>
-            <TouchableOpacity style={styles.iconCircleBtn} activeOpacity={0.7}>
-              <Menu size={18} color="#FFFFFF" />
+      <SafeAreaView edges={['top']} style={styles.safeHeader}>
+        {/* Top App Bar */}
+        <View style={styles.headerBar}>
+          <TouchableOpacity activeOpacity={0.7} style={styles.iconCircle}>
+            <Menu size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+
+          <View style={styles.headerRight}>
+            <TouchableOpacity activeOpacity={0.7} style={styles.iconCircle}>
+              <Bell size={18} color="#FFFFFF" />
+              <View style={styles.badgeDot} />
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.avatarContainer}
-              onPress={() => navigation.navigate('Profile')}
               activeOpacity={0.8}
+              onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' } as any)}
+              style={styles.avatarRing}
             >
               <Image
-                source={require('../../assets/logo/logoNoBg.png')}
+                source={require('../../assets/images/bentas01.webp')}
                 style={styles.avatarImg}
-                resizeMode="contain"
               />
             </TouchableOpacity>
           </View>
+        </View>
+      </SafeAreaView>
 
-          <TouchableOpacity style={styles.iconCircleBtn} activeOpacity={0.7}>
-            <Bell size={18} color="#FFFFFF" />
-            <View style={styles.notificationBadge} />
-          </TouchableOpacity>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.brandRed} />
+        }
+      >
+        {/* Display Headline */}
+        <View style={styles.headlineWrapper}>
+          <Text style={styles.headline}>
+            Explore{'\n'}
+            <Text style={styles.headlineSub}>Go Every Where?</Text>
+          </Text>
         </View>
 
-        {/* Explore Headline */}
-        <View style={styles.headlineSection}>
-          <Text style={styles.exploreTitle}>Explore</Text>
-          <Text style={styles.exploreSubtitle}>Go Everywhere?</Text>
-        </View>
-
-        {/* Location Search Bar Capsule */}
+        {/* Location Search Capsule */}
         <TouchableOpacity
-          style={styles.searchCapsule}
-          onPress={() => navigation.navigate('ScheduleList')}
-          activeOpacity={0.9}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('Schedules', { origin: selectedOrigin, destination: selectedDestination })}
+          style={styles.locationCapsule}
         >
-          <View style={styles.searchContent}>
-            <Text style={styles.searchFromText}>Kuningan, Jawa Barat</Text>
-            <View style={styles.searchRouteRow}>
-              <Text style={styles.searchToText}>Jakarta / Jabodetabek</Text>
-              <Text style={styles.searchDateText}>• Hari Ini</Text>
-            </View>
-          </View>
-
-          <View style={styles.searchPinButton}>
-            <MapPin size={18} color="#FFFFFF" />
+          <Text style={styles.locationText}>
+            Current: <Text style={styles.locationBold}>{selectedOrigin} → {selectedDestination}</Text>
+          </Text>
+          <View style={styles.locationRedBtn}>
+            <MapPin size={16} color="#FFFFFF" />
           </View>
         </TouchableOpacity>
 
@@ -159,239 +153,219 @@ export default function HomeScreen({ navigation }: any) {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryChipsScroll}
+          contentContainerStyle={styles.categoriesRow}
         >
           {categories.map((cat) => {
-            const isSelected = selectedCategory === cat.id;
+            const isActive = activeCategory === cat.id;
             const IconComp = cat.icon;
             return (
               <TouchableOpacity
                 key={cat.id}
-                style={[styles.categoryChip, isSelected && styles.categoryChipActive]}
+                activeOpacity={0.8}
                 onPress={() => {
-                  setSelectedCategory(cat.id);
+                  setActiveCategory(cat.id);
                   if (cat.id === 'charter') navigation.navigate('Charter');
                   if (cat.id === 'promo') navigation.navigate('Promo');
                 }}
-                activeOpacity={0.8}
+                style={[styles.categoryChip, isActive ? styles.categoryChipActive : styles.categoryChipInactive]}
               >
-                <IconComp
-                  size={15}
-                  color={isSelected ? '#FFFFFF' : Colors.textSecondary}
-                  style={{ marginRight: 8 }}
-                />
-                <Text
-                  style={[styles.categoryChipText, isSelected && styles.categoryChipTextActive]}
-                >
-                  {cat.title}
+                <IconComp size={16} color={isActive ? '#FFFFFF' : COLORS.textSecondary} />
+                <Text style={[styles.categoryText, isActive ? styles.categoryTextActive : styles.categoryTextInactive]}>
+                  {cat.label}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
 
-        {/* Featured Bus Hero Card */}
-        <View style={styles.heroCard}>
-          <View style={styles.heroHeaderRow}>
-            <View style={styles.routeTag}>
-              <Text style={styles.routeTagText}>Kuningan ➔ Jakarta</Text>
-            </View>
-            <View style={styles.durationTag}>
-              <Clock size={12} color="#FFFFFF" style={{ marginRight: 4 }} />
-              <Text style={styles.durationText}>± 4-5 Jam</Text>
-            </View>
-          </View>
-
-          <Text style={styles.heroBusTitle}>Executive Suite Class</Text>
-          <Text style={styles.heroBusDesc}>Air Suspension • Leg Rest • Snack & Drink</Text>
-
-          {/* Cutout Bus Image */}
-          <View style={styles.heroBusImageContainer}>
-            <Image
-              source={require('../../assets/images/heroImg.jpg')}
-              style={styles.heroBusImage}
-              resizeMode="cover"
-            />
-          </View>
-
-          {/* Slide Action Bar */}
-          <TouchableOpacity
-            style={styles.heroActionPill}
-            onPress={() => navigation.navigate('ScheduleList')}
-            activeOpacity={0.85}
+        {/* Featured Hero Card (Matching Mockup Card) */}
+        <View style={styles.heroCardContainer}>
+          <LinearGradient
+            colors={['#181C26', '#12151D']}
+            style={styles.heroCard}
           >
-            <Text style={styles.heroActionText}>Pesan Tiket Sekarang</Text>
-            <View style={styles.heroActionCircle}>
-              <ArrowRight size={16} color="#FFFFFF" />
+            {/* Left Content */}
+            <View style={styles.heroLeft}>
+              <View style={styles.heroBadges}>
+                <View style={styles.heroBadge}>
+                  <Text style={styles.heroBadgeText}>Central Line</Text>
+                </View>
+                <View style={styles.heroBadge}>
+                  <Text style={styles.heroBadgeText}>8-10 hrs</Text>
+                </View>
+              </View>
+
+              <Text style={styles.heroTitle}>
+                Executive{'\n'}Double Decker
+              </Text>
+
+              {/* Slider Button */}
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={() => navigation.navigate('Schedules')}
+                style={styles.slideBar}
+              >
+                <View style={styles.slideIconBox}>
+                  <CreditCard size={15} color="#FFFFFF" />
+                </View>
+                <Text style={styles.slideArrowText}>&gt;&gt;&gt;</Text>
+                <View style={styles.slideEndIcon}>
+                  <Ticket size={15} color={COLORS.brandRed} />
+                </View>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
+
+            {/* Right Bus Cutout Image */}
+            <View style={styles.heroRight}>
+              <Image
+                source={require('../../assets/images/resiBisma.webp')}
+                style={styles.heroBusImage}
+                resizeMode="contain"
+              />
+            </View>
+          </LinearGradient>
         </View>
 
-        {/* "What's New" Stories / News Banner Carousel */}
-        <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitle}>What's New</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Promo')}>
-            <Text style={styles.sectionViewAll}>View all &gt;</Text>
+        {/* What's New Stories Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>What's new</Text>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('Promo')}
+            style={styles.viewAllBtn}
+          >
+            <Text style={styles.viewAllText}>View &gt;</Text>
           </TouchableOpacity>
         </View>
 
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.storiesScroll}
+          contentContainerStyle={styles.whatsNewScroll}
         >
-          {news.length > 0 ? (
-            news.map((item, idx) => (
-              <TouchableOpacity key={idx} style={styles.storyCard} activeOpacity={0.85}>
-                <Image
-                  source={require('../../assets/images/heroImg.jpg')}
-                  style={styles.storyImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.storyOverlay}>
-                  <Text style={styles.storyTag}>BERITA</Text>
-                  <Text style={styles.storyTitle} numberOfLines={2}>
-                    {item.title}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <View style={styles.storyCard}>
-              <Image
-                source={require('../../assets/images/heroImg.jpg')}
-                style={styles.storyImage}
-                resizeMode="cover"
-              />
-              <View style={styles.storyOverlay}>
-                <Text style={styles.storyTag}>PROMO</Text>
-                <Text style={styles.storyTitle}>Diskon Spesial Liburan 20%</Text>
+          {/* Card 1: Executive Experience */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate('Schedules')}
+            style={styles.storyCard}
+          >
+            <Image
+              source={require('../../assets/images/bentas01.webp')}
+              style={styles.storyImage}
+              resizeMode="cover"
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(10, 12, 16, 0.95)']}
+              style={styles.storyGradient}
+            >
+              <Text style={styles.storyTitle}>Dive into Luxury Journey</Text>
+              <Text style={styles.storySubtitle}>Armada baru sleeper bus eksekutif</Text>
+              <View style={styles.storyPill}>
+                <Text style={styles.storyPillText}>View &gt;</Text>
               </View>
-            </View>
-          )}
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Card 2: Pariwisata Charter */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate('Charter')}
+            style={styles.storyCard}
+          >
+            <Image
+              source={require('../../assets/images/kylorenParwis.webp')}
+              style={styles.storyImage}
+              resizeMode="cover"
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(10, 12, 16, 0.95)']}
+              style={styles.storyGradient}
+            >
+              <Text style={styles.storyTitle}>Sewa Bus Pariwisata</Text>
+              <Text style={styles.storySubtitle}>Rute fleksibel &amp; harga spesial</Text>
+              <View style={styles.storyPill}>
+                <Text style={styles.storyPillText}>View &gt;</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
         </ScrollView>
 
-        {/* Popular Schedules Section */}
-        <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitle}>Jadwal Bus Terpopuler</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('ScheduleList')}>
-            <Text style={styles.sectionViewAll}>Semua Jadwal &gt;</Text>
+        {/* Popular Schedules List */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Popular Routes</Text>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('Schedules')}
+            style={styles.viewAllBtn}
+          >
+            <Text style={styles.viewAllText}>All &gt;</Text>
           </TouchableOpacity>
         </View>
 
-        {loading ? (
-          <ActivityIndicator color={Colors.primary} style={{ marginTop: 20 }} />
-        ) : (
-          schedules.slice(0, 3).map((item, idx) => {
-            const departed = isBusDeparted(item.departure_time);
+        <View style={styles.scheduleList}>
+          {schedules.map((item, idx) => {
+            const busName = item.bus?.name || 'Resi Bisma';
+            const origin = item.route?.origin || 'Jakarta';
+            const destination = item.route?.destination || 'Kuningan';
+            const price = Number(item.price || 180000).toLocaleString('id-ID');
+            const depTime = item.departure_time ? item.departure_time.substring(0, 5) : '07:00';
+
             return (
-              <View key={idx} style={styles.scheduleCard}>
-                <View style={styles.scheduleHeaderRow}>
-                  <View style={styles.scheduleBusBadge}>
-                    <Bus size={13} color={Colors.primary} style={{ marginRight: 5 }} />
-                    <Text style={styles.scheduleBusName}>
-                      {item.bus?.name || 'Tunggal Jaya Bus'}
-                    </Text>
+              <TouchableOpacity
+                key={item.id || idx}
+                activeOpacity={0.85}
+                onPress={() => navigation.navigate('SeatSelection', { scheduleId: item.id })}
+                style={styles.scheduleCard}
+              >
+                <Image
+                  source={idx % 2 === 0 ? require('../../assets/images/primadona.webp') : require('../../assets/images/bentas01.webp')}
+                  style={styles.scheduleBusThumb}
+                />
+                <View style={styles.scheduleMiddle}>
+                  <Text style={styles.scheduleRoute}>{origin} → {destination}</Text>
+                  <Text style={styles.scheduleBusName}>{busName} • {depTime} WIB</Text>
+                  <Text style={styles.schedulePrice}>
+                    Rp {price} <Text style={styles.schedulePerPerson}>/ org</Text>
+                  </Text>
+                </View>
+                <View style={styles.scheduleAction}>
+                  <View style={styles.ratingBadge}>
+                    <Text style={styles.ratingText}>★ 4.8</Text>
                   </View>
-
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      departed ? styles.statusDeparted : styles.statusAvailable,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.statusBadgeText,
-                        departed ? styles.statusDepartedText : styles.statusAvailableText,
-                      ]}
-                    >
-                      {departed ? 'Sudah Berangkat' : 'Tersedia'}
-                    </Text>
+                  <View style={styles.chevronCircle}>
+                    <ChevronRight size={16} color="#FFFFFF" />
                   </View>
                 </View>
-
-                {/* Route Flow */}
-                <View style={styles.scheduleRouteRow}>
-                  <View style={styles.routeCol}>
-                    <Text style={styles.routeTime}>
-                      {item.departure_time ? item.departure_time.slice(0, 5) : '07:00'}
-                    </Text>
-                    <Text style={styles.routeName}>
-                      {item.route?.origin_city || 'Kuningan'}
-                    </Text>
-                  </View>
-
-                  <View style={styles.routeDivider}>
-                    <View style={styles.dividerLine} />
-                    <View style={styles.busDot}>
-                      <Bus size={10} color={Colors.primary} />
-                    </View>
-                    <View style={styles.dividerLine} />
-                  </View>
-
-                  <View style={[styles.routeCol, { alignItems: 'flex-end' }]}>
-                    <Text style={styles.routeTime}>
-                      {item.arrival_time ? item.arrival_time.slice(0, 5) : '12:00'}
-                    </Text>
-                    <Text style={styles.routeName}>
-                      {item.route?.destination_city || 'Jakarta'}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Price & Book Action */}
-                <View style={styles.scheduleFooterRow}>
-                  <View>
-                    <Text style={styles.priceLabel}>Mulai dari</Text>
-                    <Text style={styles.priceValue}>
-                      Rp {Number(item.price || 130000).toLocaleString('id-ID')}
-                    </Text>
-                  </View>
-
-                  <TouchableOpacity
-                    style={[styles.bookBtn, departed && styles.bookBtnDisabled]}
-                    disabled={departed}
-                    onPress={() =>
-                      navigation.navigate('SeatSelection', {
-                        schedule: item,
-                        date: new Date().toISOString().split('T')[0],
-                      })
-                    }
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.bookBtnText}>
-                      {departed ? 'Berangkat' : 'Pilih Kursi'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+              </TouchableOpacity>
             );
-          })
-        )}
+          })}
+        </View>
 
-        {/* Fleet Amenities */}
-        <View style={styles.amenitiesSection}>
-          <Text style={styles.amenitiesTitle}>Fasilitas Armada Unggulan</Text>
+        {/* Fleet Amenities Feature Bar */}
+        <View style={styles.amenitiesCard}>
+          <Text style={styles.amenitiesTitle}>Fasilitas Standar Eksekutif</Text>
           <View style={styles.amenitiesGrid}>
             <View style={styles.amenityItem}>
-              <Wifi size={20} color={Colors.primary} />
-              <Text style={styles.amenityText}>Free Wi-Fi</Text>
+              <Wifi size={18} color={COLORS.brandRed} />
+              <Text style={styles.amenityText}>Free 4G Wi-Fi</Text>
             </View>
             <View style={styles.amenityItem}>
-              <Tv size={20} color={Colors.primary} />
-              <Text style={styles.amenityText}>Personal AVOD</Text>
+              <Tv size={18} color={COLORS.brandRed} />
+              <Text style={styles.amenityText}>Smart TV &amp; Audio</Text>
             </View>
             <View style={styles.amenityItem}>
-              <Coffee size={20} color={Colors.primary} />
-              <Text style={styles.amenityText}>Snack & Drink</Text>
+              <Coffee size={18} color={COLORS.brandRed} />
+              <Text style={styles.amenityText}>Snack &amp; Air</Text>
             </View>
             <View style={styles.amenityItem}>
-              <ShieldCheck size={20} color={Colors.primary} />
-              <Text style={styles.amenityText}>Air Purifier</Text>
+              <ShieldCheck size={18} color={COLORS.brandRed} />
+              <Text style={styles.amenityText}>Kru Tersertifikasi</Text>
             </View>
           </View>
         </View>
+
+        {/* Bottom Spacing for Floating Tab Bar */}
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
@@ -400,420 +374,373 @@ export default function HomeScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: COLORS.bgDark,
   },
-  scrollContent: {
-    paddingHorizontal: 20,
+  safeHeader: {
+    backgroundColor: COLORS.bgDark,
+    zIndex: 10,
   },
-  topBar: {
+  headerBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
   },
-  leftTopBar: {
+  headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
-  iconCircleBtn: {
+  iconCircle: {
     width: 42,
     height: 42,
-    backgroundColor: Colors.surfaceCard,
-    borderRadius: Radius.full,
+    borderRadius: 21,
+    backgroundColor: '#161922',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.2,
-    borderColor: Colors.border,
-    position: 'relative',
   },
-  notificationBadge: {
+  badgeDot: {
     position: 'absolute',
-    top: 9,
-    right: 10,
-    width: 8,
-    height: 8,
-    borderRadius: Radius.full,
-    backgroundColor: Colors.primary,
+    top: 10,
+    right: 11,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: COLORS.brandRed,
   },
-  avatarContainer: {
-    width: 42,
-    height: 42,
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: Radius.full,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
-    overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarImg: {
-    width: 26,
-    height: 26,
-  },
-  headlineSection: {
-    marginBottom: 18,
-  },
-  exploreTitle: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    letterSpacing: -1,
-  },
-  exploreSubtitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: -0.5,
-    marginTop: -4,
-  },
-  searchCapsule: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.surfaceCard,
-    borderRadius: Radius.pill,
-    paddingLeft: 20,
-    paddingRight: 6,
-    paddingVertical: 8,
-    borderWidth: 1.2,
-    borderColor: Colors.border,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 18,
-    elevation: 6,
-    marginBottom: 20,
-  },
-  searchContent: {
-    flex: 1,
-  },
-  searchFromText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  searchRouteRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 2,
-  },
-  searchToText: {
-    color: Colors.textSecondary,
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  searchDateText: {
-    color: Colors.primary,
-    fontSize: 12,
-    fontWeight: '700',
-    marginLeft: 4,
-  },
-  searchPinButton: {
+  avatarRing: {
     width: 44,
     height: 44,
-    borderRadius: Radius.full,
-    backgroundColor: Colors.primary,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: COLORS.brandRed,
+    overflow: 'hidden',
+  },
+  avatarImg: {
+    width: '100%',
+    height: '100%',
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+  },
+  headlineWrapper: {
+    marginVertical: 14,
+  },
+  headline: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontSize: 28,
+    color: '#FFFFFF',
+    lineHeight: 34,
+    letterSpacing: -0.5,
+  },
+  headlineSub: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 24,
+    color: 'rgba(255, 255, 255, 0.85)',
+  },
+  locationCapsule: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#161922',
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    paddingLeft: 20,
+    paddingRight: 6,
+    paddingVertical: 6,
+    marginBottom: 20,
+  },
+  locationText: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  locationBold: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    color: '#FFFFFF',
+  },
+  locationRedBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: COLORS.brandRed,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 4,
   },
-  categoryChipsScroll: {
+  categoriesRow: {
     flexDirection: 'row',
     gap: 10,
-    marginBottom: 24,
+    marginBottom: 22,
   },
   categoryChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceCard,
+    gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: Radius.pill,
-    borderWidth: 1.2,
-    borderColor: Colors.border,
+    borderRadius: 24,
   },
   categoryChipActive: {
-    backgroundColor: '#26263A',
-    borderColor: Colors.primary,
+    backgroundColor: COLORS.brandRed,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.brandRed,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
-  categoryChipText: {
-    color: Colors.textSecondary,
+  categoryChipInactive: {
+    backgroundColor: '#161922',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  categoryText: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 13,
-    fontWeight: '600',
   },
-  categoryChipTextActive: {
+  categoryTextActive: {
     color: '#FFFFFF',
-    fontWeight: '800',
+  },
+  categoryTextInactive: {
+    color: COLORS.textSecondary,
+  },
+  heroCardContainer: {
+    marginBottom: 26,
   },
   heroCard: {
-    backgroundColor: Colors.surfaceCard,
-    borderRadius: 28,
-    borderWidth: 1.2,
-    borderColor: Colors.border,
-    padding: 22,
-    marginBottom: 26,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 28,
-    elevation: 8,
-  },
-  heroHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  routeTag: {
-    backgroundColor: Colors.surfaceContainer,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: Radius.pill,
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: Colors.borderLight,
-  },
-  routeTagText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  durationTag: {
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    padding: 20,
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.primaryContainer,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: Radius.pill,
-  },
-  durationText: {
-    color: Colors.primary,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  heroBusTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: '#FFFFFF',
-  },
-  heroBusDesc: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginTop: 2,
-    marginBottom: 16,
-  },
-  heroBusImageContainer: {
-    height: 140,
-    borderRadius: 18,
     overflow: 'hidden',
-    marginBottom: 16,
   },
-  heroBusImage: {
-    width: '100%',
-    height: '100%',
+  heroLeft: {
+    flex: 1.1,
   },
-  heroActionPill: {
+  heroBadges: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: Colors.primary,
-    paddingLeft: 20,
-    paddingRight: 6,
-    paddingVertical: 6,
-    borderRadius: Radius.pill,
+    gap: 6,
+    marginBottom: 12,
   },
-  heroActionText: {
+  heroBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  heroBadgeText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.8)',
+  },
+  heroTitle: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 22,
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
+    lineHeight: 28,
+    marginBottom: 16,
+    letterSpacing: -0.4,
   },
-  heroActionCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: Radius.full,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+  slideBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#0F1218',
+    borderRadius: 20,
+    paddingHorizontal: 6,
+    paddingVertical: 5,
+    width: '95%',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  slideIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.brandRed,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  sectionHeaderRow: {
+  slideArrowText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.4)',
+    letterSpacing: 2,
+  },
+  slideEndIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 26, 53, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heroRight: {
+    flex: 0.9,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heroBusImage: {
+    width: '120%',
+    height: 120,
+    transform: [{ scale: 1.15 }],
+  },
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 14,
   },
   sectionTitle: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 18,
-    fontWeight: '800',
     color: '#FFFFFF',
+    letterSpacing: -0.3,
   },
-  sectionViewAll: {
-    fontSize: 12,
-    color: Colors.primary,
-    fontWeight: '700',
+  viewAllBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
-  storiesScroll: {
-    flexDirection: 'row',
+  viewAllText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 13,
+    color: COLORS.textMuted,
+  },
+  whatsNewScroll: {
     gap: 14,
     marginBottom: 26,
   },
   storyCard: {
-    width: SCREEN_WIDTH * 0.65,
-    height: 120,
-    borderRadius: 20,
+    width: width * 0.58,
+    height: 150,
+    borderRadius: 18,
     overflow: 'hidden',
-    position: 'relative',
-    borderWidth: 1.2,
-    borderColor: Colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   storyImage: {
     width: '100%',
     height: '100%',
   },
-  storyOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+  storyGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     padding: 14,
-    justifyContent: 'flex-end',
-  },
-  storyTag: {
-    color: Colors.primary,
-    fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 0.5,
-    marginBottom: 2,
   },
   storyTitle: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 14,
     color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '800',
-    lineHeight: 18,
+    marginBottom: 2,
+  },
+  storySubtitle: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    marginBottom: 8,
+  },
+  storyPill: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  storyPillText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 10,
+    color: '#FFFFFF',
+  },
+  scheduleList: {
+    gap: 12,
+    marginBottom: 26,
   },
   scheduleCard: {
-    backgroundColor: Colors.surfaceCard,
-    borderRadius: 22,
-    borderWidth: 1.2,
-    borderColor: Colors.border,
-    padding: 18,
-    marginBottom: 14,
-  },
-  scheduleHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 14,
-  },
-  scheduleBusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#14171F',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    padding: 12,
+    gap: 14,
+  },
+  scheduleBusThumb: {
+    width: 68,
+    height: 68,
+    borderRadius: 14,
+  },
+  scheduleMiddle: {
+    flex: 1,
+  },
+  scheduleRoute: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 15,
+    color: '#FFFFFF',
+    marginBottom: 2,
   },
   scheduleBusName: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: Radius.pill,
-  },
-  statusBadgeText: {
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  statusAvailable: {
-    backgroundColor: Colors.successContainer,
-  },
-  statusAvailableText: {
-    color: Colors.success,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  statusDeparted: {
-    backgroundColor: Colors.surfaceContainer,
-  },
-  statusDepartedText: {
-    color: Colors.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  scheduleRouteRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  routeCol: {
-    flex: 1,
-  },
-  routeTime: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '900',
-  },
-  routeName: {
-    color: Colors.textSecondary,
+    fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    marginTop: 2,
+    color: COLORS.textSecondary,
+    marginBottom: 6,
   },
-  routeDivider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 0.8,
-    justifyContent: 'center',
+  schedulePrice: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 15,
+    color: '#FFFFFF',
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: Colors.borderLight,
-  },
-  busDot: {
-    marginHorizontal: 8,
-  },
-  scheduleFooterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-  priceLabel: {
-    color: Colors.textMuted,
+  schedulePerPerson: {
+    fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 11,
+    color: COLORS.textMuted,
   },
-  priceValue: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '900',
+  scheduleAction: {
+    alignItems: 'flex-end',
+    gap: 8,
   },
-  bookBtn: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: Radius.pill,
+  ratingBadge: {
+    backgroundColor: 'rgba(255, 184, 0, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
   },
-  bookBtnDisabled: {
-    backgroundColor: Colors.surfaceHighest,
+  ratingText: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 11,
+    color: '#FFB800',
   },
-  bookBtnText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '800',
+  chevronCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#1E222C',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  amenitiesSection: {
-    backgroundColor: Colors.surfaceCard,
-    borderRadius: 22,
-    borderWidth: 1.2,
-    borderColor: Colors.border,
+  amenitiesCard: {
+    backgroundColor: '#14171F',
+    borderRadius: 18,
     padding: 18,
-    marginTop: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   amenitiesTitle: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 15,
     color: '#FFFFFF',
     marginBottom: 14,
   },
@@ -823,11 +750,11 @@ const styles = StyleSheet.create({
   },
   amenityItem: {
     alignItems: 'center',
+    gap: 6,
   },
   amenityText: {
-    color: Colors.textSecondary,
+    fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 11,
-    marginTop: 6,
-    fontWeight: '600',
+    color: COLORS.textSecondary,
   },
 });

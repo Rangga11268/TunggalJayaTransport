@@ -1,20 +1,15 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import { Colors, Radius } from '../theme/colors';
+import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Home, Calendar, HelpCircle, User } from 'lucide-react-native';
+import { COLORS } from '../theme/colors';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-export default function FloatingTabBar({ state, descriptors, navigation }: any) {
-  const icons = [Home, Calendar, HelpCircle, User];
-
+export default function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
-    <View style={styles.floatingContainer}>
-      <View style={styles.tabBarCard}>
-        {state.routes.map((route: any, index: number) => {
-          const { options } = descriptors[route.key];
+    <View style={styles.floatingWrapper} pointerEvents="box-none">
+      <View style={styles.container}>
+        {state.routes.map((route, index) => {
           const isFocused = state.index === index;
-          const IconComp = icons[index] || Home;
 
           const onPress = () => {
             const event = navigation.emit({
@@ -28,20 +23,37 @@ export default function FloatingTabBar({ state, descriptors, navigation }: any) 
             }
           };
 
+          const renderIcon = () => {
+            const color = isFocused ? '#FFFFFF' : COLORS.textMuted;
+            const size = 20;
+
+            switch (route.name) {
+              case 'Home':
+                return <Home size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
+              case 'Schedules':
+                return <Calendar size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
+              case 'Help':
+                return <HelpCircle size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
+              case 'Profile':
+                return <User size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
+              default:
+                return <Home size={size} color={color} strokeWidth={2} />;
+            }
+          };
+
           return (
             <TouchableOpacity
-              key={index}
+              key={route.key}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? { selected: true } : {}}
               onPress={onPress}
               style={[
-                styles.tabItem,
-                isFocused && styles.tabItemActive,
+                styles.tabButton,
+                isFocused ? styles.tabButtonActive : styles.tabButtonInactive,
               ]}
-              activeOpacity={0.8}
             >
-              <IconComp
-                size={20}
-                color={isFocused ? '#FFFFFF' : '#8E8EA8'}
-              />
+              {renderIcon()}
             </TouchableOpacity>
           );
         })}
@@ -51,46 +63,66 @@ export default function FloatingTabBar({ state, descriptors, navigation }: any) 
 }
 
 const styles = StyleSheet.create({
-  floatingContainer: {
+  floatingWrapper: {
     position: 'absolute',
-    bottom: 20,
-    left: 28,
-    right: 28,
+    bottom: Platform.OS === 'ios' ? 28 : 20,
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    zIndex: 99,
+    justifyContent: 'center',
   },
-  tabBarCard: {
+  container: {
     flexDirection: 'row',
-    backgroundColor: '#14141E',
-    borderRadius: Radius.pill,
-    height: 64,
-    width: '100%',
-    justifyContent: 'space-around',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    borderWidth: 1.2,
-    borderColor: '#262638',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.6,
-    shadowRadius: 28,
-    elevation: 12,
+    justifyContent: 'space-between',
+    backgroundColor: '#13161C',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 40,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    width: '78%',
+    maxWidth: 320,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.5,
+        shadowRadius: 18,
+      },
+      android: {
+        elevation: 14,
+      },
+      web: {
+        boxShadow: '0px 14px 28px rgba(0, 0, 0, 0.65)',
+      },
+    }),
   },
-  tabItem: {
-    width: 42,
-    height: 42,
-    borderRadius: Radius.full,
+  tabButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  tabItemActive: {
-    width: 48,
-    height: 48,
-    backgroundColor: Colors.primary,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.45,
-    shadowRadius: 14,
-    elevation: 8,
+  tabButtonActive: {
+    backgroundColor: COLORS.brandRed,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.brandRed,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.5,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+      web: {
+        boxShadow: '0px 4px 14px rgba(255, 26, 53, 0.55)',
+      },
+    }),
+  },
+  tabButtonInactive: {
+    backgroundColor: 'transparent',
   },
 });

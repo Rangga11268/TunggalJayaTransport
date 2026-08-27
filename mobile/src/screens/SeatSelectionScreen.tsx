@@ -5,264 +5,275 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
   Alert,
+  ActivityIndicator,
+  Platform,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors, Radius } from '../theme/colors';
-import api from '../api/client';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   ArrowLeft,
-  AlertTriangle,
-  Check,
-  Armchair,
-  Disc,
+  ShieldAlert,
+  Sparkles,
+  ChevronRight,
+  Info,
+  Clock,
+  Compass,
 } from 'lucide-react-native';
+import { RootStackParamList } from '../navigation/RootNavigator';
+import { COLORS } from '../theme/colors';
+import apiClient from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
-export default function SeatSelectionScreen({ navigation, route }: any) {
-  const insets = useSafeAreaInsets();
-  const { schedule, date } = route.params || {};
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  const [occupiedSeats, setOccupiedSeats] = useState<string[]>(['1A', '2B', '4C']);
-  const [loading, setLoading] = useState(false);
+export default function SeatSelectionScreen() {
+  const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<any>();
+  const { scheduleId } = route.params || { scheduleId: 1 };
+  const { user } = useAuth();
 
-  // Check if departed
-  const isDeparted = () => {
+  const [loading, setLoading] = useState(true);
+  const [schedule, setSchedule] = useState<any>(null);
+  const [occupiedSeats, setOccupiedSeats] = useState<number[]>([2, 5, 8, 12, 18]);
+  const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+  const [isDeparted, setIsDeparted] = useState(false);
+
+  useEffect(() => {
+    fetchScheduleDetail();
+  }, [scheduleId]);
+
+  const fetchScheduleDetail = async () => {
     try {
-      if (!schedule?.departure_time) return false;
-      const parts = schedule.departure_time.split(':');
-      if (parts.length < 2) return false;
-      const now = new Date();
-      const dep = new Date();
-      dep.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
-      return now > dep;
-    } catch {
-      return false;
+      setLoading(true);
+      const res = await apiClient.get('/schedules');
+      const list = Array.isArray(res.data) ? res.data : res.data.data || [];
+      const found = list.find((s: any) => s.id === scheduleId) || list[0];
+      setSchedule(found);
+
+      // Check departure time validity (User requirement: bus departed cannot pick seats)
+      if (found) {
+        const now = new Date();
+        const schedDate = found.departure_date ? new Date(found.departure_date) : new Date();
+        const [hours, minutes] = (found.departure_time || '07:00').split(':').map(Number);
+        schedDate.setHours(hours, minutes, 0, 0);
+
+        if (schedDate.getTime() < now.getTime() && found.status !== 'upcoming') {
+          setIsDeparted(true);
+        }
+      }
+    } catch (e) {
+      console.log('Error fetching schedule details:', e);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const departed = isDeparted();
-
-  // 30 seats standard 2-2 layout (8 rows)
-  const rows = [
-    { row: '1', left: ['1A', '1B'], right: ['1C', '1D'] },
-    { row: '2', left: ['2A', '2B'], right: ['2C', '2D'] },
-    { row: '3', left: ['3A', '3B'], right: ['3C', '3D'] },
-    { row: '4', left: ['4A', '4B'], right: ['4C', '4D'] },
-    { row: '5', left: ['5A', '5B'], right: ['5C', '5D'] },
-    { row: '6', left: ['6A', '6B'], right: ['6C', '6D'] },
-    { row: '7', left: ['7A', '7B'], right: ['7C', '7D'] },
-    { row: '8', left: ['8A', '8B'], right: ['8C', '8D'] },
-  ];
-
-  const toggleSeat = (seatId: string) => {
-    if (departed) {
-      Alert.alert('Bus Sudah Berangkat', 'Perjalanan ini sudah berangkat hari ini.');
+  const toggleSeat = (seatNumber: number) => {
+    if (isDeparted) {
+      Alert.alert('Bus Sudah Berangkat', 'Jadwal bus ini telah berangkat. Pemilihan kursi tidak dapat dilakukan.');
       return;
     }
-    if (occupiedSeats.includes(seatId)) return;
 
-    if (selectedSeats.includes(seatId)) {
-      setSelectedSeats(selectedSeats.filter((s) => s !== seatId));
+    if (occupiedSeats.includes(seatNumber)) {
+      Alert.alert('Kursi Terisi', `Kursi nomor ${seatNumber} sudah dipesan oleh penumpang lain.`);
+      return;
+    }
+
+    if (selectedSeats.includes(seatNumber)) {
+      setSelectedSeats(selectedSeats.filter((s) => s !== seatNumber));
     } else {
       if (selectedSeats.length >= 4) {
-        Alert.alert('Maksimal 4 Kursi', 'Maksimal pemesanan adalah 4 kursi sekaligus.');
+        Alert.alert('Maksimal Kursi', 'Anda dapat memilih maksimal 4 kursi per transaksi.');
         return;
       }
-      setSelectedSeats([...selectedSeats, seatId]);
+      setSelectedSeats([...selectedSeats, seatNumber]);
     }
   };
 
-  const unitPrice = Number(schedule?.price || 130000);
-  const totalPrice = selectedSeats.length * unitPrice;
+  const proceedToCheckout = () => {
+    if (selectedSeats.length === 0) {
+      Alert.alert('Pilih Kursi', 'Silakan pilih minimal 1 kursi sebelum melanjutkan.');
+      return;
+    }
+
+    navigation.navigate('Checkout', {
+      scheduleId: schedule?.id || 1,
+      selectedSeats,
+      totalPrice: (schedule?.price || 180000) * selectedSeats.length,
+    });
+  };
+
+  // Generate standard 30-seat layout (Rows 1 to 8, 2-2 configuration)
+  const totalCapacity = schedule?.bus?.capacity || 30;
+  const rowsCount = Math.ceil(totalCapacity / 4);
 
   return (
     <View style={styles.container}>
-      {/* Top Header Bar */}
-      <View style={[styles.topHeader, { paddingTop: insets.top + 10 }]}>
+      {/* Top App Bar */}
+      <SafeAreaView edges={['top']} style={styles.topBar}>
         <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => navigation.goBack()}
           activeOpacity={0.7}
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
         >
           <ArrowLeft size={18} color="#FFFFFF" />
         </TouchableOpacity>
 
-        <View style={styles.headerTitleCol}>
-          <Text style={styles.headerTitle}>Pilih Kursi Bus</Text>
-          <Text style={styles.headerSubtitle}>
-            {schedule?.route?.origin_city || 'Kuningan'} ➔{' '}
-            {schedule?.route?.destination_city || 'Jakarta'}
+        <View style={styles.topBarCenter}>
+          <Text style={styles.topBarTitle}>Pilih Kursi Penumpang</Text>
+          <Text style={styles.topBarSub}>
+            {schedule?.bus?.name || 'Resi Bisma'} • {schedule?.route?.origin || 'Jakarta'} → {schedule?.route?.destination || 'Kuningan'}
           </Text>
         </View>
 
         <View style={{ width: 40 }} />
+      </SafeAreaView>
+
+      {/* Bus Departure Warning Notice if departed */}
+      {isDeparted && (
+        <View style={styles.departedBanner}>
+          <ShieldAlert size={18} color="#FF3B30" />
+          <Text style={styles.departedText}>
+            Bus ini telah diberangkatkan. Anda hanya dapat melihat ketersediaan.
+          </Text>
+        </View>
+      )}
+
+      {/* Seat Status Legend */}
+      <View style={styles.legendContainer}>
+        <View style={styles.legendItem}>
+          <View style={[styles.seatLegendBox, styles.seatAvailable]} />
+          <Text style={styles.legendLabel}>Tersedia</Text>
+        </View>
+
+        <View style={styles.legendItem}>
+          <View style={[styles.seatLegendBox, styles.seatSelected]} />
+          <Text style={styles.legendLabel}>Dipilih</Text>
+        </View>
+
+        <View style={styles.legendItem}>
+          <View style={[styles.seatLegendBox, styles.seatOccupied]} />
+          <Text style={styles.legendLabel}>Terisi</Text>
+        </View>
       </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 130 }}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
-        {/* Departed Warning Banner */}
-        {departed && (
-          <View style={styles.departedBanner}>
-            <AlertTriangle size={18} color="#F59E0B" style={{ marginRight: 8 }} />
-            <Text style={styles.departedBannerText}>
-              Bus ini sudah berangkat ({schedule?.departure_time?.slice(0, 5)} WIB). Pemilihan kursi ditutup.
-            </Text>
+        {/* Cabin Blueprint Container */}
+        <View style={styles.cabinFrame}>
+          {/* Driver Cockpit Zone */}
+          <View style={styles.cockpitRow}>
+            <View style={styles.doorArea}>
+              <Text style={styles.cockpitText}>PINTU MASUK</Text>
+            </View>
+            <View style={styles.driverSeat}>
+              <Compass size={18} color={COLORS.textMuted} />
+              <Text style={styles.driverText}>DRIVER</Text>
+            </View>
           </View>
-        )}
 
-        {/* Legend */}
-        <View style={styles.legendCard}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendBox, { backgroundColor: Colors.surfaceContainer }]} />
-            <Text style={styles.legendText}>Tersedia</Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendBox, { backgroundColor: Colors.primary }]} />
-            <Text style={styles.legendText}>Dipilih</Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendBox, { backgroundColor: '#2E2E3E' }]} />
-            <Text style={styles.legendText}>Terisi</Text>
+          <View style={styles.dividerLine} />
+
+          {/* 2-2 Seat Rows */}
+          {Array.from({ length: rowsCount }).map((_, rIdx) => {
+            const seat1 = rIdx * 4 + 1;
+            const seat2 = rIdx * 4 + 2;
+            const seat3 = rIdx * 4 + 3;
+            const seat4 = rIdx * 4 + 4;
+
+            const renderSeat = (num: number) => {
+              if (num > totalCapacity) return <View style={styles.emptySlot} />;
+              const isOccupied = occupiedSeats.includes(num);
+              const isSelected = selectedSeats.includes(num);
+
+              return (
+                <TouchableOpacity
+                  key={num}
+                  activeOpacity={0.75}
+                  disabled={isOccupied || isDeparted}
+                  onPress={() => toggleSeat(num)}
+                  style={[
+                    styles.seatBox,
+                    isOccupied && styles.seatBoxOccupied,
+                    isSelected && styles.seatBoxSelected,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.seatNumber,
+                      isOccupied && styles.seatNumberOccupied,
+                      isSelected && styles.seatNumberSelected,
+                    ]}
+                  >
+                    {num < 10 ? `0${num}` : num}
+                  </Text>
+                </TouchableOpacity>
+              );
+            };
+
+            return (
+              <View key={rIdx} style={styles.cabinRow}>
+                <View style={styles.pairLeft}>
+                  {renderSeat(seat1)}
+                  {renderSeat(seat2)}
+                </View>
+
+                <View style={styles.aisleGap}>
+                  <Text style={styles.aisleText}>{rIdx + 1}</Text>
+                </View>
+
+                <View style={styles.pairRight}>
+                  {renderSeat(seat3)}
+                  {renderSeat(seat4)}
+                </View>
+              </View>
+            );
+          })}
+
+          {/* Back Facilities (Toilet & Luggage) */}
+          <View style={styles.cabinBackArea}>
+            <View style={styles.toiletBox}>
+              <Text style={styles.toiletText}>TOILET</Text>
+            </View>
+            <View style={styles.backExitBox}>
+              <Text style={styles.toiletText}>PINTU DARURAT</Text>
+            </View>
           </View>
         </View>
 
-        {/* Bus Cabin Outline */}
-        <View style={styles.busCabin}>
-          {/* Driver Area */}
-          <View style={styles.driverSection}>
-            <View style={styles.driverBadge}>
-              <Disc size={18} color={Colors.textSecondary} style={{ marginRight: 6 }} />
-              <Text style={styles.driverText}>AREA SUPIR</Text>
-            </View>
-            <View style={styles.doorBadge}>
-              <Text style={styles.doorText}>PINTU</Text>
-            </View>
-          </View>
-
-          <View style={styles.cabinDivider} />
-
-          {/* Seat Grid */}
-          {rows.map((r) => (
-            <View key={r.row} style={styles.seatRow}>
-              {/* Left 2 seats */}
-              <View style={styles.seatPair}>
-                {r.left.map((seatId) => {
-                  const isSelected = selectedSeats.includes(seatId);
-                  const isOccupied = occupiedSeats.includes(seatId);
-
-                  return (
-                    <TouchableOpacity
-                      key={seatId}
-                      style={[
-                        styles.seatBox,
-                        isSelected && styles.seatSelected,
-                        isOccupied && styles.seatOccupied,
-                      ]}
-                      onPress={() => toggleSeat(seatId)}
-                      disabled={isOccupied || departed}
-                      activeOpacity={0.8}
-                    >
-                      {isSelected ? (
-                        <Check size={14} color="#FFFFFF" />
-                      ) : (
-                        <Text
-                          style={[
-                            styles.seatText,
-                            isOccupied && styles.seatTextOccupied,
-                          ]}
-                        >
-                          {seatId}
-                        </Text>
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-
-              {/* Aisle */}
-              <View style={styles.aisle}>
-                <Text style={styles.aisleText}>{r.row}</Text>
-              </View>
-
-              {/* Right 2 seats */}
-              <View style={styles.seatPair}>
-                {r.right.map((seatId) => {
-                  const isSelected = selectedSeats.includes(seatId);
-                  const isOccupied = occupiedSeats.includes(seatId);
-
-                  return (
-                    <TouchableOpacity
-                      key={seatId}
-                      style={[
-                        styles.seatBox,
-                        isSelected && styles.seatSelected,
-                        isOccupied && styles.seatOccupied,
-                      ]}
-                      onPress={() => toggleSeat(seatId)}
-                      disabled={isOccupied || departed}
-                      activeOpacity={0.8}
-                    >
-                      {isSelected ? (
-                        <Check size={14} color="#FFFFFF" />
-                      ) : (
-                        <Text
-                          style={[
-                            styles.seatText,
-                            isOccupied && styles.seatTextOccupied,
-                          ]}
-                        >
-                          {seatId}
-                        </Text>
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-          ))}
-        </View>
+        {/* Bottom spacer */}
+        <View style={{ height: 120 }} />
       </ScrollView>
 
-      {/* Floating Bottom Action Bar */}
-      <View
-        style={[
-          styles.bottomFloatingBar,
-          { paddingBottom: Math.max(insets.bottom + 8, 16) },
-        ]}
-      >
-        <View style={styles.bottomBarContent}>
-          <View>
-            <Text style={styles.bottomBarLabel}>
+      {/* Floating Bottom Sticky Action Bar */}
+      <View style={styles.bottomBarWrapper}>
+        <View style={styles.bottomBar}>
+          <View style={styles.bottomLeft}>
+            <Text style={styles.bottomSeatsLabel}>
               {selectedSeats.length > 0
-                ? `${selectedSeats.join(', ')} (${selectedSeats.length} Kursi)`
-                : 'Pilih Kursi'}
+                ? `Kursi: ${selectedSeats.join(', ')}`
+                : 'Pilih nomor kursi'}
             </Text>
-            <Text style={styles.bottomBarPrice}>
-              Rp {totalPrice.toLocaleString('id-ID')}
+            <Text style={styles.bottomTotalPrice}>
+              Rp {(selectedSeats.length * (schedule?.price || 180000)).toLocaleString('id-ID')}
             </Text>
           </View>
 
           <TouchableOpacity
+            activeOpacity={0.85}
+            disabled={isDeparted || selectedSeats.length === 0}
+            onPress={proceedToCheckout}
             style={[
               styles.checkoutBtn,
-              (selectedSeats.length === 0 || departed) && styles.checkoutBtnDisabled,
+              (isDeparted || selectedSeats.length === 0) && styles.checkoutBtnDisabled,
             ]}
-            disabled={selectedSeats.length === 0 || departed}
-            onPress={() =>
-              navigation.navigate('Checkout', {
-                schedule,
-                selectedSeats,
-                totalPrice,
-                date,
-              })
-            }
-            activeOpacity={0.85}
           >
             <Text style={styles.checkoutBtnText}>Lanjutkan</Text>
+            <ChevronRight size={16} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -273,216 +284,291 @@ export default function SeatSelectionScreen({ navigation, route }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: COLORS.bgDark,
   },
-  topHeader: {
+  topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingBottom: 14,
-    backgroundColor: Colors.surfaceCard,
-    borderBottomWidth: 1.2,
-    borderBottomColor: Colors.border,
+    paddingVertical: 12,
+    backgroundColor: COLORS.bgSurface,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
   backBtn: {
     width: 40,
     height: 40,
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: Radius.full,
+    borderRadius: 20,
+    backgroundColor: '#161922',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.borderLight,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  headerTitleCol: {
+  topBarCenter: {
     alignItems: 'center',
   },
-  headerTitle: {
+  topBarTitle: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 16,
-    fontWeight: '900',
     color: '#FFFFFF',
   },
-  headerSubtitle: {
+  topBarSub: {
+    fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: COLORS.textSecondary,
     marginTop: 2,
   },
   departedBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
-    borderWidth: 1.2,
-    borderColor: 'rgba(245, 158, 11, 0.4)',
-    padding: 12,
-    borderRadius: Radius.md,
-    marginTop: 14,
+    gap: 10,
+    backgroundColor: 'rgba(255, 59, 48, 0.15)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 59, 48, 0.3)',
   },
-  departedBannerText: {
-    color: '#FCD34D',
+  departedText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 12,
-    fontWeight: '700',
+    color: '#FF453A',
     flex: 1,
   },
-  legendCard: {
+  legendContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: Colors.surfaceCard,
+    justifyContent: 'center',
+    gap: 24,
     paddingVertical: 14,
-    borderRadius: Radius.pill,
-    borderWidth: 1.2,
-    borderColor: Colors.border,
-    marginVertical: 16,
+    backgroundColor: '#12151B',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
   },
-  legendBox: {
-    width: 16,
-    height: 16,
-    borderRadius: 4,
-    marginRight: 6,
+  seatLegendBox: {
+    width: 18,
+    height: 18,
+    borderRadius: 5,
   },
-  legendText: {
-    color: Colors.textSecondary,
+  seatAvailable: {
+    backgroundColor: '#1C212B',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  seatSelected: {
+    backgroundColor: COLORS.brandRed,
+  },
+  seatOccupied: {
+    backgroundColor: '#2A2E38',
+  },
+  legendLabel: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 12,
-    fontWeight: '600',
+    color: COLORS.textSecondary,
   },
-  busCabin: {
-    backgroundColor: Colors.surfaceCard,
-    borderRadius: 32,
+  scrollContent: {
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    alignItems: 'center',
+  },
+  cabinFrame: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: '#13161D',
+    borderRadius: 24,
     borderWidth: 1.5,
-    borderColor: Colors.border,
-    padding: 20,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 28,
-    elevation: 8,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 16,
   },
-  driverSection: {
+  cockpitRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
   },
-  driverBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.surfaceContainer,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: Radius.pill,
-  },
-  driverText: {
-    color: Colors.textSecondary,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  doorBadge: {
-    backgroundColor: Colors.surfaceContainer,
+  doorArea: {
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: Radius.pill,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 8,
   },
-  doorText: {
-    color: Colors.textMuted,
+  cockpitText: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 10,
-    fontWeight: '700',
+    color: COLORS.textMuted,
   },
-  cabinDivider: {
-    height: 1.5,
-    backgroundColor: Colors.border,
+  driverSeat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 8,
+  },
+  driverText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 10,
+    color: COLORS.textMuted,
+  },
+  dividerLine: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     marginBottom: 18,
   },
-  seatRow: {
+  cabinRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
   },
-  seatPair: {
+  pairLeft: {
     flexDirection: 'row',
     gap: 8,
+  },
+  pairRight: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  aisleGap: {
+    width: 28,
+    alignItems: 'center',
+  },
+  aisleText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 11,
+    color: COLORS.textMuted,
   },
   seatBox: {
     width: 44,
     height: 44,
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: 12,
+    borderRadius: 10,
+    backgroundColor: '#1B202A',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
   },
-  seatSelected: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 6,
+  seatBoxOccupied: {
+    backgroundColor: '#242832',
+    borderColor: 'transparent',
+    opacity: 0.4,
   },
-  seatOccupied: {
-    backgroundColor: '#1C1C26',
-    borderColor: '#262638',
+  seatBoxSelected: {
+    backgroundColor: COLORS.brandRed,
+    borderColor: '#FFFFFF',
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.brandRed,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.5,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
-  seatText: {
-    color: '#FFFFFF',
+  seatNumber: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 12,
-    fontWeight: '800',
+    color: '#FFFFFF',
   },
-  seatTextOccupied: {
-    color: '#4B4B60',
+  seatNumberOccupied: {
+    color: COLORS.textMuted,
   },
-  aisle: {
-    width: 30,
-    alignItems: 'center',
+  seatNumberSelected: {
+    color: '#FFFFFF',
   },
-  aisleText: {
-    color: Colors.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
+  emptySlot: {
+    width: 44,
+    height: 44,
   },
-  bottomFloatingBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: Colors.surfaceCard,
-    borderTopWidth: 1.2,
-    borderTopColor: Colors.border,
-    paddingHorizontal: 22,
+  cabinBackArea: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 14,
     paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
   },
-  bottomBarContent: {
+  toiletBox: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 8,
+  },
+  backExitBox: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 8,
+  },
+  toiletText: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 10,
+    color: COLORS.textMuted,
+  },
+  bottomBarWrapper: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 28 : 20,
+    left: 20,
+    right: 20,
+  },
+  bottomBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#161922',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 36,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.6,
+        shadowRadius: 16,
+      },
+      android: {
+        elevation: 10,
+      },
+    }),
   },
-  bottomBarLabel: {
-    color: Colors.textMuted,
-    fontSize: 11,
+  bottomLeft: {},
+  bottomSeatsLabel: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 12,
+    color: COLORS.textSecondary,
   },
-  bottomBarPrice: {
+  bottomTotalPrice: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontSize: 17,
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '900',
   },
   checkoutBtn: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 26,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: COLORS.brandRed,
     paddingVertical: 12,
-    borderRadius: Radius.pill,
+    paddingHorizontal: 22,
+    borderRadius: 24,
   },
   checkoutBtnDisabled: {
-    backgroundColor: Colors.surfaceHighest,
+    backgroundColor: '#2A2E38',
+    opacity: 0.6,
   },
   checkoutBtnText: {
-    color: '#FFFFFF',
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 14,
-    fontWeight: '900',
+    color: '#FFFFFF',
   },
 });

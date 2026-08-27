@@ -20,8 +20,29 @@ import PromoScreen from '../screens/PromoScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import HelpScreen from '../screens/HelpScreen';
 
-const Stack = createNativeStackNavigator<any>();
-const Tab = createBottomTabNavigator<any>();
+export type RootStackParamList = {
+  GetStarted: undefined;
+  Login: undefined;
+  Register: undefined;
+  MainTabs: { screen?: string } | undefined;
+  Schedules: { origin?: string; destination?: string } | undefined;
+  ScheduleList: { origin?: string; destination?: string } | undefined;
+  SeatSelection: { scheduleId: number };
+  Checkout: { scheduleId: number; selectedSeats: number[]; totalPrice: number };
+  TicketDetail: { bookingId: number };
+  Charter: undefined;
+  Promo: undefined;
+};
+
+export type MainTabParamList = {
+  Home: undefined;
+  Schedules: undefined;
+  Help: undefined;
+  Profile: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
 
 function MainTabs() {
   return (
@@ -33,7 +54,7 @@ function MainTabs() {
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="BookingHistory" component={BookingHistoryScreen} />
+      <Tab.Screen name="Schedules" component={ScheduleListScreen} />
       <Tab.Screen name="Help" component={HelpScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
@@ -57,6 +78,7 @@ export default function RootNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="MainTabs" component={MainTabs} />
+        <Stack.Screen name="Schedules" component={ScheduleListScreen} />
         <Stack.Screen name="ScheduleList" component={ScheduleListScreen} />
         <Stack.Screen name="SeatSelection" component={SeatSelectionScreen} />
         <Stack.Screen name="Checkout" component={CheckoutScreen} />

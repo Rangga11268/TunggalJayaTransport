@@ -1,82 +1,94 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors, Radius } from '../theme/colors';
-import { ChevronRight } from 'lucide-react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ImageBackground,
+  TouchableOpacity,
+  Dimensions,
+  Platform,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/RootNavigator';
+import { COLORS } from '../theme/colors';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
-export default function GetStartedScreen({ navigation }: any) {
-  const insets = useSafeAreaInsets();
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'GetStarted'>;
+
+export default function GetStartedScreen() {
+  const navigation = useNavigation<NavigationProp>();
 
   return (
     <View style={styles.container}>
-      {/* Top Hero Image with Gradient */}
-      <View style={styles.heroContainer}>
-        <Image
-          source={require('../../assets/images/heroImg.jpg')}
-          style={styles.heroImage}
-          resizeMode="cover"
-        />
-        <View style={styles.gradientOverlay} />
-
-        {/* Top Header Pill: Brand Logo & Skip Link */}
-        <View style={[styles.topBar, { top: insets.top + 16 }]}>
-          <View style={styles.logoBadge}>
-            <Image
-              source={require('../../assets/logo/logoNoBg.png')}
-              style={styles.logoIcon}
-              resizeMode="contain"
-            />
-            <Text style={styles.brandTitle}>Tunggal Jaya</Text>
+      <ImageBackground
+        source={require('../../assets/images/heroImg.jpg')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        {/* Top Header */}
+        <SafeAreaView edges={['top']} style={styles.topHeader}>
+          <View style={styles.brandRow}>
+            <View style={styles.logoIcon}>
+              <View style={styles.logoRedDot} />
+            </View>
+            <Text style={styles.brandName}>
+              <Text style={{ color: COLORS.brandRed }}>Tunggal</Text> Jaya
+            </Text>
           </View>
-
           <TouchableOpacity
-            style={styles.skipButton}
+            activeOpacity={0.7}
             onPress={() => navigation.replace('MainTabs')}
-            activeOpacity={0.8}
+            style={styles.skipButton}
           >
-            <Text style={styles.skipText}>Skip</Text>
-            <ChevronRight size={12} color="#FFFFFF" />
+            <Text style={styles.skipText}>Skip &gt;</Text>
           </TouchableOpacity>
-        </View>
-      </View>
+        </SafeAreaView>
 
-      {/* Bottom Dark Container Sheet */}
-      <View style={[styles.bottomSheet, { paddingBottom: Math.max(insets.bottom + 16, 28) }]}>
-        <View style={styles.content}>
-          <Text style={styles.headline}>Cashback & Exclusive Deals</Text>
-          <Text style={styles.subtitle}>
-            Pesan tiket bus AKAP & sewa armada pariwisata Tunggal Jaya langsung dari smartphone Anda.
-          </Text>
+        {/* Gradient Transition into Dark Card */}
+        <LinearGradient
+          colors={['transparent', 'rgba(10, 12, 16, 0.4)', 'rgba(10, 12, 16, 0.95)', '#0A0C10']}
+          locations={[0, 0.35, 0.65, 1]}
+          style={styles.bottomGradient}
+        >
+          {/* Bottom Card Content */}
+          <View style={styles.bottomCard}>
+            <Text style={styles.title}>Cashback &amp; Offer</Text>
+            <Text style={styles.subtitle}>
+              Dapatkan akses ke promo eksklusif, diskon tiket, dan perjalanan bus eksekutif ternyaman.
+            </Text>
 
-          {/* Dots Indicator */}
-          <View style={styles.dotsRow}>
-            <View style={styles.activeDot} />
-            <View style={styles.dot} />
-            <View style={styles.dot} />
+            {/* Carousel Dots */}
+            <View style={styles.dotsRow}>
+              <View style={[styles.dot, styles.dotActive]} />
+              <View style={styles.dot} />
+              <View style={styles.dot} />
+            </View>
+
+            {/* Twin Action Buttons */}
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.loginBtn}
+                onPress={() => navigation.navigate('Login')}
+              >
+                <Text style={styles.loginBtnText}>Log in</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.joinBtn}
+                onPress={() => navigation.navigate('Register')}
+              >
+                <Text style={styles.joinBtnText}>Join</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-
-        {/* Twin Action Buttons (Log in & Join) */}
-        <View style={styles.buttonsRow}>
-          <TouchableOpacity
-            style={styles.loginBtn}
-            onPress={() => navigation.navigate('Login')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.loginBtnText}>Log in</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.joinBtn}
-            onPress={() => navigation.navigate('Register')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.joinBtnText}>Join</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+        </LinearGradient>
+      </ImageBackground>
     </View>
   );
 }
@@ -84,149 +96,140 @@ export default function GetStartedScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: COLORS.bgDark,
   },
-  heroContainer: {
-    height: SCREEN_HEIGHT * 0.62,
-    width: '100%',
-    position: 'relative',
-  },
-  heroImage: {
+  backgroundImage: {
+    flex: 1,
     width: '100%',
     height: '100%',
+    justifyContent: 'space-between',
   },
-  gradientOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(11, 11, 15, 0.4)',
-  },
-  topBar: {
-    position: 'absolute',
-    left: 24,
-    right: 24,
+  topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    zIndex: 10,
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === 'android' ? 16 : 8,
   },
-  logoBadge: {
+  brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(18, 18, 24, 0.85)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: Radius.pill,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    gap: 8,
   },
   logoIcon: {
     width: 22,
     height: 22,
-    marginRight: 8,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255, 26, 53, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  brandTitle: {
+  logoRedDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.brandRed,
+  },
+  brandName: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 20,
     color: '#FFFFFF',
-    fontWeight: '900',
-    fontSize: 14,
-    letterSpacing: 0.5,
+    letterSpacing: -0.3,
   },
   skipButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: Radius.pill,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
   },
   skipText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-    marginRight: 4,
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
   },
-  bottomSheet: {
-    flex: 1,
-    backgroundColor: Colors.surfaceCard,
-    borderTopLeftRadius: 36,
-    borderTopRightRadius: 36,
-    borderTopWidth: 1.5,
-    borderTopColor: Colors.border,
-    paddingHorizontal: 28,
-    paddingTop: 28,
-    justifyContent: 'space-between',
+  bottomGradient: {
+    paddingHorizontal: 24,
+    paddingBottom: Platform.OS === 'ios' ? 44 : 32,
+    paddingTop: 60,
   },
-  content: {
+  bottomCard: {
     alignItems: 'center',
   },
-  headline: {
-    fontSize: 24,
-    fontWeight: '900',
+  title: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 26,
     color: '#FFFFFF',
     textAlign: 'center',
-    letterSpacing: -0.5,
+    marginBottom: 8,
+    letterSpacing: -0.4,
   },
   subtitle: {
-    fontSize: 13,
-    color: Colors.textSecondary,
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 14,
+    color: COLORS.textSecondary,
     textAlign: 'center',
-    marginTop: 10,
-    lineHeight: 20,
+    lineHeight: 22,
+    paddingHorizontal: 16,
+    marginBottom: 20,
   },
   dotsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
-  },
-  activeDot: {
-    width: 22,
-    height: 6,
-    backgroundColor: Colors.primary,
-    borderRadius: Radius.full,
-    marginRight: 6,
+    gap: 6,
+    marginBottom: 28,
   },
   dot: {
     width: 6,
     height: 6,
-    backgroundColor: Colors.surfaceHighest,
-    borderRadius: Radius.full,
-    marginRight: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
   },
-  buttonsRow: {
+  dotActive: {
+    width: 18,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.brandRed,
+  },
+  buttonRow: {
     flexDirection: 'row',
-    gap: 14,
+    width: '100%',
+    gap: 12,
   },
   loginBtn: {
     flex: 1,
     height: 52,
-    backgroundColor: '#222232',
-    borderRadius: Radius.pill,
+    borderRadius: 26,
+    backgroundColor: '#1E222B',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
   },
   loginBtnText: {
-    color: '#FFFFFF',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 15,
-    fontWeight: '700',
+    color: '#FFFFFF',
   },
   joinBtn: {
     flex: 1,
     height: 52,
-    backgroundColor: Colors.primary,
-    borderRadius: Radius.pill,
+    borderRadius: 26,
+    backgroundColor: COLORS.brandRed,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.brandRed,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.45,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
   joinBtnText: {
-    color: '#FFFFFF',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 15,
-    fontWeight: '800',
+    color: '#FFFFFF',
   },
 });

@@ -7,39 +7,42 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  Platform,
   ActivityIndicator,
-  FlatList,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors, Radius } from '../theme/colors';
-import api from '../api/client';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   ArrowLeft,
   Bell,
   Star,
-  Bus,
-  Clock,
   ChevronRight,
+  User,
+  Clock,
   ShieldCheck,
-  Tag,
-  Info,
   CheckCircle,
+  Tag,
+  FileText,
+  MessageSquare,
 } from 'lucide-react-native';
+import { RootStackParamList } from '../navigation/RootNavigator';
+import { COLORS } from '../theme/colors';
+import apiClient from '../api/client';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-export default function ScheduleListScreen({ navigation, route }: any) {
-  const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState('deals');
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+export default function ScheduleListScreen() {
+  const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<any>();
+
+  const [activeTab, setActiveTab] = useState<'deals' | 'details' | 'reviews'>('deals');
   const [schedules, setSchedules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
-
-  const tabs = [
-    { id: 'deals', title: 'Deals', icon: Tag },
-    { id: 'details', title: 'Details', icon: Info },
-    { id: 'reviews', title: 'Reviews', icon: Star },
-  ];
 
   useEffect(() => {
     fetchSchedules();
@@ -48,247 +51,216 @@ export default function ScheduleListScreen({ navigation, route }: any) {
   const fetchSchedules = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/schedules');
-      const data = res.data?.data || [];
-      setSchedules(data);
-      if (data.length > 0) {
-        setSelectedSchedule(data[0]);
+      const res = await apiClient.get('/schedules');
+      const list = Array.isArray(res.data) ? res.data : res.data.data || [];
+      setSchedules(list);
+      if (list.length > 0) {
+        setSelectedSchedule(list[0]);
       }
     } catch (e) {
-      console.error('Error loading schedules:', e);
+      console.log('Error fetching schedules:', e);
     } finally {
       setLoading(false);
     }
   };
 
-  const isBusDeparted = (departureTimeStr: string) => {
-    try {
-      if (!departureTimeStr) return false;
-      const parts = departureTimeStr.split(':');
-      if (parts.length < 2) return false;
-      const now = new Date();
-      const dep = new Date();
-      dep.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
-      return now > dep;
-    } catch {
-      return false;
-    }
-  };
+  const tabs = [
+    { id: 'deals', label: 'Deals', icon: Tag },
+    { id: 'details', label: 'Details', icon: FileText },
+    { id: 'reviews', label: 'Reviews', icon: MessageSquare },
+  ];
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 120 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Top Hero Preview Header */}
-        <View style={styles.heroHeaderContainer}>
-          <Image
-            source={require('../../assets/images/heroImg.jpg')}
-            style={styles.heroHeaderImg}
-            resizeMode="cover"
-          />
-          <View style={styles.heroHeaderOverlay} />
-
-          {/* Top Bar Nav */}
-          <View style={[styles.topBar, { top: insets.top + 12 }]}>
+      {/* Top Hero Photo */}
+      <View style={styles.heroContainer}>
+        <Image
+          source={require('../../assets/images/heroImg.jpg')}
+          style={styles.heroImage}
+          resizeMode="cover"
+        />
+        <LinearGradient
+          colors={['rgba(10, 12, 16, 0.7)', 'transparent', 'rgba(10, 12, 16, 0.95)', '#0A0C10']}
+          locations={[0, 0.3, 0.75, 1]}
+          style={styles.heroGradient}
+        >
+          {/* Header Navigation Bar */}
+          <SafeAreaView edges={['top']} style={styles.navBar}>
             <TouchableOpacity
-              style={styles.navCircleBtn}
-              onPress={() => navigation.goBack()}
               activeOpacity={0.7}
+              onPress={() => navigation.goBack()}
+              style={styles.navIconBtn}
             >
               <ArrowLeft size={18} color="#FFFFFF" />
             </TouchableOpacity>
 
-            <View style={styles.brandCapsule}>
-              <Text style={styles.brandCapsuleText}>PILIH JADWAL</Text>
-            </View>
+            <Text style={styles.navTitle}>Schedule Detail</Text>
 
-            <TouchableOpacity style={styles.navCircleBtn} activeOpacity={0.7}>
+            <TouchableOpacity activeOpacity={0.7} style={styles.navIconBtn}>
               <Bell size={18} color="#FFFFFF" />
             </TouchableOpacity>
-          </View>
-        </View>
+          </SafeAreaView>
 
-        {/* Highlighted Route Summary Card */}
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryTopRow}>
-            <View>
-              <Text style={styles.summaryRoute}>Kuningan ➔ Jakarta</Text>
-              <View style={styles.ratingRow}>
-                <Star size={13} color={Colors.gold} fill={Colors.gold} />
-                <Text style={styles.ratingText}> 4.8 </Text>
-                <Text style={styles.reviewsCount}>(1.2k ulasan)</Text>
+          {/* Floating Route Info Overlay */}
+          <View style={styles.routeHeaderOverlay}>
+            <View style={styles.routeHeaderLeft}>
+              <Text style={styles.routeHeaderTitle}>Central Line</Text>
+              <Text style={styles.routeHeaderSub}>Jakarta ↔ Kuningan</Text>
+            </View>
+
+            <View style={styles.routeHeaderRight}>
+              <View style={styles.starsRow}>
+                <Star size={14} color="#FFB800" fill="#FFB800" />
+                <Text style={styles.starsText}>4.8 (9.6k)</Text>
               </View>
-            </View>
-
-            <View style={styles.priceContainer}>
-              <Text style={styles.priceSmall}>Mulai</Text>
-              <Text style={styles.priceLarge}>
-                Rp{' '}
-                {Number(selectedSchedule?.price || 130000).toLocaleString('id-ID')}
+              <Text style={styles.routeHeaderPrice}>
+                Rp 180.000 <Text style={styles.routeHeaderPriceSub}>/ org</Text>
               </Text>
             </View>
           </View>
+        </LinearGradient>
+      </View>
 
-          {/* Segmented Tab Switcher Pills */}
-          <View style={styles.tabsContainer}>
-            {tabs.map((tab) => {
-              const isSelected = activeTab === tab.id;
-              const TabIcon = tab.icon;
-              return (
-                <TouchableOpacity
-                  key={tab.id}
-                  style={[styles.tabPill, isSelected && styles.tabPillActive]}
-                  onPress={() => setActiveTab(tab.id)}
-                  activeOpacity={0.8}
-                >
-                  <TabIcon
-                    size={13}
-                    color={isSelected ? '#FFFFFF' : Colors.textSecondary}
-                    style={{ marginRight: 6 }}
-                  />
-                  <Text
-                    style={[styles.tabPillText, isSelected && styles.tabPillTextActive]}
-                  >
-                    {tab.title}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          {/* Tab Content Panels */}
-          {activeTab === 'deals' && (
-            <View style={styles.tabContentBox}>
-              <Tag size={16} color={Colors.primary} style={{ marginRight: 8 }} />
-              <Text style={styles.dealPromoText}>
-                Gunakan kupon <Text style={{ color: Colors.primary, fontWeight: '900' }}>TJHEMAT20</Text> untuk diskon Rp 20.000
-              </Text>
-            </View>
-          )}
-
-          {activeTab === 'details' && (
-            <View style={styles.detailsBox}>
-              <Text style={styles.detailItemText}>• Bus Executive Suite Class 2-2</Text>
-              <Text style={styles.detailItemText}>• Fasilitas: AC, Reclining Seat, Audio, Snack</Text>
-              <Text style={styles.detailItemText}>• Waktu tempuh perkiraan: 4 - 5 Jam via Tol Cipali</Text>
-            </View>
-          )}
-
-          {activeTab === 'reviews' && (
-            <View style={styles.reviewsBox}>
-              <Text style={styles.reviewUser}>Rangga P. (⭐⭐⭐⭐⭐)</Text>
-              <Text style={styles.reviewText}>
-                "Bus bersih dan supir sangat profesional, sampai tepat waktu!"
-              </Text>
-            </View>
-          )}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Tab Switcher Pills */}
+        <View style={styles.tabsRow}>
+          {tabs.map((t) => {
+            const isActive = activeTab === t.id;
+            const IconComp = t.icon;
+            return (
+              <TouchableOpacity
+                key={t.id}
+                activeOpacity={0.8}
+                onPress={() => setActiveTab(t.id as any)}
+                style={[styles.tabPill, isActive ? styles.tabPillActive : styles.tabPillInactive]}
+              >
+                <IconComp size={15} color={isActive ? '#FFFFFF' : COLORS.textSecondary} />
+                <Text style={[styles.tabPillText, isActive ? styles.tabPillTextActive : styles.tabPillTextInactive]}>
+                  {t.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        {/* Schedule List */}
-        <View style={styles.schedulesSection}>
-          <Text style={styles.schedulesTitle}>Jadwal Keberangkatan Hari Ini</Text>
+        {/* Tab Content: Deals / Schedules List */}
+        {activeTab === 'deals' && (
+          <View style={styles.schedulesSection}>
+            {loading ? (
+              <ActivityIndicator size="large" color={COLORS.brandRed} style={{ marginVertical: 30 }} />
+            ) : (
+              schedules.map((item, idx) => {
+                const isSelected = selectedSchedule?.id === item.id;
+                const busName = item.bus?.name || 'Resi Bisma';
+                const depTime = item.departure_time ? item.departure_time.substring(0, 5) : '07:00';
+                const arrTime = item.arrival_time ? item.arrival_time.substring(0, 5) : '15:00';
+                const price = Number(item.price || 180000).toLocaleString('id-ID');
 
-          {loading ? (
-            <ActivityIndicator color={Colors.primary} style={{ marginTop: 24 }} />
-          ) : (
-            schedules.map((item, idx) => {
-              const departed = isBusDeparted(item.departure_time);
-              const isCurrent = selectedSchedule?.id === item.id;
+                return (
+                  <TouchableOpacity
+                    key={item.id || idx}
+                    activeOpacity={0.85}
+                    onPress={() => setSelectedSchedule(item)}
+                    style={[
+                      styles.scheduleCard,
+                      isSelected && styles.scheduleCardSelected,
+                    ]}
+                  >
+                    <Image
+                      source={idx % 2 === 0 ? require('../../assets/images/bentas02.webp') : require('../../assets/images/bentas03.webp')}
+                      style={styles.scheduleImage}
+                    />
 
-              return (
-                <TouchableOpacity
-                  key={idx}
-                  style={[
-                    styles.scheduleItemCard,
-                    isCurrent && styles.scheduleItemCardSelected,
-                  ]}
-                  onPress={() => setSelectedSchedule(item)}
-                  activeOpacity={0.85}
-                >
-                  <Image
-                    source={require('../../assets/images/heroImg.jpg')}
-                    style={styles.busThumbnail}
-                    resizeMode="cover"
-                  />
-
-                  <View style={styles.itemInfo}>
-                    <View style={styles.itemHeaderRow}>
-                      <Text style={styles.itemBusName}>
-                        {item.bus?.name || 'Tunggal Jaya Suite'}
+                    <View style={styles.scheduleMiddle}>
+                      <Text style={styles.scheduleTitle}>{busName}</Text>
+                      <Text style={styles.scheduleTime}>
+                        <Clock size={12} color={COLORS.brandRed} /> {depTime} - {arrTime} WIB
                       </Text>
-                      <View
-                        style={[
-                          styles.badgeSmall,
-                          departed ? styles.badgeSmallDeparted : styles.badgeSmallAvailable,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.badgeSmallText,
-                            departed ? styles.badgeSmallDepartedText : styles.badgeSmallAvailableText,
-                          ]}
-                        >
-                          {departed ? 'Berangkat' : 'Tersedia'}
-                        </Text>
+                      <Text style={styles.schedulePriceText}>
+                        Rp {price} <Text style={styles.schedulePriceSub}>/ Seat</Text>
+                      </Text>
+                    </View>
+
+                    <View style={styles.scheduleRight}>
+                      <View style={styles.ratingBadge}>
+                        <Text style={styles.ratingBadgeText}>★ 4.8</Text>
+                      </View>
+                      <View style={[styles.selectCircle, isSelected && styles.selectCircleActive]}>
+                        <ChevronRight size={16} color={isSelected ? '#FFFFFF' : COLORS.textMuted} />
                       </View>
                     </View>
+                  </TouchableOpacity>
+                );
+              })
+            )}
+          </View>
+        )}
 
-                    <Text style={styles.itemTime}>
-                      {item.departure_time ? item.departure_time.slice(0, 5) : '07:00'} -{' '}
-                      {item.arrival_time ? item.arrival_time.slice(0, 5) : '12:00'}
-                    </Text>
+        {/* Tab Content: Details */}
+        {activeTab === 'details' && (
+          <View style={styles.detailsBox}>
+            <Text style={styles.detailsHeading}>Spesifikasi Armada &amp; Fasilitas</Text>
+            <Text style={styles.detailsDesc}>
+              Armada Executive Double Decker Tunggal Jaya Transport dengan sasis premium, suspensi udara, kabin kedap suara, dan kursi ergonomis recliner.
+            </Text>
+            <View style={styles.facilitiesList}>
+              {['Leg Rest Ekstra Lebar', 'USB Charger Tiap Kursi', 'Toilet Standar Higienis', 'Free Snack & Air Mineral', 'Kru Pengemudi Berpengalaman'].map((f, i) => (
+                <View key={i} style={styles.facilityItem}>
+                  <CheckCircle size={16} color={COLORS.accentGold} />
+                  <Text style={styles.facilityText}>{f}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
 
-                    <View style={styles.itemFooterRow}>
-                      <Text style={styles.itemPrice}>
-                        Rp {Number(item.price || 130000).toLocaleString('id-ID')}
-                      </Text>
-                      <ChevronRight size={16} color={Colors.textSecondary} />
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            })
-          )}
-        </View>
+        {/* Tab Content: Reviews */}
+        {activeTab === 'reviews' && (
+          <View style={styles.reviewsBox}>
+            <View style={styles.reviewCard}>
+              <View style={styles.reviewHeader}>
+                <Text style={styles.reviewAuthor}>Rangga Pradana</Text>
+                <Text style={styles.reviewRating}>★★★★★</Text>
+              </View>
+              <Text style={styles.reviewText}>
+                Bus sangat nyaman, tepat waktu, dan driver menyetir dengan sangat halus. Rekomendasi utama rute Kuningan - Jakarta!
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* Bottom spacing for Floating Action Bar */}
+        <View style={{ height: 120 }} />
       </ScrollView>
 
-      {/* Floating Bottom Booking Bar (Matching Phone 3 from screenshot) */}
-      <View
-        style={[
-          styles.bottomFloatingBar,
-          { paddingBottom: Math.max(insets.bottom + 8, 16) },
-        ]}
-      >
-        <View style={styles.bottomBarContent}>
-          <View>
-            <Text style={styles.bottomBarLabel}>Total Estimasi (1 Kursi)</Text>
-            <Text style={styles.bottomBarPrice}>
-              Rp{' '}
-              {Number(selectedSchedule?.price || 130000).toLocaleString('id-ID')}
-            </Text>
+      {/* Floating Bottom Red Action Bar (Phone 3 Mockup) */}
+      <View style={styles.bottomBarWrapper} pointerEvents="box-none">
+        <View style={styles.bottomBarContainer}>
+          <View style={styles.bottomBarLeft}>
+            <View style={styles.seatIconCircle}>
+              <User size={16} color={COLORS.brandRed} />
+            </View>
+            <View>
+              <Text style={styles.bottomSeatLabel}>1 Seat • Executive</Text>
+              <Text style={styles.bottomPriceValue}>
+                Rp {Number(selectedSchedule?.price || 180000).toLocaleString('id-ID')}
+              </Text>
+            </View>
           </View>
 
           <TouchableOpacity
-            style={[
-              styles.bookNowBtn,
-              isBusDeparted(selectedSchedule?.departure_time) && styles.bookNowBtnDisabled,
-            ]}
-            disabled={isBusDeparted(selectedSchedule?.departure_time)}
-            onPress={() =>
-              navigation.navigate('SeatSelection', {
-                schedule: selectedSchedule,
-                date: new Date().toISOString().split('T')[0],
-              })
-            }
             activeOpacity={0.85}
+            onPress={() => {
+              if (selectedSchedule?.id) {
+                navigation.navigate('SeatSelection', { scheduleId: selectedSchedule.id });
+              }
+            }}
+            style={styles.bookNowBtn}
           >
-            <Text style={styles.bookNowBtnText}>
-              {isBusDeparted(selectedSchedule?.departure_time)
-                ? 'Sudah Berangkat'
-                : 'Book Now'}
-            </Text>
+            <Text style={styles.bookNowBtnText}>Book Now</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -299,300 +271,320 @@ export default function ScheduleListScreen({ navigation, route }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: COLORS.bgDark,
   },
-  heroHeaderContainer: {
-    height: 190,
+  heroContainer: {
+    height: 250,
     width: '100%',
     position: 'relative',
   },
-  heroHeaderImg: {
+  heroImage: {
     width: '100%',
     height: '100%',
   },
-  heroHeaderOverlay: {
+  heroGradient: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(11, 11, 15, 0.45)',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingBottom: 16,
   },
-  topBar: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
+  navBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    zIndex: 10,
+    paddingTop: Platform.OS === 'android' ? 12 : 6,
   },
-  navCircleBtn: {
+  navIconBtn: {
     width: 40,
     height: 40,
-    backgroundColor: 'rgba(18, 18, 24, 0.85)',
-    borderRadius: Radius.full,
+    borderRadius: 20,
+    backgroundColor: 'rgba(22, 26, 34, 0.75)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
   },
-  brandCapsule: {
-    backgroundColor: 'rgba(18, 18, 24, 0.85)',
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: Radius.pill,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-  },
-  brandCapsuleText: {
+  navTitle: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 16,
     color: '#FFFFFF',
-    fontWeight: '900',
-    fontSize: 11,
-    letterSpacing: 0.5,
   },
-  summaryCard: {
-    backgroundColor: Colors.surfaceCard,
-    borderRadius: 28,
-    borderWidth: 1.2,
-    borderColor: Colors.border,
-    padding: 22,
-    marginHorizontal: 20,
-    marginTop: -36,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 28,
-    elevation: 8,
-  },
-  summaryTopRow: {
+  routeHeaderOverlay: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  summaryRoute: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#FFFFFF',
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  ratingText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  reviewsCount: {
-    color: Colors.textSecondary,
-    fontSize: 11,
-  },
-  priceContainer: {
     alignItems: 'flex-end',
   },
-  priceSmall: {
-    color: Colors.textMuted,
-    fontSize: 10,
+  routeHeaderLeft: {},
+  routeHeaderTitle: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontSize: 22,
+    color: '#FFFFFF',
+    letterSpacing: -0.3,
   },
-  priceLarge: {
-    color: Colors.primary,
-    fontSize: 18,
-    fontWeight: '900',
+  routeHeaderSub: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 2,
   },
-  tabsContainer: {
+  routeHeaderRight: {
+    alignItems: 'flex-end',
+  },
+  starsRow: {
     flexDirection: 'row',
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: Radius.pill,
-    padding: 4,
-    marginBottom: 16,
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginBottom: 4,
+  },
+  starsText: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 11,
+    color: '#FFFFFF',
+  },
+  routeHeaderPrice: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 18,
+    color: '#FFFFFF',
+  },
+  routeHeaderPriceSub: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 12,
+    color: COLORS.textMuted,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  tabsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 20,
   },
   tabPill: {
-    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 8,
-    borderRadius: Radius.pill,
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 22,
   },
   tabPillActive: {
-    backgroundColor: Colors.primary,
+    backgroundColor: COLORS.brandRed,
+  },
+  tabPillInactive: {
+    backgroundColor: '#161922',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   tabPillText: {
-    color: Colors.textSecondary,
-    fontSize: 12,
-    fontWeight: '700',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 13,
   },
   tabPillTextActive: {
     color: '#FFFFFF',
-    fontWeight: '800',
   },
-  tabContentBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.surfaceContainer,
-    padding: 12,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
-  },
-  dealPromoText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    flex: 1,
-  },
-  detailsBox: {
-    backgroundColor: Colors.surfaceContainer,
-    padding: 12,
-    borderRadius: Radius.md,
-    gap: 4,
-  },
-  detailItemText: {
-    color: Colors.textSecondary,
-    fontSize: 12,
-    lineHeight: 18,
-  },
-  reviewsBox: {
-    backgroundColor: Colors.surfaceContainer,
-    padding: 12,
-    borderRadius: Radius.md,
-  },
-  reviewUser: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-  reviewText: {
-    color: Colors.textSecondary,
-    fontSize: 12,
-    fontStyle: 'italic',
+  tabPillTextInactive: {
+    color: COLORS.textSecondary,
   },
   schedulesSection: {
-    paddingHorizontal: 20,
-    marginTop: 22,
+    gap: 12,
   },
-  schedulesTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    marginBottom: 14,
-  },
-  scheduleItemCard: {
+  scheduleCard: {
     flexDirection: 'row',
-    backgroundColor: Colors.surfaceCard,
-    borderRadius: 20,
-    borderWidth: 1.2,
-    borderColor: Colors.border,
-    padding: 14,
-    marginBottom: 12,
     alignItems: 'center',
+    backgroundColor: '#14171F',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    padding: 12,
+    gap: 14,
   },
-  scheduleItemCardSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: '#1E1A22',
+  scheduleCardSelected: {
+    borderColor: COLORS.brandRed,
+    backgroundColor: '#181C26',
   },
-  busThumbnail: {
+  scheduleImage: {
     width: 68,
     height: 68,
     borderRadius: 14,
-    marginRight: 14,
   },
-  itemInfo: {
+  scheduleMiddle: {
     flex: 1,
   },
-  itemHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  itemBusName: {
+  scheduleTitle: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 15,
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
+    marginBottom: 2,
   },
-  badgeSmall: {
+  scheduleTime: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginBottom: 6,
+  },
+  schedulePriceText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 15,
+    color: '#FFFFFF',
+  },
+  schedulePriceSub: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 11,
+    color: COLORS.textMuted,
+  },
+  scheduleRight: {
+    alignItems: 'flex-end',
+    gap: 10,
+  },
+  ratingBadge: {
+    backgroundColor: 'rgba(255, 184, 0, 0.15)',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: Radius.pill,
+    borderRadius: 8,
   },
-  badgeSmallText: {
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  badgeSmallAvailable: {
-    backgroundColor: Colors.successContainer,
-  },
-  badgeSmallAvailableText: {
-    color: Colors.success,
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  badgeSmallDeparted: {
-    backgroundColor: Colors.surfaceContainer,
-  },
-  badgeSmallDepartedText: {
-    color: Colors.textMuted,
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  itemTime: {
-    color: Colors.textSecondary,
-    fontSize: 12,
-    marginTop: 3,
-    fontWeight: '600',
-  },
-  itemFooterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 6,
-  },
-  itemPrice: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  bottomFloatingBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: Colors.surfaceCard,
-    borderTopWidth: 1.2,
-    borderTopColor: Colors.border,
-    paddingHorizontal: 22,
-    paddingTop: 14,
-  },
-  bottomBarContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  bottomBarLabel: {
-    color: Colors.textMuted,
+  ratingBadgeText: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 11,
+    color: '#FFB800',
   },
-  bottomBarPrice: {
+  selectCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#1E222C',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  selectCircleActive: {
+    backgroundColor: COLORS.brandRed,
+  },
+  detailsBox: {
+    backgroundColor: '#14171F',
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  detailsHeading: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 16,
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '900',
+    marginBottom: 8,
+  },
+  detailsDesc: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  facilitiesList: {
+    gap: 10,
+  },
+  facilityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  facilityText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 13,
+    color: '#FFFFFF',
+  },
+  reviewsBox: {
+    gap: 12,
+  },
+  reviewCard: {
+    backgroundColor: '#14171F',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  reviewAuthor: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  reviewRating: {
+    color: '#FFB800',
+    fontSize: 12,
+  },
+  reviewText: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    lineHeight: 19,
+  },
+  bottomBarWrapper: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 28 : 20,
+    left: 20,
+    right: 20,
+  },
+  bottomBarContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: COLORS.brandRed,
+    paddingVertical: 10,
+    paddingLeft: 16,
+    paddingRight: 10,
+    borderRadius: 36,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.brandRed,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.5,
+        shadowRadius: 14,
+      },
+      android: {
+        elevation: 10,
+      },
+    }),
+  },
+  bottomBarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  seatIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bottomSeatLabel: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.85)',
+  },
+  bottomPriceValue: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontSize: 16,
+    color: '#FFFFFF',
   },
   bookNowBtn: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 26,
+    backgroundColor: '#FFFFFF',
     paddingVertical: 12,
-    borderRadius: Radius.pill,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 14,
-    elevation: 6,
-  },
-  bookNowBtnDisabled: {
-    backgroundColor: Colors.surfaceHighest,
+    paddingHorizontal: 22,
+    borderRadius: 28,
   },
   bookNowBtnText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '900',
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 13,
+    color: COLORS.brandRed,
   },
 });
