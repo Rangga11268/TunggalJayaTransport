@@ -79,7 +79,7 @@ class Bus extends Model implements HasMedia
         if (str_contains($nameLower, 'jedha')) return '/img/jedha.webp';
         if (str_contains($nameLower, 'fortuna')) return '/img/fortuna.webp';
         if (str_contains($nameLower, 'semar')) return '/img/semar.webp';
-        
+
         return '/img/heroImg.jpg';
     }
 }
