@@ -24,10 +24,7 @@ import {
   Compass,
   Ticket,
   ChevronRight,
-  Sparkles,
   CreditCard,
-  ArrowRight,
-  ShieldCheck,
   Wifi,
   Tv,
   Coffee,
@@ -37,9 +34,8 @@ import {
   LogOut,
   X,
   Crown,
-  Phone,
-  Calendar,
-  Gift,
+  Tag,
+  ShieldCheck,
 } from 'lucide-react-native';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { COLORS } from '../theme/colors';
@@ -55,13 +51,12 @@ export default function HomeScreen() {
   const { user, logout } = useAuth();
 
   const [schedules, setSchedules] = useState<any[]>([]);
-  const [articles, setArticles] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedOrigin, setSelectedOrigin] = useState('Jakarta');
-  const [selectedDestination, setSelectedDestination] = useState('Kuningan');
+  const [originCity] = useState('Jakarta');
+  const [destinationCity] = useState('Kuningan');
 
-  // Prominent Quick Links directly on the Homepage
+  // Prominent Quick Actions Grid (Spacious 2x2 with clear functional icons)
   const quickLinks = [
     {
       id: 'schedules',
@@ -94,7 +89,7 @@ export default function HomeScreen() {
       id: 'promo',
       title: 'Voucher Promo',
       subtitle: 'Diskon s.d 50%',
-      icon: Gift,
+      icon: Tag,
       iconColor: '#D97706',
       bgColor: 'rgba(217, 119, 6, 0.08)',
       action: () => navigation.navigate('Promo'),
@@ -103,24 +98,11 @@ export default function HomeScreen() {
 
   const fetchHomeData = async () => {
     try {
-      const [schedRes, newsRes] = await Promise.allSettled([
-        apiClient.get('/schedules'),
-        apiClient.get('/news'),
-      ]);
-
-      if (schedRes.status === 'fulfilled' && schedRes.value.data) {
-        const list = Array.isArray(schedRes.value.data)
-          ? schedRes.value.data
-          : schedRes.value.data.data || [];
-        setSchedules(list.slice(0, 4));
-      }
-
-      if (newsRes.status === 'fulfilled' && newsRes.value.data) {
-        const list = Array.isArray(newsRes.value.data)
-          ? newsRes.value.data
-          : newsRes.value.data.data || [];
-        setArticles(list.slice(0, 3));
-      }
+      const response = await apiClient.get('/schedules').catch(() => ({ data: [] }));
+      const list = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || [];
+      setSchedules(list.slice(0, 4));
     } catch (e) {
       console.log('Error loading home data:', e);
     }
@@ -206,18 +188,18 @@ export default function HomeScreen() {
         {/* Location Search Capsule */}
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={() => navigation.navigate('Schedules', { origin: selectedOrigin, destination: selectedDestination })}
+          onPress={() => navigation.navigate('Schedules', { origin: originCity, destination: destinationCity })}
           style={styles.locationCapsule}
         >
           <Text style={styles.locationText}>
-            Current: <Text style={styles.locationBold}>{selectedOrigin} → {selectedDestination}</Text>
+            Current: <Text style={styles.locationBold}>{originCity} → {destinationCity}</Text>
           </Text>
           <View style={styles.locationRedBtn}>
             <MapPin size={16} color="#FFFFFF" />
           </View>
         </TouchableOpacity>
 
-        {/* PROMINENT QUICK ACTIONS GRID ON HOMEPAGE (4 Primary Cards) */}
+        {/* PROMINENT QUICK ACTIONS GRID (2x2 Layout) */}
         <View style={styles.quickSection}>
           <View style={styles.sectionHeaderNoMargin}>
             <Text style={styles.sectionTitle}>Layanan Utama</Text>
@@ -237,39 +219,38 @@ export default function HomeScreen() {
                   <View style={[styles.quickIconCircle, { backgroundColor: item.bgColor }]}>
                     <IconComp size={22} color={item.iconColor} />
                   </View>
-                  <View style={styles.quickContent}>
-                    <Text style={styles.quickTitle}>{item.title}</Text>
-                    <Text style={styles.quickSubtitle}>{item.subtitle}</Text>
-                  </View>
-                  <ChevronRight size={16} color="#9CA3AF" />
+                  <Text style={styles.quickTitle} numberOfLines={1}>
+                    {item.title}
+                  </Text>
+                  <Text style={styles.quickSubtitle} numberOfLines={1}>
+                    {item.subtitle}
+                  </Text>
                 </TouchableOpacity>
               );
             })}
           </View>
         </View>
 
-        {/* Featured Hero Card (Warm Alabaster Light Luxury) */}
+        {/* Featured Hero Card (Tunggal Jaya Jetbus 5 Super High Deck Adiputro - NO DOUBLE DECKER) */}
         <View style={styles.heroCardContainer}>
           <LinearGradient
             colors={['#FFFFFF', '#F8FAFC']}
             style={styles.heroCard}
           >
-            {/* Left Content */}
             <View style={styles.heroLeft}>
               <View style={styles.heroBadges}>
                 <View style={styles.heroBadge}>
-                  <Text style={styles.heroBadgeText}>Central Line</Text>
+                  <Text style={styles.heroBadgeText}>Adiputro SHD</Text>
                 </View>
                 <View style={styles.heroBadge}>
-                  <Text style={styles.heroBadgeText}>8-10 hrs</Text>
+                  <Text style={styles.heroBadgeText}>Air Suspension</Text>
                 </View>
               </View>
 
               <Text style={styles.heroTitle}>
-                Executive{'\n'}Double Decker
+                Jetbus 5{'\n'}Super High Deck
               </Text>
 
-              {/* Slider Button */}
               <TouchableOpacity
                 activeOpacity={0.85}
                 onPress={() => navigation.navigate('Schedules')}
@@ -285,7 +266,6 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Right Bus Cutout Image */}
             <View style={styles.heroRight}>
               <Image
                 source={require('../../assets/images/resiBisma.webp')}
@@ -313,7 +293,6 @@ export default function HomeScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.whatsNewScroll}
         >
-          {/* Card 1: Executive Experience */}
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={() => navigation.navigate('Schedules')}
@@ -328,15 +307,14 @@ export default function HomeScreen() {
               colors={['transparent', 'rgba(17, 24, 39, 0.88)']}
               style={styles.storyGradient}
             >
-              <Text style={styles.storyTitle}>Dive into Luxury Journey</Text>
-              <Text style={styles.storySubtitle}>Armada baru sleeper bus eksekutif</Text>
+              <Text style={styles.storyTitle}>Bentas-01 Kuningan - Jkt</Text>
+              <Text style={styles.storySubtitle}>Jadwal harian rute favorit via Tol Cipali</Text>
               <View style={styles.storyPill}>
-                <Text style={styles.storyPillText}>View &gt;</Text>
+                <Text style={styles.storyPillText}>Cek Jadwal &gt;</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Card 2: Pariwisata Charter */}
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={() => navigation.navigate('Charter')}
@@ -351,10 +329,10 @@ export default function HomeScreen() {
               colors={['transparent', 'rgba(17, 24, 39, 0.88)']}
               style={styles.storyGradient}
             >
-              <Text style={styles.storyTitle}>Sewa Bus Pariwisata</Text>
-              <Text style={styles.storySubtitle}>Rute fleksibel &amp; harga spesial</Text>
+              <Text style={styles.storyTitle}>Kylo Ren Jetbus 5 SHD</Text>
+              <Text style={styles.storySubtitle}>Armada pariwisata VIP Hino RM 280</Text>
               <View style={styles.storyPill}>
-                <Text style={styles.storyPillText}>View &gt;</Text>
+                <Text style={styles.storyPillText}>Sewa Unit &gt;</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
@@ -362,33 +340,33 @@ export default function HomeScreen() {
 
         {/* Popular Routes List */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Popular Routes</Text>
+          <Text style={styles.sectionTitle}>Rute Populer AKAP</Text>
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => navigation.navigate('Schedules')}
             style={styles.viewAllBtn}
           >
-            <Text style={styles.viewAllText}>All &gt;</Text>
+            <Text style={styles.viewAllText}>Semua &gt;</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.scheduleList}>
           {schedules.map((item, idx) => {
-            const busName = item.bus?.name || 'Resi Bisma';
-            const origin = item.route?.origin || 'Jakarta';
-            const destination = item.route?.destination || 'Kuningan';
-            const price = Number(item.price || 180000).toLocaleString('id-ID');
-            const depTime = item.departure_time ? item.departure_time.substring(0, 5) : '07:00';
+            const busName = item.bus?.name || (idx % 2 === 0 ? 'Resi Bisma' : 'Primadona');
+            const origin = item.route?.origin || 'Kuningan';
+            const destination = item.route?.destination || (idx % 2 === 0 ? 'Jakarta (Kalideres)' : 'Jakarta (Roxy)');
+            const price = Number(item.price || 140000).toLocaleString('id-ID');
+            const depTime = item.departure_time ? item.departure_time.substring(0, 5) : '07:45';
 
             return (
               <TouchableOpacity
                 key={item.id || idx}
                 activeOpacity={0.85}
-                onPress={() => navigation.navigate('ScheduleDetail', { scheduleId: item.id })}
+                onPress={() => navigation.navigate('ScheduleDetail', { scheduleId: item.id || 1 })}
                 style={styles.scheduleCard}
               >
                 <Image
-                  source={idx % 2 === 0 ? require('../../assets/images/primadona.webp') : require('../../assets/images/bentas01.webp')}
+                  source={idx % 2 === 0 ? require('../../assets/images/resiBisma.webp') : require('../../assets/images/primadona.webp')}
                   style={styles.scheduleBusThumb}
                 />
                 <View style={styles.scheduleMiddle}>
@@ -400,7 +378,7 @@ export default function HomeScreen() {
                 </View>
                 <View style={styles.scheduleAction}>
                   <View style={styles.ratingBadge}>
-                    <Text style={styles.ratingText}>★ 4.8</Text>
+                    <Text style={styles.ratingText}>★ 4.9</Text>
                   </View>
                   <View style={styles.chevronCircle}>
                     <ChevronRight size={16} color="#FFFFFF" />
@@ -413,13 +391,13 @@ export default function HomeScreen() {
 
         {/* Fleet Amenities Feature Bar */}
         <View style={styles.amenitiesCard}>
-          <Text style={styles.amenitiesTitle}>Fasilitas Standar Eksekutif</Text>
+          <Text style={styles.amenitiesTitle}>Fasilitas Standar Eksekutif Tunggal Jaya</Text>
           <View style={styles.amenitiesGrid}>
             <View style={styles.amenityItem}>
               <View style={styles.amenityIconCircle}>
                 <Wifi size={16} color={COLORS.brandRed} />
               </View>
-              <Text style={styles.amenityText}>Free 4G Wi-Fi</Text>
+              <Text style={styles.amenityText}>Free Wi-Fi</Text>
             </View>
             <View style={styles.amenityItem}>
               <View style={styles.amenityIconCircle}>
@@ -431,18 +409,17 @@ export default function HomeScreen() {
               <View style={styles.amenityIconCircle}>
                 <Coffee size={16} color={COLORS.brandRed} />
               </View>
-              <Text style={styles.amenityText}>Snack &amp; Air</Text>
+              <Text style={styles.amenityText}>Full AC &amp; Reclining</Text>
             </View>
             <View style={styles.amenityItem}>
               <View style={styles.amenityIconCircle}>
                 <ShieldCheck size={16} color={COLORS.brandRed} />
               </View>
-              <Text style={styles.amenityText}>Kru Resmi</Text>
+              <Text style={styles.amenityText}>Kru Resmi TJ</Text>
             </View>
           </View>
         </View>
 
-        {/* Bottom Spacing for Floating Tab Bar */}
         <View style={{ height: 110 }} />
       </ScrollView>
 
@@ -462,7 +439,6 @@ export default function HomeScreen() {
 
           <View style={styles.drawerContainer}>
             <SafeAreaView edges={['top', 'bottom']} style={styles.drawerContent}>
-              {/* Drawer Header */}
               <View style={styles.drawerHeader}>
                 <View style={styles.drawerUserRow}>
                   <View style={styles.drawerAvatar}>
@@ -487,7 +463,6 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               </View>
 
-              {/* Navigation Links */}
               <ScrollView style={styles.drawerLinks} showsVerticalScrollIndicator={false}>
                 <TouchableOpacity
                   activeOpacity={0.7}
@@ -506,12 +481,12 @@ export default function HomeScreen() {
                   activeOpacity={0.7}
                   onPress={() => {
                     setIsDrawerOpen(false);
-                    navigation.navigate('MainTabs', { screen: 'BookingHistory' } as any);
+                    navigation.navigate('Charter');
                   }}
                   style={styles.drawerLinkItem}
                 >
-                  <Receipt size={18} color={COLORS.brandRed} style={{ marginRight: 14 }} />
-                  <Text style={styles.drawerLinkText}>Riwayat Pemesanan Tiket</Text>
+                  <Compass size={18} color="#2563EB" style={{ marginRight: 14 }} />
+                  <Text style={styles.drawerLinkText}>Sewa Bus Pariwisata</Text>
                   <ChevronRight size={16} color="#9CA3AF" />
                 </TouchableOpacity>
 
@@ -519,12 +494,12 @@ export default function HomeScreen() {
                   activeOpacity={0.7}
                   onPress={() => {
                     setIsDrawerOpen(false);
-                    navigation.navigate('Charter');
+                    navigation.navigate('MainTabs', { screen: 'BookingHistory' } as any);
                   }}
                   style={styles.drawerLinkItem}
                 >
-                  <Compass size={18} color={COLORS.brandRed} style={{ marginRight: 14 }} />
-                  <Text style={styles.drawerLinkText}>Sewa Bus Pariwisata</Text>
+                  <Receipt size={18} color="#059669" style={{ marginRight: 14 }} />
+                  <Text style={styles.drawerLinkText}>Riwayat Pemesanan Tiket</Text>
                   <ChevronRight size={16} color="#9CA3AF" />
                 </TouchableOpacity>
 
@@ -536,7 +511,7 @@ export default function HomeScreen() {
                   }}
                   style={styles.drawerLinkItem}
                 >
-                  <Ticket size={18} color={COLORS.brandRed} style={{ marginRight: 14 }} />
+                  <Tag size={18} color="#D97706" style={{ marginRight: 14 }} />
                   <Text style={styles.drawerLinkText}>Kupon &amp; Voucher Diskon</Text>
                   <ChevronRight size={16} color="#9CA3AF" />
                 </TouchableOpacity>
@@ -562,13 +537,12 @@ export default function HomeScreen() {
                   }}
                   style={styles.drawerLinkItem}
                 >
-                  <User size={18} color={COLORS.brandRed} style={{ marginRight: 14 }} />
+                  <User size={18} color="#111827" style={{ marginRight: 14 }} />
                   <Text style={styles.drawerLinkText}>Profil &amp; Akun Saya</Text>
                   <ChevronRight size={16} color="#9CA3AF" />
                 </TouchableOpacity>
               </ScrollView>
 
-              {/* Drawer Footer */}
               <View style={styles.drawerFooter}>
                 <TouchableOpacity
                   activeOpacity={0.8}
@@ -712,8 +686,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
-  // Prominent Quick Actions Grid
   quickSection: {
     marginBottom: 24,
   },
@@ -737,18 +709,18 @@ const styles = StyleSheet.create({
   quickGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'space-between',
     gap: 12,
   },
   quickCard: {
     width: (width - 52) / 2,
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    padding: 14,
-    flexDirection: 'row',
+    paddingVertical: 16,
+    paddingHorizontal: 14,
     alignItems: 'center',
-    gap: 10,
     ...Platform.select({
       ios: {
         shadowColor: '#0F172A',
@@ -762,27 +734,26 @@ const styles = StyleSheet.create({
     }),
   },
   quickIconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  quickContent: {
-    flex: 1,
+    marginBottom: 10,
   },
   quickTitle: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 13,
     color: '#111827',
+    textAlign: 'center',
     marginBottom: 2,
   },
   quickSubtitle: {
     fontFamily: 'PlusJakartaSans_400Regular',
-    fontSize: 10,
+    fontSize: 11,
     color: '#6B7280',
+    textAlign: 'center',
   },
-
   heroCardContainer: {
     marginBottom: 26,
   },
@@ -826,9 +797,9 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 22,
+    fontSize: 21,
     color: '#111827',
-    lineHeight: 28,
+    lineHeight: 27,
     marginBottom: 16,
     letterSpacing: -0.4,
   },
@@ -1061,8 +1032,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#4B5563',
   },
-
-  // Modal Drawer Styles
   modalOverlay: {
     flex: 1,
     flexDirection: 'row',

@@ -20,7 +20,6 @@ import { COLORS } from '../theme/colors';
 import api from '../api/client';
 import {
   ArrowLeft,
-  Sparkles,
   MapPin,
   Calendar,
   Users,
@@ -30,7 +29,7 @@ import {
   ShieldCheck,
   Plus,
   Minus,
-  MessageCircle,
+  Compass,
 } from 'lucide-react-native';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -38,45 +37,64 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 interface BusTypeOption {
   id: string;
   name: string;
+  body: string;
+  chassis: string;
   capacity: string;
   pricePerDay: number;
   image: any;
   features: string[];
 }
 
+// REAL TUNGGAL JAYA PARIWISATA FLEETS (NO DOUBLE DECKER)
 const BUS_OPTIONS: BusTypeOption[] = [
   {
-    id: 'medium',
-    name: 'Medium Bus Pariwisata',
-    capacity: '31 - 35 Kursi',
-    pricePerDay: 2500000,
-    image: require('../../assets/images/bentas01.webp'),
-    features: ['Reclining Seat 2-2', 'Full AC Blower', 'Audio & Karaoke TV', 'USB Fast Charging'],
+    id: 'kyloren',
+    name: 'Kylo Ren (VIP Flagship)',
+    body: 'Jetbus 5 SHD Single Glass (Adiputro)',
+    chassis: 'Hino RM 280 Air Suspension',
+    capacity: 'Seat 2-2 (40 - 50 Kursi)',
+    pricePerDay: 4000000,
+    image: require('../../assets/images/kylorenParwis.webp'),
+    features: ['Pneumatic Air Suspension', 'Telolet Basuri V3/V4', 'Full Audio & Disco Light', 'Android Smart TV & Karaoke', 'Toilet & Dispenser'],
   },
   {
-    id: 'big',
-    name: 'Big Bus Jetbus 5',
-    capacity: '50 - 59 Kursi',
+    id: 'takumi',
+    name: 'Takumi / Blackpink Edition',
+    body: 'Jetbus 5 SHD Double Glass (Adiputro)',
+    chassis: 'Hino RM 280 Air Suspension',
+    capacity: 'Seat 2-2 (45 - 50 Kursi)',
     pricePerDay: 3800000,
     image: require('../../assets/images/resiBisma.webp'),
-    features: ['Reclining Seat 2-2', 'Toilet Higienis', 'Smart TV & Karaoke', 'Bagasi Ekstra Luas', 'Bantal & Selimut'],
+    features: ['Custom Livery Edition', 'Air Suspension Empuk', 'Subwoofer Audio System', 'Full AC & Reclining Seat', 'Toilet Bersih'],
   },
   {
-    id: 'double',
-    name: 'Executive Double Decker',
-    capacity: '40 Kursi VIP',
-    pricePerDay: 5500000,
-    image: require('../../assets/images/kylorenParwis.webp'),
-    features: ['Leg Rest Ekstra Lebar', 'Toilet Mewah', 'AVOD Personal Screen', 'Dispenser Air Panas', 'Air Suspension'],
+    id: 'jupiter',
+    name: 'Jupiter (New Armada R25)',
+    body: 'New Armada Body (R25/R22 Series)',
+    chassis: 'Hino RK 280 Air Suspension',
+    capacity: 'Seat 2-2 (48 - 54 Kursi)',
+    pricePerDay: 3500000,
+    image: require('../../assets/images/bentas01.webp'),
+    features: ['New Armada R25 Bodywork', 'Air Suspension System', 'Smart TV & Karaoke', 'Reclining Seat & USB Port', 'Bagasi Ekstra Luas'],
+  },
+  {
+    id: 'winata',
+    name: 'Winata & Ghaura (Multi-Purpose)',
+    body: 'Jetbus 3+ SHD (Adiputro)',
+    chassis: 'Hino RK8 R260',
+    capacity: 'Seat 2-3 / 2-2 (50 - 59 Kursi)',
+    pricePerDay: 3000000,
+    image: require('../../assets/images/primadona.webp'),
+    features: ['Multi-Purpose Charter', 'Lintas Jawa & Sumatera Ready', 'Full AC & Audio System', 'Reclining Seat Nyaman', 'Kru Berpengalaman'],
   },
 ];
 
 export default function CharterScreen() {
   const navigation = useNavigation<NavigationProp>();
 
-  const [selectedBus, setSelectedBus] = useState<BusTypeOption>(BUS_OPTIONS[1]);
+  const [selectedBus, setSelectedBus] = useState<BusTypeOption>(BUS_OPTIONS[0]);
   const [pickup, setPickup] = useState('Pool Kuningan / Cirebon');
-  const [destination, setDestination] = useState('Yogyakarta');
+  const [destination, setDestination] = useState('Yogyakarta / Bandung');
   const [startDate, setStartDate] = useState('2026-09-15');
   const [daysCount, setDaysCount] = useState(2);
   const [busCount, setBusCount] = useState(1);
@@ -107,7 +125,7 @@ export default function CharterScreen() {
 
       Alert.alert(
         'Pengajuan Sewa Berhasil!',
-        `Terima kasih! Tim Marketing Pariwisata Tunggal Jaya akan segera menghubungi nomor Anda untuk konfirmasi jadwal armada ${selectedBus.name}.`,
+        `Terima kasih! Tim Pariwisata Tunggal Jaya akan segera menghubungi nomor Anda untuk konfirmasi jadwal armada ${selectedBus.name}.`,
         [
           {
             text: 'Lihat Riwayat',
@@ -151,24 +169,24 @@ export default function CharterScreen() {
             resizeMode="cover"
           />
           <LinearGradient
-            colors={['rgba(17, 24, 39, 0.3)', 'rgba(17, 24, 39, 0.9)']}
+            colors={['rgba(17, 24, 39, 0.35)', 'rgba(17, 24, 39, 0.92)']}
             style={styles.heroGradient}
           >
             <View style={styles.heroBadge}>
-              <Sparkles size={12} color="#FFFFFF" style={{ marginRight: 4 }} />
-              <Text style={styles.heroBadgeText}>LAYANAN CHARTER EKSKLUSIF</Text>
+              <Compass size={12} color="#FFFFFF" style={{ marginRight: 4 }} />
+              <Text style={styles.heroBadgeText}>ARMADA RESMI PARIWISATA TJ</Text>
             </View>
             <Text style={styles.heroTitle}>Sewa Bus Rombongan &amp; Wisata</Text>
             <Text style={styles.heroSub}>
-              Armada premium terawat, sopir profesional berpengalaman, dan harga kompetitif.
+              Pilihan armada Jetbus 5 SHD, New Armada R25 &amp; Jetbus 3+ dengan suspensi udara empuk.
             </Text>
           </LinearGradient>
         </View>
 
         {/* Section 1: Pilihan Tipe Armada Bus */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>1. Pilih Tipe Armada</Text>
-          <Text style={styles.sectionSub}>Tersedia 3 Kelas</Text>
+          <Text style={styles.sectionTitle}>1. Pilih Tipe Armada Bus</Text>
+          <Text style={styles.sectionSub}>Tersedia 4 Pilihan Unit</Text>
         </View>
 
         <ScrollView
@@ -188,10 +206,11 @@ export default function CharterScreen() {
                   isSelected && styles.busOptionCardSelected,
                 ]}
               >
-                <Image source={bus.image} style={styles.busOptionImage} />
+                <Image source={bus.image} style={styles.busOptionImage} resizeMode="cover" />
                 <View style={styles.busOptionContent}>
-                  <Text style={styles.busOptionName}>{bus.name}</Text>
-                  <Text style={styles.busOptionCap}>{bus.capacity}</Text>
+                  <Text style={styles.busOptionName} numberOfLines={1}>{bus.name}</Text>
+                  <Text style={styles.busOptionBody} numberOfLines={1}>{bus.body}</Text>
+                  <Text style={styles.busOptionCap}>{bus.capacity} • {bus.chassis}</Text>
                   <Text style={styles.busOptionPrice}>
                     Rp {bus.pricePerDay.toLocaleString('id-ID')} <Text style={styles.busOptionPriceSub}>/ hari</Text>
                   </Text>
@@ -339,7 +358,7 @@ export default function CharterScreen() {
                 style={styles.textareaInput}
                 value={notes}
                 onChangeText={setNotes}
-                placeholder="Contoh: Titik kumpul sekolah, butuh mikrofon karaoke tambahan, paket tol &amp; makan..."
+                placeholder="Contoh: Titik kumpul sekolah, butuh mikrofon karaoke, paket tol &amp; makan..."
                 placeholderTextColor="#9CA3AF"
                 multiline
                 numberOfLines={3}
@@ -362,7 +381,7 @@ export default function CharterScreen() {
             <Text style={styles.summaryVal}>Rp {estimatedTotal.toLocaleString('id-ID')}</Text>
           </View>
           <View style={styles.summaryLine}>
-            <Text style={[styles.summaryLabel, { color: '#059669' }]}>Driver &amp; Kru Berpengalaman</Text>
+            <Text style={[styles.summaryLabel, { color: '#059669' }]}>Driver &amp; Kru Resmi TJ</Text>
             <Text style={[styles.summaryVal, { color: '#059669' }]}>Termasuk</Text>
           </View>
 
@@ -381,7 +400,7 @@ export default function CharterScreen() {
         <View style={styles.guaranteeBox}>
           <ShieldCheck size={18} color="#059669" />
           <Text style={styles.guaranteeText}>
-            Armada berasuransi resmi Jasa Raharja &amp; lolos uji KIR berkala.
+            Armada resmi PO Tunggal Jaya dengan asuransi Jasa Raharja &amp; uji KIR berkala.
           </Text>
         </View>
 
@@ -480,7 +499,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: COLORS.brandRed,
+    backgroundColor: '#2563EB',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -525,7 +544,7 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
   busOptionCard: {
-    width: 230,
+    width: 240,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     borderWidth: 1.5,
@@ -549,7 +568,7 @@ const styles = StyleSheet.create({
   },
   busOptionImage: {
     width: '100%',
-    height: 105,
+    height: 110,
   },
   busOptionContent: {
     padding: 14,
@@ -560,9 +579,15 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginBottom: 2,
   },
+  busOptionBody: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 11,
+    color: COLORS.brandRed,
+    marginBottom: 4,
+  },
   busOptionCap: {
     fontFamily: 'PlusJakartaSans_400Regular',
-    fontSize: 12,
+    fontSize: 11,
     color: '#6B7280',
     marginBottom: 8,
   },
