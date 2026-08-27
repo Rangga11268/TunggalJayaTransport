@@ -9,6 +9,8 @@ import {
   Dimensions,
   Platform,
   RefreshControl,
+  Modal,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -29,24 +31,32 @@ import {
   Wifi,
   Tv,
   Coffee,
+  Receipt,
+  HelpCircle,
+  User,
+  LogOut,
+  X,
+  Crown,
+  Phone,
 } from 'lucide-react-native';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { COLORS } from '../theme/colors';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../api/client';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function HomeScreen() {
   const navigation = useNavigation<NavigationProp>();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const [activeCategory, setActiveCategory] = useState('bus');
   const [schedules, setSchedules] = useState<any[]>([]);
   const [articles, setArticles] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedOrigin, setSelectedOrigin] = useState('Jakarta');
   const [selectedDestination, setSelectedDestination] = useState('Kuningan');
 
@@ -54,6 +64,8 @@ export default function HomeScreen() {
     { id: 'bus', label: 'Bus Tickets', icon: Bus },
     { id: 'charter', label: 'Pariwisata', icon: Compass },
     { id: 'promo', label: 'Vouchers', icon: Ticket },
+    { id: 'history', label: 'Riwayat', icon: Receipt },
+    { id: 'help', label: 'Bantuan', icon: HelpCircle },
   ];
 
   const fetchHomeData = async () => {
@@ -91,17 +103,40 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
+  const handleLogout = () => {
+    setIsDrawerOpen(false);
+    Alert.alert('Konfirmasi Keluar', 'Apakah Anda yakin ingin keluar dari akun?', [
+      { text: 'Batal', style: 'cancel' },
+      {
+        text: 'Keluar',
+        style: 'destructive',
+        onPress: async () => {
+          await logout();
+          navigation.replace('GetStarted');
+        },
+      },
+    ]);
+  };
+
   return (
     <View style={styles.container}>
       <SafeAreaView edges={['top']} style={styles.safeHeader}>
         {/* Top App Bar */}
         <View style={styles.headerBar}>
-          <TouchableOpacity activeOpacity={0.7} style={styles.iconCircle}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setIsDrawerOpen(true)}
+            style={styles.iconCircle}
+          >
             <Menu size={20} color="#111827" />
           </TouchableOpacity>
 
           <View style={styles.headerRight}>
-            <TouchableOpacity activeOpacity={0.7} style={styles.iconCircle}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => Alert.alert('Notifikasi', 'Tidak ada notifikasi baru.')}
+              style={styles.iconCircle}
+            >
               <Bell size={18} color="#111827" />
               <View style={styles.badgeDot} />
             </TouchableOpacity>
@@ -149,7 +184,7 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* Category Filter Chips */}
+        {/* Category Filter Chips (Smooth Swipable Horizontal Carousel) */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -164,8 +199,11 @@ export default function HomeScreen() {
                 activeOpacity={0.8}
                 onPress={() => {
                   setActiveCategory(cat.id);
+                  if (cat.id === 'bus') navigation.navigate('Schedules');
                   if (cat.id === 'charter') navigation.navigate('Charter');
                   if (cat.id === 'promo') navigation.navigate('Promo');
+                  if (cat.id === 'history') navigation.navigate('MainTabs', { screen: 'BookingHistory' } as any);
+                  if (cat.id === 'help') navigation.navigate('MainTabs', { screen: 'Help' } as any);
                 }}
                 style={[styles.categoryChip, isActive ? styles.categoryChipActive : styles.categoryChipInactive]}
               >
@@ -375,6 +413,146 @@ export default function HomeScreen() {
         {/* Bottom Spacing for Floating Tab Bar */}
         <View style={{ height: 110 }} />
       </ScrollView>
+
+      {/* Side Drawer Modal (Hamburger Menu) */}
+      <Modal
+        visible={isDrawerOpen}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setIsDrawerOpen(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => setIsDrawerOpen(false)}
+            style={styles.modalBackdrop}
+          />
+
+          <View style={styles.drawerContainer}>
+            <SafeAreaView edges={['top', 'bottom']} style={styles.drawerContent}>
+              {/* Drawer Header */}
+              <View style={styles.drawerHeader}>
+                <View style={styles.drawerUserRow}>
+                  <View style={styles.drawerAvatar}>
+                    <User size={24} color="#111827" />
+                  </View>
+                  <View style={styles.drawerUserInfo}>
+                    <Text style={styles.drawerUserName}>{user?.name || 'Tamu Pengguna'}</Text>
+                    <Text style={styles.drawerUserEmail}>{user?.email || 'Belum masuk akun'}</Text>
+                    <View style={styles.vipBadge}>
+                      <Crown size={12} color="#D97706" style={{ marginRight: 4 }} />
+                      <Text style={styles.vipBadgeText}>VIP Member</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => setIsDrawerOpen(false)}
+                  style={styles.drawerCloseBtn}
+                >
+                  <X size={20} color="#111827" />
+                </TouchableOpacity>
+              </View>
+
+              {/* Navigation Links */}
+              <ScrollView style={styles.drawerLinks} showsVerticalScrollIndicator={false}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setIsDrawerOpen(false);
+                    navigation.navigate('Schedules');
+                  }}
+                  style={styles.drawerLinkItem}
+                >
+                  <Bus size={18} color={COLORS.brandRed} style={{ marginRight: 14 }} />
+                  <Text style={styles.drawerLinkText}>Pesan Tiket Bus AKAP</Text>
+                  <ChevronRight size={16} color="#9CA3AF" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setIsDrawerOpen(false);
+                    navigation.navigate('MainTabs', { screen: 'BookingHistory' } as any);
+                  }}
+                  style={styles.drawerLinkItem}
+                >
+                  <Receipt size={18} color={COLORS.brandRed} style={{ marginRight: 14 }} />
+                  <Text style={styles.drawerLinkText}>Riwayat Pemesanan Tiket</Text>
+                  <ChevronRight size={16} color="#9CA3AF" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setIsDrawerOpen(false);
+                    navigation.navigate('Charter');
+                  }}
+                  style={styles.drawerLinkItem}
+                >
+                  <Compass size={18} color={COLORS.brandRed} style={{ marginRight: 14 }} />
+                  <Text style={styles.drawerLinkText}>Sewa Bus Pariwisata</Text>
+                  <ChevronRight size={16} color="#9CA3AF" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setIsDrawerOpen(false);
+                    navigation.navigate('Promo');
+                  }}
+                  style={styles.drawerLinkItem}
+                >
+                  <Ticket size={18} color={COLORS.brandRed} style={{ marginRight: 14 }} />
+                  <Text style={styles.drawerLinkText}>Kupon &amp; Voucher Diskon</Text>
+                  <ChevronRight size={16} color="#9CA3AF" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setIsDrawerOpen(false);
+                    navigation.navigate('MainTabs', { screen: 'Help' } as any);
+                  }}
+                  style={styles.drawerLinkItem}
+                >
+                  <HelpCircle size={18} color={COLORS.brandRed} style={{ marginRight: 14 }} />
+                  <Text style={styles.drawerLinkText}>Pusat Bantuan &amp; WhatsApp CS</Text>
+                  <ChevronRight size={16} color="#9CA3AF" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setIsDrawerOpen(false);
+                    navigation.navigate('MainTabs', { screen: 'Profile' } as any);
+                  }}
+                  style={styles.drawerLinkItem}
+                >
+                  <User size={18} color={COLORS.brandRed} style={{ marginRight: 14 }} />
+                  <Text style={styles.drawerLinkText}>Profil &amp; Akun Saya</Text>
+                  <ChevronRight size={16} color="#9CA3AF" />
+                </TouchableOpacity>
+              </ScrollView>
+
+              {/* Drawer Footer */}
+              <View style={styles.drawerFooter}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleLogout}
+                  style={styles.drawerLogoutBtn}
+                >
+                  <LogOut size={16} color={COLORS.brandRed} style={{ marginRight: 8 }} />
+                  <Text style={styles.drawerLogoutText}>Keluar Akun</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.drawerVersionText}>Tunggal Jaya Transport v2.4.0</Text>
+              </View>
+            </SafeAreaView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -505,6 +683,7 @@ const styles = StyleSheet.create({
   categoriesRow: {
     flexDirection: 'row',
     gap: 10,
+    paddingRight: 24,
     marginBottom: 22,
   },
   categoryChip: {
@@ -827,5 +1006,147 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 11,
     color: '#4B5563',
+  },
+
+  // Modal Drawer Styles
+  modalOverlay: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(17, 24, 39, 0.5)',
+  },
+  drawerContainer: {
+    width: '80%',
+    maxWidth: 320,
+    backgroundColor: '#FFFFFF',
+    height: '100%',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 6, height: 0 },
+        shadowOpacity: 0.15,
+        shadowRadius: 18,
+      },
+      android: {
+        elevation: 16,
+      },
+    }),
+  },
+  drawerContent: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+  },
+  drawerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  drawerUserRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  drawerAvatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: '#F1F4F8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  drawerUserInfo: {
+    flex: 1,
+  },
+  drawerUserName: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 16,
+    color: '#111827',
+  },
+  drawerUserEmail: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 12,
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  vipBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(217, 119, 6, 0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  vipBadgeText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 10,
+    color: '#D97706',
+  },
+  drawerCloseBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F1F4F8',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  drawerLinks: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  drawerLinkItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    marginBottom: 4,
+  },
+  drawerLinkText: {
+    flex: 1,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 14,
+    color: '#111827',
+  },
+  drawerFooter: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+  },
+  drawerLogoutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FEE2E2',
+    height: 46,
+    borderRadius: 23,
+    marginBottom: 12,
+  },
+  drawerLogoutText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 13,
+    color: COLORS.brandRed,
+  },
+  drawerVersionText: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 11,
+    color: '#9CA3AF',
+    textAlign: 'center',
   },
 });

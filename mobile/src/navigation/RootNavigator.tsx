@@ -31,14 +31,18 @@ export type RootStackParamList = {
   ScheduleDetail: { scheduleId: number };
   SeatSelection: { scheduleId: number };
   Checkout: { scheduleId: number; selectedSeats: number[]; totalPrice: number };
-  TicketDetail: { bookingId: number };
+  TicketDetail: { bookingId?: number; booking?: any; schedule?: any; selectedSeats?: number[] };
+  BookingHistory: undefined;
   Charter: undefined;
   Promo: undefined;
+  Help: undefined;
+  Profile: undefined;
 };
 
 export type MainTabParamList = {
   Home: undefined;
   Schedules: undefined;
+  BookingHistory: undefined;
   Help: undefined;
   Profile: undefined;
 };
@@ -57,6 +61,7 @@ function MainTabs() {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Schedules" component={ScheduleListScreen} />
+      <Tab.Screen name="BookingHistory" component={BookingHistoryScreen} />
       <Tab.Screen name="Help" component={HelpScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
@@ -86,6 +91,7 @@ export default function RootNavigator() {
         <Stack.Screen name="SeatSelection" component={SeatSelectionScreen} />
         <Stack.Screen name="Checkout" component={CheckoutScreen} />
         <Stack.Screen name="TicketDetail" component={TicketDetailScreen} />
+        <Stack.Screen name="BookingHistory" component={BookingHistoryScreen} />
         <Stack.Screen name="Charter" component={CharterScreen} />
         <Stack.Screen name="Promo" component={PromoScreen} />
       </Stack.Navigator>

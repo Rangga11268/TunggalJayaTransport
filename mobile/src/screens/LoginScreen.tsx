@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,10 +10,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   Mail,
   Lock,
@@ -21,26 +21,31 @@ import {
   EyeOff,
   ArrowLeft,
   ShieldCheck,
-} from 'lucide-react-native';
-import { RootStackParamList } from '../navigation/RootNavigator';
-import { COLORS } from '../theme/colors';
-import { useAuth } from '../context/AuthContext';
+} from "lucide-react-native";
+import { RootStackParamList } from "../navigation/RootNavigator";
+import { COLORS } from "../theme/colors";
+import { useAuth } from "../context/AuthContext";
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Login">;
 
 export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [focusedField, setFocusedField] = useState<'email' | 'password' | null>(null);
+  const [focusedField, setFocusedField] = useState<"email" | "password" | null>(
+    null,
+  );
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Form Belum Lengkap', 'Silakan masukkan email dan password Anda.');
+      Alert.alert(
+        "Form Belum Lengkap",
+        "Silakan masukkan email dan password Anda.",
+      );
       return;
     }
 
@@ -48,21 +53,24 @@ export default function LoginScreen() {
     try {
       const ok = await login(email.trim(), password);
       if (ok) {
-        navigation.replace('MainTabs');
+        navigation.replace("MainTabs");
       } else {
-        Alert.alert('Gagal Masuk', 'Periksa kembali email dan kata sandi Anda.');
+        Alert.alert(
+          "Gagal Masuk",
+          "Periksa kembali email dan kata sandi Anda.",
+        );
       }
     } catch (e: any) {
-      Alert.alert('Gagal Masuk', e?.message || 'Terjadi kesalahan saat masuk.');
+      Alert.alert("Gagal Masuk", e?.message || "Terjadi kesalahan saat masuk.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView edges={['top', 'bottom']} style={styles.container}>
+    <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -90,7 +98,8 @@ export default function LoginScreen() {
           <View style={styles.headerBox}>
             <Text style={styles.title}>Selamat Datang</Text>
             <Text style={styles.subtitle}>
-              Masuk ke akun Tunggal Jaya untuk akses tiket, promo eksklusif &amp; status perjalanan.
+              Masuk ke akun Tunggal Jaya untuk akses tiket, promo eksklusif
+              &amp; status perjalanan.
             </Text>
           </View>
 
@@ -102,10 +111,13 @@ export default function LoginScreen() {
               <View
                 style={[
                   styles.inputContainer,
-                  focusedField === 'email' && styles.inputContainerFocused,
+                  focusedField === "email" && styles.inputContainerFocused,
                 ]}
               >
-                <Mail size={18} color={focusedField === 'email' ? COLORS.brandRed : '#6B7280'} />
+                <Mail
+                  size={18}
+                  color={focusedField === "email" ? COLORS.brandRed : "#6B7280"}
+                />
                 <TextInput
                   style={styles.textInput}
                   placeholder="nama@email.com"
@@ -114,7 +126,7 @@ export default function LoginScreen() {
                   autoCapitalize="none"
                   value={email}
                   onChangeText={setEmail}
-                  onFocus={() => setFocusedField('email')}
+                  onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
                 />
               </View>
@@ -132,10 +144,15 @@ export default function LoginScreen() {
               <View
                 style={[
                   styles.inputContainer,
-                  focusedField === 'password' && styles.inputContainerFocused,
+                  focusedField === "password" && styles.inputContainerFocused,
                 ]}
               >
-                <Lock size={18} color={focusedField === 'password' ? COLORS.brandRed : '#6B7280'} />
+                <Lock
+                  size={18}
+                  color={
+                    focusedField === "password" ? COLORS.brandRed : "#6B7280"
+                  }
+                />
                 <TextInput
                   style={styles.textInput}
                   placeholder="Masukkan kata sandi"
@@ -143,7 +160,7 @@ export default function LoginScreen() {
                   secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={setPassword}
-                  onFocus={() => setFocusedField('password')}
+                  onFocus={() => setFocusedField("password")}
                   onBlur={() => setFocusedField(null)}
                 />
                 <TouchableOpacity
@@ -180,7 +197,7 @@ export default function LoginScreen() {
             <Text style={styles.footerText}>Belum punya akun?</Text>
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('Register')}
+              onPress={() => navigation.navigate("Register")}
             >
               <Text style={styles.registerLink}>Daftar Sekarang</Text>
             </TouchableOpacity>
@@ -202,23 +219,23 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 24,
   },
   backBtn: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
+        shadowColor: "#0F172A",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 6,
@@ -229,45 +246,45 @@ const styles = StyleSheet.create({
     }),
   },
   sslBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
-    backgroundColor: 'rgba(5, 150, 105, 0.1)',
+    backgroundColor: "rgba(5, 150, 105, 0.1)",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
   },
   sslText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: "PlusJakartaSans_600SemiBold",
     fontSize: 11,
-    color: '#059669',
+    color: "#059669",
   },
   headerBox: {
     marginBottom: 24,
   },
   title: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 28,
-    color: '#111827',
+    color: "#111827",
     marginBottom: 6,
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontFamily: 'PlusJakartaSans_400Regular',
+    fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 14,
-    color: '#4B5563',
+    color: "#4B5563",
     lineHeight: 22,
   },
   formCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 24,
     padding: 22,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
     marginBottom: 24,
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
+        shadowColor: "#0F172A",
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.06,
         shadowRadius: 16,
@@ -281,36 +298,36 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   labelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   inputLabel: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 13,
-    color: '#111827',
+    color: "#111827",
     marginBottom: 8,
   },
   forgotText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: "PlusJakartaSans_600SemiBold",
     fontSize: 12,
     color: COLORS.brandRed,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F1F4F8',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F1F4F8",
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
     paddingHorizontal: 16,
     height: 52,
     gap: 12,
   },
   inputContainerFocused: {
     borderColor: COLORS.brandRed,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     ...Platform.select({
       ios: {
         shadowColor: COLORS.brandRed,
@@ -325,13 +342,13 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 14,
-    color: '#111827',
+    color: "#111827",
     paddingVertical: 0,
-    ...(Platform.OS === 'web'
+    ...(Platform.OS === "web"
       ? ({
-          outlineStyle: 'none',
+          outlineStyle: "none",
           outlineWidth: 0,
           borderWidth: 0,
         } as any)
@@ -344,8 +361,8 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 26,
     backgroundColor: COLORS.brandRed,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 8,
     ...Platform.select({
       ios: {
@@ -363,23 +380,23 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   submitBtnText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 15,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 6,
   },
   footerText: {
-    fontFamily: 'PlusJakartaSans_400Regular',
+    fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 14,
-    color: '#4B5563',
+    color: "#4B5563",
   },
   registerLink: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 14,
     color: COLORS.brandRed,
   },

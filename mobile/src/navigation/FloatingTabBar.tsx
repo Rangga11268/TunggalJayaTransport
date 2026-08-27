@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { Home, Calendar, HelpCircle, User } from 'lucide-react-native';
+import { Home, Calendar, Receipt, HelpCircle, User } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 
 export default function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
@@ -25,13 +25,15 @@ export default function FloatingTabBar({ state, descriptors, navigation }: Botto
 
           const renderIcon = () => {
             const color = isFocused ? '#FFFFFF' : '#64748B';
-            const size = 20;
+            const size = 19;
 
             switch (route.name) {
               case 'Home':
                 return <Home size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
               case 'Schedules':
                 return <Calendar size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
+              case 'BookingHistory':
+                return <Receipt size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
               case 'Help':
                 return <HelpCircle size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
               case 'Profile':
@@ -74,15 +76,15 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     backgroundColor: '#FFFFFF',
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     borderRadius: 40,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    width: '78%',
-    maxWidth: 320,
+    width: '88%',
+    maxWidth: 360,
     ...Platform.select({
       ios: {
         shadowColor: '#0F172A',
@@ -99,9 +101,9 @@ const styles = StyleSheet.create({
     }),
   },
   tabButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
   },
