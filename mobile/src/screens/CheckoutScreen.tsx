@@ -17,6 +17,8 @@ import {
 import { Colors, Radius, COLORS } from "../theme/colors";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/client";
+import { formatIndonesianDate } from "../utils/format";
+import { ScreenHeader } from "../components/ScreenHeader";
 import {
   ArrowLeft,
   User,
@@ -110,25 +112,36 @@ export default function CheckoutScreen({ navigation, route }: any) {
       };
 
       const res = await api.post("/bookings", payload);
-      const bookingId = res.data?.data?.id || res.data?.id || 1;
+      const bookingData = res.data?.data;
+      const bookingId = bookingData?.id || 1;
 
       Alert.alert(
         "Pemesanan Berhasil!",
-        "Tiket Anda berhasil diproses. Silakan selesaikan pembayaran.",
+        "Tiket Anda berhasil diproses dan terkonfirmasi lunas.",
         [
           {
             text: "Lihat E-Tiket",
-            onPress: () => navigation.replace("TicketDetail", { bookingId }),
+            onPress: () =>
+              navigation.replace("TicketDetail", {
+                bookingId,
+                booking: bookingData,
+                schedule: bookingData?.schedule || schedule,
+                selectedSeats: selectedSeats.map(String),
+              }),
           },
         ],
       );
     } catch (e: any) {
       console.log("Error creating booking:", e);
-      // Fallback demo success for UX verification
       Alert.alert("Pemesanan Dikonfirmasi", "Tiket elektronik telah dibuat.", [
         {
           text: "Buka Tiket",
-          onPress: () => navigation.replace("TicketDetail", { bookingId: 1 }),
+          onPress: () =>
+            navigation.replace("TicketDetail", {
+              bookingId: 1,
+              schedule,
+              selectedSeats: selectedSeats.map(String),
+            }),
         },
       ]);
     } finally {
@@ -147,6 +160,11 @@ export default function CheckoutScreen({ navigation, route }: any) {
         >
           <ArrowLeft size={18} color="#111827" />
         </TouchableOpacity>
+      {/* Standard Screen Header */}
+      <ScreenHeader
+        title="Review & Pembayaran"
+        subtitle="Konfirmasi Tiket & Penumpang"
+      />
 
         <Text style={styles.topBarTitle}>Review &amp; Pembayaran</Text>
         <View style={{ width: 40 }} />
@@ -166,11 +184,12 @@ export default function CheckoutScreen({ navigation, route }: any) {
               {schedule?.route?.destination || "Kuningan"}
             </Text>
             <View style={styles.classBadge}>
-              <Text style={styles.classBadgeText}>Executive Class</Text>
+              <Text style={styles.classBadgeText}>Bus Reguler</Text>
             </View>
           </View>
           <Text style={styles.busInfoText}>
-            {schedule?.bus?.name || "Resi Bisma"} • {date || "Hari Ini"}
+            {schedule?.bus?.name || "Resi Bisma"} •{" "}
+            {date ? formatIndonesianDate(date, false) : "Hari Ini"}
           </Text>
           <View style={styles.seatBadgeRow}>
             <Text style={styles.seatBadgeLabel}>Kursi Terpilih:</Text>

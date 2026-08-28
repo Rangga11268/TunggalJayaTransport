@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,10 +8,10 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   ArrowLeft,
   ShieldAlert,
@@ -20,11 +20,12 @@ import {
   Info,
   Clock,
   Compass,
-} from 'lucide-react-native';
-import { RootStackParamList } from '../navigation/RootNavigator';
-import { COLORS } from '../theme/colors';
-import apiClient from '../api/client';
-import { useAuth } from '../context/AuthContext';
+} from "lucide-react-native";
+import { RootStackParamList } from "../navigation/RootNavigator";
+import { COLORS } from "../theme/colors";
+import apiClient from "../api/client";
+import { ScreenHeader } from "../components/ScreenHeader";
+import { useAuth } from "../context/AuthContext";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -36,7 +37,9 @@ export default function SeatSelectionScreen() {
 
   const [loading, setLoading] = useState(true);
   const [schedule, setSchedule] = useState<any>(null);
-  const [occupiedSeats, setOccupiedSeats] = useState<number[]>([2, 5, 8, 12, 18]);
+  const [occupiedSeats, setOccupiedSeats] = useState<number[]>([
+    2, 5, 8, 12, 18,
+  ]);
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
   const [isDeparted, setIsDeparted] = useState(false);
 
@@ -47,23 +50,30 @@ export default function SeatSelectionScreen() {
   const fetchScheduleDetail = async () => {
     try {
       setLoading(true);
-      const res = await apiClient.get('/schedules');
+      const res = await apiClient.get("/schedules");
       const list = Array.isArray(res.data) ? res.data : res.data.data || [];
       const found = list.find((s: any) => s.id === scheduleId) || list[0];
       setSchedule(found);
 
       if (found) {
         const now = new Date();
-        const schedDate = found.departure_date ? new Date(found.departure_date) : new Date();
-        const [hours, minutes] = (found.departure_time || '07:00').split(':').map(Number);
+        const schedDate = found.departure_date
+          ? new Date(found.departure_date)
+          : new Date();
+        const [hours, minutes] = (found.departure_time || "07:00")
+          .split(":")
+          .map(Number);
         schedDate.setHours(hours, minutes, 0, 0);
 
-        if (schedDate.getTime() < now.getTime() && found.status !== 'upcoming') {
+        if (
+          schedDate.getTime() < now.getTime() &&
+          found.status !== "upcoming"
+        ) {
           setIsDeparted(true);
         }
       }
     } catch (e) {
-      console.log('Error fetching schedule details:', e);
+      console.log("Error fetching schedule details:", e);
     } finally {
       setLoading(false);
     }
@@ -71,12 +81,18 @@ export default function SeatSelectionScreen() {
 
   const toggleSeat = (seatNumber: number) => {
     if (isDeparted) {
-      Alert.alert('Bus Sudah Berangkat', 'Jadwal bus ini telah berangkat. Pemilihan kursi tidak dapat dilakukan.');
+      Alert.alert(
+        "Bus Sudah Berangkat",
+        "Jadwal bus ini telah berangkat. Pemilihan kursi tidak dapat dilakukan.",
+      );
       return;
     }
 
     if (occupiedSeats.includes(seatNumber)) {
-      Alert.alert('Kursi Terisi', `Kursi nomor ${seatNumber} sudah dipesan oleh penumpang lain.`);
+      Alert.alert(
+        "Kursi Terisi",
+        `Kursi nomor ${seatNumber} sudah dipesan oleh penumpang lain.`,
+      );
       return;
     }
 
@@ -84,7 +100,10 @@ export default function SeatSelectionScreen() {
       setSelectedSeats(selectedSeats.filter((s) => s !== seatNumber));
     } else {
       if (selectedSeats.length >= 4) {
-        Alert.alert('Maksimal Kursi', 'Anda dapat memilih maksimal 4 kursi per transaksi.');
+        Alert.alert(
+          "Maksimal Kursi",
+          "Anda dapat memilih maksimal 4 kursi per transaksi.",
+        );
         return;
       }
       setSelectedSeats([...selectedSeats, seatNumber]);
@@ -93,11 +112,14 @@ export default function SeatSelectionScreen() {
 
   const proceedToCheckout = () => {
     if (selectedSeats.length === 0) {
-      Alert.alert('Pilih Kursi', 'Silakan pilih minimal 1 kursi sebelum melanjutkan.');
+      Alert.alert(
+        "Pilih Kursi",
+        "Silakan pilih minimal 1 kursi sebelum melanjutkan.",
+      );
       return;
     }
 
-    navigation.navigate('Checkout', {
+    navigation.navigate("Checkout", {
       scheduleId: schedule?.id || 1,
       selectedSeats,
       totalPrice: (schedule?.price || 180000) * selectedSeats.length,
@@ -110,7 +132,7 @@ export default function SeatSelectionScreen() {
   return (
     <View style={styles.container}>
       {/* Top App Bar */}
-      <SafeAreaView edges={['top']} style={styles.topBar}>
+      <SafeAreaView edges={["top"]} style={styles.topBar}>
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => navigation.goBack()}
@@ -118,11 +140,18 @@ export default function SeatSelectionScreen() {
         >
           <ArrowLeft size={18} color="#111827" />
         </TouchableOpacity>
+      {/* Standard Screen Header */}
+      <ScreenHeader
+        title="Pilih Kursi Penumpang"
+        subtitle={`${schedule?.bus?.name || "Resi Bisma"} • ${schedule?.route?.origin || "Jakarta"} → ${schedule?.route?.destination || "Kuningan"}`}
+      />
 
         <View style={styles.topBarCenter}>
           <Text style={styles.topBarTitle}>Pilih Kursi Penumpang</Text>
           <Text style={styles.topBarSub}>
-            {schedule?.bus?.name || 'Resi Bisma'} • {schedule?.route?.origin || 'Jakarta'} → {schedule?.route?.destination || 'Kuningan'}
+            {schedule?.bus?.name || "Resi Bisma"} •{" "}
+            {schedule?.route?.origin || "Jakarta"} →{" "}
+            {schedule?.route?.destination || "Kuningan"}
           </Text>
         </View>
 
@@ -132,7 +161,7 @@ export default function SeatSelectionScreen() {
       {/* Bus Departure Warning Notice if departed */}
       {isDeparted && (
         <View style={styles.departedBanner}>
-          <ShieldAlert size={18} color="#E60023" />
+          <ShieldAlert size={18} color="#DC2626" />
           <Text style={styles.departedText}>
             Bus ini telah diberangkatkan. Anda hanya dapat melihat ketersediaan.
           </Text>
@@ -253,11 +282,14 @@ export default function SeatSelectionScreen() {
           <View style={styles.bottomLeft}>
             <Text style={styles.bottomSeatsLabel}>
               {selectedSeats.length > 0
-                ? `Kursi: ${selectedSeats.join(', ')}`
-                : 'Pilih nomor kursi'}
+                ? `Kursi: ${selectedSeats.join(", ")}`
+                : "Pilih nomor kursi"}
             </Text>
             <Text style={styles.bottomTotalPrice}>
-              Rp {(selectedSeats.length * (schedule?.price || 180000)).toLocaleString('id-ID')}
+              Rp{" "}
+              {(
+                selectedSeats.length * (schedule?.price || 180000)
+              ).toLocaleString("id-ID")}
             </Text>
           </View>
 
@@ -267,7 +299,8 @@ export default function SeatSelectionScreen() {
             onPress={proceedToCheckout}
             style={[
               styles.checkoutBtn,
-              (isDeparted || selectedSeats.length === 0) && styles.checkoutBtnDisabled,
+              (isDeparted || selectedSeats.length === 0) &&
+                styles.checkoutBtnDisabled,
             ]}
           >
             <Text style={styles.checkoutBtnText}>Lanjutkan</Text>
@@ -285,67 +318,67 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgDark,
   },
   topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: "#E2E8F0",
   },
   backBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F4F6F9',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#F4F6F9",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
   },
   topBarCenter: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   topBarTitle: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 16,
-    color: '#111827',
+    color: "#111827",
   },
   topBarSub: {
-    fontFamily: 'PlusJakartaSans_400Regular',
+    fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 12,
-    color: '#4B5563',
+    color: "#4B5563",
     marginTop: 2,
   },
   departedBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
-    backgroundColor: 'rgba(230, 0, 35, 0.08)',
+    backgroundColor: "rgba(230, 0, 35, 0.08)",
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(230, 0, 35, 0.2)',
+    borderBottomColor: "rgba(230, 0, 35, 0.2)",
   },
   departedText: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 12,
     color: COLORS.brandRed,
     flex: 1,
   },
   legendContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 24,
     paddingVertical: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: "#E2E8F0",
   },
   legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   seatLegendBox: {
@@ -354,37 +387,37 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   seatAvailable: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
-    borderColor: '#CBD5E1',
+    borderColor: "#CBD5E1",
   },
   seatSelected: {
     backgroundColor: COLORS.brandRed,
   },
   seatOccupied: {
-    backgroundColor: '#E2E8F0',
+    backgroundColor: "#E2E8F0",
   },
   legendLabel: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 12,
-    color: '#4B5563',
+    color: "#4B5563",
   },
   scrollContent: {
     paddingHorizontal: 24,
     paddingTop: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cabinFrame: {
-    width: '100%',
+    width: "100%",
     maxWidth: 340,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 24,
     borderWidth: 1.5,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
     padding: 16,
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
+        shadowColor: "#0F172A",
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.06,
         shadowRadius: 14,
@@ -395,77 +428,77 @@ const styles = StyleSheet.create({
     }),
   },
   cockpitRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 14,
   },
   doorArea: {
     paddingHorizontal: 10,
     paddingVertical: 6,
-    backgroundColor: '#F1F4F8',
+    backgroundColor: "#F1F4F8",
     borderRadius: 8,
   },
   cockpitText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: "PlusJakartaSans_600SemiBold",
     fontSize: 10,
-    color: '#6B7280',
+    color: "#6B7280",
   },
   driverSeat: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    backgroundColor: '#F1F4F8',
+    backgroundColor: "#F1F4F8",
     borderRadius: 8,
   },
   driverText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 10,
-    color: '#6B7280',
+    color: "#6B7280",
   },
   dividerLine: {
     height: 1,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: "#E2E8F0",
     marginBottom: 18,
   },
   cabinRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   pairLeft: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   pairRight: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   aisleGap: {
     width: 28,
-    alignItems: 'center',
+    alignItems: "center",
   },
   aisleText: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 11,
-    color: '#9CA3AF',
+    color: "#9CA3AF",
   },
   seatBox: {
     width: 44,
     height: 44,
     borderRadius: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
-    borderColor: '#CBD5E1',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: "#CBD5E1",
+    justifyContent: "center",
+    alignItems: "center",
   },
   seatBoxOccupied: {
-    backgroundColor: '#E2E8F0',
-    borderColor: 'transparent',
+    backgroundColor: "#E2E8F0",
+    borderColor: "transparent",
     opacity: 0.6,
   },
   seatBoxSelected: {
@@ -484,64 +517,64 @@ const styles = StyleSheet.create({
     }),
   },
   seatNumber: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 12,
-    color: '#111827',
+    color: "#111827",
   },
   seatNumberOccupied: {
-    color: '#9CA3AF',
+    color: "#9CA3AF",
   },
   seatNumberSelected: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   emptySlot: {
     width: 44,
     height: 44,
   },
   cabinBackArea: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 14,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
+    borderTopColor: "#E2E8F0",
   },
   toiletBox: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: '#F1F4F8',
+    backgroundColor: "#F1F4F8",
     borderRadius: 8,
   },
   backExitBox: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: '#F1F4F8',
+    backgroundColor: "#F1F4F8",
     borderRadius: 8,
   },
   toiletText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: "PlusJakartaSans_600SemiBold",
     fontSize: 10,
-    color: '#6B7280',
+    color: "#6B7280",
   },
   bottomBarWrapper: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 28 : 20,
+    position: "absolute",
+    bottom: Platform.OS === "ios" ? 28 : 20,
     left: 20,
     right: 20,
   },
   bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
     paddingVertical: 12,
     paddingHorizontal: 18,
     borderRadius: 36,
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
+        shadowColor: "#0F172A",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.12,
         shadowRadius: 18,
@@ -553,18 +586,18 @@ const styles = StyleSheet.create({
   },
   bottomLeft: {},
   bottomSeatsLabel: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 12,
-    color: '#4B5563',
+    color: "#4B5563",
   },
   bottomTotalPrice: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 17,
-    color: '#111827',
+    color: "#111827",
   },
   checkoutBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     backgroundColor: COLORS.brandRed,
     paddingVertical: 12,
@@ -572,11 +605,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   checkoutBtnDisabled: {
-    backgroundColor: '#CBD5E1',
+    backgroundColor: "#CBD5E1",
   },
   checkoutBtnText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 14,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
 });
