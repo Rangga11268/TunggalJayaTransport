@@ -2,80 +2,117 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Schedule;
 use App\Models\Bus;
 use App\Models\Route;
-use Carbon\Carbon;
 
 class DailyScheduleSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Run the database seeds based on real Tunggal Jaya routes and fleet.
      */
     public function run(): void
     {
         $buses = Bus::all();
         $routes = Route::all();
-        
+
         if ($buses->isEmpty() || $routes->isEmpty()) {
-            echo "No buses or routes found. Please run other seeders first.\n";
             return;
         }
 
-        $schedules = [];
+        $baseDate = '2000-01-01';
 
-        // Kuningan - Jakarta (Pulogebang)
-        $route = Route::where('name', 'like', '%Pulogebang%')->first();
-        if ($route) {
-            $schedules[] = [
-                'bus_id' => $buses->where('name', 'Resi Bisma')->first()?->id ?? $buses->first()->id,
-                'route_id' => $route->id,
-                'departure_time' => '07:00:00',
-                'arrival_time' => '11:00:00',
-                'price' => 130000,
-                'status' => 'active',
-                'is_daily' => true,
-            ];
-        }
-
-        // Kuningan - Jakarta (Lebak Bulus)
-        $route = Route::where('name', 'like', '%Lebak Bulus%')->first();
-        if ($route) {
-            $schedules[] = [
-                'bus_id' => $buses->where('name', 'Primadona')->first()?->id ?? $buses->first()->id,
-                'route_id' => $route->id,
-                'departure_time' => '08:00:00',
-                'arrival_time' => '13:00:00',
+        $schedules = [
+            // 1. Bentas-01 Salamina: Kuningan - Kalideres (Pagi 06:50 WIB)
+            [
+                'bus_name' => 'Bentas-01 (Salamina)',
+                'route_name' => 'Kuningan - Jakarta (Kalideres)',
+                'departure_time' => $baseDate . ' 06:50:00',
+                'arrival_time' => $baseDate . ' 13:30:00',
                 'price' => 140000,
                 'status' => 'active',
                 'is_daily' => true,
-            ];
-        }
-
-        // Kuningan - Rangkasbitung
-        $route = Route::where('name', 'like', '%Rangkasbitung%')->first();
-        if ($route) {
-            $schedules[] = [
-                'bus_id' => $buses->where('name', 'Bentas')->first()?->id ?? $buses->first()->id,
-                'route_id' => $route->id,
-                'departure_time' => '06:30:00',
-                'arrival_time' => '13:30:00',
+            ],
+            // 2. Resi Bisma: Kuningan - Kalideres (07:45 WIB)
+            [
+                'bus_name' => 'Resi Bisma (Bentas-02)',
+                'route_name' => 'Kuningan - Jakarta (Kalideres)',
+                'departure_time' => $baseDate . ' 07:45:00',
+                'arrival_time' => $baseDate . ' 14:30:00',
+                'price' => 140000,
+                'status' => 'active',
+                'is_daily' => true,
+            ],
+            // 3. Dewi Fortuna: Kuningan - Rangkasbitung (10:00 WIB)
+            [
+                'bus_name' => 'Dewi Fortuna',
+                'route_name' => 'Kuningan - Rangkasbitung (Banten)',
+                'departure_time' => $baseDate . ' 10:00:00',
+                'arrival_time' => $baseDate . ' 17:30:00',
                 'price' => 150000,
                 'status' => 'active',
                 'is_daily' => true,
-            ];
+            ],
+            // 4. Primadona: Kuningan - Roxy / Jembatan 5 (12:40 WIB)
+            [
+                'bus_name' => 'Primadona (Bentas-05)',
+                'route_name' => 'Kuningan - Jakarta (Roxy / Jembatan 5)',
+                'departure_time' => $baseDate . ' 12:40:00',
+                'arrival_time' => $baseDate . ' 19:15:00',
+                'price' => 140000,
+                'status' => 'active',
+                'is_daily' => true,
+            ],
+            // 5. Semar Mesem: Kuningan - Kalideres (14:20 WIB)
+            [
+                'bus_name' => 'Semar Mesem (Bentas-03)',
+                'route_name' => 'Kuningan - Jakarta (Kalideres)',
+                'departure_time' => $baseDate . ' 14:20:00',
+                'arrival_time' => $baseDate . ' 21:00:00',
+                'price' => 140000,
+                'status' => 'active',
+                'is_daily' => true,
+            ],
+            // 6. Resi Bisma: Jakarta - Kuningan (Sore 18:00 WIB)
+            [
+                'bus_name' => 'Resi Bisma (Bentas-02)',
+                'route_name' => 'Jakarta - Kuningan (Pulogebang - Cirendang)',
+                'departure_time' => $baseDate . ' 18:00:00',
+                'arrival_time' => $baseDate . ' 23:45:00',
+                'price' => 140000,
+                'status' => 'active',
+                'is_daily' => true,
+            ],
+            // 7. Bentas-01: Cirebon - Pang. Asem (07:00 WIB)
+            [
+                'bus_name' => 'Bentas-01 (Salamina)',
+                'route_name' => 'Cirebon - Jakarta (Pangkalan Asem)',
+                'departure_time' => $baseDate . ' 07:00:00',
+                'arrival_time' => $baseDate . ' 13:00:00',
+                'price' => 140000,
+                'status' => 'active',
+                'is_daily' => true,
+            ],
+        ];
+
+        foreach ($schedules as $data) {
+            $bus = $buses->firstWhere('name', $data['bus_name']) ?? $buses->first();
+            $route = $routes->firstWhere('name', $data['route_name']) ?? $routes->first();
+
+            Schedule::updateOrCreate(
+                [
+                    'bus_id' => $bus->id,
+                    'route_id' => $route->id,
+                    'departure_time' => $data['departure_time'],
+                ],
+                [
+                    'arrival_time' => $data['arrival_time'],
+                    'price' => $data['price'],
+                    'status' => $data['status'],
+                    'is_daily' => $data['is_daily'],
+                ]
+            );
         }
-        
-        foreach ($schedules as $scheduleData) {
-            $baseDate = '2000-01-01';
-            $scheduleData['departure_time'] = $baseDate . ' ' . $scheduleData['departure_time'];
-            $scheduleData['arrival_time'] = $baseDate . ' ' . $scheduleData['arrival_time'];
-            
-            Schedule::create($scheduleData);
-        }
-        
-        echo "Created " . count($schedules) . " daily recurring schedules.\n";
     }
 }

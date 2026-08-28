@@ -116,15 +116,15 @@ class Booking extends Model implements HasMedia
 
     public function setSeatNumbersAttribute($value)
     {
-        // Validasi jumlah kursi, jangan sampe lebih dari yg di-booking
-        if ($value) {
-            $seatNumbers = explode(',', $value);
-            if (count($seatNumbers) > $this->number_of_seats) {
-                throw new \InvalidArgumentException('Kebanyakan milih kursi woy, jatahnya cuma ' . $this->number_of_seats);
+        $strValue = is_array($value) ? implode(',', $value) : $value;
+        if ($strValue) {
+            $seatNumbers = explode(',', $strValue);
+            if ($this->number_of_seats && count($seatNumbers) > $this->number_of_seats) {
+                throw new \InvalidArgumentException('Jumlah nomor kursi melebihi kuota booking: ' . $this->number_of_seats);
             }
         }
 
-        $this->attributes['seat_numbers'] = $value;
+        $this->attributes['seat_numbers'] = $strValue;
     }
 
     public function setNumberOfSeatsAttribute($value)
