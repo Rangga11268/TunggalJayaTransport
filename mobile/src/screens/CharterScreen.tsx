@@ -1,140 +1,219 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  TextInput,
   TouchableOpacity,
-  ActivityIndicator,
-  Alert,
   Image,
+  TextInput,
+  Dimensions,
   Platform,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/RootNavigator';
-import { COLORS } from '../theme/colors';
-import api from '../api/client';
+  Alert,
+  ActivityIndicator,
+  Linking,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation/RootNavigator";
+import { COLORS } from "../theme/colors";
+import api from "../api/client";
+import { formatIndonesianDate } from "../utils/format";
+import { ScreenHeader } from "../components/ScreenHeader";
+import { SectionHeader } from "../components/SectionHeader";
 import {
   ArrowLeft,
   MapPin,
   Calendar,
-  Users,
-  Bus,
-  CheckCircle,
   Clock,
+  CheckCircle2,
+  Users,
   ShieldCheck,
+  Compass,
+  MessageCircle,
   Plus,
   Minus,
-  Compass,
-} from 'lucide-react-native';
+  Sparkles,
+  Info,
+  Tv,
+  Wifi,
+  Coffee,
+  Check,
+} from "lucide-react-native";
+
+const { width } = Dimensions.get("window");
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-interface BusTypeOption {
+export interface CharterBusOption {
   id: string;
-  name: string;
-  body: string;
-  chassis: string;
-  capacity: string;
+  title: string;
+  seats: string;
+  badge: string;
+  badgeColor: string;
+  desc: string;
   pricePerDay: number;
   image: any;
   features: string[];
 }
 
-// REAL TUNGGAL JAYA PARIWISATA FLEETS (NO DOUBLE DECKER)
-const BUS_OPTIONS: BusTypeOption[] = [
+// Official Charter Bus Types from Tunggal Jaya Web Profile
+export const CHARTER_BUS_OPTIONS: CharterBusOption[] = [
   {
-    id: 'kyloren',
-    name: 'Kylo Ren (VIP Flagship)',
-    body: 'Jetbus 5 SHD Single Glass (Adiputro)',
-    chassis: 'Hino RM 280 Air Suspension',
-    capacity: 'Seat 2-2 (40 - 50 Kursi)',
-    pricePerDay: 4000000,
-    image: require('../../assets/images/kylorenParwis.webp'),
-    features: ['Pneumatic Air Suspension', 'Telolet Basuri V3/V4', 'Full Audio & Disco Light', 'Android Smart TV & Karaoke', 'Toilet & Dispenser'],
-  },
-  {
-    id: 'takumi',
-    name: 'Takumi / Blackpink Edition',
-    body: 'Jetbus 5 SHD Double Glass (Adiputro)',
-    chassis: 'Hino RM 280 Air Suspension',
-    capacity: 'Seat 2-2 (45 - 50 Kursi)',
+    id: "bigbus-50",
+    title: "Bigbus Executive",
+    seats: "50 Seat (2-2)",
+    badge: "Armada Viral (Kylo Ren)",
+    badgeColor: "#2563EB",
+    desc: "Unit ikonik Kylo Ren, Bentas & Kids Panda dengan suspensi udara empuk.",
     pricePerDay: 3800000,
-    image: require('../../assets/images/resiBisma.webp'),
-    features: ['Custom Livery Edition', 'Air Suspension Empuk', 'Subwoofer Audio System', 'Full AC & Reclining Seat', 'Toilet Bersih'],
+    image: require("../../assets/images/kylorenParwis.webp"),
+    features: [
+      "Air Suspension Empuk",
+      "Audio Karaoke & Disco Light",
+      "Smart Android TV",
+      "USB Fast Charger",
+      "Dispenser & Bagasi Luas",
+    ],
   },
   {
-    id: 'jupiter',
-    name: 'Jupiter (New Armada R25)',
-    body: 'New Armada Body (R25/R22 Series)',
-    chassis: 'Hino RK 280 Air Suspension',
-    capacity: 'Seat 2-2 (48 - 54 Kursi)',
+    id: "bigbus-59",
+    title: "Bigbus Max Capacity",
+    seats: "59 Seat (2-3)",
+    badge: "Paling Hemat (Study Tour)",
+    badgeColor: "#059669",
+    desc: "Kapasitas muatan terbesar untuk rombongan study tour sekolah & instansi.",
     pricePerDay: 3500000,
-    image: require('../../assets/images/bentas01.webp'),
-    features: ['New Armada R25 Bodywork', 'Air Suspension System', 'Smart TV & Karaoke', 'Reclining Seat & USB Port', 'Bagasi Ekstra Luas'],
+    image: require("../../assets/images/resiBisma.webp"),
+    features: [
+      "Full AC Dingin Merata",
+      "Reclining Seat 2-3 Nyaman",
+      "Audio Music System",
+      "Bagasi Ekstra Kapasitas",
+      "Kru Berpengalaman",
+    ],
   },
   {
-    id: 'winata',
-    name: 'Winata & Ghaura (Multi-Purpose)',
-    body: 'Jetbus 3+ SHD (Adiputro)',
-    chassis: 'Hino RK8 R260',
-    capacity: 'Seat 2-3 / 2-2 (50 - 59 Kursi)',
-    pricePerDay: 3000000,
-    image: require('../../assets/images/primadona.webp'),
-    features: ['Multi-Purpose Charter', 'Lintas Jawa & Sumatera Ready', 'Full AC & Audio System', 'Reclining Seat Nyaman', 'Kru Berpengalaman'],
+    id: "bigbus-custom",
+    title: "Bigbus Seat Custom / Legrest",
+    seats: "Seat Custom (Legrest 40-45)",
+    badge: "Eksklusif VIP Long Trip",
+    badgeColor: "#D97706",
+    desc: "Konfigurasi kursi santai fleksibel & sandaran kaki legrest untuk kenyamanan maksimal.",
+    pricePerDay: 4200000,
+    image: require("../../assets/images/primadona.webp"),
+    features: [
+      "Pneumatic Air Suspension",
+      "Legrest Seat Santai",
+      "Audio Karaoke System",
+      "Smart TV & USB Port",
+      "Toilet Bersih Terawat",
+    ],
   },
 ];
 
 export default function CharterScreen() {
   const navigation = useNavigation<NavigationProp>();
 
-  const [selectedBus, setSelectedBus] = useState<BusTypeOption>(BUS_OPTIONS[0]);
-  const [pickup, setPickup] = useState('Pool Kuningan / Cirebon');
-  const [destination, setDestination] = useState('Yogyakarta / Bandung');
-  const [startDate, setStartDate] = useState('2026-09-15');
+  const [selectedBus, setSelectedBus] = useState<CharterBusOption>(
+    CHARTER_BUS_OPTIONS[0],
+  );
+  const [pickup, setPickup] = useState("Kuningan / Cirebon");
+  const [destination, setDestination] = useState("Yogyakarta / Solo / Bali");
+  const [startDate, setStartDate] = useState("2026-09-15");
   const [daysCount, setDaysCount] = useState(2);
   const [busCount, setBusCount] = useState(1);
-  const [notes, setNotes] = useState('');
+  const [departureTime, setDepartureTime] = useState("06:00 WIB");
+  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const estimatedTotal = selectedBus.pricePerDay * daysCount * busCount;
 
+  const handleSendWhatsApp = () => {
+    if (!pickup.trim() || !destination.trim() || !startDate.trim()) {
+      Alert.alert(
+        "Data Belum Lengkap",
+        "Harap isi lokasi penjemputan, tujuan wisata, dan tanggal rencana sewa.",
+      );
+      return;
+    }
+
+    const message =
+      `*FORM RESERVASI SEWA BUS PARIWISATA PO TUNGGAL JAYA*\n\n` +
+      `Saya ingin menanyakan reservasi sewa bus pariwisata:\n` +
+      `- Kebutuhan bus : ${selectedBus.title} (${selectedBus.seats})\n` +
+      `- Jumlah unit : ${busCount} Unit\n` +
+      `- Jemputan : ${pickup.trim()}\n` +
+      `- Tujuan : ${destination.trim()}\n` +
+      `- Tgl & bulan berangkat : ${formatIndonesianDate(startDate, false)}\n` +
+      `- Berangkat jam berapa : ${departureTime}\n` +
+      `- Berapa hari : ${daysCount} Hari\n` +
+      `- Estimasi Biaya : Rp ${estimatedTotal.toLocaleString("id-ID")}\n` +
+      `- Keterangan : ${notes.trim() || "Konsultasi Sewa Bus Pariwisata via Aplikasi Mobile"}\n\n` +
+      `Mohon info ketersediaan dan penawarannya. Terima kasih.`;
+
+    const targetPhone = "6281122222353";
+    const encoded = encodeURIComponent(message);
+    Linking.openURL(
+      `https://api.whatsapp.com/send?phone=${targetPhone}&text=${encoded}`,
+    );
+  };
+
   const handleSubmit = async () => {
     if (!pickup.trim() || !destination.trim() || !startDate.trim()) {
-      Alert.alert('Data Belum Lengkap', 'Harap isi lokasi penjemputan, tujuan wisata, dan tanggal keberangkatan.');
+      Alert.alert(
+        "Data Belum Lengkap",
+        "Harap isi lokasi penjemputan, tujuan wisata, dan tanggal keberangkatan.",
+      );
       return;
     }
 
     try {
       setLoading(true);
-      await api.post('/charter/request', {
-        bus_type: selectedBus.name,
-        pickup_location: pickup.trim(),
-        destination: destination.trim(),
-        start_date: startDate.trim(),
-        days_count: daysCount,
-        bus_count: busCount,
-        total_estimate: estimatedTotal,
-        notes: notes.trim(),
-      }).catch(() => {});
+      await api
+        .post("/charter/request", {
+          bus_type: selectedBus.title,
+          bus_requests: [
+            {
+              type: selectedBus.title,
+              count: busCount,
+              seat_configuration: selectedBus.seats,
+            },
+          ],
+          pickup_location: pickup.trim(),
+          destination: destination.trim(),
+          pickup_date: startDate.trim(),
+          return_date: startDate.trim(),
+          days_count: daysCount,
+          bus_count: busCount,
+          total_price: estimatedTotal,
+          notes: notes.trim(),
+        })
+        .catch(() => {});
 
       Alert.alert(
-        'Pengajuan Sewa Berhasil!',
-        `Terima kasih! Tim Pariwisata Tunggal Jaya akan segera menghubungi nomor Anda untuk konfirmasi jadwal armada ${selectedBus.name}.`,
+        "Pengajuan Terkirim!",
+        "Permintaan sewa pariwisata Anda telah tercatat. Hubungi WhatsApp Customer Service kami untuk konfirmasi ketersediaan instan.",
         [
           {
-            text: 'Lihat Riwayat',
-            onPress: () => navigation.navigate('MainTabs', { screen: 'BookingHistory' } as any),
+            text: "Buka WhatsApp Reservasi",
+            onPress: handleSendWhatsApp,
           },
-        ]
+          {
+            text: "Lihat Riwayat Pesanan",
+            onPress: () =>
+              navigation.navigate("MainTabs", {
+                screen: "BookingHistory",
+              } as any),
+          },
+        ],
       );
     } catch (e: any) {
-      Alert.alert('Pengajuan Terkirim', 'Permintaan sewa bus telah diteruskan ke tim operasional pariwisata.');
+      console.log("Error submitting charter request:", e);
+      handleSendWhatsApp();
     } finally {
       setLoading(false);
     }
@@ -143,7 +222,7 @@ export default function CharterScreen() {
   return (
     <View style={styles.container}>
       {/* Top Header */}
-      <SafeAreaView edges={['top']} style={styles.topBar}>
+      <SafeAreaView edges={["top"]} style={styles.topBar}>
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => navigation.goBack()}
@@ -151,104 +230,171 @@ export default function CharterScreen() {
         >
           <ArrowLeft size={18} color="#111827" />
         </TouchableOpacity>
+        {/* Standard Screen Header */}
+        <ScreenHeader
+          title="Sewa Bus Pariwisata"
+          subtitle="PO Tunggal Jaya Transport"
+          rightElement={
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={handleSendWhatsApp}
+              style={styles.waHeaderBtn}
+            >
+              <MessageCircle size={18} color="#059669" />
+            </TouchableOpacity>
+          }
+        />
 
         <Text style={styles.topBarTitle}>Sewa Bus Pariwisata</Text>
-        <View style={{ width: 40 }} />
+
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={handleSendWhatsApp}
+          style={styles.waHeaderBtn}
+        >
+          <MessageCircle size={18} color="#059669" />
+        </TouchableOpacity>
       </SafeAreaView>
 
       <ScrollView
-        showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Hero Header Banner */}
-        <View style={styles.heroCard}>
-          <Image
-            source={require('../../assets/images/kylorenParwis.webp')}
-            style={styles.heroImage}
-            resizeMode="cover"
-          />
-          <LinearGradient
-            colors={['rgba(17, 24, 39, 0.35)', 'rgba(17, 24, 39, 0.92)']}
-            style={styles.heroGradient}
-          >
-            <View style={styles.heroBadge}>
-              <Compass size={12} color="#FFFFFF" style={{ marginRight: 4 }} />
-              <Text style={styles.heroBadgeText}>ARMADA RESMI PARIWISATA TJ</Text>
-            </View>
-            <Text style={styles.heroTitle}>Sewa Bus Rombongan &amp; Wisata</Text>
-            <Text style={styles.heroSub}>
-              Pilihan armada Jetbus 5 SHD, New Armada R25 &amp; Jetbus 3+ dengan suspensi udara empuk.
-            </Text>
-          </LinearGradient>
-        </View>
-
-        {/* Section 1: Pilihan Tipe Armada Bus */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>1. Pilih Tipe Armada Bus</Text>
-          <Text style={styles.sectionSub}>Tersedia 4 Pilihan Unit</Text>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.busCardsScroll}
+        {/* Banner Hero Card */}
+        <LinearGradient
+          colors={["#2563EB", "#1D4ED8"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroBanner}
         >
-          {BUS_OPTIONS.map((bus) => {
+          <View style={styles.heroBadge}>
+            <Compass size={12} color="#FFFFFF" style={{ marginRight: 4 }} />
+            <Text style={styles.heroBadgeText}>
+              TUNGGAL JAYA TOUR &amp; TRAVEL
+            </Text>
+          </View>
+          <Text style={styles.heroHeading}>Carter Bus Pariwisata Resmi</Text>
+          <Text style={styles.heroSubtitle}>
+            Pilihan armada big bus berkapasitas 50 s.d 59 kursi, suspensi udara
+            empuk, dan kru ramah berlisensi resmi.
+          </Text>
+        </LinearGradient>
+
+        {/* 1. Kategori / Tipe Bus Pariwisata Resmi */}
+        <View style={styles.sectionHeaderBox}>
+          <Text style={styles.sectionHeading}>Pilih Kategori Bus</Text>
+          <Text style={styles.sectionSub}>Sesuai Kapasitas Rombongan</Text>
+        </View>
+        <SectionHeader
+          title="Pilih Kategori Bus"
+          subtitle="Sesuai Kapasitas Rombongan"
+        />
+
+        <View style={styles.busOptionsList}>
+          {CHARTER_BUS_OPTIONS.map((bus) => {
             const isSelected = selectedBus.id === bus.id;
             return (
               <TouchableOpacity
                 key={bus.id}
-                activeOpacity={0.85}
+                activeOpacity={0.88}
                 onPress={() => setSelectedBus(bus)}
-                style={[
-                  styles.busOptionCard,
-                  isSelected && styles.busOptionCardSelected,
-                ]}
+                style={[styles.busCard, isSelected && styles.busCardSelected]}
               >
-                <Image source={bus.image} style={styles.busOptionImage} resizeMode="cover" />
-                <View style={styles.busOptionContent}>
-                  <Text style={styles.busOptionName} numberOfLines={1}>{bus.name}</Text>
-                  <Text style={styles.busOptionBody} numberOfLines={1}>{bus.body}</Text>
-                  <Text style={styles.busOptionCap}>{bus.capacity} • {bus.chassis}</Text>
-                  <Text style={styles.busOptionPrice}>
-                    Rp {bus.pricePerDay.toLocaleString('id-ID')} <Text style={styles.busOptionPriceSub}>/ hari</Text>
-                  </Text>
-                  <View style={[styles.selectIndicator, isSelected && styles.selectIndicatorActive]}>
-                    <Text style={[styles.selectIndicatorText, isSelected && styles.selectIndicatorTextActive]}>
-                      {isSelected ? '✓ Terpilih' : 'Pilih Unit'}
-                    </Text>
+                <Image
+                  source={bus.image}
+                  style={styles.busCardImage}
+                  resizeMode="cover"
+                />
+
+                <View style={styles.busCardBody}>
+                  <View style={styles.busCardHeader}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.busCardTitle}>{bus.title}</Text>
+                      <Text style={styles.busCardSeats}>{bus.seats}</Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.categoryBadge,
+                        { backgroundColor: `${bus.badgeColor}15` },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.categoryBadgeText,
+                          { color: bus.badgeColor },
+                        ]}
+                      >
+                        {bus.badge}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.busCardDesc}>{bus.desc}</Text>
+
+                  {/* Feature Chips */}
+                  <View style={styles.featuresRow}>
+                    {bus.features.slice(0, 3).map((feat, idx) => (
+                      <View key={idx} style={styles.featurePill}>
+                        <Check
+                          size={11}
+                          color={COLORS.brandBlue}
+                          style={{ marginRight: 4 }}
+                        />
+                        <Text style={styles.featurePillText}>{feat}</Text>
+                      </View>
+                    ))}
+                  </View>
+
+                  <View style={styles.busCardFooter}>
+                    <View>
+                      <Text style={styles.priceLabel}>
+                        Estimasi Sewa / Hari
+                      </Text>
+                      <Text style={styles.priceValue}>
+                        Rp {bus.pricePerDay.toLocaleString("id-ID")}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={[
+                        styles.selectRadio,
+                        isSelected && styles.selectRadioActive,
+                      ]}
+                    >
+                      {isSelected && <View style={styles.selectRadioDot} />}
+                    </View>
                   </View>
                 </View>
               </TouchableOpacity>
             );
           })}
-        </ScrollView>
-
-        {/* Section 2: Form Rincian Perjalanan */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>2. Detail Perjalanan</Text>
-          <Text style={styles.sectionSub}>Lengkapi Rute &amp; Jadwal</Text>
         </View>
 
+        {/* 2. Formulir Rencana Perjalanan */}
         <View style={styles.formCard}>
+          <Text style={styles.formCardTitle}>Rencana Perjalanan Wisata</Text>
+
           {/* Pickup Location */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>LOKASI PENJEMPUTAN</Text>
             <View
               style={[
                 styles.inputContainer,
-                focusedField === 'pickup' && styles.inputContainerFocused,
+                focusedField === "pickup" && styles.inputContainerFocused,
               ]}
             >
-              <MapPin size={18} color={focusedField === 'pickup' ? COLORS.brandRed : '#6B7280'} />
+              <MapPin
+                size={18}
+                color={focusedField === "pickup" ? COLORS.brandBlue : "#6B7280"}
+              />
               <TextInput
                 style={styles.textInput}
                 value={pickup}
                 onChangeText={setPickup}
-                placeholder="Contoh: Pool Kuningan / Cirebon / Jakarta"
+                placeholder="Contoh: Pool Cirendang Kuningan / Cirebon / Jakarta"
                 placeholderTextColor="#9CA3AF"
-                onFocus={() => setFocusedField('pickup')}
+                onFocus={() => setFocusedField("pickup")}
                 onBlur={() => setFocusedField(null)}
               />
             </View>
@@ -260,17 +406,22 @@ export default function CharterScreen() {
             <View
               style={[
                 styles.inputContainer,
-                focusedField === 'destination' && styles.inputContainerFocused,
+                focusedField === "destination" && styles.inputContainerFocused,
               ]}
             >
-              <MapPin size={18} color={focusedField === 'destination' ? COLORS.brandRed : '#6B7280'} />
+              <MapPin
+                size={18}
+                color={
+                  focusedField === "destination" ? COLORS.brandBlue : "#6B7280"
+                }
+              />
               <TextInput
                 style={styles.textInput}
                 value={destination}
                 onChangeText={setDestination}
-                placeholder="Contoh: Yogyakarta / Bandung / Bali / Malang"
+                placeholder="Contoh: Yogyakarta / Bandung / Bali / Malang / Pangandaran"
                 placeholderTextColor="#9CA3AF"
-                onFocus={() => setFocusedField('destination')}
+                onFocus={() => setFocusedField("destination")}
                 onBlur={() => setFocusedField(null)}
               />
             </View>
@@ -278,27 +429,75 @@ export default function CharterScreen() {
 
           {/* Start Date */}
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>TANGGAL KEBERANGKATAN</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 8,
+              }}
+            >
+              <Text style={styles.inputLabel}>TANGGAL KEBERANGKATAN</Text>
+              <Text
+                style={{
+                  fontFamily: "PlusJakartaSans_700Bold",
+                  fontSize: 11,
+                  color: COLORS.brandBlue,
+                }}
+              >
+                {formatIndonesianDate(startDate, false)}
+              </Text>
+            </View>
             <View
               style={[
                 styles.inputContainer,
-                focusedField === 'startDate' && styles.inputContainerFocused,
+                focusedField === "startDate" && styles.inputContainerFocused,
               ]}
             >
-              <Calendar size={18} color={focusedField === 'startDate' ? COLORS.brandRed : '#6B7280'} />
+              <Calendar
+                size={18}
+                color={
+                  focusedField === "startDate" ? COLORS.brandBlue : "#6B7280"
+                }
+              />
               <TextInput
                 style={styles.textInput}
                 value={startDate}
                 onChangeText={setStartDate}
                 placeholder="YYYY-MM-DD (Contoh: 2026-09-15)"
                 placeholderTextColor="#9CA3AF"
-                onFocus={() => setFocusedField('startDate')}
+                onFocus={() => setFocusedField("startDate")}
                 onBlur={() => setFocusedField(null)}
               />
             </View>
           </View>
 
-          {/* Steppers: Days & Buses Count */}
+          {/* Departure Time */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>JAM KEBERANGKATAN PENJEMPUTAN</Text>
+            <View
+              style={[
+                styles.inputContainer,
+                focusedField === "time" && styles.inputContainerFocused,
+              ]}
+            >
+              <Clock
+                size={18}
+                color={focusedField === "time" ? COLORS.brandBlue : "#6B7280"}
+              />
+              <TextInput
+                style={styles.textInput}
+                value={departureTime}
+                onChangeText={setDepartureTime}
+                placeholder="Contoh: 06:00 WIB"
+                placeholderTextColor="#9CA3AF"
+                onFocus={() => setFocusedField("time")}
+                onBlur={() => setFocusedField(null)}
+              />
+            </View>
+          </View>
+
+          {/* Steppers: Duration & Bus Count */}
           <View style={styles.countersRow}>
             {/* Days Count */}
             <View style={styles.counterBox}>
@@ -324,7 +523,7 @@ export default function CharterScreen() {
 
             {/* Bus Count */}
             <View style={styles.counterBox}>
-              <Text style={styles.counterLabel}>JUMLAH BUS</Text>
+              <Text style={styles.counterLabel}>JUMLAH UNIT</Text>
               <View style={styles.stepperContainer}>
                 <TouchableOpacity
                   activeOpacity={0.7}
@@ -345,87 +544,91 @@ export default function CharterScreen() {
             </View>
           </View>
 
-          {/* Additional Notes */}
+          {/* Notes */}
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>CATATAN / PERMINTAAN KHUSUS (OPSIONAL)</Text>
+            <Text style={styles.inputLabel}>
+              CATATAN KHUSUS / TUJUAN TAMBAHAN
+            </Text>
             <View
               style={[
-                styles.textareaContainer,
-                focusedField === 'notes' && styles.inputContainerFocused,
+                styles.textAreaContainer,
+                focusedField === "notes" && styles.inputContainerFocused,
               ]}
             >
               <TextInput
-                style={styles.textareaInput}
+                style={styles.textAreaInput}
                 value={notes}
                 onChangeText={setNotes}
-                placeholder="Contoh: Titik kumpul sekolah, butuh mikrofon karaoke, paket tol &amp; makan..."
+                placeholder="Rencana rute singgah, daftar destinasi wisata, atau permintaan khusus..."
                 placeholderTextColor="#9CA3AF"
                 multiline
                 numberOfLines={3}
-                onFocus={() => setFocusedField('notes')}
+                onFocus={() => setFocusedField("notes")}
                 onBlur={() => setFocusedField(null)}
               />
             </View>
           </View>
         </View>
 
-        {/* Section 3: Ringkasan & Estimasi Biaya */}
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryHeading}>Estimasi Biaya Sewa</Text>
-          <View style={styles.summaryLine}>
-            <Text style={styles.summaryLabel}>Unit: {selectedBus.name}</Text>
-            <Text style={styles.summaryVal}>Rp {selectedBus.pricePerDay.toLocaleString('id-ID')} / hari</Text>
-          </View>
-          <View style={styles.summaryLine}>
-            <Text style={styles.summaryLabel}>Durasi &amp; Unit: {daysCount} Hari x {busCount} Bus</Text>
-            <Text style={styles.summaryVal}>Rp {estimatedTotal.toLocaleString('id-ID')}</Text>
-          </View>
-          <View style={styles.summaryLine}>
-            <Text style={[styles.summaryLabel, { color: '#059669' }]}>Driver &amp; Kru Resmi TJ</Text>
-            <Text style={[styles.summaryVal, { color: '#059669' }]}>Termasuk</Text>
-          </View>
-
-          <View style={styles.summaryDivider} />
-
-          <View style={styles.totalRow}>
-            <View>
-              <Text style={styles.totalLabel}>Total Estimasi Biaya</Text>
-              <Text style={styles.totalSub}>*Belum termasuk tol, parkir &amp; tips sopir</Text>
-            </View>
-            <Text style={styles.totalPrice}>Rp {estimatedTotal.toLocaleString('id-ID')}</Text>
-          </View>
-        </View>
-
-        {/* Security & Support Guarantee */}
-        <View style={styles.guaranteeBox}>
-          <ShieldCheck size={18} color="#059669" />
-          <Text style={styles.guaranteeText}>
-            Armada resmi PO Tunggal Jaya dengan asuransi Jasa Raharja &amp; uji KIR berkala.
+        {/* Official Facilities Card */}
+        <View style={styles.amenitiesCard}>
+          <Text style={styles.amenitiesTitle}>
+            Standar Fasilitas Pariwisata PO Tunggal Jaya
           </Text>
+          <View style={styles.amenitiesGrid}>
+            <View style={styles.amenityItem}>
+              <ShieldCheck size={18} color={COLORS.brandBlue} />
+              <Text style={styles.amenityText}>Kru Driver Berlisensi</Text>
+            </View>
+            <View style={styles.amenityItem}>
+              <Tv size={18} color={COLORS.brandBlue} />
+              <Text style={styles.amenityText}>Full Audio &amp; Karaoke</Text>
+            </View>
+            <View style={styles.amenityItem}>
+              <Wifi size={18} color={COLORS.brandBlue} />
+              <Text style={styles.amenityText}>Air Suspension Nyaman</Text>
+            </View>
+            <View style={styles.amenityItem}>
+              <Coffee size={18} color={COLORS.brandBlue} />
+              <Text style={styles.amenityText}>Dispenser &amp; Cooler</Text>
+            </View>
+          </View>
         </View>
 
         <View style={{ height: 120 }} />
       </ScrollView>
 
-      {/* Floating Bottom Action Bar */}
-      <View style={styles.bottomBarWrapper}>
-        <View style={styles.bottomBar}>
-          <View>
-            <Text style={styles.bottomBarLabel}>Total Estimasi ({daysCount} Hari)</Text>
-            <Text style={styles.bottomBarPrice}>Rp {estimatedTotal.toLocaleString('id-ID')}</Text>
-          </View>
+      {/* Floating Bottom Booking Action Bar */}
+      <View style={styles.bottomBar}>
+        <View style={styles.bottomPriceCol}>
+          <Text style={styles.bottomPriceLabel}>
+            Estimasi ({daysCount} Hari x {busCount} Unit)
+          </Text>
+          <Text style={styles.bottomPriceValue}>
+            Rp {estimatedTotal.toLocaleString("id-ID")}
+          </Text>
+        </View>
 
+        <View style={styles.bottomActionRow}>
           <TouchableOpacity
-            style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
-            disabled={loading}
-            onPress={handleSubmit}
             activeOpacity={0.85}
+            onPress={handleSubmit}
+            disabled={loading}
+            style={styles.bookBtn}
           >
             {loading ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text style={styles.submitBtnText}>Ajukan Sewa &gt;</Text>
+              <Text style={styles.bookBtnText}>Ajukan Sewa</Text>
             )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={handleSendWhatsApp}
+            style={styles.waQuickBtn}
+          >
+            <MessageCircle size={18} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -439,120 +642,101 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgDark,
   },
   topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: "#E2E8F0",
   },
   backBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F4F6F9',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    backgroundColor: "#F1F4F8",
+    justifyContent: "center",
+    alignItems: "center",
   },
   topBarTitle: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 16,
-    color: '#111827',
+    color: "#111827",
+  },
+  waHeaderBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(5, 150, 105, 0.1)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 16,
   },
-  heroCard: {
-    height: 160,
+  heroBanner: {
     borderRadius: 22,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 22,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#0F172A',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 3,
-      },
-    }),
-  },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-  },
-  heroGradient: {
-    ...StyleSheet.absoluteFillObject,
-    padding: 18,
-    justifyContent: 'flex-end',
+    padding: 20,
+    marginBottom: 20,
   },
   heroBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: '#2563EB',
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 6,
+    borderRadius: 12,
+    marginBottom: 10,
   },
   heroBadgeText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 10,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     letterSpacing: 0.5,
   },
-  heroTitle: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 18,
-    color: '#FFFFFF',
-    marginBottom: 4,
+  heroHeading: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 20,
+    color: "#FFFFFF",
+    marginBottom: 6,
+    letterSpacing: -0.4,
   },
-  heroSub: {
-    fontFamily: 'PlusJakartaSans_400Regular',
+  heroSubtitle: {
+    fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: "rgba(255, 255, 255, 0.9)",
+    lineHeight: 18,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  sectionHeaderBox: {
     marginBottom: 12,
   },
-  sectionTitle: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 16,
-    color: '#111827',
+  sectionHeading: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 17,
+    color: "#111827",
   },
   sectionSub: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 12,
-    color: '#6B7280',
+    color: "#6B7280",
+    marginTop: 2,
   },
-  busCardsScroll: {
+  busOptionsList: {
     gap: 14,
-    paddingRight: 20,
-    marginBottom: 22,
+    marginBottom: 24,
   },
-  busOptionCard: {
-    width: 240,
-    backgroundColor: '#FFFFFF',
+  busCard: {
+    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    overflow: 'hidden',
+    borderColor: "#E2E8F0",
+    overflow: "hidden",
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
+        shadowColor: "#0F172A",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.05,
         shadowRadius: 10,
@@ -562,291 +746,304 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  busOptionCardSelected: {
-    borderColor: COLORS.brandRed,
-    backgroundColor: '#FFFBFB',
+  busCardSelected: {
+    borderColor: COLORS.brandBlue,
+    backgroundColor: "#F8FAFC",
   },
-  busOptionImage: {
-    width: '100%',
-    height: 110,
+  busCardImage: {
+    width: "100%",
+    height: 140,
   },
-  busOptionContent: {
-    padding: 14,
+  busCardBody: {
+    padding: 16,
   },
-  busOptionName: {
-    fontFamily: 'PlusJakartaSans_700Bold',
-    fontSize: 14,
-    color: '#111827',
+  busCardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 6,
+  },
+  busCardTitle: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 15,
+    color: "#111827",
     marginBottom: 2,
   },
-  busOptionBody: {
-    fontFamily: 'PlusJakartaSans_500Medium',
-    fontSize: 11,
-    color: COLORS.brandRed,
-    marginBottom: 4,
+  busCardSeats: {
+    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontSize: 12,
+    color: COLORS.brandBlue,
   },
-  busOptionCap: {
-    fontFamily: 'PlusJakartaSans_400Regular',
-    fontSize: 11,
-    color: '#6B7280',
-    marginBottom: 8,
+  categoryBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
   },
-  busOptionPrice: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 15,
-    color: '#111827',
+  categoryBadgeText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 10,
+  },
+  busCardDesc: {
+    fontFamily: "PlusJakartaSans_400Regular",
+    fontSize: 12,
+    color: "#4B5563",
+    lineHeight: 18,
     marginBottom: 10,
   },
-  busOptionPriceSub: {
-    fontFamily: 'PlusJakartaSans_400Regular',
-    fontSize: 11,
-    color: '#6B7280',
+  featuresRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginBottom: 14,
   },
-  selectIndicator: {
-    backgroundColor: '#F1F4F8',
-    paddingVertical: 7,
-    borderRadius: 10,
-    alignItems: 'center',
+  featurePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#EFF6FF",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
   },
-  selectIndicatorActive: {
-    backgroundColor: COLORS.brandRed,
+  featurePillText: {
+    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontSize: 10.5,
+    color: "#1E40AF",
   },
-  selectIndicatorText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
-    fontSize: 12,
-    color: '#4B5563',
+  busCardFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#F1F4F8",
   },
-  selectIndicatorTextActive: {
-    color: '#FFFFFF',
+  priceLabel: {
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 10.5,
+    color: "#6B7280",
+  },
+  priceValue: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 16,
+    color: "#111827",
+  },
+  selectRadio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: "#CBD5E1",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  selectRadioActive: {
+    borderColor: COLORS.brandBlue,
+  },
+  selectRadioDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.brandBlue,
   },
   formCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 22,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
     marginBottom: 20,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#0F172A',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+  },
+  formCardTitle: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 16,
+    color: "#111827",
+    marginBottom: 16,
   },
   inputGroup: {
-    marginBottom: 14,
+    marginBottom: 16,
   },
   inputLabel: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 11,
-    color: '#6B7280',
-    marginBottom: 6,
+    color: "#374151",
+    marginBottom: 8,
     letterSpacing: 0.5,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F1F4F8',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F8FAFC",
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
+    borderWidth: 1.2,
+    borderColor: "#E2E8F0",
     paddingHorizontal: 14,
-    height: 50,
+    height: 48,
     gap: 10,
   },
   inputContainerFocused: {
-    borderColor: COLORS.brandRed,
-    backgroundColor: '#FFFFFF',
+    borderColor: COLORS.brandBlue,
+    backgroundColor: "#FFFFFF",
   },
   textInput: {
     flex: 1,
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 13,
-    color: '#111827',
+    color: "#111827",
     paddingVertical: 0,
-    ...(Platform.OS === 'web' ? ({ outlineStyle: 'none', borderWidth: 0 } as any) : {}),
+    ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : {}),
   },
   countersRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
-    marginBottom: 14,
+    marginBottom: 16,
   },
   counterBox: {
     flex: 1,
   },
   counterLabel: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 11,
-    color: '#6B7280',
-    marginBottom: 6,
+    color: "#374151",
+    marginBottom: 8,
     letterSpacing: 0.5,
   },
   stepperContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#F1F4F8',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#F8FAFC",
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    padding: 6,
+    borderWidth: 1.2,
+    borderColor: "#E2E8F0",
+    paddingHorizontal: 6,
+    height: 48,
   },
   stepBtn: {
-    width: 36,
-    height: 36,
+    width: 34,
+    height: 34,
     borderRadius: 10,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
   },
   stepValueText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 13,
-    color: '#111827',
+    color: "#111827",
   },
-  textareaContainer: {
-    backgroundColor: '#F1F4F8',
+  textAreaContainer: {
+    backgroundColor: "#F8FAFC",
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    padding: 12,
+    borderWidth: 1.2,
+    borderColor: "#E2E8F0",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     minHeight: 70,
   },
-  textareaInput: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+  textAreaInput: {
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 13,
-    color: '#111827',
-    ...(Platform.OS === 'web' ? ({ outlineStyle: 'none', borderWidth: 0 } as any) : {}),
+    color: "#111827",
+    textAlignVertical: "top",
+    ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : {}),
   },
-  summaryCard: {
-    backgroundColor: '#FFFFFF',
+  amenitiesCard: {
+    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
     marginBottom: 16,
   },
-  summaryHeading: {
-    fontFamily: 'PlusJakartaSans_700Bold',
-    fontSize: 15,
-    color: '#111827',
-    marginBottom: 12,
-  },
-  summaryLine: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  summaryLabel: {
-    fontFamily: 'PlusJakartaSans_400Regular',
-    fontSize: 13,
-    color: '#4B5563',
-  },
-  summaryVal: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-    fontSize: 13,
-    color: '#111827',
-  },
-  summaryDivider: {
-    height: 1,
-    backgroundColor: '#E2E8F0',
-    marginVertical: 10,
-  },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  totalLabel: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+  amenitiesTitle: {
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 14,
-    color: '#111827',
+    color: "#111827",
+    marginBottom: 14,
   },
-  totalSub: {
-    fontFamily: 'PlusJakartaSans_400Regular',
-    fontSize: 10,
-    color: '#9CA3AF',
-    marginTop: 2,
+  amenitiesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
   },
-  totalPrice: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 17,
-    color: COLORS.brandRed,
+  amenityItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    width: "47%",
   },
-  guaranteeBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(5, 150, 105, 0.08)',
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(5, 150, 105, 0.2)',
-  },
-  guaranteeText: {
-    fontFamily: 'PlusJakartaSans_500Medium',
-    fontSize: 12,
-    color: '#059669',
-    flex: 1,
-  },
-  bottomBarWrapper: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 28 : 20,
-    left: 20,
-    right: 20,
+  amenityText: {
+    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontSize: 11.5,
+    color: "#4B5563",
   },
   bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 36,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    borderTopWidth: 1,
+    borderTopColor: "#E2E8F0",
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === "ios" ? 28 : 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.12,
-        shadowRadius: 18,
+        shadowColor: "#0F172A",
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
       },
       android: {
-        elevation: 8,
+        elevation: 12,
+      },
+      web: {
+        boxShadow: "0px -4px 20px rgba(15, 23, 42, 0.08)",
       },
     }),
   },
-  bottomBarLabel: {
-    fontFamily: 'PlusJakartaSans_400Regular',
+  bottomPriceCol: {
+    flex: 1,
+  },
+  bottomPriceLabel: {
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 11,
-    color: '#6B7280',
+    color: "#6B7280",
   },
-  bottomBarPrice: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
+  bottomPriceValue: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 17,
-    color: '#111827',
+    color: COLORS.brandBlue,
   },
-  submitBtn: {
-    backgroundColor: COLORS.brandRed,
-    paddingVertical: 12,
-    paddingHorizontal: 22,
-    borderRadius: 24,
+  bottomActionRow: {
+    flexDirection: "row",
+    gap: 8,
   },
-  submitBtnDisabled: {
-    opacity: 0.7,
+  bookBtn: {
+    backgroundColor: COLORS.brandBlue,
+    paddingHorizontal: 20,
+    height: 46,
+    borderRadius: 23,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  submitBtnText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+  bookBtnText: {
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 14,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
+  },
+  waQuickBtn: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: "#059669",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -102,7 +102,7 @@ export default function RegisterScreen() {
             <Text style={styles.title}>Buat Akun Baru</Text>
             <Text style={styles.subtitle}>
               Daftar sekarang untuk kemudahan pemesanan tiket, riwayat
-              perjalanan, dan reward loyalti VIP.
+              perjalanan, dan reward poin member.
             </Text>
           </View>
 

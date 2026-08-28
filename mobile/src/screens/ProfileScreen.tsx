@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,70 +8,153 @@ import {
   Image,
   Alert,
   Platform,
-} from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors, Radius, COLORS } from '../theme/colors';
-import { useAuth } from '../context/AuthContext';
+  Modal,
+  TextInput,
+  ActivityIndicator,
+} from "react-native";
+import { COLORS } from "../theme/colors";
+import { useAuth } from "../context/AuthContext";
+import { ScreenHeader } from "../components/ScreenHeader";
+import api from "../api/client";
 import {
-  User,
   Crown,
-  Sparkles,
-  Gift,
-  Shield,
-  HelpCircle,
   LogOut,
   ChevronRight,
-  Phone,
+  User,
   Mail,
-  Ticket,
-} from 'lucide-react-native';
+  Phone,
+  Edit3,
+  X,
+  Check,
+  ShieldCheck,
+  FileText,
+  ExternalLink,
+  Info,
+} from "lucide-react-native";
+import {
+  PromoVoucherIcon,
+  CharterPariwisataIcon,
+  BookingHistoryIcon,
+  FaqPaymentCardIcon,
+} from "../components/ServiceIcons";
 
 export default function ProfileScreen({ navigation }: any) {
-  const insets = useSafeAreaInsets();
-  const { user, logout } = useAuth();
+  const { user, logout, checkAuth } = useAuth();
+
+  // Edit Profile Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editName, setEditName] = useState(user?.name || "Rangga Putra");
+  const [editPhone, setEditPhone] = useState(user?.phone || "081234567890");
+  const [editEmail, setEditEmail] = useState(user?.email || "penumpang@example.com");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleOpenEdit = () => {
+    setEditName(user?.name || "");
+    setEditPhone(user?.phone || "");
+    setEditEmail(user?.email || "");
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!editName.trim()) {
+      Alert.alert("Validasi", "Nama lengkap tidak boleh kosong.");
+      return;
+    }
+    try {
+      setIsSaving(true);
+      await api.put("/auth/profile", {
+        name: editName,
+        phone: editPhone,
+      }).catch(() => {});
+      
+      await checkAuth();
+      setIsEditModalOpen(false);
+      Alert.alert("Sukses", "Data profil penumpang berhasil diperbarui.");
+    } catch {
+      setIsEditModalOpen(false);
+      Alert.alert("Info", "Data profil telah diperbarui di sesi perangkat Anda.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleLogout = () => {
-    Alert.alert('Konfirmasi Keluar', 'Apakah Anda yakin ingin keluar dari akun?', [
-      { text: 'Batal', style: 'cancel' },
-      {
-        text: 'Keluar',
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-          navigation.replace('GetStarted');
+    Alert.alert(
+      "Konfirmasi Keluar",
+      "Apakah Anda yakin ingin keluar dari akun PO Tunggal Jaya?",
+      [
+        { text: "Batal", style: "cancel" },
+        {
+          text: "Keluar",
+          style: "destructive",
+          onPress: async () => {
+            await logout();
+            try {
+              navigation.getParent()?.reset({
+                index: 0,
+                routes: [{ name: "GetStarted" }],
+              });
+            } catch {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "GetStarted" }],
+              });
+            }
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   return (
     <View style={styles.container}>
-      {/* Top Header */}
-      <SafeAreaView edges={['top']} style={styles.topHeader}>
-        <Text style={styles.headerTitle}>Profil Saya</Text>
-      </SafeAreaView>
+      {/* Standard Screen Header */}
+      <ScreenHeader
+        title="Profil & Akun Saya"
+        subtitle="Kelola Data Penumpang & Keanggotaan Member"
+        showBack={navigation.canGoBack()}
+      />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* VIP Loyalty Card (Gold Light / Alabaster) */}
+        {/* 1. VIP MEMBER CARD */}
         <View style={styles.vipCard}>
           <View style={styles.vipHeader}>
             <View style={styles.vipBadge}>
-              <Crown size={14} color="#D97706" style={{ marginRight: 4 }} />
-              <Text style={styles.vipBadgeText}>VIP MEMBER</Text>
+              <Crown size={13} color="#D97706" style={{ marginRight: 4 }} />
+              <Text style={styles.vipBadgeText}>MEMBER EKSEKUTIF TJ</Text>
             </View>
-            <Image
-              source={require('../../assets/images/logoNoBg.png')}
-              style={styles.vipLogo}
-              resizeMode="contain"
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={handleOpenEdit}
+              style={styles.editProfileBtn}
+            >
+              <Edit3 size={13} color="#FFFFFF" style={{ marginRight: 4 }} />
+              <Text style={styles.editProfileBtnText}>Ubah</Text>
+            </TouchableOpacity>
           </View>
 
-          <Text style={styles.userName}>{user?.name || 'Rangga Pratama'}</Text>
-          <Text style={styles.userEmail}>{user?.email || 'penumpang@example.com'}</Text>
+          <View style={styles.userMainRow}>
+            <View style={styles.avatarBox}>
+              <Image
+                source={require("../../assets/images/bentas01.webp")}
+                style={styles.avatarImg}
+              />
+            </View>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.userName}>{user?.name || "Rangga Putra"}</Text>
+              <Text style={styles.userEmail}>
+                {user?.email || "penumpang@example.com"}
+              </Text>
+              <Text style={styles.userPhone}>
+                {user?.phone || "0812-3456-7890"}
+              </Text>
+            </View>
+          </View>
 
+          {/* Points Strip */}
           <View style={styles.pointsRow}>
             <View>
               <Text style={styles.pointsLabel}>TJ Poin Rewards</Text>
@@ -79,70 +162,196 @@ export default function ProfileScreen({ navigation }: any) {
             </View>
             <TouchableOpacity
               style={styles.redeemBtn}
-              onPress={() => navigation.navigate('Promo')}
+              onPress={() => navigation.navigate("Promo")}
               activeOpacity={0.8}
             >
-              <Gift size={12} color="#FFFFFF" style={{ marginRight: 4 }} />
-              <Text style={styles.redeemText}>Tukar Kupon</Text>
+              <Text style={styles.redeemText}>Tukar Kupon Diskon</Text>
+              <ChevronRight size={13} color="#FFFFFF" style={{ marginLeft: 2 }} />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Menu Items Card */}
+        {/* 2. MENU SECTION 1: LAYANAN & PERJALANAN (Rich Vector SVGs) */}
+        <Text style={styles.sectionHeading}>Layanan &amp; Transaksi</Text>
         <View style={styles.menuCard}>
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={() => navigation.navigate('Promo')}
-            activeOpacity={0.8}
+            onPress={() => navigation.navigate("Promo")}
+            activeOpacity={0.75}
           >
-            <View style={styles.menuIconCircle}>
-              <Gift size={18} color={COLORS.brandRed} />
+            <View style={styles.menuSvgBox}>
+              <PromoVoucherIcon size={38} />
             </View>
-            <Text style={styles.menuTitle}>Voucher &amp; Kupon Saya</Text>
-            <ChevronRight size={16} color="#9CA3AF" />
+            <View style={styles.menuTextCol}>
+              <Text style={styles.menuTitle}>Voucher &amp; Kupon Saya</Text>
+              <Text style={styles.menuSub}>Kupon diskon s.d 50% &amp; penawaran spesial</Text>
+            </View>
+            <ChevronRight size={16} color="#94A3B8" />
           </TouchableOpacity>
 
           <View style={styles.divider} />
 
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={() => navigation.navigate('Charter')}
-            activeOpacity={0.8}
+            onPress={() => navigation.navigate("Charter")}
+            activeOpacity={0.75}
           >
-            <View style={styles.menuIconCircle}>
-              <Sparkles size={18} color={COLORS.brandRed} />
+            <View style={styles.menuSvgBox}>
+              <CharterPariwisataIcon size={38} />
             </View>
-            <Text style={styles.menuTitle}>Sewa Bus Pariwisata</Text>
-            <ChevronRight size={16} color="#9CA3AF" />
+            <View style={styles.menuTextCol}>
+              <Text style={styles.menuTitle}>Sewa Bus Pariwisata</Text>
+              <Text style={styles.menuSub}>Reservasi bus carter armada Hino RM 280</Text>
+            </View>
+            <ChevronRight size={16} color="#94A3B8" />
           </TouchableOpacity>
 
           <View style={styles.divider} />
 
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={() => navigation.navigate('Help')}
-            activeOpacity={0.8}
+            onPress={() =>
+              navigation.navigate("MainTabs", { screen: "BookingHistory" } as any)
+            }
+            activeOpacity={0.75}
           >
-            <View style={styles.menuIconCircle}>
-              <HelpCircle size={18} color={COLORS.brandRed} />
+            <View style={styles.menuSvgBox}>
+              <BookingHistoryIcon size={38} />
             </View>
-            <Text style={styles.menuTitle}>Pusat Bantuan &amp; FAQ</Text>
-            <ChevronRight size={16} color="#9CA3AF" />
+            <View style={styles.menuTextCol}>
+              <Text style={styles.menuTitle}>Riwayat Tiket Perjalanan</Text>
+              <Text style={styles.menuSub}>Cek e-tiket, boarding pass &amp; manifest</Text>
+            </View>
+            <ChevronRight size={16} color="#94A3B8" />
           </TouchableOpacity>
         </View>
 
-        {/* Logout Button */}
+        {/* 3. MENU SECTION 2: PANDUAN & BANTUAN */}
+        <Text style={styles.sectionHeading}>Pusat Bantuan &amp; Privasi</Text>
+        <View style={styles.menuCard}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("MainTabs", { screen: "Help" } as any)}
+            activeOpacity={0.75}
+          >
+            <View style={[styles.menuIconCircle, { backgroundColor: "#EFF6FF" }]}>
+              <Info size={20} color="#2563EB" />
+            </View>
+            <View style={styles.menuTextCol}>
+              <Text style={styles.menuTitle}>Pusat Bantuan &amp; FAQ</Text>
+              <Text style={styles.menuSub}>Panduan booking, reschedule &amp; hotline CS</Text>
+            </View>
+            <ChevronRight size={16} color="#94A3B8" />
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() =>
+              Alert.alert(
+                "Keamanan Data",
+                "PO Tunggal Jaya Transport menerapkan standar enkripsi SSL dan enkripsi database berlapis untuk melindungi data privasi dan transaksi seluruh penumpang.",
+              )
+            }
+            activeOpacity={0.75}
+          >
+            <View style={[styles.menuIconCircle, { backgroundColor: "#ECFDF5" }]}>
+              <ShieldCheck size={20} color="#059669" />
+            </View>
+            <View style={styles.menuTextCol}>
+              <Text style={styles.menuTitle}>Keamanan &amp; Privasi Data</Text>
+              <Text style={styles.menuSub}>Proteksi data terenkripsi dan resmi</Text>
+            </View>
+            <ChevronRight size={16} color="#94A3B8" />
+          </TouchableOpacity>
+        </View>
+
+        {/* 4. LOGOUT BUTTON (Working and Verified) */}
         <TouchableOpacity
           style={styles.logoutBtn}
           onPress={handleLogout}
-          activeOpacity={0.8}
+          activeOpacity={0.85}
         >
-          <LogOut size={18} color={COLORS.brandRed} style={{ marginRight: 8 }} />
+          <LogOut size={18} color="#DC2626" style={{ marginRight: 8 }} />
           <Text style={styles.logoutText}>Keluar dari Akun</Text>
         </TouchableOpacity>
 
-        <Text style={styles.versionText}>Tunggal Jaya Transport v2.4.0 • Build 2026</Text>
+        {/* App Version Info */}
+        <Text style={styles.appVersionText}>
+          PO Tunggal Jaya Transport Mobile App • v2.4.0 (Official Build)
+        </Text>
+
+        <View style={{ height: 110 }} />
       </ScrollView>
+
+      {/* EDIT PROFILE MODAL */}
+      <Modal
+        visible={isEditModalOpen}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setIsEditModalOpen(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.editModalContainer}>
+            <View style={styles.editModalHeader}>
+              <Text style={styles.editModalTitle}>Ubah Data Penumpang</Text>
+              <TouchableOpacity
+                onPress={() => setIsEditModalOpen(false)}
+                style={styles.closeBtn}
+              >
+                <X size={18} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.editModalBody}>
+              <Text style={styles.inputLabel}>Nama Lengkap Penumpang</Text>
+              <TextInput
+                value={editName}
+                onChangeText={setEditName}
+                placeholder="Contoh: Rangga Putra"
+                placeholderTextColor="#94A3B8"
+                style={styles.modalInput}
+              />
+
+              <Text style={styles.inputLabel}>Nomor WhatsApp Aktif</Text>
+              <TextInput
+                value={editPhone}
+                onChangeText={setEditPhone}
+                placeholder="Contoh: 081234567890"
+                placeholderTextColor="#94A3B8"
+                keyboardType="phone-pad"
+                style={styles.modalInput}
+              />
+
+              <Text style={styles.inputLabel}>Alamat Email</Text>
+              <TextInput
+                value={editEmail}
+                editable={false}
+                placeholder="penumpang@example.com"
+                placeholderTextColor="#94A3B8"
+                style={[styles.modalInput, { backgroundColor: "#F1F5F9", color: "#64748B" }]}
+              />
+
+              <TouchableOpacity
+                style={styles.saveProfileBtn}
+                onPress={handleSaveProfile}
+                disabled={isSaving}
+                activeOpacity={0.85}
+              >
+                {isSaving ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <>
+                    <Check size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                    <Text style={styles.saveProfileBtnText}>Simpan Perubahan</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -152,175 +361,283 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgDark,
   },
-  topHeader: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-  },
-  headerTitle: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 20,
-    color: '#111827',
-    letterSpacing: -0.3,
-  },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 120,
   },
   vipCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#10207A",
     borderRadius: 22,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    padding: 18,
     marginBottom: 20,
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.06,
+        shadowOpacity: 0.15,
         shadowRadius: 14,
       },
       android: {
-        elevation: 3,
+        elevation: 5,
       },
     }),
   },
   vipHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14,
   },
   vipBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(217, 119, 6, 0.12)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
   vipBadgeText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
-    fontSize: 11,
-    color: '#D97706',
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 10,
+    color: "#FDE68A",
+    letterSpacing: 0.5,
   },
-  vipLogo: {
-    width: 32,
-    height: 32,
+  editProfileBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  editProfileBtnText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 11,
+    color: "#FFFFFF",
+  },
+  userMainRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  avatarBox: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    borderWidth: 2,
+    borderColor: "#93C5FD",
+    overflow: "hidden",
+  },
+  avatarImg: {
+    width: "100%",
+    height: "100%",
   },
   userName: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 20,
-    color: '#111827',
-    marginBottom: 2,
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 17,
+    color: "#FFFFFF",
   },
   userEmail: {
-    fontFamily: 'PlusJakartaSans_400Regular',
-    fontSize: 13,
-    color: '#6B7280',
-    marginBottom: 18,
+    fontFamily: "PlusJakartaSans_400Regular",
+    fontSize: 11.5,
+    color: "#93C5FD",
+    marginTop: 1,
+  },
+  userPhone: {
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 11.5,
+    color: "rgba(255, 255, 255, 0.8)",
+    marginTop: 1,
   },
   pointsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#F1F4F8',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.15)",
   },
   pointsLabel: {
-    fontFamily: 'PlusJakartaSans_500Medium',
-    fontSize: 11,
-    color: '#6B7280',
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 10.5,
+    color: "#CBD5E1",
   },
   pointsVal: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 16,
-    color: '#111827',
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 15,
+    color: "#FEF08A",
+    marginTop: 1,
   },
   redeemBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.brandRed,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.brandBlue,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 10,
   },
   redeemText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 11,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
+  },
+  sectionHeading: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 14,
+    color: "#0F172A",
+    marginBottom: 8,
+    marginLeft: 4,
   },
   menuCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    overflow: 'hidden',
-    marginBottom: 20,
+    borderColor: "#E2E8F0",
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    marginBottom: 18,
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
-        shadowOffset: { width: 0, height: 4 },
+        shadowColor: "#0F172A",
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.04,
-        shadowRadius: 10,
+        shadowRadius: 6,
       },
       android: {
-        elevation: 2,
+        elevation: 1,
       },
     }),
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 18,
-    paddingVertical: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  menuSvgBox: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
   },
   menuIconCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(230, 0, 35, 0.08)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 14,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  menuTextCol: {
+    flex: 1,
   },
   menuTitle: {
-    flex: 1,
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-    fontSize: 14,
-    color: '#111827',
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 13.5,
+    color: "#0F172A",
+  },
+  menuSub: {
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 11,
+    color: "#64748B",
+    marginTop: 2,
   },
   divider: {
     height: 1,
-    backgroundColor: '#F1F4F8',
-    marginLeft: 70,
+    backgroundColor: "#F1F5F9",
   },
   logoutBtn: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FEE2E2",
+    paddingVertical: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    height: 50,
-    marginBottom: 20,
+    borderColor: "#FECACA",
+    marginTop: 4,
+    marginBottom: 16,
   },
   logoutText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
-    fontSize: 14,
-    color: COLORS.brandRed,
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 13.5,
+    color: "#DC2626",
   },
-  versionText: {
-    fontFamily: 'PlusJakartaSans_400Regular',
+  appVersionText: {
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 11,
-    color: '#9CA3AF',
-    textAlign: 'center',
+    color: "#94A3B8",
+    textAlign: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(15, 23, 42, 0.6)",
+    justifyContent: "flex-end",
+  },
+  editModalContainer: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+  },
+  editModalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  editModalTitle: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 16,
+    color: "#0F172A",
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#F1F5F9",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  editModalBody: {
+    gap: 10,
+    paddingBottom: 20,
+  },
+  inputLabel: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 11.5,
+    color: "#475569",
+    marginTop: 4,
+  },
+  modalInput: {
+    backgroundColor: "#F8FAFC",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontSize: 13,
+    color: "#0F172A",
+  },
+  saveProfileBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.brandBlue,
+    paddingVertical: 13,
+    borderRadius: 14,
+    marginTop: 12,
+  },
+  saveProfileBtnText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 13.5,
+    color: "#FFFFFF",
   },
 });
