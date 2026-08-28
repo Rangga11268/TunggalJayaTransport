@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -11,13 +11,14 @@ import {
   useWindowDimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/RootNavigator';
-import { COLORS } from '../theme/colors';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation/RootNavigator";
+import { COLORS } from "../theme/colors";
+import { useAuth } from "../context/AuthContext";
 import {
   Tag,
   Crown,
@@ -25,9 +26,12 @@ import {
   ChevronRight,
   ChevronLeft,
   ArrowRight,
-} from 'lucide-react-native';
+} from "lucide-react-native";
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'GetStarted'>;
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "GetStarted"
+>;
 
 interface SlideItem {
   id: string;
@@ -40,33 +44,37 @@ interface SlideItem {
 
 const SLIDES: SlideItem[] = [
   {
-    id: '1',
-    badge: 'PROMO SPESIAL',
+    id: "1",
+    badge: "PROMO SPESIAL",
     badgeIcon: Tag,
-    title: 'Cashback & Offer',
-    subtitle: 'Dapatkan diskon eksklusif, cashback voucher tiket, dan kumpulkan TJ Poin di setiap perjalanan Anda.',
-    image: require('../../assets/images/bentas01.webp'),
+    title: "Cashback & Offer",
+    subtitle:
+      "Dapatkan diskon eksklusif, cashback voucher tiket, dan kumpulkan TJ Poin di setiap perjalanan Anda.",
+    image: require("../../assets/images/bentas01.webp"),
   },
   {
-    id: '2',
-    badge: 'ARMADA MEWAH',
+    id: "2",
+    badge: "ARMADA BUS",
     badgeIcon: Crown,
-    title: 'Executive Comfort',
-    subtitle: 'Rasakan kenyamanan perjalanan antarkota dengan kursi leg rest ergonomis, full AC, dan toilet higienis.',
-    image: require('../../assets/images/resiBisma.webp'),
+    title: "Perjalanan Nyaman",
+    subtitle:
+      "Rasakan kenyamanan perjalanan antarkota dengan kursi ergonomis, full AC dingin, dan suspensi udara empuk.",
+    image: require("../../assets/images/resiBisma.webp"),
   },
   {
-    id: '3',
-    badge: 'INSTANT BOOKING',
+    id: "3",
+    badge: "INSTANT BOOKING",
     badgeIcon: Zap,
-    title: 'Pesan Tiket Mudah',
-    subtitle: 'Pilih nomor kursi favorit langsung di denah bus, bayar praktis dengan QRIS realtime tanpa antre.',
-    image: require('../../assets/images/kylorenParwis.webp'),
+    title: "Pesan Tiket Mudah",
+    subtitle:
+      "Pilih nomor kursi favorit langsung di denah bus, bayar praktis dengan QRIS realtime tanpa antre.",
+    image: require("../../assets/images/kylorenParwis.webp"),
   },
 ];
 
 export default function GetStartedScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const { user } = useAuth();
   const { width: windowWidth } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
@@ -85,7 +93,7 @@ export default function GetStartedScreen() {
     if (activeIndex < SLIDES.length - 1) {
       goToSlide(activeIndex + 1);
     } else {
-      navigation.navigate('Register');
+      navigation.navigate("Register");
     }
   };
 
@@ -117,10 +125,10 @@ export default function GetStartedScreen() {
 
         {/* Ambient Dark Gradient for Top Header visibility */}
         <LinearGradient
-          colors={['rgba(17, 24, 39, 0.65)', 'transparent']}
+          colors={["rgba(17, 24, 39, 0.65)", "transparent"]}
           style={styles.topGradient}
         >
-          <SafeAreaView edges={['top']} style={styles.topHeader}>
+          <SafeAreaView edges={["top"]} style={styles.topHeader}>
             <View style={styles.brandCapsule}>
               <View style={styles.brandRedDot} />
               <Text style={styles.brandTitle}>
@@ -130,7 +138,7 @@ export default function GetStartedScreen() {
 
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => navigation.replace('MainTabs')}
+              onPress={() => navigation.replace("MainTabs")}
               style={styles.skipBtn}
             >
               <Text style={styles.skipText}>Lewati</Text>
@@ -166,7 +174,11 @@ export default function GetStartedScreen() {
             return (
               <View style={[styles.slideItem, { width: slideWidth }]}>
                 <View style={styles.badgePill}>
-                  <IconComp size={12} color={COLORS.brandRed} style={{ marginRight: 5 }} />
+                  <IconComp
+                    size={12}
+                    color={COLORS.brandRed}
+                    style={{ marginRight: 5 }}
+                  />
                   <Text style={styles.badgeText}>{item.badge}</Text>
                 </View>
 
@@ -184,9 +196,15 @@ export default function GetStartedScreen() {
             activeOpacity={0.7}
             disabled={activeIndex === 0}
             onPress={handlePrev}
-            style={[styles.arrowCircle, activeIndex === 0 && styles.arrowCircleDisabled]}
+            style={[
+              styles.arrowCircle,
+              activeIndex === 0 && styles.arrowCircleDisabled,
+            ]}
           >
-            <ChevronLeft size={18} color={activeIndex === 0 ? '#CBD5E1' : '#111827'} />
+            <ChevronLeft
+              size={18}
+              color={activeIndex === 0 ? "#CBD5E1" : "#111827"}
+            />
           </TouchableOpacity>
 
           {/* Dots Pagination (Clickable) */}
@@ -199,7 +217,10 @@ export default function GetStartedScreen() {
                   activeOpacity={0.8}
                   onPress={() => goToSlide(idx)}
                   hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}
-                  style={[styles.dot, isActive ? styles.dotActive : styles.dotInactive]}
+                  style={[
+                    styles.dot,
+                    isActive ? styles.dotActive : styles.dotInactive,
+                  ]}
                 />
               );
             })}
@@ -215,24 +236,45 @@ export default function GetStartedScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Twin Action Buttons (Ergonomic 52px height) */}
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={styles.loginBtn}
-            onPress={() => navigation.navigate('Login')}
-          >
-            <Text style={styles.loginBtnText}>Log in</Text>
-          </TouchableOpacity>
+        {/* Action Buttons */}
+        {user ? (
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={[
+                styles.loginBtn,
+                {
+                  backgroundColor: COLORS.brandBlue,
+                  borderWidth: 0,
+                  width: "100%",
+                },
+              ]}
+              onPress={() => navigation.replace("MainTabs")}
+            >
+              <Text style={[styles.loginBtnText, { color: "#FFFFFF" }]}>
+                Masuk ke Aplikasi ({user.name || "Sobat TJ"})
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={styles.loginBtn}
+              onPress={() => navigation.navigate("Login")}
+            >
+              <Text style={styles.loginBtnText}>Log in</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={styles.joinBtn}
-            onPress={() => navigation.navigate('Register')}
-          >
-            <Text style={styles.joinBtnText}>Join</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={styles.joinBtn}
+              onPress={() => navigation.navigate("Register")}
+            >
+              <Text style={styles.joinBtnText}>Join</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -241,41 +283,41 @@ export default function GetStartedScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F6F9',
+    backgroundColor: "#F4F6F9",
   },
   heroStage: {
     flex: 1,
-    width: '100%',
-    position: 'relative',
-    backgroundColor: '#1E293B',
+    width: "100%",
+    position: "relative",
+    backgroundColor: "#1E293B",
   },
   heroImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   topGradient: {
     ...StyleSheet.absoluteFillObject,
     paddingHorizontal: 20,
   },
   topHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: Platform.OS === 'android' ? 14 : 6,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: Platform.OS === "android" ? 14 : 6,
   },
   brandCapsule: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    backgroundColor: "rgba(255, 255, 255, 0.92)",
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
+        shadowColor: "#0F172A",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
@@ -292,40 +334,40 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.brandRed,
   },
   brandTitle: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 16,
-    color: '#111827',
+    color: "#111827",
     letterSpacing: -0.3,
   },
   skipBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    backgroundColor: "rgba(255, 255, 255, 0.92)",
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
   },
   skipText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 13,
-    color: '#111827',
+    color: "#111827",
   },
   cardSheet: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     paddingTop: 24,
-    paddingBottom: Platform.OS === 'ios' ? 40 : 28,
+    paddingBottom: Platform.OS === "ios" ? 40 : 28,
     paddingHorizontal: 24,
     marginTop: -28,
     borderTopWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
+        shadowColor: "#0F172A",
         shadowOffset: { width: 0, height: -8 },
         shadowOpacity: 0.08,
         shadowRadius: 18,
@@ -339,44 +381,44 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   slideItem: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: 6,
   },
   badgePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(230, 0, 35, 0.08)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(230, 0, 35, 0.08)",
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 14,
     marginBottom: 10,
   },
   badgeText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 11,
     color: COLORS.brandRed,
     letterSpacing: 0.5,
   },
   slideTitle: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 25,
-    color: '#111827',
-    textAlign: 'center',
+    color: "#111827",
+    textAlign: "center",
     marginBottom: 8,
     letterSpacing: -0.5,
   },
   slideSubtitle: {
-    fontFamily: 'PlusJakartaSans_400Regular',
+    fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 14,
-    color: '#4B5563',
-    textAlign: 'center',
+    color: "#4B5563",
+    textAlign: "center",
     lineHeight: 22,
     paddingHorizontal: 8,
   },
   navControlsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 10,
     marginBottom: 22,
   },
@@ -384,19 +426,19 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#F1F4F8',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#F1F4F8",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
   },
   arrowCircleDisabled: {
     opacity: 0.4,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: "#F8FAFC",
   },
   dotsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   dot: {
@@ -409,25 +451,25 @@ const styles = StyleSheet.create({
   },
   dotInactive: {
     width: 6,
-    backgroundColor: '#CBD5E1',
+    backgroundColor: "#CBD5E1",
   },
   buttonRow: {
-    flexDirection: 'row',
-    width: '100%',
+    flexDirection: "row",
+    width: "100%",
     gap: 14,
   },
   loginBtn: {
     flex: 1,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#F1F4F8',
+    backgroundColor: "#F1F4F8",
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: "#E2E8F0",
+    justifyContent: "center",
+    alignItems: "center",
     ...Platform.select({
       ios: {
-        shadowColor: '#0F172A',
+        shadowColor: "#0F172A",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.04,
         shadowRadius: 6,
@@ -438,17 +480,17 @@ const styles = StyleSheet.create({
     }),
   },
   loginBtnText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 15,
-    color: '#111827',
+    color: "#111827",
   },
   joinBtn: {
     flex: 1,
     height: 52,
     borderRadius: 26,
     backgroundColor: COLORS.brandRed,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     ...Platform.select({
       ios: {
         shadowColor: COLORS.brandRed,
@@ -462,8 +504,8 @@ const styles = StyleSheet.create({
     }),
   },
   joinBtnText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 15,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
 });

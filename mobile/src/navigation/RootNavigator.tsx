@@ -1,27 +1,29 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import { useAuth } from '../context/AuthContext';
-import FloatingTabBar from './FloatingTabBar';
+import { useAuth } from "../context/AuthContext";
+import FloatingTabBar from "./FloatingTabBar";
 
-import GetStartedScreen from '../screens/GetStartedScreen';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import HomeScreen from '../screens/HomeScreen';
-import ScheduleListScreen from '../screens/ScheduleListScreen';
-import ScheduleDetailScreen from '../screens/ScheduleDetailScreen';
-import SeatSelectionScreen from '../screens/SeatSelectionScreen';
-import CheckoutScreen from '../screens/CheckoutScreen';
-import TicketDetailScreen from '../screens/TicketDetailScreen';
-import BookingHistoryScreen from '../screens/BookingHistoryScreen';
-import CharterScreen from '../screens/CharterScreen';
-import PromoScreen from '../screens/PromoScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import HelpScreen from '../screens/HelpScreen';
+import SplashScreen from "../screens/SplashScreen";
+import GetStartedScreen from "../screens/GetStartedScreen";
+import LoginScreen from "../screens/LoginScreen";
+import RegisterScreen from "../screens/RegisterScreen";
+import HomeScreen from "../screens/HomeScreen";
+import ScheduleListScreen from "../screens/ScheduleListScreen";
+import ScheduleDetailScreen from "../screens/ScheduleDetailScreen";
+import SeatSelectionScreen from "../screens/SeatSelectionScreen";
+import CheckoutScreen from "../screens/CheckoutScreen";
+import TicketDetailScreen from "../screens/TicketDetailScreen";
+import BookingHistoryScreen from "../screens/BookingHistoryScreen";
+import CharterScreen from "../screens/CharterScreen";
+import PromoScreen from "../screens/PromoScreen";
+import ProfileScreen from "../screens/ProfileScreen";
+import HelpScreen from "../screens/HelpScreen";
 
 export type RootStackParamList = {
+  Splash: undefined;
   GetStarted: undefined;
   Login: undefined;
   Register: undefined;
@@ -31,7 +33,12 @@ export type RootStackParamList = {
   ScheduleDetail: { scheduleId: number };
   SeatSelection: { scheduleId: number };
   Checkout: { scheduleId: number; selectedSeats: number[]; totalPrice: number };
-  TicketDetail: { bookingId?: number; booking?: any; schedule?: any; selectedSeats?: number[] };
+  TicketDetail: {
+    bookingId?: number;
+    booking?: any;
+    schedule?: any;
+    selectedSeats?: number[];
+  };
   BookingHistory: undefined;
   Charter: undefined;
   Promo: undefined;
@@ -75,12 +82,13 @@ export default function RootNavigator() {
     <NavigationContainer>
       <Stack.Navigator
         id="root-stack"
-        initialRouteName={user ? 'MainTabs' : 'GetStarted'}
+        initialRouteName="Splash"
         screenOptions={{
           headerShown: false,
-          animation: 'slide_from_right',
+          animation: "slide_from_right",
         }}
       >
+        <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="GetStarted" component={GetStartedScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
