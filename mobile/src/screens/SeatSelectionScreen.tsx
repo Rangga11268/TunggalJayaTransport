@@ -144,6 +144,8 @@ export default function SeatSelectionScreen() {
       <ScreenHeader
         title="Pilih Kursi Penumpang"
         subtitle={`${schedule?.bus?.name || "Resi Bisma"} • ${schedule?.route?.origin || "Jakarta"} → ${schedule?.route?.destination || "Kuningan"}`}
+        showBack={true}
+        onBack={() => navigation.goBack()}
       />
 
         <View style={styles.topBarCenter}>

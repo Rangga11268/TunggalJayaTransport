@@ -144,6 +144,8 @@ export default function PromoScreen() {
       <ScreenHeader
         title="Voucher & Kupon Promo"
         subtitle="Diskon Tiket AKAP & Sewa Pariwisata"
+        showBack={true}
+        onBack={() => navigation.goBack()}
       />
 
         <Text style={styles.topBarTitle}>Voucher &amp; Kupon Promo</Text>

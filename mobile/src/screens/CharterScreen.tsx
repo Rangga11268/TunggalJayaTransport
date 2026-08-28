@@ -244,6 +244,22 @@ export default function CharterScreen() {
             </TouchableOpacity>
           }
         />
+      {/* Standard Screen Header */}
+      <ScreenHeader
+        title="Sewa Bus Pariwisata"
+        subtitle="PO Tunggal Jaya Transport"
+        showBack={true}
+        onBack={() => navigation.goBack()}
+        rightElement={
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleSendWhatsApp}
+            style={styles.waHeaderBtn}
+          >
+            <MessageCircle size={18} color="#059669" />
+          </TouchableOpacity>
+        }
+      />
 
         <Text style={styles.topBarTitle}>Sewa Bus Pariwisata</Text>
 

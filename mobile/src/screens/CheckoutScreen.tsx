@@ -164,6 +164,8 @@ export default function CheckoutScreen({ navigation, route }: any) {
       <ScreenHeader
         title="Review & Pembayaran"
         subtitle="Konfirmasi Tiket & Penumpang"
+        showBack={true}
+        onBack={() => navigation.goBack()}
       />
 
         <Text style={styles.topBarTitle}>Review &amp; Pembayaran</Text>
