@@ -57,6 +57,8 @@ class ScheduleController extends Controller
         })->values()->map(function ($schedule) use ($searchDate) {
             $bookedSeats = $schedule->booked_seats_count ?? 0;
             $availableSeats = max(0, $schedule->bus->capacity - $bookedSeats);
+            $hasDeparted = $schedule->hasDeparted($searchDate);
+            $nextDate = $searchDate->copy()->addDay();
 
             return [
                 'id' => $schedule->id,
@@ -65,6 +67,11 @@ class ScheduleController extends Controller
                 'arrival_time' => $schedule->getActualArrivalTime($searchDate)->format('H:i'),
                 'duration' => $schedule->route->formatted_duration,
                 'available_seats' => $availableSeats,
+                'is_departed' => $hasDeparted,
+                'has_departed' => $hasDeparted,
+                'selected_date' => $searchDate->toDateString(),
+                'next_departure_date' => $nextDate->toDateString(),
+                'next_departure_formatted' => 'Besok, ' . $nextDate->translatedFormat('d M Y') . ' • ' . $schedule->departure_time->format('H:i') . ' WIB',
                 'bus' => [
                     'name' => $schedule->bus->name,
                     'type' => $schedule->bus->bus_type,
@@ -100,15 +107,10 @@ class ScheduleController extends Controller
 
         $dateParam = $request->get('date');
         $checkDate = $dateParam ? Carbon::parse($dateParam) : Carbon::today('Asia/Jakarta');
+        $hasDeparted = $schedule->hasDeparted($checkDate);
+        $nextDate = $checkDate->copy()->addDay();
 
-        if ($schedule->hasDeparted($checkDate)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Jadwal sudah berangkat',
-            ], 400);
-        }
-
-        $bookedSeats = $schedule->getBookedSeatNumbers($checkDate);
+        $bookedSeats = $schedule->getBookedSeatNumbers($hasDeparted ? $nextDate : $checkDate);
 
         return response()->json([
             'success' => true,
@@ -118,6 +120,11 @@ class ScheduleController extends Controller
                 'departure_time' => $schedule->getActualDepartureTime($checkDate)->format('H:i'),
                 'arrival_time' => $schedule->getActualArrivalTime($checkDate)->format('H:i'),
                 'duration' => $schedule->route->formatted_duration,
+                'is_departed' => $hasDeparted,
+                'has_departed' => $hasDeparted,
+                'selected_date' => $checkDate->toDateString(),
+                'next_departure_date' => $nextDate->toDateString(),
+                'next_departure_formatted' => 'Besok, ' . $nextDate->translatedFormat('d M Y') . ' • ' . $schedule->departure_time->format('H:i') . ' WIB',
                 'route' => $schedule->route,
                 'bus' => $schedule->bus,
                 'occupied_seats' => $bookedSeats,

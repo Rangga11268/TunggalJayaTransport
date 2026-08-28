@@ -50,7 +50,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/charter/history', [CharterController::class, 'index']);
     Route::post('/charter/request', [CharterController::class, 'store']);
     Route::post('/charter/{id}/cancel', [CharterController::class, 'cancel']);
+
+    // Notifikasi
+    Route::get('/notifications', [\App\Http\Controllers\API\NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\API\NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [\App\Http\Controllers\API\NotificationController::class, 'markAllAsRead']);
+    Route::get('/notifications/unread-count', [\App\Http\Controllers\API\NotificationController::class, 'unreadCount']);
 });
+
+Route::get('/notifications', [\App\Http\Controllers\API\NotificationController::class, 'index']);
+Route::get('/notifications/unread-count', [\App\Http\Controllers\API\NotificationController::class, 'unreadCount']);
 
 Route::get('/news', [NewsController::class, 'index']);
 Route::get('/news/{slug}', [NewsController::class, 'show']);

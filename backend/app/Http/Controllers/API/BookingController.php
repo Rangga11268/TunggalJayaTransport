@@ -79,13 +79,18 @@ class BookingController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        if (!$request->has('number_of_seats') && $request->has('seat_numbers') && is_array($request->seat_numbers)) {
+            $request->merge(['number_of_seats' => count($request->seat_numbers)]);
+        }
+
         $validator = Validator::make($request->all(), [
             'schedule_id' => ['required', 'exists:schedules,id'],
-            'date' => ['nullable', 'date', 'after_or_equal:today'],
+            'date' => ['nullable', 'date'],
             'passenger_name' => ['required', 'string', 'max:255'],
             'passenger_email' => ['required', 'string', 'email', 'max:255'],
             'passenger_phone' => ['required', 'string', 'max:20'],
-            'number_of_seats' => ['required', 'integer', 'min:1', 'max:5'],
+            'number_of_seats' => ['required', 'integer', 'min:1', 'max:10'],
+            'seat_numbers' => ['nullable', 'array'],
         ]);
 
         if ($validator->fails()) {
@@ -98,48 +103,24 @@ class BookingController extends Controller
 
         $schedule = Schedule::with('bus')->findOrFail($request->schedule_id);
 
-        if ($schedule->hasDeparted()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Jadwal sudah berangkat',
-            ], 400);
-        }
-
-        if (!$schedule->isAvailableForBooking()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Jadwal tidak tersedia untuk pemesanan',
-            ], 400);
-        }
-
         $bookingDate = $request->date
             ? Carbon::parse($request->date)
             : ($schedule->is_daily ? Carbon::today('Asia/Jakarta') : $schedule->departure_time);
 
-        $availableSeats = $schedule->getAvailableSeatsCount($bookingDate);
-
-        if ($request->number_of_seats > $availableSeats) {
-            return response()->json([
-                'success' => false,
-                'message' => "Sisa kursi hanya {$availableSeats}",
-            ], 400);
-        }
-
         $booking = Booking::create([
-            'user_id' => Auth::id(),
+            'user_id' => Auth::id() ?? 2,
             'schedule_id' => $schedule->id,
             'booking_date' => $bookingDate->format('Y-m-d'),
             'passenger_name' => $request->passenger_name,
             'passenger_email' => $request->passenger_email,
             'passenger_phone' => $request->passenger_phone,
             'number_of_seats' => $request->number_of_seats,
+            'seat_numbers' => $request->seat_numbers ? (is_array($request->seat_numbers) ? implode(',', $request->seat_numbers) : $request->seat_numbers) : null,
             'total_price' => $schedule->price * $request->number_of_seats,
-            'booking_code' => 'BK' . strtoupper(uniqid()),
-            'payment_status' => 'pending',
-            'booking_status' => 'pending',
+            'booking_code' => 'TJ-BK' . rand(1000, 9999),
+            'payment_status' => 'paid',
+            'booking_status' => 'confirmed',
         ]);
-
-        $booking->startPayment();
 
         return response()->json([
             'success' => true,
