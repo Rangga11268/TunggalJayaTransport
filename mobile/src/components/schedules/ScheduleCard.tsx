@@ -49,6 +49,10 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
   const depTime = formatIndonesianTime(item.departure_time, "07:00");
   const arrTime = formatIndonesianTime(item.arrival_time, "11:00");
   const price = Number(item.price || 140000).toLocaleString("id-ID");
+  const duration = item.duration || "6 Jam";
+  const nextDepartureText =
+    item.next_departure_formatted ||
+    `Besok (${tomorrowOption.dayNum} ${tomorrowOption.monthName}) • ${depTime} WIB`;
 
   const nameLower = (busName || "").toLowerCase();
   let thumbSource = require("../../../assets/images/resiBisma.webp");
@@ -67,15 +71,20 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
           <Image
             source={thumbSource}
             style={[styles.busAvatar, isDeparted && { opacity: 0.55 }]}
+            style={[styles.busAvatar, isDeparted && { opacity: 0.7 }]}
             resizeMode="cover"
           />
           <View>
+          <View style={{ flex: 1 }}>
             <Text
               style={[styles.busNameText, isDeparted && { color: "#6B7280" }]}
+              style={[styles.busNameText, isDeparted && { color: "#374151" }]}
+              numberOfLines={1}
             >
               {busName}
             </Text>
             <Text style={styles.busClassText}>
+            <Text style={styles.busClassText} numberOfLines={1}>
               {busType} • {capacity} Kursi (2-2)
               {availableSeats !== undefined ? ` • Sisa ${availableSeats}` : ""}
             </Text>
@@ -85,6 +94,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
         {isDeparted ? (
           <View style={styles.departedBadge}>
             <Text style={styles.departedBadgeText}>BERANGKAT</Text>
+            <Text style={styles.departedBadgeText}>SUDAH BERANGKAT</Text>
           </View>
         ) : (
           <View style={styles.ratingBadge}>
@@ -101,10 +111,17 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
 
       {/* Main Departure Timeline Flow */}
       <View style={styles.timelineContainer}>
+      <View
+        style={[
+          styles.timelineContainer,
+          isDeparted && styles.timelineContainerDeparted,
+        ]}
+      >
         {/* Left: Departure */}
         <View style={styles.timeCol}>
           <Text
             style={[styles.bigTimeText, isDeparted && { color: "#6B7280" }]}
+            style={[styles.bigTimeText, isDeparted && { color: "#4B5563" }]}
           >
             {depTime}
           </Text>
@@ -116,6 +133,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
         {/* Middle: Duration & Route Line */}
         <View style={styles.lineCol}>
           <Text style={styles.durationText}>8j 00m</Text>
+          <Text style={styles.durationText}>{duration}</Text>
           <View style={styles.dashedLineRow}>
             <View style={styles.lineDot} />
             <View style={styles.lineBar} />
@@ -134,6 +152,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
         <View style={[styles.timeCol, { alignItems: "flex-end" }]}>
           <Text
             style={[styles.bigTimeText, isDeparted && { color: "#6B7280" }]}
+            style={[styles.bigTimeText, isDeparted && { color: "#4B5563" }]}
           >
             {arrTime}
           </Text>
@@ -149,6 +168,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
       {/* Intermediate Stops Strip */}
       <View style={styles.stopsBox}>
         <Navigation size={11} color="#6B7280" style={{ marginRight: 4 }} />
+        <Navigation size={11} color="#475569" style={{ marginRight: 5 }} />
         <Text style={styles.stopsBoxText} numberOfLines={1}>
           Lintas: {stops.join(" • ")}
         </Text>
@@ -156,23 +176,29 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
 
       {/* Next Departure Banner if Departed Today */}
       {isDeparted ? (
+      {isDeparted && (
         <View style={styles.nextDepartureCard}>
           <Calendar size={13} color="#4B5563" style={{ marginRight: 6 }} />
           <Text style={styles.nextDepartureCardText}>
+          <Calendar size={13} color="#B45309" style={{ marginRight: 6 }} />
+          <Text style={styles.nextDepartureCardText} numberOfLines={1}>
             Trip Hari Ini Selesai •{" "}
             <Text style={styles.nextDepartureCardBold}>
               Trip Berikutnya: Besok ({tomorrowOption.dayNum}{" "}
               {tomorrowOption.monthName}) {depTime} WIB
+              {nextDepartureText}
             </Text>
           </Text>
         </View>
       ) : null}
+      )}
 
       {/* Footer: Seat info & Action CTA */}
       <View style={styles.cardFooter}>
         <View>
           <Text style={styles.fareLabel}>Harga per orang</Text>
           <Text style={[styles.fareValue, isDeparted && { color: "#6B7280" }]}>
+          <Text style={[styles.fareValue, isDeparted && { color: "#4B5563" }]}>
             Rp {price}
           </Text>
         </View>
@@ -182,6 +208,11 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
             activeOpacity={0.85}
             onPress={() =>
               onSelectTomorrow(tomorrowOption.dateStr, busName, depTime)
+              onSelectTomorrow(
+                item.next_departure_date || tomorrowOption.dateStr,
+                busName,
+                depTime,
+              )
             }
             style={styles.tomorrowActionBtn}
           >
@@ -293,6 +324,9 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 10,
   },
+  timelineContainerDeparted: {
+    backgroundColor: "#F1F5F9",
+  },
   timeCol: {
     flex: 1,
   },
@@ -342,13 +376,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#F1F5F9",
+    backgroundColor: "#F8FAFC",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
     marginBottom: 12,
+    marginBottom: 10,
   },
   stopsBoxText: {
     fontFamily: "PlusJakartaSans_500Medium",
+    fontFamily: "PlusJakartaSans_600SemiBold",
     fontSize: 10.5,
     color: "#475569",
     flex: 1,
@@ -357,22 +396,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#F3F4F6",
+    backgroundColor: "#FFFBEB",
     borderWidth: 1,
     borderColor: "#E5E7EB",
+    borderColor: "#FDE68A",
     paddingHorizontal: 10,
     paddingVertical: 7,
     borderRadius: 10,
     marginBottom: 12,
+    marginBottom: 10,
   },
   nextDepartureCardText: {
     fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 10.5,
     color: "#4B5563",
+    color: "#92400E",
     flex: 1,
   },
   nextDepartureCardBold: {
     fontFamily: "PlusJakartaSans_700Bold",
     color: "#1F2937",
+    color: "#78350F",
   },
   cardFooter: {
     flexDirection: "row",
@@ -399,6 +443,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 10,
+    backgroundColor: "#0F172A",
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#0F172A",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   tomorrowActionText: {
     fontFamily: "PlusJakartaSans_700Bold",
