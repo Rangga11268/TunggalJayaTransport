@@ -33,6 +33,11 @@ import {
   CreditCard,
   Wallet,
 } from "lucide-react-native";
+import {
+  OfficialQrisBrandIcon,
+  OfficialBankVaBrandIcon,
+  OfficialEwalletBrandIcon,
+} from "../components/ServiceIcons";
 
 export default function CheckoutScreen({ navigation, route }: any) {
   const insets = useSafeAreaInsets();
@@ -417,6 +422,8 @@ export default function CheckoutScreen({ navigation, route }: any) {
             <View style={styles.paymentLeft}>
               <QrCode size={20} color="#059669" />
               <View>
+              <OfficialQrisBrandIcon size={38} />
+              <View style={{ flex: 1 }}>
                 <Text style={styles.paymentTitle}>
                   QRIS Realtime (BCA, GoPay, OVO, Dana)
                 </Text>
@@ -445,6 +452,8 @@ export default function CheckoutScreen({ navigation, route }: any) {
             <View style={styles.paymentLeft}>
               <Building size={20} color="#2563EB" />
               <View>
+              <OfficialBankVaBrandIcon size={38} />
+              <View style={{ flex: 1 }}>
                 <Text style={styles.paymentTitle}>
                   Virtual Account Bank (BCA / Mandiri / BRI / BNI)
                 </Text>
@@ -473,6 +482,8 @@ export default function CheckoutScreen({ navigation, route }: any) {
             <View style={styles.paymentLeft}>
               <Wallet size={20} color="#0284C7" />
               <View>
+              <OfficialEwalletBrandIcon size={38} />
+              <View style={{ flex: 1 }}>
                 <Text style={styles.paymentTitle}>GoPay / ShopeePay E-Wallet</Text>
                 <Text style={styles.paymentSub}>
                   Redirect instan ke aplikasi e-wallet

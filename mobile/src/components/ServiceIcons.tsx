@@ -924,3 +924,92 @@ export const FaqLuggageBagIcon: React.FC<IconProps> = ({ size = 36 }) => {
     </Svg>
   );
 };
+
+/**
+ * 18. Official QRIS Payment Brand Vector SVG Icon
+ */
+export const OfficialQrisBrandIcon: React.FC<{ size?: number; style?: any }> = ({
+  size = 38,
+  style,
+}) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 44 44" fill="none" style={style}>
+      <Rect width="44" height="44" rx="12" fill="#F0FDF4" stroke="#BBF7D0" strokeWidth="1" />
+      {/* Outer QR Frame */}
+      <Rect x="8" y="8" width="28" height="28" rx="4" fill="#FFFFFF" stroke="#16A34A" strokeWidth="1.5" />
+      {/* Top-Left Finder */}
+      <Rect x="11" y="11" width="7" height="7" rx="1.5" fill="#16A34A" />
+      <Rect x="13" y="13" width="3" height="3" fill="#FFFFFF" />
+      {/* Top-Right Finder */}
+      <Rect x="26" y="11" width="7" height="7" rx="1.5" fill="#16A34A" />
+      <Rect x="28" y="13" width="3" height="3" fill="#FFFFFF" />
+      {/* Bottom-Left Finder */}
+      <Rect x="11" y="26" width="7" height="7" rx="1.5" fill="#16A34A" />
+      <Rect x="13" y="28" width="3" height="3" fill="#FFFFFF" />
+      {/* Center QRIS Red Badge Accent */}
+      <Rect x="20" y="20" width="8" height="8" rx="2" fill="#EF4444" />
+      <Path d="M22 24 L24 22 L26 24" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
+
+/**
+ * 19. Official Bank Virtual Account Brand Vector SVG Icon
+ */
+export const OfficialBankVaBrandIcon: React.FC<{ size?: number; style?: any }> = ({
+  size = 38,
+  style,
+}) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 44 44" fill="none" style={style}>
+      <Defs>
+        <LinearGradient id="vaBankGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#2563EB" />
+          <Stop offset="100%" stopColor="#1E40AF" />
+        </LinearGradient>
+      </Defs>
+      <Rect width="44" height="44" rx="12" fill="#EFF6FF" stroke="#BFDBFE" strokeWidth="1" />
+      {/* Bank Building Card Graphic */}
+      <Path d="M11 17 L22 10 L33 17 H11 Z" fill="url(#vaBankGrad)" />
+      {/* Columns */}
+      <Rect x="13" y="19" width="3" height="11" rx="1" fill="#2563EB" />
+      <Rect x="18.5" y="19" width="3" height="11" rx="1" fill="#2563EB" />
+      <Rect x="24" y="19" width="3" height="11" rx="1" fill="#2563EB" />
+      <Rect x="29.5" y="19" width="3" height="11" rx="1" fill="#2563EB" />
+      {/* Base */}
+      <Rect x="10" y="31" width="24" height="3" rx="1" fill="url(#vaBankGrad)" />
+      {/* Star/Chip Indicator */}
+      <Circle cx="22" cy="15" r="1.5" fill="#FEF08A" />
+    </Svg>
+  );
+};
+
+/**
+ * 20. Official E-Wallet (GoPay / ShopeePay) Brand Vector SVG Icon
+ */
+export const OfficialEwalletBrandIcon: React.FC<{ size?: number; style?: any }> = ({
+  size = 38,
+  style,
+}) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 44 44" fill="none" style={style}>
+      <Defs>
+        <LinearGradient id="gopayGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#00AED6" />
+          <Stop offset="100%" stopColor="#007799" />
+        </LinearGradient>
+      </Defs>
+      <Rect width="44" height="44" rx="12" fill="#F0F9FF" stroke="#BAE6FD" strokeWidth="1" />
+      {/* Wallet Body */}
+      <Rect x="9" y="13" width="26" height="18" rx="4" fill="url(#gopayGrad)" />
+      {/* Top Flap */}
+      <Path d="M9 17 H35" stroke="#FFFFFF" strokeWidth="1.5" opacity="0.4" />
+      {/* ShopeePay / GoPay Coin Clasp */}
+      <Rect x="25" y="18" width="10" height="8" rx="3" fill="#EE4D2D" stroke="#FFFFFF" strokeWidth="1" />
+      <Circle cx="30" cy="22" r="1.5" fill="#FFFFFF" />
+      {/* Balance Dots */}
+      <Circle cx="15" cy="23" r="1.5" fill="#FFFFFF" opacity="0.8" />
+      <Circle cx="19" cy="23" r="1.5" fill="#FFFFFF" opacity="0.8" />
+    </Svg>
+  );
+};
