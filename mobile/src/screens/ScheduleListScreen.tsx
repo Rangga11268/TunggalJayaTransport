@@ -117,6 +117,41 @@ const getAvailableDates = (): DateOption[] => {
   return dates;
 };
 
+export interface RoutePreset {
+  id: string;
+  label: string;
+  origin: string;
+  destination: string;
+}
+
+export const ROUTE_PRESETS: RoutePreset[] = [
+  { id: "all", label: "Semua Rute", origin: "", destination: "" },
+  {
+    id: "kng-jkt",
+    label: "Kuningan → Jakarta",
+    origin: "Kuningan",
+    destination: "Jakarta",
+  },
+  {
+    id: "jkt-kng",
+    label: "Jakarta → Kuningan",
+    origin: "Jakarta",
+    destination: "Kuningan",
+  },
+  {
+    id: "kng-btn",
+    label: "Kuningan → Banten",
+    origin: "Kuningan",
+    destination: "Rangkasbitung",
+  },
+  {
+    id: "crb-jkt",
+    label: "Cirebon → Jakarta",
+    origin: "Cirebon",
+    destination: "Jakarta",
+  },
+];
+
 export default function ScheduleListScreen() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
@@ -124,6 +159,25 @@ export default function ScheduleListScreen() {
 
   const originCity = params.origin || "Kuningan";
   const destCity = params.destination || "Jakarta";
+  const initialRouteId = useMemo(() => {
+    if (!params.origin && !params.destination) return "all";
+    const found = ROUTE_PRESETS.find(
+      (p) =>
+        p.id !== "all" &&
+        params.origin?.toLowerCase().includes(p.origin.toLowerCase()) &&
+        params.destination?.toLowerCase().includes(p.destination.toLowerCase()),
+    );
+    return found ? found.id : "custom";
+  }, [params.origin, params.destination]);
+
+  const [selectedRouteId, setSelectedRouteId] =
+    useState<string>(initialRouteId);
+  const [currentOrigin, setCurrentOrigin] = useState<string>(
+    params.origin || "",
+  );
+  const [currentDest, setCurrentDest] = useState<string>(
+    params.destination || "",
+  );
 
   const dateOptions = useMemo(() => getAvailableDates(), []);
   const [selectedDate, setSelectedDate] = useState<string>(
@@ -145,9 +199,19 @@ export default function ScheduleListScreen() {
     destinationArea: "all",
   });
 
+  const handleSelectRoutePreset = (preset: RoutePreset) => {
+    setSelectedRouteId(preset.id);
+    setCurrentOrigin(preset.origin);
+    setCurrentDest(preset.destination);
+  };
+
   const fetchSchedules = async () => {
     try {
       setLoading(true);
+      const queryParams: any = { date: selectedDate };
+      if (currentOrigin) queryParams.origin = currentOrigin;
+      if (currentDest) queryParams.destination = currentDest;
+
       const res = await apiClient
         .get("/schedules", {
           params: {
@@ -156,10 +220,10 @@ export default function ScheduleListScreen() {
             date: selectedDate,
           },
         })
+        .get("/schedules", { params: queryParams })
         .catch(() => ({ data: [] }));
 
       const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      setSchedules(list);
       if (list.length === 0) {
         setSchedules([
           {
@@ -179,7 +243,9 @@ export default function ScheduleListScreen() {
             route: {
               id: 3,
               origin: originCity || "Kuningan",
-              destination: destCity ? `${destCity} (Kalideres)` : "Jakarta (Kalideres)",
+              destination: destCity
+                ? `${destCity} (Kalideres)`
+                : "Jakarta (Kalideres)",
               name: "Kuningan - Jakarta (Kalideres)",
             },
           },
@@ -221,7 +287,9 @@ export default function ScheduleListScreen() {
             route: {
               id: 3,
               origin: originCity || "Kuningan",
-              destination: destCity ? `${destCity} (Kalideres)` : "Jakarta (Kalideres)",
+              destination: destCity
+                ? `${destCity} (Kalideres)`
+                : "Jakarta (Kalideres)",
               name: "Kuningan - Jakarta (Kalideres)",
             },
           },
@@ -242,7 +310,9 @@ export default function ScheduleListScreen() {
             route: {
               id: 8,
               origin: originCity || "Kuningan",
-              destination: destCity ? `${destCity} (Pulogebang)` : "Jakarta (Pulogebang)",
+              destination: destCity
+                ? `${destCity} (Pulogebang)`
+                : "Jakarta (Pulogebang)",
               name: "Kuningan - Jakarta (Pulogebang)",
             },
           },
@@ -250,6 +320,7 @@ export default function ScheduleListScreen() {
       } else {
         setSchedules(list);
       }
+      setSchedules(list);
     } catch (e) {
       console.log("Error loading schedules:", e);
     } finally {
@@ -260,6 +331,7 @@ export default function ScheduleListScreen() {
   useEffect(() => {
     fetchSchedules();
   }, [originCity, destCity, selectedDate]);
+  }, [currentOrigin, currentDest, selectedDate]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -364,6 +436,18 @@ export default function ScheduleListScreen() {
     (filters.sortBy !== "earliest" ? 1 : 0);
 
   const tomorrowOption = dateOptions[1] || dateOptions[0];
+  const headerTitle = useMemo(() => {
+    if (currentOrigin && currentDest) {
+      return `${currentOrigin} → ${currentDest}`;
+    }
+    if (currentOrigin) {
+      return `Dari ${currentOrigin}`;
+    }
+    if (currentDest) {
+      return `Tujuan ${currentDest}`;
+    }
+    return "Semua Jadwal AKAP";
+  }, [currentOrigin, currentDest]);
 
   return (
     <View style={styles.container}>
@@ -371,7 +455,43 @@ export default function ScheduleListScreen() {
       <ScreenHeader
         title={`${originCity} → ${destCity}`}
         subtitle="Pilih Jadwal Keberangkatan"
+        title={headerTitle}
+        subtitle="Pilih Jadwal Keberangkatan Bus"
+        showBack={navigation.canGoBack()}
       />
+
+      {/* 1.5. HORIZONTAL ROUTE SELECTOR PRESETS */}
+      <View style={styles.routeSelectorBar}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.routeSelectorScroll}
+        >
+          {ROUTE_PRESETS.map((preset) => {
+            const isSelected = selectedRouteId === preset.id;
+            return (
+              <TouchableOpacity
+                key={preset.id}
+                activeOpacity={0.8}
+                onPress={() => handleSelectRoutePreset(preset)}
+                style={[
+                  styles.routePresetChip,
+                  isSelected && styles.routePresetChipActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.routePresetChipText,
+                    isSelected && styles.routePresetChipTextActive,
+                  ]}
+                >
+                  {preset.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
 
       {/* 2. 7-DAY HORIZONTAL CALENDAR STRIP */}
       <ScheduleDatePicker
@@ -566,6 +686,12 @@ export default function ScheduleListScreen() {
               item.route?.origin || originCity,
               item.route?.destination || destCity,
             );
+            const tomorrowOption = dateOptions[1] || dateOptions[0];
+            const itemOrigin =
+              item.route?.origin || currentOrigin || "Kuningan";
+            const itemDest =
+              item.route?.destination || currentDest || "Jakarta";
+            const stops = getStopsPreview(itemOrigin, itemDest);
 
             return (
               <ScheduleCard
@@ -573,6 +699,8 @@ export default function ScheduleListScreen() {
                 item={item}
                 originCity={originCity}
                 destCity={destCity}
+                originCity={itemOrigin}
+                destCity={itemDest}
                 isDeparted={isDeparted}
                 tomorrowOption={tomorrowOption}
                 stops={stops}
@@ -725,5 +853,35 @@ const styles = StyleSheet.create({
     fontFamily: "PlusJakartaSans_600SemiBold",
     fontSize: 12,
     color: COLORS.brandBlue,
+  },
+  routeSelectorBar: {
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+  routeSelectorScroll: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  routePresetChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: "#F1F5F9",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  routePresetChipActive: {
+    backgroundColor: COLORS.brandBlue,
+    borderColor: COLORS.brandBlue,
+  },
+  routePresetChipText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 12,
+    color: "#475569",
+  },
+  routePresetChipTextActive: {
+    color: "#FFFFFF",
   },
 });
