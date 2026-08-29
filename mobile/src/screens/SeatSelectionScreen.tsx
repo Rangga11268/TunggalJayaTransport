@@ -131,15 +131,6 @@ export default function SeatSelectionScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Top App Bar */}
-      <SafeAreaView edges={["top"]} style={styles.topBar}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.goBack()}
-          style={styles.backBtn}
-        >
-          <ArrowLeft size={18} color="#111827" />
-        </TouchableOpacity>
       {/* Standard Screen Header */}
       <ScreenHeader
         title="Pilih Kursi Penumpang"
@@ -147,18 +138,6 @@ export default function SeatSelectionScreen() {
         showBack={true}
         onBack={() => navigation.goBack()}
       />
-
-        <View style={styles.topBarCenter}>
-          <Text style={styles.topBarTitle}>Pilih Kursi Penumpang</Text>
-          <Text style={styles.topBarSub}>
-            {schedule?.bus?.name || "Resi Bisma"} •{" "}
-            {schedule?.route?.origin || "Jakarta"} →{" "}
-            {schedule?.route?.destination || "Kuningan"}
-          </Text>
-        </View>
-
-        <View style={{ width: 40 }} />
-      </SafeAreaView>
 
       {/* Bus Departure Warning Notice if departed */}
       {isDeparted && (

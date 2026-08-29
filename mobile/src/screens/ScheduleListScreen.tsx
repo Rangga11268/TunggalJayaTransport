@@ -344,13 +344,6 @@ export default function ScheduleListScreen() {
         showBack={navigation.canGoBack()}
       />
 
-      {/* 1. NATIVE TRAVEL APP TRIP SUMMARY CARD */}
-      <View style={styles.tripSummaryHeader}>
-        <View style={styles.routeSwapRow}>
-          <View style={styles.routeCityBox}>
-            <Text style={styles.routeCityLabel}>DARI</Text>
-            <Text style={styles.routeCityName}>{originCity}</Text>
-          </View>
       {/* 4. MAIN SCHEDULES & FILTERS SCROLL CONTAINER */}
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -371,13 +364,6 @@ export default function ScheduleListScreen() {
               <Text style={styles.routeCityName}>{originCity}</Text>
             </View>
 
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={handleSwapRoute}
-            style={styles.swapBtn}
-          >
-            <ArrowLeftRight size={16} color={COLORS.brandBlue} />
-          </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={handleSwapRoute}
@@ -386,36 +372,12 @@ export default function ScheduleListScreen() {
               <ArrowLeftRight size={16} color={COLORS.brandBlue} />
             </TouchableOpacity>
 
-          <View style={[styles.routeCityBox, { alignItems: "flex-end" }]}>
-            <Text style={styles.routeCityLabel}>TUJUAN</Text>
-            <Text style={styles.routeCityName}>{destCity}</Text>
             <View style={[styles.routeCityBox, { alignItems: "flex-end" }]}>
               <Text style={styles.routeCityLabel}>TUJUAN</Text>
               <Text style={styles.routeCityName}>{destCity}</Text>
             </View>
           </View>
-        </View>
 
-        {/* 2. CALENDAR DATE RIBBON CAROUSEL */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.dateRibbonScroll}
-        >
-          {dateOptions.map((item) => {
-            const isSelected = selectedDate === item.dateStr;
-            return (
-              <TouchableOpacity
-                key={item.dateStr}
-                activeOpacity={0.8}
-                onPress={() => setSelectedDate(item.dateStr)}
-                style={[styles.dateCard, isSelected && styles.dateCardActive]}
-              >
-                <Text
-                  style={[
-                    styles.dateDayText,
-                    isSelected && styles.dateDayTextActive,
-                  ]}
           {/* 2. CALENDAR DATE RIBBON CAROUSEL */}
           <ScrollView
             horizontal
@@ -431,64 +393,14 @@ export default function ScheduleListScreen() {
                   onPress={() => setSelectedDate(item.dateStr)}
                   style={[styles.dateCard, isSelected && styles.dateCardActive]}
                 >
-                  {item.dayName}
-                </Text>
-                <Text
-                  style={[
-                    styles.dateNumText,
-                    isSelected && styles.dateNumTextActive,
-                  ]}
-                >
-                  {item.dayNum}
-                </Text>
-                <Text
-                  style={[
-                    styles.dateMonthText,
-                    isSelected && styles.dateMonthTextActive,
-                  ]}
-                >
-                  {item.monthName}
-                </Text>
-                <View
-                  style={[
-                    styles.dateFareDot,
-                    isSelected && styles.dateFareDotActive,
-                  ]}
-                >
                   <Text
                     style={[
-                      styles.dateFareText,
-                      isSelected && styles.dateFareTextActive,
                       styles.dateDayText,
                       isSelected && styles.dateDayTextActive,
                     ]}
                   >
-                    140rb
                     {item.dayName}
                   </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      {/* 3. STICKY FILTER & SEARCH TOOLBAR */}
-      <View style={styles.toolbarSection}>
-        <View style={styles.searchBar}>
-          <Search size={16} color="#6B7280" style={{ marginRight: 6 }} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Cari armada / terminal..."
-            placeholderTextColor="#9CA3AF"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery ? (
-            <TouchableOpacity onPress={() => setSearchQuery("")}>
-              <X size={14} color="#6B7280" />
-            </TouchableOpacity>
-          ) : null}
                   <Text
                     style={[
                       styles.dateNumText,
@@ -526,29 +438,6 @@ export default function ScheduleListScreen() {
           </ScrollView>
         </View>
 
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => setFilterModalVisible(true)}
-          style={[
-            styles.filterTriggerBtn,
-            activeFilterCount > 0 && styles.filterTriggerBtnActive,
-          ]}
-        >
-          <SlidersHorizontal
-            size={14}
-            color={activeFilterCount > 0 ? "#FFFFFF" : "#374151"}
-            style={{ marginRight: 5 }}
-          />
-          <Text
-            style={[
-              styles.filterTriggerText,
-              activeFilterCount > 0 && styles.filterTriggerTextActive,
-            ]}
-          >
-            Filter {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
-          </Text>
-        </TouchableOpacity>
-      </View>
         {/* 3. FILTER & SEARCH TOOLBAR */}
         <View style={styles.toolbarSection}>
           <View style={styles.searchBar}>
@@ -567,34 +456,14 @@ export default function ScheduleListScreen() {
             ) : null}
           </View>
 
-      {/* Quick Filter Tag Bar */}
-      <View style={styles.quickTagsBar}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.quickTagsScroll}
-        >
           <TouchableOpacity
-            activeOpacity={0.75}
-            onPress={() =>
-              setFilters((prev) => ({
-                ...prev,
-                availableOnly: !prev.availableOnly,
-              }))
-            }
             activeOpacity={0.8}
             onPress={() => setFilterModalVisible(true)}
             style={[
-              styles.quickTag,
-              filters.availableOnly && styles.quickTagActive,
               styles.filterTriggerBtn,
               activeFilterCount > 0 && styles.filterTriggerBtnActive,
             ]}
           >
-            <CheckCircle2
-              size={12}
-              color={filters.availableOnly ? "#FFFFFF" : "#059669"}
-              style={{ marginRight: 4 }}
             <SlidersHorizontal
               size={14}
               color={activeFilterCount > 0 ? "#FFFFFF" : "#374151"}
@@ -602,30 +471,15 @@ export default function ScheduleListScreen() {
             />
             <Text
               style={[
-                styles.quickTagText,
-                filters.availableOnly && styles.quickTagTextActive,
                 styles.filterTriggerText,
                 activeFilterCount > 0 && styles.filterTriggerTextActive,
               ]}
             >
-              Tersedia Saja
               Filter {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
             </Text>
           </TouchableOpacity>
         </View>
 
-          <TouchableOpacity
-            activeOpacity={0.75}
-            onPress={() =>
-              setFilters((prev) => ({
-                ...prev,
-                timeSlot: prev.timeSlot === "morning" ? "all" : "morning",
-              }))
-            }
-            style={[
-              styles.quickTag,
-              filters.timeSlot === "morning" && styles.quickTagActive,
-            ]}
         {/* Quick Filter Tag Bar */}
         <View style={styles.quickTagsBar}>
           <ScrollView
@@ -633,7 +487,6 @@ export default function ScheduleListScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.quickTagsScroll}
           >
-            <Text
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() =>
@@ -643,15 +496,10 @@ export default function ScheduleListScreen() {
                 }))
               }
               style={[
-                styles.quickTagText,
-                filters.timeSlot === "morning" && styles.quickTagTextActive,
                 styles.quickTag,
                 filters.availableOnly && styles.quickTagActive,
               ]}
             >
-              Pagi (06:00 - 12:00)
-            </Text>
-          </TouchableOpacity>
               <CheckCircle2
                 size={12}
                 color={filters.availableOnly ? "#FFFFFF" : "#059669"}
@@ -667,20 +515,6 @@ export default function ScheduleListScreen() {
               </Text>
             </TouchableOpacity>
 
-          <TouchableOpacity
-            activeOpacity={0.75}
-            onPress={() =>
-              setFilters((prev) => ({
-                ...prev,
-                timeSlot: prev.timeSlot === "afternoon" ? "all" : "afternoon",
-              }))
-            }
-            style={[
-              styles.quickTag,
-              filters.timeSlot === "afternoon" && styles.quickTagActive,
-            ]}
-          >
-            <Text
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() =>
@@ -690,15 +524,10 @@ export default function ScheduleListScreen() {
                 }))
               }
               style={[
-                styles.quickTagText,
-                filters.timeSlot === "afternoon" && styles.quickTagTextActive,
                 styles.quickTag,
                 filters.timeSlot === "morning" && styles.quickTagActive,
               ]}
             >
-              Siang (12:00 - 18:00)
-            </Text>
-          </TouchableOpacity>
               <Text
                 style={[
                   styles.quickTagText,
@@ -709,20 +538,6 @@ export default function ScheduleListScreen() {
               </Text>
             </TouchableOpacity>
 
-          <TouchableOpacity
-            activeOpacity={0.75}
-            onPress={() =>
-              setFilters((prev) => ({
-                ...prev,
-                sortBy: prev.sortBy === "cheapest" ? "earliest" : "cheapest",
-              }))
-            }
-            style={[
-              styles.quickTag,
-              filters.sortBy === "cheapest" && styles.quickTagActive,
-            ]}
-          >
-            <Text
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() =>
@@ -732,17 +547,10 @@ export default function ScheduleListScreen() {
                 }))
               }
               style={[
-                styles.quickTagText,
-                filters.sortBy === "cheapest" && styles.quickTagTextActive,
                 styles.quickTag,
                 filters.timeSlot === "afternoon" && styles.quickTagActive,
               ]}
             >
-              Tarif Termurah
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
               <Text
                 style={[
                   styles.quickTagText,
@@ -753,18 +561,6 @@ export default function ScheduleListScreen() {
               </Text>
             </TouchableOpacity>
 
-      {/* 4. MAIN SCHEDULES LIST */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={COLORS.brandBlue}
-          />
-        }
-      >
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() =>
@@ -1067,11 +863,6 @@ const styles = StyleSheet.create({
   },
   tripSummaryHeader: {
     backgroundColor: "#FFFFFF",
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E2E8F0",
     borderRadius: 18,
     padding: 12,
     borderWidth: 1,
@@ -1193,9 +984,6 @@ const styles = StyleSheet.create({
   toolbarSection: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: "#FFFFFF",
     marginBottom: 8,
     gap: 8,
   },
@@ -1203,7 +991,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F1F4F8",
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
     paddingHorizontal: 10,
@@ -1221,7 +1008,6 @@ const styles = StyleSheet.create({
   filterTriggerBtn: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F1F4F8",
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 12,
     height: 38,
@@ -1242,15 +1028,10 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   quickTagsBar: {
-    backgroundColor: "#FFFFFF",
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E2E8F0",
     marginBottom: 10,
   },
   quickTagsScroll: {
     flexDirection: "row",
-    paddingHorizontal: 16,
     gap: 8,
   },
   quickTag: {

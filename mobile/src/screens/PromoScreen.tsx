@@ -131,15 +131,6 @@ export default function PromoScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Top Header */}
-      <SafeAreaView edges={["top"]} style={styles.topBar}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.goBack()}
-          style={styles.backBtn}
-        >
-          <ArrowLeft size={18} color="#111827" />
-        </TouchableOpacity>
       {/* Standard Screen Header */}
       <ScreenHeader
         title="Voucher & Kupon Promo"
@@ -147,10 +138,6 @@ export default function PromoScreen() {
         showBack={true}
         onBack={() => navigation.goBack()}
       />
-
-        <Text style={styles.topBarTitle}>Voucher &amp; Kupon Promo</Text>
-        <View style={{ width: 40 }} />
-      </SafeAreaView>
 
       <ScrollView
         showsVerticalScrollIndicator={false}

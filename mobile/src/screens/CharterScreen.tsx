@@ -221,29 +221,6 @@ export default function CharterScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Top Header */}
-      <SafeAreaView edges={["top"]} style={styles.topBar}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.goBack()}
-          style={styles.backBtn}
-        >
-          <ArrowLeft size={18} color="#111827" />
-        </TouchableOpacity>
-        {/* Standard Screen Header */}
-        <ScreenHeader
-          title="Sewa Bus Pariwisata"
-          subtitle="PO Tunggal Jaya Transport"
-          rightElement={
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={handleSendWhatsApp}
-              style={styles.waHeaderBtn}
-            >
-              <MessageCircle size={18} color="#059669" />
-            </TouchableOpacity>
-          }
-        />
       {/* Standard Screen Header */}
       <ScreenHeader
         title="Sewa Bus Pariwisata"
@@ -260,17 +237,6 @@ export default function CharterScreen() {
           </TouchableOpacity>
         }
       />
-
-        <Text style={styles.topBarTitle}>Sewa Bus Pariwisata</Text>
-
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={handleSendWhatsApp}
-          style={styles.waHeaderBtn}
-        >
-          <MessageCircle size={18} color="#059669" />
-        </TouchableOpacity>
-      </SafeAreaView>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
