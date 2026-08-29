@@ -18,6 +18,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { COLORS } from "../theme/colors";
 import apiClient from "../api/client";
+import { formatIndonesianTime } from "../utils/format";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { EmptyState } from "../components/EmptyState";
 import {
@@ -612,14 +613,8 @@ export default function ScheduleListScreen() {
             const busType = item.bus?.bus_type || "Bus Reguler";
             const origin = item.route?.origin || originCity;
             const destination = item.route?.destination || destCity;
-            const depTime = item.departure_time
-              ? item.departure_time.substring(11, 16) ||
-                item.departure_time.substring(0, 5)
-              : "07:00";
-            const arrTime = item.arrival_time
-              ? item.arrival_time.substring(11, 16) ||
-                item.arrival_time.substring(0, 5)
-              : "15:00";
+            const depTime = formatIndonesianTime(item.departure_time, "07:00");
+            const arrTime = formatIndonesianTime(item.arrival_time, "11:00");
             const price = Number(item.price || 140000).toLocaleString("id-ID");
 
             const isDeparted = isScheduleDeparted(item);

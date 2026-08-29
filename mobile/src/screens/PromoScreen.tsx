@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { COLORS } from "../theme/colors";
 import { ScreenHeader } from "../components/ScreenHeader";
+import { useCustomAlert } from "../context/AlertContext";
 import {
   ArrowLeft,
   Tag,
@@ -96,6 +97,7 @@ const PROMOS: PromoItem[] = [
 
 export default function PromoScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const { showAlert } = useCustomAlert();
   const [activeCategory, setActiveCategory] = useState<
     "all" | "akap" | "charter" | "vip"
   >("all");
@@ -115,17 +117,22 @@ export default function PromoScreen() {
 
   const handleCopyCode = (code: string) => {
     setCopiedCode(code);
-    Alert.alert(
-      "Kupon Berhasil Disalin!",
-      `Kode ${code} siap ditempel pada halaman checkout pembayaran tiket.`,
-      [
+    showAlert({
+      title: "Kupon Berhasil Disalin",
+      message: `Gunakan kupon promo ini saat checkout pemesanan tiket.\n\nKode Voucher: ${code}\n\nPotongan harga akan otomatis dihitung pada total pembayaran.`,
+      type: "success",
+      buttons: [
         {
-          text: "Pesan Tiket Sekarang",
+          text: "Tutup",
+          style: "cancel",
+        },
+        {
+          text: "Pesan Tiket",
+          style: "default",
           onPress: () => navigation.navigate("Schedules"),
         },
-        { text: "Tutup", style: "cancel" },
       ],
-    );
+    });
     setTimeout(() => setCopiedCode(null), 3000);
   };
 

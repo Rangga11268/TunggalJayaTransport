@@ -15,6 +15,8 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../theme/colors";
 import { useAuth } from "../context/AuthContext";
+import { useRewards } from "../context/RewardContext";
+import { useCustomAlert } from "../context/AlertContext";
 import api from "../api/client";
 import { formatIndonesianDate } from "../utils/format";
 import { ScreenHeader } from "../components/ScreenHeader";
@@ -42,6 +44,8 @@ import {
 export default function CheckoutScreen({ navigation, route }: any) {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const { earnPointsFromBooking } = useRewards();
+  const { showSuccess, showError, showWarning } = useCustomAlert();
   const {
     schedule,
     selectedSeats = [4],
@@ -100,17 +104,23 @@ export default function CheckoutScreen({ navigation, route }: any) {
       });
       if (res.data?.data?.discount_amount) {
         setDiscount(res.data.data.discount_amount);
-        Alert.alert(
-          "Sukses",
-          `Kupon berhasil diterapkan! Diskon Rp ${res.data.data.discount_amount.toLocaleString("id-ID")}`,
+        showSuccess(
+          "Kupon Diterapkan",
+          `Selamat! Kupon berhasil diterapkan. Diskon Rp ${res.data.data.discount_amount.toLocaleString("id-ID")}`,
         );
       } else {
         setDiscount(20000);
-        Alert.alert("Kupon Diterapkan", "Diskon promo Rp 20.000");
+        showSuccess(
+          "Kupon Diterapkan",
+          "Diskon promo Rp 20.000 berhasil digunakan.",
+        );
       }
     } catch {
       setDiscount(20000);
-      Alert.alert("Kupon Diterapkan", "Diskon promo Rp 20.000");
+      showSuccess(
+        "Kupon Diterapkan",
+        "Diskon promo Rp 20.000 berhasil digunakan.",
+      );
     } finally {
       setValidatingPromo(false);
     }
@@ -119,6 +129,7 @@ export default function CheckoutScreen({ navigation, route }: any) {
   const finalTotal = Math.max(0, (totalPrice || 180000) - discount);
 
   const navigateToSuccess = (bookingId: number, bookingData: any) => {
+    earnPointsFromBooking(finalTotal);
     navigation.replace("TicketDetail", {
       bookingId,
       booking: bookingData,
@@ -157,7 +168,7 @@ export default function CheckoutScreen({ navigation, route }: any) {
         },
         onError: (err: any) => {
           console.log("Midtrans Snap Error:", err);
-          Alert.alert(
+          showError(
             "Pembayaran Gagal",
             "Terjadi kesalahan saat memproses transaksi di Midtrans. Anda dapat mencoba kembali.",
           );
@@ -188,9 +199,9 @@ export default function CheckoutScreen({ navigation, route }: any) {
 
   const handleCheckout = async () => {
     if (!passengerName.trim() || !passengerPhone.trim()) {
-      Alert.alert(
+      showWarning(
         "Data Belum Lengkap",
-        "Silakan isi nama dan nomor telepon aktif penumpang.",
+        "Silakan isi nama dan nomor telepon aktif penumpang terlebih dahulu.",
       );
       return;
     }
@@ -221,7 +232,7 @@ export default function CheckoutScreen({ navigation, route }: any) {
       }
     } catch (e: any) {
       console.log("Error creating booking:", e);
-      Alert.alert(
+      showError(
         "Gagal Membuat Pemesanan",
         e.response?.data?.message ||
           "Terjadi kendala saat menghubungi server pemesanan.",
@@ -237,17 +248,11 @@ export default function CheckoutScreen({ navigation, route }: any) {
       setVerifyingPayment(true);
       await api.post(`/bookings/${pendingPayment.bookingId}/confirm-payment`);
       setShowPaymentModal(false);
-      navigateToSuccess(
-        pendingPayment.bookingId,
-        pendingPayment.bookingData,
-      );
+      navigateToSuccess(pendingPayment.bookingId, pendingPayment.bookingData);
     } catch (e) {
       console.log("Error confirming payment:", e);
       setShowPaymentModal(false);
-      navigateToSuccess(
-        pendingPayment.bookingId,
-        pendingPayment.bookingData,
-      );
+      navigateToSuccess(pendingPayment.bookingId, pendingPayment.bookingData);
     } finally {
       setVerifyingPayment(false);
     }
@@ -420,9 +425,7 @@ export default function CheckoutScreen({ navigation, route }: any) {
             ]}
           >
             <View style={styles.paymentLeft}>
-              <QrCode size={20} color="#059669" />
-              <View>
-              <OfficialQrisBrandIcon size={38} />
+              <OfficialQrisBrandIcon size={42} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.paymentTitle}>
                   QRIS Realtime (BCA, GoPay, OVO, Dana)
@@ -446,13 +449,12 @@ export default function CheckoutScreen({ navigation, route }: any) {
             onPress={() => setSelectedPayment("bank_transfer")}
             style={[
               styles.paymentOption,
-              selectedPayment === "bank_transfer" && styles.paymentOptionSelected,
+              selectedPayment === "bank_transfer" &&
+                styles.paymentOptionSelected,
             ]}
           >
             <View style={styles.paymentLeft}>
-              <Building size={20} color="#2563EB" />
-              <View>
-              <OfficialBankVaBrandIcon size={38} />
+              <OfficialBankVaBrandIcon size={42} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.paymentTitle}>
                   Virtual Account Bank (BCA / Mandiri / BRI / BNI)
@@ -480,11 +482,11 @@ export default function CheckoutScreen({ navigation, route }: any) {
             ]}
           >
             <View style={styles.paymentLeft}>
-              <Wallet size={20} color="#0284C7" />
-              <View>
-              <OfficialEwalletBrandIcon size={38} />
+              <OfficialEwalletBrandIcon size={42} />
               <View style={{ flex: 1 }}>
-                <Text style={styles.paymentTitle}>GoPay / ShopeePay E-Wallet</Text>
+                <Text style={styles.paymentTitle}>
+                  GoPay / ShopeePay E-Wallet
+                </Text>
                 <Text style={styles.paymentSub}>
                   Redirect instan ke aplikasi e-wallet
                 </Text>
@@ -593,10 +595,12 @@ export default function CheckoutScreen({ navigation, route }: any) {
                 Rp {finalTotal.toLocaleString("id-ID")}
               </Text>
               <Text style={styles.modalBookingCodeText}>
-                Kode Transaksi: {pendingPayment?.bookingData?.booking_code || "TJ-BK101"}
+                Kode Transaksi:{" "}
+                {pendingPayment?.bookingData?.booking_code || "TJ-BK101"}
               </Text>
               <Text style={styles.modalDescText}>
-                Transaksi telah terdaftar di Midtrans Gateway. Silakan buka jendela pembayaran atau konfirmasi setelah membayar.
+                Transaksi telah terdaftar di Midtrans Gateway. Silakan buka
+                jendela pembayaran atau konfirmasi setelah membayar.
               </Text>
 
               {/* Action Buttons */}
@@ -613,7 +617,11 @@ export default function CheckoutScreen({ navigation, route }: any) {
                     )
                   }
                 >
-                  <ExternalLink size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                  <ExternalLink
+                    size={16}
+                    color="#FFFFFF"
+                    style={{ marginRight: 6 }}
+                  />
                   <Text style={styles.openSnapBtnText}>
                     Buka Pembayaran Midtrans Snap
                   </Text>
@@ -630,7 +638,11 @@ export default function CheckoutScreen({ navigation, route }: any) {
                   <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : (
                   <>
-                    <CheckCircle2 size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                    <CheckCircle2
+                      size={16}
+                      color="#FFFFFF"
+                      style={{ marginRight: 6 }}
+                    />
                     <Text style={styles.confirmPaymentBtnText}>
                       Konfirmasi Status Pembayaran
                     </Text>

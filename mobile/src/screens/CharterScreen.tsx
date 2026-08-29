@@ -23,6 +23,7 @@ import api from "../api/client";
 import { formatIndonesianDate } from "../utils/format";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { SectionHeader } from "../components/SectionHeader";
+import { useCustomAlert } from "../context/AlertContext";
 import {
   ArrowLeft,
   MapPin,
@@ -116,6 +117,7 @@ export const CHARTER_BUS_OPTIONS: CharterBusOption[] = [
 
 export default function CharterScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const { showAlert, showWarning } = useCustomAlert();
 
   const [selectedBus, setSelectedBus] = useState<CharterBusOption>(
     CHARTER_BUS_OPTIONS[0],
@@ -134,9 +136,9 @@ export default function CharterScreen() {
 
   const handleSendWhatsApp = () => {
     if (!pickup.trim() || !destination.trim() || !startDate.trim()) {
-      Alert.alert(
+      showWarning(
         "Data Belum Lengkap",
-        "Harap isi lokasi penjemputan, tujuan wisata, dan tanggal rencana sewa.",
+        "Harap isi lokasi penjemputan, tujuan wisata, dan tanggal rencana sewa pariwisata.",
       );
       return;
     }
@@ -164,9 +166,9 @@ export default function CharterScreen() {
 
   const handleSubmit = async () => {
     if (!pickup.trim() || !destination.trim() || !startDate.trim()) {
-      Alert.alert(
+      showWarning(
         "Data Belum Lengkap",
-        "Harap isi lokasi penjemputan, tujuan wisata, dan tanggal keberangkatan.",
+        "Harap isi lokasi penjemputan, tujuan wisata, dan tanggal rencana sewa pariwisata.",
       );
       return;
     }
@@ -194,23 +196,27 @@ export default function CharterScreen() {
         })
         .catch(() => {});
 
-      Alert.alert(
-        "Pengajuan Terkirim!",
-        "Permintaan sewa pariwisata Anda telah tercatat. Hubungi WhatsApp Customer Service kami untuk konfirmasi ketersediaan instan.",
-        [
+      showAlert({
+        title: "Pengajuan Terkirim",
+        message:
+          "Permintaan sewa bus pariwisata Anda telah tercatat. Hubungi WhatsApp CS kami untuk konfirmasi ketersediaan instan.",
+        type: "success",
+        buttons: [
           {
-            text: "Buka WhatsApp Reservasi",
-            onPress: handleSendWhatsApp,
-          },
-          {
-            text: "Lihat Riwayat Pesanan",
+            text: "Lihat Riwayat",
+            style: "cancel",
             onPress: () =>
               navigation.navigate("MainTabs", {
                 screen: "BookingHistory",
               } as any),
           },
+          {
+            text: "Buka WhatsApp",
+            style: "default",
+            onPress: handleSendWhatsApp,
+          },
         ],
-      );
+      });
     } catch (e: any) {
       console.log("Error submitting charter request:", e);
       handleSendWhatsApp();
@@ -264,13 +270,10 @@ export default function CharterScreen() {
         </LinearGradient>
 
         {/* 1. Kategori / Tipe Bus Pariwisata Resmi */}
-        <View style={styles.sectionHeaderBox}>
-          <Text style={styles.sectionHeading}>Pilih Kategori Bus</Text>
-          <Text style={styles.sectionSub}>Sesuai Kapasitas Rombongan</Text>
-        </View>
         <SectionHeader
           title="Pilih Kategori Bus"
           subtitle="Sesuai Kapasitas Rombongan"
+          style={{ marginBottom: 12 }}
         />
 
         <View style={styles.busOptionsList}>
@@ -577,6 +580,84 @@ export default function CharterScreen() {
           </View>
         </View>
 
+        {/* Destinasi Wisata Populer */}
+        <View style={styles.sectionBox}>
+          <SectionHeader
+            title="Destinasi Wisata Favorit"
+            subtitle="Rute Populer Rombongan Pariwisata"
+            style={{ marginBottom: 12 }}
+          />
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.destScroll}
+          >
+            <View style={styles.destCard}>
+              <Text style={styles.destCity}>YOGYAKARTA</Text>
+              <Text style={styles.destTitle}>
+                Malioboro &amp; Candi Borobudur
+              </Text>
+              <Text style={styles.destSub}>
+                Paket 3H2M • Free Tol &amp; Parkir Wisata
+              </Text>
+            </View>
+
+            <View style={styles.destCard}>
+              <Text style={[styles.destCity, { color: "#059669" }]}>
+                BANDUNG
+              </Text>
+              <Text style={styles.destTitle}>Lembang &amp; Ciwidey Tour</Text>
+              <Text style={styles.destSub}>
+                Paket 2H1M • Rute Fleksibel Acara
+              </Text>
+            </View>
+
+            <View style={styles.destCard}>
+              <Text style={[styles.destCity, { color: "#D97706" }]}>
+                PANGANDARAN
+              </Text>
+              <Text style={styles.destTitle}>Pantai &amp; Green Canyon</Text>
+              <Text style={styles.destSub}>Paket 2H1M • Rombongan Kompak</Text>
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Fasilitas Termasuk Sewa */}
+        <View style={styles.sectionBox}>
+          <SectionHeader
+            title="Fasilitas Termasuk Sewa"
+            subtitle="Jaminan Layanan Standar Pariwisata PO Tunggal Jaya"
+            style={{ marginBottom: 12 }}
+          />
+          <View style={styles.inclusiveGrid}>
+            <View style={styles.inclusiveItem}>
+              <Check size={16} color="#059669" />
+              <Text style={styles.inclusiveText}>
+                BBM Bus &amp; Armada Standar Pariwisata
+              </Text>
+            </View>
+            <View style={styles.inclusiveItem}>
+              <Check size={16} color="#059669" />
+              <Text style={styles.inclusiveText}>
+                Kru Driver &amp; Co-Driver Berlisensi Resmi
+              </Text>
+            </View>
+            <View style={styles.inclusiveItem}>
+              <Check size={16} color="#059669" />
+              <Text style={styles.inclusiveText}>
+                Audio Karaoke, TV LED &amp; Mic Wireless
+              </Text>
+            </View>
+            <View style={styles.inclusiveItem}>
+              <Check size={16} color="#059669" />
+              <Text style={styles.inclusiveText}>
+                Asuransi Jasa Raharja Resmi
+              </Text>
+            </View>
+          </View>
+        </View>
+
         <View style={{ height: 120 }} />
       </ScrollView>
 
@@ -657,6 +738,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 16,
+  },
+  sectionBox: {
+    marginBottom: 20,
   },
   heroBanner: {
     borderRadius: 22,
@@ -960,6 +1044,66 @@ const styles = StyleSheet.create({
     fontFamily: "PlusJakartaSans_600SemiBold",
     fontSize: 11.5,
     color: "#4B5563",
+  },
+  destScroll: {
+    flexDirection: "row",
+    gap: 12,
+    paddingBottom: 4,
+  },
+  destCard: {
+    width: 200,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#0F172A",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 1,
+      },
+    }),
+  },
+  destCity: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 11,
+    color: COLORS.brandBlue,
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  destTitle: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 12.5,
+    color: "#0F172A",
+    marginBottom: 3,
+  },
+  destSub: {
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 10.5,
+    color: "#64748B",
+  },
+  inclusiveGrid: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    gap: 10,
+  },
+  inclusiveItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  inclusiveText: {
+    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontSize: 12,
+    color: "#334155",
   },
   bottomBar: {
     position: "absolute",

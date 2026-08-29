@@ -1,7 +1,8 @@
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, LinkingOptions } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Platform } from "react-native";
 
 import { useAuth } from "../context/AuthContext";
 import FloatingTabBar from "./FloatingTabBar";
@@ -21,6 +22,7 @@ import CharterScreen from "../screens/CharterScreen";
 import PromoScreen from "../screens/PromoScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import HelpScreen from "../screens/HelpScreen";
+import RewardsScreen from "../screens/RewardsScreen";
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -42,6 +44,7 @@ export type RootStackParamList = {
   BookingHistory: undefined;
   Charter: undefined;
   Promo: undefined;
+  Rewards: undefined;
   Help: undefined;
   Profile: undefined;
 };
@@ -56,6 +59,46 @@ export type MainTabParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
+
+const linking: LinkingOptions<RootStackParamList> = {
+  prefixes: [
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "http://localhost:8081",
+    "http://localhost:8081",
+    "http://localhost:19006",
+    "tunggaljaya://",
+  ],
+  config: {
+    screens: {
+      Splash: "splash",
+      GetStarted: "get-started",
+      Login: "login",
+      Register: "register",
+      MainTabs: {
+        screens: {
+          Home: "",
+          Schedules: "schedules",
+          BookingHistory: "booking-history",
+          Help: "help",
+          Profile: "profile",
+        },
+      } as any,
+      Schedules: "all-schedules",
+      ScheduleList: "schedule-list",
+      ScheduleDetail: "schedule/:scheduleId",
+      SeatSelection: "seats/:scheduleId",
+      Checkout: "checkout",
+      TicketDetail: "ticket/:bookingId",
+      BookingHistory: "my-tickets",
+      Charter: "charter",
+      Promo: "promos",
+      Rewards: "rewards",
+      Help: "help-center",
+      Profile: "my-profile",
+    },
+  },
+};
 
 function MainTabs() {
   return (
@@ -78,11 +121,28 @@ function MainTabs() {
 export default function RootNavigator() {
   const { user } = useAuth();
 
+  // On Web, if user is on specific page, do not force Splash as initial
+  const isWeb = Platform.OS === "web" && typeof window !== "undefined";
+  const hasSpecificPath =
+    isWeb &&
+    window.location.pathname !== "/" &&
+    window.location.pathname !== "/splash";
+
+  const getInitialRoute = (): keyof RootStackParamList => {
+    if (hasSpecificPath) {
+      return "MainTabs";
+    }
+    if (user) {
+      return "MainTabs";
+    }
+    return "Splash";
+  };
+
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator
         id="root-stack"
-        initialRouteName="Splash"
+        initialRouteName={getInitialRoute()}
         screenOptions={{
           headerShown: false,
           animation: "slide_from_right",
@@ -102,6 +162,7 @@ export default function RootNavigator() {
         <Stack.Screen name="BookingHistory" component={BookingHistoryScreen} />
         <Stack.Screen name="Charter" component={CharterScreen} />
         <Stack.Screen name="Promo" component={PromoScreen} />
+        <Stack.Screen name="Rewards" component={RewardsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

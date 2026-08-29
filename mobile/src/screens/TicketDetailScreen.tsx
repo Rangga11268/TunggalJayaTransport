@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { COLORS } from "../theme/colors";
 import api from "../api/client";
-import { formatIndonesianDate } from "../utils/format";
+import { formatIndonesianDate, formatIndonesianTime } from "../utils/format";
 import { ScreenHeader } from "../components/ScreenHeader";
 import {
   Share2,
@@ -84,18 +84,12 @@ export default function TicketDetailScreen({ navigation, route }: any) {
 
   const bookingCode = booking?.booking_code || `TJ-BK${booking?.id || 101}`;
   const origin = schedule?.route?.origin || "Kuningan";
-  const destination = schedule?.route?.destination || "Jakarta (Kalideres)";
+  const destination = schedule?.route?.destination || "Jakarta (Pulogebang)";
   const busName = schedule?.bus?.name || "Resi Bisma";
-  const busType = schedule?.bus?.bus_type || "Super High Deck (Jetbus 5)";
+  const busType = schedule?.bus?.bus_type || "Executive";
   const plateNumber = schedule?.bus?.plate_number || "E 7777 TJ";
-  const depTime = schedule?.departure_time
-    ? schedule.departure_time.substring(11, 16) ||
-      schedule.departure_time.substring(0, 5)
-    : "07:00";
-  const arrTime = schedule?.arrival_time
-    ? schedule.arrival_time.substring(11, 16) ||
-      schedule.arrival_time.substring(0, 5)
-    : "13:00";
+  const depTime = formatIndonesianTime(schedule?.departure_time, "07:00");
+  const arrTime = formatIndonesianTime(schedule?.arrival_time, "11:00");
   const passengerName = booking?.passenger_name || "Rangga Putra";
   const passengerPhone = booking?.passenger_phone || "081234567890";
   const date = formatIndonesianDate(
@@ -186,8 +180,12 @@ export default function TicketDetailScreen({ navigation, route }: any) {
               <View style={styles.busIconCircle}>
                 <Bus size={18} color={COLORS.brandBlue} />
               </View>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
-                <View style={{ width: 14, height: 1.5, backgroundColor: "#CBD5E1" }} />
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 3 }}
+              >
+                <View
+                  style={{ width: 14, height: 1.5, backgroundColor: "#CBD5E1" }}
+                />
                 <ArrowRight size={13} color="#94A3B8" />
               </View>
             </View>
@@ -268,7 +266,8 @@ export default function TicketDetailScreen({ navigation, route }: any) {
             <Text style={styles.routeDescLabel}>ROUTE</Text>
             <View style={styles.routeDescBox}>
               <Text style={styles.routeDescText}>
-                {origin.toUpperCase()} &gt;&gt; {destination.toUpperCase()} (VIA TOL CIPALI)
+                {origin.toUpperCase()} &gt;&gt; {destination.toUpperCase()} (VIA
+                TOL CIPALI)
               </Text>
             </View>
           </View>
@@ -287,8 +286,8 @@ export default function TicketDetailScreen({ navigation, route }: any) {
             </View>
             <Text style={styles.qrCodeText}>ID {bookingCode}</Text>
             <Text style={styles.qrInstruction}>
-              Tunjukkan QR Code ini kepada kondektur atau kru agen PO Tunggal Jaya
-              saat proses boarding keberangkatan.
+              Tunjukkan QR Code ini kepada kondektur atau kru agen PO Tunggal
+              Jaya saat proses boarding keberangkatan.
             </Text>
           </View>
         </View>

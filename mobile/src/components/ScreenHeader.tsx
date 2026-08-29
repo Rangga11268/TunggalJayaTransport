@@ -1,8 +1,14 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { ArrowLeft } from 'lucide-react-native';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { ArrowLeft } from "lucide-react-native";
 
 interface ScreenHeaderProps {
   title: string;
@@ -22,7 +28,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   onBack,
   leftElement,
   rightElement,
-  backgroundColor = '#FFFFFF',
+  backgroundColor = "#FFFFFF",
   borderBottom = true,
 }) => {
   const navigation = useNavigation();
@@ -32,12 +38,14 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
       onBack();
     } else if (navigation.canGoBack()) {
       navigation.goBack();
+    } else {
+      (navigation as any).navigate("MainTabs");
     }
   };
 
   return (
     <SafeAreaView
-      edges={['top']}
+      edges={["top"]}
       style={[
         styles.safeArea,
         { backgroundColor },
@@ -46,7 +54,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
     >
       <View style={styles.container}>
         {/* Left Action / Back Button */}
-        <View style={styles.sideCol}>
+        <View style={styles.leftCol}>
           {leftElement ? (
             leftElement
           ) : showBack ? (
@@ -58,26 +66,28 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
             >
               <ArrowLeft size={18} color="#111827" />
             </TouchableOpacity>
-          ) : (
-            <View style={styles.spacer} />
-          )}
+          ) : null}
         </View>
 
-        {/* Center Title & Subtitle */}
-        <View style={styles.centerCol}>
-          <Text style={styles.title} numberOfLines={1}>
+        {/* Center / Text Title & Subtitle */}
+        <View style={styles.textCol}>
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
             {title}
           </Text>
           {subtitle ? (
-            <Text style={styles.subtitle} numberOfLines={1}>
+            <Text
+              style={styles.subtitle}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {subtitle}
             </Text>
           ) : null}
         </View>
 
         {/* Right Action Element */}
-        <View style={[styles.sideCol, styles.rightAlign]}>
-          {rightElement ? rightElement : <View style={styles.spacer} />}
+        <View style={styles.rightCol}>
+          {rightElement ? rightElement : <View style={styles.rightSpacer} />}
         </View>
       </View>
     </SafeAreaView>
@@ -90,56 +100,57 @@ const styles = StyleSheet.create({
   },
   bottomBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: "#E2E8F0",
   },
   container: {
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    minHeight: 56,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
+    paddingVertical: 6,
+    gap: 8,
   },
-  sideCol: {
-    width: 44,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
+  leftCol: {
+    flexShrink: 0,
+    justifyContent: "center",
+    alignItems: "flex-start",
   },
-  rightAlign: {
-    alignItems: 'flex-end',
+  textCol: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    paddingHorizontal: 4,
   },
-  spacer: {
-    width: 40,
-    height: 40,
+  rightCol: {
+    flexShrink: 0,
+    justifyContent: "center",
+    alignItems: "flex-end",
+  },
+  rightSpacer: {
+    width: 8,
+    height: 38,
   },
   circleBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F8FAFC',
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: "#F8FAFC",
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  centerCol: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 8,
+    borderColor: "#E2E8F0",
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 16.5,
-    color: '#111827',
-    textAlign: 'center',
-    letterSpacing: -0.3,
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 16,
+    color: "#0F172A",
+    letterSpacing: -0.2,
   },
   subtitle: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 11.5,
-    color: '#6B7280',
-    textAlign: 'center',
+    color: "#64748B",
     marginTop: 1,
   },
 });
-

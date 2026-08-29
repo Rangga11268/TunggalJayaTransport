@@ -23,6 +23,9 @@ import {
   Sparkles,
   ArrowRight,
   Bus,
+  Compass,
+  Receipt,
+  Ticket,
   Tag,
   ArrowLeftRight,
   Calendar,
@@ -35,6 +38,8 @@ import {
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { COLORS } from "../theme/colors";
 import { useAuth } from "../context/AuthContext";
+import { useRewards } from "../context/RewardContext";
+import { useCustomAlert } from "../context/AlertContext";
 import apiClient from "../api/client";
 import { SectionHeader } from "../components/SectionHeader";
 import {
@@ -56,6 +61,8 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 export default function HomeScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { user } = useAuth();
+  const { points } = useRewards();
+  const { showSuccess } = useCustomAlert();
 
   const [schedules, setSchedules] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -70,35 +77,35 @@ export default function HomeScreen() {
     "today",
   );
 
-  // Rich Vector SVG Service Icons for Layanan Utama
+  // Prominent Quick Actions Grid (Vibrant Multi-layer Vector SVG Icons)
   const quickLinks = [
     {
       id: "schedules",
-      title: "Tiket Bus AKAP",
+      title: "Tiket AKAP",
       subtitle: "Jadwal & Kursi",
-      iconComponent: AkapBusIcon,
+      SvgIcon: AkapBusIcon,
       action: () => navigation.navigate("Schedules"),
     },
     {
       id: "charter",
-      title: "Sewa Pariwisata",
-      subtitle: "Carter Rombongan",
-      iconComponent: CharterPariwisataIcon,
+      title: "Pariwisata",
+      subtitle: "Sewa Bus TJ",
+      SvgIcon: CharterPariwisataIcon,
       action: () => navigation.navigate("Charter"),
     },
     {
       id: "history",
-      title: "Riwayat Pesanan",
-      subtitle: "Cek E-Tiket",
-      iconComponent: BookingHistoryIcon,
+      title: "Riwayat",
+      subtitle: "E-Tiket & Status",
+      SvgIcon: BookingHistoryIcon,
       action: () =>
         navigation.navigate("MainTabs", { screen: "BookingHistory" } as any),
     },
     {
       id: "promo",
-      title: "Voucher Promo",
-      subtitle: "Diskon s.d 50%",
-      iconComponent: PromoVoucherIcon,
+      title: "Promo",
+      subtitle: "Voucher Diskon",
+      SvgIcon: PromoVoucherIcon,
       action: () => navigation.navigate("Promo"),
     },
   ];
@@ -141,50 +148,99 @@ export default function HomeScreen() {
     setDestinationCity(temp);
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 11) return "Selamat Pagi";
+    if (hour < 15) return "Selamat Siang";
+    if (hour < 18) return "Selamat Sore";
+    return "Selamat Malam";
+  };
+
   const handleCopyCoupon = () => {
     setCouponCopied(true);
-    Alert.alert(
-      "Kupon Disalin",
-      "Kode voucher 'TJBERKAH' berhasil disalin. Gunakan saat checkout untuk mendapatkan potongan harga 10%.",
+    showSuccess(
+      "Kupon Berhasil Disalin",
+      "Gunakan kode kupon promo ini saat checkout pemesanan tiket.\n\nKode Voucher: TJBERKAH\n\nDapatkan diskon potongan 10% langsung pada transaksi Anda.",
     );
     setTimeout(() => setCouponCopied(false), 3000);
   };
 
   return (
     <View style={styles.container}>
-      {/* Top Header App Bar (Clean Modern Brand Bar, No Hamburger Clutter) */}
+      {/* Top Header App Bar (Integrated Modern Brand Bar) */}
       <SafeAreaView edges={["top"]} style={styles.safeHeader}>
         <View style={styles.headerBar}>
+          {/* Brand Logo with Identity Text */}
           <View style={styles.headerBrandLeft}>
-            <Image
-              source={require("../../assets/images/logoNoBg.png")}
-              style={styles.headerLogo}
-              resizeMode="contain"
-            />
+            <View style={styles.headerLogoContainer}>
+              <Image
+                source={require("../../assets/images/logoNoBg.png")}
+                style={styles.headerLogo}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.brandTextCol}>
+              <Text style={styles.brandTitleText}>PO TUNGGAL JAYA</Text>
+              <Text style={styles.brandSubtitleText}>
+                Transport &amp; Pariwisata
+              </Text>
+            </View>
           </View>
 
+          {/* Right Action Icons: Points + Notification + Avatar / Login */}
           <View style={styles.headerRight}>
+            {user && (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate("Rewards")}
+                style={styles.pointsPillBtn}
+                accessibilityLabel="TJ Rewards Poin"
+              >
+                <Sparkles
+                  size={12}
+                  color="#D97706"
+                  style={{ marginRight: 3 }}
+                />
+                <Text style={styles.pointsPillText}>
+                  {points.toLocaleString("id-ID")}
+                </Text>
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => setIsNotifOpen(true)}
               style={styles.iconCircle}
+              accessibilityLabel="Notifikasi"
             >
-              <Bell size={18} color="#111827" />
+              <Bell size={18} color="#1E293B" />
               {unreadNotifCount > 0 && <View style={styles.badgeDot} />}
             </TouchableOpacity>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() =>
-                navigation.navigate("MainTabs", { screen: "Profile" } as any)
-              }
-              style={styles.avatarRing}
-            >
-              <Image
-                source={require("../../assets/images/bentas01.webp")}
-                style={styles.avatarImg}
-              />
-            </TouchableOpacity>
+            {user ? (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() =>
+                  navigation.navigate("MainTabs", { screen: "Profile" } as any)
+                }
+                style={styles.avatarRing}
+                accessibilityLabel="Profil Saya"
+              >
+                <Image
+                  source={require("../../assets/images/bentas01.webp")}
+                  style={styles.avatarImg}
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={() => navigation.navigate("Login")}
+                style={styles.headerLoginPill}
+                accessibilityLabel="Masuk Akun"
+              >
+                <Text style={styles.headerLoginPillText}>Masuk</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </SafeAreaView>
@@ -200,12 +256,24 @@ export default function HomeScreen() {
           />
         }
       >
-        {/* User Greeting & Tagline */}
+        {/* User Greeting & VIP Status Banner */}
         <View style={styles.greetingSection}>
-          <Text style={styles.greetingTitle}>
-            Halo,{" "}
-            <Text style={styles.greetingName}>{user?.name || "Sobat TJ"}</Text>
-          </Text>
+          <View style={styles.greetingHeaderRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.greetingTimeText}>{getGreeting()},</Text>
+              <Text style={styles.greetingNameText} numberOfLines={1}>
+                {user?.name || "Sobat Tunggal Jaya"}
+              </Text>
+            </View>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate("Rewards")}
+              style={styles.vipPillBadge}
+            >
+              <Sparkles size={12} color="#D97706" style={{ marginRight: 4 }} />
+              <Text style={styles.vipPillText}>TJ Rewards &gt;</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.greetingSubtitle}>
             Mau bepergian nyaman kemana hari ini?
           </Text>
@@ -374,7 +442,7 @@ export default function HomeScreen() {
 
           <View style={styles.quickGrid}>
             {quickLinks.map((item) => {
-              const SvgIcon = item.iconComponent;
+              const SvgComp = item.SvgIcon;
               return (
                 <TouchableOpacity
                   key={item.id}
@@ -382,8 +450,8 @@ export default function HomeScreen() {
                   onPress={item.action}
                   style={styles.quickCard}
                 >
-                  <View style={styles.quickIconWrapper}>
-                    <SvgIcon size={50} />
+                  <View style={styles.quickSvgBox}>
+                    <SvgComp size={48} />
                   </View>
                   <Text style={styles.quickTitle} numberOfLines={1}>
                     {item.title}
@@ -717,24 +785,30 @@ export default function HomeScreen() {
           })}
         </View>
 
-        {/* 8. LOKASI GARASI & KONTAK RESMI (Authentic PO Tunggal Jaya Data & Real SVG Brand Icons) */}
+        {/* 8. LOKASI GARASI & KONTAK RESMI (Authentic PO Tunggal Jaya Data & Real Garage Photos) */}
         <View style={styles.garageSectionContainer}>
           <SectionHeader
             title="Garasi & Kontak Resmi"
             subtitle="Lokasi Operasional & Layanan Bantuan 24 Jam"
-            style={{ marginBottom: 12 }}
+            style={{ marginBottom: 14 }}
           />
 
-          <View style={styles.garageCardBox}>
-            {/* Garasi 1 */}
-            <View style={styles.garageItem}>
-              <View style={styles.garageBadgeRow}>
-                <View style={styles.garageBadgePill}>
-                  <Text style={styles.garageBadgePillText}>
-                    GARASI 1 (PUSAT & PARIWISATA)
-                  </Text>
-                </View>
+          {/* Garasi 1: Pusat & Pariwisata */}
+          <View style={styles.garagePhotoCard}>
+            <View style={styles.garageImageWrapper}>
+              <Image
+                source={require("../../assets/images/garasi1_cilimus.webp")}
+                style={styles.garageImage}
+                resizeMode="cover"
+              />
+              <View style={styles.garageImageBadge}>
+                <Text style={styles.garageImageBadgeText}>
+                  GARASI 1 (PUSAT &amp; PARIWISATA)
+                </Text>
               </View>
+            </View>
+
+            <View style={styles.garageCardBody}>
               <Text style={styles.garageItemTitle}>
                 Garasi Pusat Cilimus, Kuningan
               </Text>
@@ -742,91 +816,110 @@ export default function HomeScreen() {
                 Jl. Raya Linggajati, Bojong, Kec. Cilimus, Kabupaten Kuningan,
                 Jawa Barat 45556
               </Text>
+
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() =>
+                  Linking.openURL(
+                    "https://maps.google.com/?q=-6.881759,108.491583",
+                  )
+                }
+                style={styles.garageMapsBtn}
+              >
+                <MapPin
+                  size={13}
+                  color={COLORS.brandBlue}
+                  style={{ marginRight: 5 }}
+                />
+                <Text style={styles.garageMapsBtnText}>
+                  Petunjuk Arah Google Maps
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Garasi 2: Khusus Bus AKAP */}
+          <View style={styles.garagePhotoCard}>
+            <View style={styles.garageImageWrapper}>
+              <Image
+                source={require("../../assets/images/garasi2_cidahu.webp")}
+                style={styles.garageImage}
+                resizeMode="cover"
+              />
+              <View
+                style={[
+                  styles.garageImageBadge,
+                  { backgroundColor: "rgba(37, 99, 235, 0.9)" },
+                ]}
+              >
+                <Text style={styles.garageImageBadgeText}>
+                  GARASI 2 (KHUSUS BUS AKAP)
+                </Text>
+              </View>
             </View>
 
-            <View style={styles.garageItemDivider} />
-
-            {/* Garasi 2 */}
-            <View style={styles.garageItem}>
-              <View style={styles.garageBadgeRow}>
-                <View
-                  style={[
-                    styles.garageBadgePill,
-                    { backgroundColor: "#F1F5F9" },
-                  ]}
-                >
-                  <Text
-                    style={[styles.garageBadgePillText, { color: "#475569" }]}
-                  >
-                    GARASI 2 (KHUSUS BUS AKAP)
-                  </Text>
-                </View>
-              </View>
+            <View style={styles.garageCardBody}>
               <Text style={styles.garageItemTitle}>
                 Garasi Cidahu, Kuningan
               </Text>
               <Text style={styles.garageItemAddress}>
                 Cihideunggirang, Kec. Cidahu, Kabupaten Kuningan, Jawa Barat
-                45595 • Pool AKAP & Bengkel Terpadu
+                45595 • Pool AKAP &amp; Bengkel Terpadu
               </Text>
-            </View>
 
-            {/* Dedicated Action Buttons (Full-width clean row, no text clipping) */}
-            <View style={styles.garageActionsWrapper}>
               <TouchableOpacity
-                activeOpacity={0.85}
+                activeOpacity={0.8}
                 onPress={() =>
                   Linking.openURL(
-                    "https://wa.me/6281122222353?text=Halo%20CS%20PO%20Tunggal%20Jaya,%20saya%20ingin%20informasi%20jadwal%20dan%20sewa%20bus.",
+                    "https://maps.google.com/?q=-6.96324,108.62145",
                   )
                 }
-                style={styles.officialWaButton}
+                style={styles.garageMapsBtn}
               >
-                <OfficialWhatsAppIcon size={18} color="#FFFFFF" />
-                <Text style={styles.officialWaButtonText}>
-                  Chat WhatsApp CS 24 Jam
-                </Text>
-                <ExternalLink
+                <MapPin
                   size={13}
-                  color="#FFFFFF"
-                  style={{ marginLeft: 4 }}
+                  color={COLORS.brandBlue}
+                  style={{ marginRight: 5 }}
                 />
+                <Text style={styles.garageMapsBtnText}>
+                  Petunjuk Arah Google Maps
+                </Text>
               </TouchableOpacity>
-
-              <View style={styles.garageSecondaryButtonsRow}>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={() => Linking.openURL("tel:0232613399")}
-                  style={styles.officialCallButton}
-                >
-                  <PhoneCall
-                    size={14}
-                    color="#1E293B"
-                    style={{ marginRight: 6 }}
-                  />
-                  <Text style={styles.officialCallButtonText}>
-                    Telepon (0232) 613399
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={() =>
-                    Linking.openURL(
-                      "https://maps.google.com/?q=-6.881759,108.491583",
-                    )
-                  }
-                  style={styles.officialMapsButton}
-                >
-                  <MapPin
-                    size={14}
-                    color={COLORS.brandBlue}
-                    style={{ marginRight: 5 }}
-                  />
-                  <Text style={styles.officialMapsButtonText}>Rute Maps</Text>
-                </TouchableOpacity>
-              </View>
             </View>
+          </View>
+
+          {/* Dedicated Action Buttons (Full-width clean row, no text clipping) */}
+          <View style={styles.garageActionsWrapper}>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() =>
+                Linking.openURL(
+                  "https://wa.me/6281122222353?text=Halo%20CS%20PO%20Tunggal%20Jaya,%20saya%20ingin%20informasi%20jadwal%20dan%20sewa%20bus.",
+                )
+              }
+              style={styles.officialWaButton}
+            >
+              <OfficialWhatsAppIcon size={18} color="#FFFFFF" />
+              <Text style={styles.officialWaButtonText}>
+                Chat WhatsApp CS 24 Jam
+              </Text>
+              <ExternalLink
+                size={13}
+                color="#FFFFFF"
+                style={{ marginLeft: 4 }}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => Linking.openURL("tel:0232613399")}
+              style={styles.officialCallButton}
+            >
+              <PhoneCall size={14} color="#1E293B" style={{ marginRight: 6 }} />
+              <Text style={styles.officialCallButtonText}>
+                Telepon Kantor: (0232) 613399
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -855,33 +948,89 @@ const styles = StyleSheet.create({
   safeHeader: {
     backgroundColor: "#FFFFFF",
     zIndex: 50,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#0F172A",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: "0 2px 8px -2px rgba(15, 23, 42, 0.05)",
+      } as any,
+    }),
   },
   headerBar: {
-    height: 58,
+    height: 60,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#E2E8F0",
+    borderBottomColor: "#F1F5F9",
   },
   headerBrandLeft: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  headerLogo: {
-    width: 130,
-    height: 30,
-  },
-  headerRight: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
-  iconCircle: {
+  headerLogoContainer: {
     width: 38,
     height: 38,
-    borderRadius: 19,
+    borderRadius: 12,
+    backgroundColor: "#F8FAFC",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  headerLogo: {
+    width: 30,
+    height: 30,
+  },
+  brandTextCol: {
+    justifyContent: "center",
+  },
+  brandTitleText: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 13.5,
+    color: "#0F172A",
+    letterSpacing: -0.3,
+  },
+  brandSubtitleText: {
+    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontSize: 9.5,
+    color: COLORS.brandBlue,
+    letterSpacing: 0.2,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  pointsPillBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFBEB",
+    borderWidth: 1,
+    borderColor: "#FDE68A",
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 10,
+  },
+  pointsPillText: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 11,
+    color: "#D97706",
+  },
+  iconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: "#F8FAFC",
     borderWidth: 1,
     borderColor: "#E2E8F0",
@@ -890,25 +1039,41 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   badgeDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     backgroundColor: "#DC2626",
     position: "absolute",
-    top: 6,
-    right: 7,
+    top: 5,
+    right: 6,
+    borderWidth: 1.5,
+    borderColor: "#FFFFFF",
   },
   avatarRing: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    borderWidth: 1.5,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2,
     borderColor: COLORS.brandBlue,
     overflow: "hidden",
+    backgroundColor: "#EFF6FF",
   },
   avatarImg: {
     width: "100%",
     height: "100%",
+  },
+  headerLoginPill: {
+    backgroundColor: COLORS.brandBlue,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  headerLoginPillText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 12.5,
+    color: "#FFFFFF",
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -917,20 +1082,43 @@ const styles = StyleSheet.create({
   greetingSection: {
     marginBottom: 14,
   },
-  greetingTitle: {
-    fontFamily: "PlusJakartaSans_800ExtraBold",
-    fontSize: 20,
-    color: "#111827",
-    letterSpacing: -0.5,
+  greetingHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
   },
-  greetingName: {
-    color: COLORS.brandBlue,
+  greetingTimeText: {
+    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontSize: 12,
+    color: "#64748B",
+  },
+  greetingNameText: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 19,
+    color: "#0F172A",
+    letterSpacing: -0.4,
+  },
+  vipPillBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFBEB",
+    borderWidth: 1,
+    borderColor: "#FDE68A",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+  },
+  vipPillText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 11,
+    color: "#D97706",
   },
   greetingSubtitle: {
     fontFamily: "PlusJakartaSans_500Medium",
-    fontSize: 13,
-    color: "#6B7280",
-    marginTop: 2,
+    fontSize: 12.5,
+    color: "#64748B",
+    marginTop: 3,
   },
   searchCard: {
     backgroundColor: "#FFFFFF",
@@ -1140,7 +1328,7 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  quickIconWrapper: {
+  quickSvgBox: {
     width: 52,
     height: 52,
     justifyContent: "center",
@@ -1402,62 +1590,84 @@ const styles = StyleSheet.create({
   garageSectionContainer: {
     marginBottom: 20,
   },
-  garageCardBox: {
+  garagePhotoCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 22,
-    padding: 18,
+    borderRadius: 20,
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: "#E2E8F0",
+    marginBottom: 12,
     ...Platform.select({
       ios: {
         shadowColor: "#0F172A",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
       },
       android: {
         elevation: 2,
       },
     }),
   },
-  garageItem: {
-    marginBottom: 6,
+  garageImageWrapper: {
+    width: "100%",
+    height: 150,
+    position: "relative",
+    backgroundColor: "#E2E8F0",
   },
-  garageBadgeRow: {
-    marginBottom: 6,
+  garageImage: {
+    width: "100%",
+    height: "100%",
   },
-  garageBadgePill: {
-    alignSelf: "flex-start",
-    backgroundColor: "#EFF6FF",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+  garageImageBadge: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    backgroundColor: "rgba(15, 23, 42, 0.85)",
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
-  garageBadgePillText: {
-    fontFamily: "PlusJakartaSans_700Bold",
+  garageImageBadgeText: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 9.5,
-    color: "#2563EB",
-    letterSpacing: 0.3,
+    color: "#FFFFFF",
+    letterSpacing: 0.4,
+  },
+  garageCardBody: {
+    padding: 14,
   },
   garageItemTitle: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
-    fontSize: 14,
+    fontSize: 14.5,
     color: "#111827",
+    marginBottom: 4,
   },
   garageItemAddress: {
     fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 11.5,
-    color: "#6B7280",
-    marginTop: 3,
-    lineHeight: 17,
+    color: "#64748B",
+    lineHeight: 16,
+    marginBottom: 10,
   },
-  garageItemDivider: {
-    height: 1,
-    backgroundColor: "#F1F5F9",
-    marginVertical: 12,
+  garageMapsBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    backgroundColor: "#EFF6FF",
+    borderWidth: 1,
+    borderColor: "#BFDBFE",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  garageMapsBtnText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 11,
+    color: COLORS.brandBlue,
   },
   garageActionsWrapper: {
-    marginTop: 14,
+    marginTop: 6,
     gap: 8,
   },
   officialWaButton: {
@@ -1465,7 +1675,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#16A34A",
-    paddingVertical: 12,
+    paddingVertical: 13,
     borderRadius: 14,
     gap: 8,
   },
@@ -1474,40 +1684,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#FFFFFF",
   },
-  garageSecondaryButtonsRow: {
-    flexDirection: "row",
-    gap: 8,
-  },
   officialCallButton: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F8FAFC",
-    paddingVertical: 10,
-    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 11,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
   officialCallButtonText: {
     fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 11.5,
+    fontSize: 12,
     color: "#1E293B",
-  },
-  officialMapsButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#EFF6FF",
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#BFDBFE",
-  },
-  officialMapsButtonText: {
-    fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 11.5,
-    color: COLORS.brandBlue,
   },
 });

@@ -16,7 +16,11 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { COLORS } from "../theme/colors";
 import api from "../api/client";
-import { formatIndonesianDate, formatCharterDateRange } from "../utils/format";
+import {
+  formatIndonesianDate,
+  formatCharterDateRange,
+  formatIndonesianTime,
+} from "../utils/format";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { EmptyState } from "../components/EmptyState";
 import {
@@ -39,7 +43,9 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function BookingHistoryScreen() {
   const navigation = useNavigation<NavigationProp>();
-  const [activeTab, setActiveTab] = useState<"all" | "active" | "completed" | "charter">("all");
+  const [activeTab, setActiveTab] = useState<
+    "all" | "active" | "completed" | "charter"
+  >("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [bookings, setBookings] = useState<any[]>([]);
   const [charters, setCharters] = useState<any[]>([]);
@@ -367,7 +373,9 @@ export default function BookingHistoryScreen() {
                   style={styles.charterContactBtn}
                   onPress={() => navigation.navigate("Help")}
                 >
-                  <Text style={styles.charterContactText}>Hubungi CS Pariwisata</Text>
+                  <Text style={styles.charterContactText}>
+                    Hubungi CS Pariwisata
+                  </Text>
                 </TouchableOpacity>
               </View>
             ))
@@ -390,10 +398,10 @@ export default function BookingHistoryScreen() {
             const busName = b.schedule?.bus?.name || "Resi Bisma";
             const busType =
               b.schedule?.bus?.bus_type || "Super High Deck (SHD)";
-            const depTime = b.schedule?.departure_time
-              ? b.schedule.departure_time.substring(11, 16) ||
-                b.schedule.departure_time.substring(0, 5)
-              : "07:00";
+            const depTime = formatIndonesianTime(
+              b.schedule?.departure_time,
+              "07:00",
+            );
             const date = formatIndonesianDate(
               b.booking_date || "2026-08-30",
               false,
@@ -412,9 +420,7 @@ export default function BookingHistoryScreen() {
                     <View style={styles.stubTag}>
                       <Text style={styles.stubTagText}>E-TICKET BUS</Text>
                     </View>
-                    <Text style={styles.brandTitleText}>
-                      PO Tunggal Jaya
-                    </Text>
+                    <Text style={styles.brandTitleText}>PO Tunggal Jaya</Text>
                   </View>
 
                   <View
@@ -451,8 +457,20 @@ export default function BookingHistoryScreen() {
                     <View style={styles.busRound}>
                       <Bus size={16} color={COLORS.brandBlue} />
                     </View>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
-                      <View style={{ width: 12, height: 1.5, backgroundColor: "#CBD5E1" }} />
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 2,
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 12,
+                          height: 1.5,
+                          backgroundColor: "#CBD5E1",
+                        }}
+                      />
                       <ArrowRight size={12} color="#94A3B8" />
                     </View>
                   </View>
@@ -494,7 +512,9 @@ export default function BookingHistoryScreen() {
                   <View style={styles.specItem}>
                     <Text style={styles.specLabel}>KURSI</Text>
                     <View style={styles.specBox}>
-                      <Text style={[styles.specValue, { color: COLORS.brandBlue }]}>
+                      <Text
+                        style={[styles.specValue, { color: COLORS.brandBlue }]}
+                      >
                         {seats}
                       </Text>
                     </View>
@@ -548,9 +568,19 @@ export default function BookingHistoryScreen() {
                     }
                     style={styles.viewQrBtn}
                   >
-                    <QrCode size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
-                    <Text style={styles.viewQrBtnText}>Buka QR Boarding Pass</Text>
-                    <ArrowRight size={13} color="#FFFFFF" style={{ marginLeft: 4 }} />
+                    <QrCode
+                      size={15}
+                      color="#FFFFFF"
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text style={styles.viewQrBtnText}>
+                      Buka QR Boarding Pass
+                    </Text>
+                    <ArrowRight
+                      size={13}
+                      color="#FFFFFF"
+                      style={{ marginLeft: 4 }}
+                    />
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -572,7 +602,11 @@ export default function BookingHistoryScreen() {
                       }
                       style={styles.rebookBtn}
                     >
-                      <RotateCcw size={14} color={COLORS.brandBlue} style={{ marginRight: 4 }} />
+                      <RotateCcw
+                        size={14}
+                        color={COLORS.brandBlue}
+                        style={{ marginRight: 4 }}
+                      />
                       <Text style={styles.rebookBtnText}>Pesan Lagi</Text>
                     </TouchableOpacity>
                   )}

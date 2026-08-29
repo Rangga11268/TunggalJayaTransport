@@ -26,6 +26,7 @@ import { COLORS } from "../theme/colors";
 import apiClient from "../api/client";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { useAuth } from "../context/AuthContext";
+import { useCustomAlert } from "../context/AlertContext";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -34,6 +35,7 @@ export default function SeatSelectionScreen() {
   const route = useRoute<any>();
   const { scheduleId } = route.params || { scheduleId: 1 };
   const { user } = useAuth();
+  const { showWarning } = useCustomAlert();
 
   const [loading, setLoading] = useState(true);
   const [schedule, setSchedule] = useState<any>(null);
@@ -100,9 +102,9 @@ export default function SeatSelectionScreen() {
       setSelectedSeats(selectedSeats.filter((s) => s !== seatNumber));
     } else {
       if (selectedSeats.length >= 4) {
-        Alert.alert(
-          "Maksimal Kursi",
-          "Anda dapat memilih maksimal 4 kursi per transaksi.",
+        showWarning(
+          "Batas Maksimal Kursi",
+          "Anda dapat memilih maksimal 4 kursi penumpang per transaksi pemesanan.",
         );
         return;
       }
@@ -112,9 +114,9 @@ export default function SeatSelectionScreen() {
 
   const proceedToCheckout = () => {
     if (selectedSeats.length === 0) {
-      Alert.alert(
-        "Pilih Kursi",
-        "Silakan pilih minimal 1 kursi sebelum melanjutkan.",
+      showWarning(
+        "Pilih Kursi Penumpang",
+        "Silakan pilih minimal 1 kursi sebelum melanjutkan ke pembayaran.",
       );
       return;
     }

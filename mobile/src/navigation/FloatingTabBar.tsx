@@ -7,13 +7,13 @@ import {
   Platform,
 } from "react-native";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Home, Calendar, HelpCircle, User } from "lucide-react-native";
+import { Home, Calendar, Ticket, Headphones, User } from "lucide-react-native";
 import { COLORS } from "../theme/colors";
-import { NavTicketIcon } from "../components/ServiceIcons";
 
 interface TabConfig {
   label: string;
   icon: any;
+  isCenter?: boolean;
 }
 
 const TAB_CONFIGS: Record<string, TabConfig> = {
@@ -26,12 +26,13 @@ const TAB_CONFIGS: Record<string, TabConfig> = {
     icon: Calendar,
   },
   BookingHistory: {
-    label: "Pesanan",
-    icon: NavTicketIcon,
+    label: "Tiket Saya",
+    icon: Ticket,
+    isCenter: true,
   },
   Help: {
     label: "Bantuan",
-    icon: HelpCircle,
+    icon: Headphones,
   },
   Profile: {
     label: "Akun",
@@ -54,8 +55,7 @@ export default function FloatingTabBar({
             icon: Home,
           };
           const IconComp = config.icon;
-          const activeColor = COLORS.brandBlue;
-          const inactiveColor = "#64748B";
+          const isCenter = config.isCenter || index === 2;
 
           const onPress = () => {
             const event = navigation.emit({
@@ -69,11 +69,48 @@ export default function FloatingTabBar({
             }
           };
 
+          // 1. ELEVATED HERO CENTER BUTTON
+          if (isCenter) {
+            return (
+              <TouchableOpacity
+                key={route.key}
+                activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel={config.label}
+                accessibilityState={isFocused ? { selected: true } : {}}
+                onPress={onPress}
+                style={styles.centerHeroWrapper}
+              >
+                <View
+                  style={[
+                    styles.centerHeroButton,
+                    isFocused
+                      ? styles.centerHeroButtonActive
+                      : styles.centerHeroButtonInactive,
+                  ]}
+                >
+                  <IconComp size={22} color="#FFFFFF" strokeWidth={2.4} />
+                </View>
+                <Text
+                  style={[
+                    styles.centerHeroLabel,
+                    isFocused && styles.centerHeroLabelActive,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {config.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          }
+
+          // 2. STANDARD SIDE TABS
           return (
             <TouchableOpacity
               key={route.key}
               activeOpacity={0.75}
               accessibilityRole="button"
+              accessibilityLabel={config.label}
               accessibilityState={isFocused ? { selected: true } : {}}
               onPress={onPress}
               style={styles.tabItem}
@@ -85,8 +122,8 @@ export default function FloatingTabBar({
                 ]}
               >
                 <IconComp
-                  size={20}
-                  color={isFocused ? activeColor : inactiveColor}
+                  size={19}
+                  color={isFocused ? COLORS.brandBlue : "#64748B"}
                   strokeWidth={isFocused ? 2.3 : 1.8}
                 />
               </View>
@@ -111,7 +148,7 @@ export default function FloatingTabBar({
 const styles = StyleSheet.create({
   floatingWrapper: {
     position: "absolute",
-    bottom: Platform.OS === "ios" ? 24 : 14,
+    bottom: Platform.OS === "ios" ? 22 : 12,
     left: 0,
     right: 0,
     alignItems: "center",
@@ -123,13 +160,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#FFFFFF",
-    paddingVertical: 7,
+    paddingVertical: 6,
     paddingHorizontal: 8,
-    borderRadius: 32,
+    borderRadius: 30,
     borderWidth: 1,
     borderColor: "#E2E8F0",
     width: "92%",
-    maxWidth: 390,
+    maxWidth: 400,
     ...Platform.select({
       ios: {
         shadowColor: "#0F172A",
@@ -141,8 +178,8 @@ const styles = StyleSheet.create({
         elevation: 8,
       },
       web: {
-        boxShadow: "0px 8px 24px rgba(15, 23, 42, 0.1)",
-      },
+        boxShadow: "0px 8px 24px rgba(15, 23, 42, 0.12)",
+      } as any,
     }),
   },
   tabItem: {
@@ -162,7 +199,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(37, 99, 235, 0.1)",
   },
   tabLabel: {
-    fontSize: 10.5,
+    fontSize: 10,
     marginTop: 2,
     textAlign: "center",
   },
@@ -173,5 +210,53 @@ const styles = StyleSheet.create({
   tabLabelInactive: {
     fontFamily: "PlusJakartaSans_500Medium",
     color: "#64748B",
+  },
+
+  /* HERO CENTER BUTTON STYLES */
+  centerHeroWrapper: {
+    flex: 1.15,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: -22,
+  },
+  centerHeroButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#2563EB",
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.38,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 8,
+      },
+      web: {
+        boxShadow: "0px 6px 16px rgba(37, 99, 235, 0.4)",
+      } as any,
+    }),
+  },
+  centerHeroButtonActive: {
+    backgroundColor: COLORS.brandBlue,
+  },
+  centerHeroButtonInactive: {
+    backgroundColor: "#1E293B",
+  },
+  centerHeroLabel: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 10,
+    color: "#64748B",
+    marginTop: 3,
+    textAlign: "center",
+  },
+  centerHeroLabelActive: {
+    color: COLORS.brandBlue,
+    fontFamily: "PlusJakartaSans_800ExtraBold",
   },
 });

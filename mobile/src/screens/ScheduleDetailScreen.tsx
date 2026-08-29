@@ -35,6 +35,7 @@ import {
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { COLORS } from "../theme/colors";
 import apiClient from "../api/client";
+import { formatIndonesianTime } from "../utils/format";
 
 const { width } = Dimensions.get("window");
 
@@ -90,12 +91,8 @@ export default function ScheduleDetailScreen() {
   const origin = schedule?.route?.origin || "Jakarta";
   const destination = schedule?.route?.destination || "Kuningan";
   const price = Number(schedule?.price || 180000).toLocaleString("id-ID");
-  const depTime = schedule?.departure_time
-    ? schedule.departure_time.substring(0, 5)
-    : "07:00";
-  const arrTime = schedule?.arrival_time
-    ? schedule.arrival_time.substring(0, 5)
-    : "13:00";
+  const depTime = formatIndonesianTime(schedule?.departure_time, "07:00");
+  const arrTime = formatIndonesianTime(schedule?.arrival_time, "13:00");
 
   const getImageSource = () => {
     const name = (busName || "").toLowerCase();
