@@ -135,6 +135,57 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Login / Register via Google Account
+     */
+    public function googleLogin(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => ['required', 'string', 'email'],
+            'name' => ['nullable', 'string'],
+            'google_id' => ['nullable', 'string'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi Google login gagal',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $email = $request->email;
+        $name = $request->name ?: explode('@', $email)[0];
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            $user = User::create([
+                'name' => $name,
+                'email' => $email,
+                'phone' => '08' . rand(10000000, 99999999),
+                'password' => Hash::make(\Illuminate\Support\Str::random(16)),
+                'email_verified_at' => now(),
+            ]);
+
+            $customerRole = Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
+            $user->assignRole($customerRole);
+        }
+
+        $user->tokens()->delete();
+        $token = $user->createToken('mobile-google-auth')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Login Google berhasil',
+            'data' => [
+                'user' => $user,
+                'token' => $token,
+                'needs_verification' => false,
+            ],
+        ]);
+    }
+
     public function sendOtp(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
