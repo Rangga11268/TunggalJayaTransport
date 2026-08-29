@@ -21,9 +21,16 @@ export const CheckoutTripSummary: React.FC<CheckoutTripSummaryProps> = ({
         <Text style={styles.tripRouteText}>
           {schedule?.route?.origin || "Jakarta"} →{" "}
           {schedule?.route?.destination || "Kuningan"}
+          {schedule?.route?.origin || "Kuningan"} →{" "}
+          {schedule?.route?.destination || "Jakarta"}
         </Text>
         <View style={styles.classBadge}>
           <Text style={styles.classBadgeText}>Bus Reguler</Text>
+          <Text style={styles.classBadgeText}>
+            {schedule?.bus?.bus_type ||
+              schedule?.bus?.type ||
+              "Executive Class"}
+          </Text>
         </View>
       </View>
       <Text style={styles.busInfoText}>

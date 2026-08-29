@@ -62,6 +62,10 @@ export default function BookingHistoryScreen() {
       const [resBookings, resCharters] = await Promise.all([
         api.get("/bookings").catch(() => ({ data: [] })),
         api.get("/charter/my-requests").catch(() => ({ data: [] })),
+        api
+          .get("/charter/history")
+          .catch(() => api.get("/charter/my-requests"))
+          .catch(() => ({ data: [] })),
       ]);
 
       const bkList = Array.isArray(resBookings.data)

@@ -32,14 +32,20 @@ export type RootStackParamList = {
   MainTabs: { screen?: string } | undefined;
   Schedules: { origin?: string; destination?: string } | undefined;
   ScheduleList: { origin?: string; destination?: string } | undefined;
-  ScheduleDetail: { scheduleId: number };
-  SeatSelection: { scheduleId: number };
-  Checkout: { scheduleId: number; selectedSeats: number[]; totalPrice: number };
+  ScheduleDetail: { scheduleId: number; date?: string };
+  SeatSelection: { scheduleId: number; date?: string };
+  Checkout: {
+    scheduleId: number;
+    selectedSeats: number[];
+    totalPrice: number;
+    schedule?: any;
+    date?: string;
+  };
   TicketDetail: {
     bookingId?: number;
     booking?: any;
     schedule?: any;
-    selectedSeats?: number[];
+    selectedSeats?: (number | string)[];
   };
   BookingHistory: undefined;
   Charter: undefined;

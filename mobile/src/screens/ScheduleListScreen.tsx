@@ -150,7 +150,11 @@ export default function ScheduleListScreen() {
       setLoading(true);
       const res = await apiClient
         .get("/schedules", {
-          params: { origin: originCity, destination: destCity },
+          params: {
+            origin: originCity,
+            destination: destCity,
+            date: selectedDate,
+          },
         })
         .catch(() => ({ data: [] }));
 
@@ -165,7 +169,7 @@ export default function ScheduleListScreen() {
 
   useEffect(() => {
     fetchSchedules();
-  }, [originCity, destCity]);
+  }, [originCity, destCity, selectedDate]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -185,6 +189,9 @@ export default function ScheduleListScreen() {
   };
 
   const isScheduleDeparted = (item: any): boolean => {
+    if (item.is_departed !== undefined) return Boolean(item.is_departed);
+    if (item.has_departed !== undefined) return Boolean(item.has_departed);
+
     const todayStr = new Date().toISOString().split("T")[0];
     if (selectedDate !== todayStr) return false;
 
@@ -489,6 +496,7 @@ export default function ScheduleListScreen() {
                 onBookSchedule={(scheduleId) => {
                   navigation.navigate("ScheduleDetail", {
                     scheduleId,
+                    date: selectedDate,
                   });
                 }}
               />

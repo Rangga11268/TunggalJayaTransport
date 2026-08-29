@@ -44,7 +44,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 export default function ScheduleDetailScreen() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<any>();
-  const { scheduleId } = route.params || { scheduleId: 1 };
+  const { scheduleId, date } = route.params || { scheduleId: 1 };
 
   const [activeTab, setActiveTab] = useState<"deals" | "details" | "reviews">(
     "details",
@@ -54,15 +54,24 @@ export default function ScheduleDetailScreen() {
 
   useEffect(() => {
     fetchDetail();
-  }, [scheduleId]);
+  }, [scheduleId, date]);
 
   const fetchDetail = async () => {
     try {
       setLoading(true);
-      const res = await apiClient.get("/schedules");
-      const list = Array.isArray(res.data) ? res.data : res.data.data || [];
-      const found = list.find((s: any) => s.id === scheduleId) || list[0];
-      setSchedule(found);
+      const res = await apiClient
+        .get(`/schedules/${scheduleId}`, { params: { date } })
+        .catch(() => apiClient.get("/schedules"));
+
+      const data = res.data?.data;
+      if (data && !Array.isArray(data)) {
+        setSchedule(data);
+      } else {
+        const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+        const found =
+          list.find((s: any) => s.id === Number(scheduleId)) || list[0];
+        setSchedule(found);
+      }
     } catch (e) {
       console.log("Error loading schedule detail:", e);
     } finally {
@@ -85,9 +94,10 @@ export default function ScheduleDetailScreen() {
   }
 
   const busName = schedule?.bus?.name || "Resi Bisma";
-  const busType = schedule?.bus?.bus_type || "Bus Reguler";
+  const busType =
+    schedule?.bus?.bus_type || schedule?.bus?.type || "Executive";
   const plateNumber = schedule?.bus?.plate_number || "E 7777 TJ";
-  const capacity = schedule?.bus?.capacity || 30;
+  const capacity = schedule?.bus?.capacity || 50;
   const origin = schedule?.route?.origin || "Jakarta";
   const destination = schedule?.route?.destination || "Kuningan";
   const price = Number(schedule?.price || 180000).toLocaleString("id-ID");
@@ -456,6 +466,7 @@ export default function ScheduleDetailScreen() {
               if (schedule?.id) {
                 navigation.navigate("SeatSelection", {
                   scheduleId: schedule.id,
+                  date: date || schedule?.selected_date,
                 });
               }
             }}

@@ -33,7 +33,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 export default function SeatSelectionScreen() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<any>();
-  const { scheduleId } = route.params || { scheduleId: 1 };
+  const { scheduleId, date } = route.params || { scheduleId: 1 };
   const { user } = useAuth();
   const { showWarning } = useCustomAlert();
 
@@ -47,32 +47,31 @@ export default function SeatSelectionScreen() {
 
   useEffect(() => {
     fetchScheduleDetail();
-  }, [scheduleId]);
+  }, [scheduleId, date]);
 
   const fetchScheduleDetail = async () => {
     try {
       setLoading(true);
-      const res = await apiClient.get("/schedules");
-      const list = Array.isArray(res.data) ? res.data : res.data.data || [];
-      const found = list.find((s: any) => s.id === scheduleId) || list[0];
-      setSchedule(found);
+      const res = await apiClient
+        .get(`/schedules/${scheduleId}`, { params: { date } })
+        .catch(() => apiClient.get("/schedules"));
 
-      if (found) {
-        const now = new Date();
-        const schedDate = found.departure_date
-          ? new Date(found.departure_date)
-          : new Date();
-        const [hours, minutes] = (found.departure_time || "07:00")
-          .split(":")
-          .map(Number);
-        schedDate.setHours(hours, minutes, 0, 0);
-
-        if (
-          schedDate.getTime() < now.getTime() &&
-          found.status !== "upcoming"
-        ) {
-          setIsDeparted(true);
+      const data = res.data?.data;
+      if (data && !Array.isArray(data)) {
+        setSchedule(data);
+        if (Array.isArray(data.occupied_seats)) {
+          setOccupiedSeats(
+            data.occupied_seats.map(Number).filter((n: number) => !isNaN(n)),
+          );
         }
+        if (data.is_departed !== undefined) {
+          setIsDeparted(Boolean(data.is_departed));
+        }
+      } else {
+        const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+        const found =
+          list.find((s: any) => s.id === Number(scheduleId)) || list[0];
+        setSchedule(found);
       }
     } catch (e) {
       console.log("Error fetching schedule details:", e);
@@ -122,13 +121,15 @@ export default function SeatSelectionScreen() {
     }
 
     navigation.navigate("Checkout", {
+      schedule: schedule,
       scheduleId: schedule?.id || 1,
       selectedSeats,
-      totalPrice: (schedule?.price || 180000) * selectedSeats.length,
+      totalPrice: (Number(schedule?.price) || 140000) * selectedSeats.length,
+      date: date || schedule?.selected_date,
     });
   };
 
-  const totalCapacity = schedule?.bus?.capacity || 30;
+  const totalCapacity = schedule?.bus?.capacity || 50;
   const rowsCount = Math.ceil(totalCapacity / 4);
 
   return (

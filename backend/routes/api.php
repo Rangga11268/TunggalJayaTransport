@@ -52,7 +52,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Pariwisata (Charter)
     Route::get('/charter/history', [CharterController::class, 'index']);
+    Route::get('/charter/my-requests', [CharterController::class, 'index']);
+    Route::get('/charters', [CharterController::class, 'index']);
     Route::post('/charter/request', [CharterController::class, 'store']);
+    Route::post('/charters', [CharterController::class, 'store']);
     Route::post('/charter/{id}/cancel', [CharterController::class, 'cancel']);
 
     // Notifikasi

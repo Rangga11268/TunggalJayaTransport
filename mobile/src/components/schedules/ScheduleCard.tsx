@@ -41,7 +41,9 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
   onBookSchedule,
 }) => {
   const busName = item.bus?.name || "Resi Bisma";
-  const busType = item.bus?.bus_type || "Bus Reguler";
+  const busType = item.bus?.bus_type || item.bus?.type || "Executive Class";
+  const capacity = item.bus?.capacity || 50;
+  const availableSeats = item.available_seats;
   const origin = item.route?.origin || originCity;
   const destination = item.route?.destination || destCity;
   const depTime = formatIndonesianTime(item.departure_time, "07:00");
@@ -58,34 +60,24 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
     thumbSource = require("../../../assets/images/kylorenParwis.webp");
 
   return (
-    <View
-      style={[
-        styles.ticketCard,
-        isDeparted && styles.ticketCardDeparted,
-      ]}
-    >
+    <View style={[styles.ticketCard, isDeparted && styles.ticketCardDeparted]}>
       {/* Header Bus Row */}
       <View style={styles.cardHeader}>
         <View style={styles.busInfoLeft}>
           <Image
             source={thumbSource}
-            style={[
-              styles.busAvatar,
-              isDeparted && { opacity: 0.55 },
-            ]}
+            style={[styles.busAvatar, isDeparted && { opacity: 0.55 }]}
             resizeMode="cover"
           />
           <View>
             <Text
-              style={[
-                styles.busNameText,
-                isDeparted && { color: "#6B7280" },
-              ]}
+              style={[styles.busNameText, isDeparted && { color: "#6B7280" }]}
             >
               {busName}
             </Text>
             <Text style={styles.busClassText}>
-              {busType} • 50 Kursi (2-2)
+              {busType} • {capacity} Kursi (2-2)
+              {availableSeats !== undefined ? ` • Sisa ${availableSeats}` : ""}
             </Text>
           </View>
         </View>
@@ -112,10 +104,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
         {/* Left: Departure */}
         <View style={styles.timeCol}>
           <Text
-            style={[
-              styles.bigTimeText,
-              isDeparted && { color: "#6B7280" },
-            ]}
+            style={[styles.bigTimeText, isDeparted && { color: "#6B7280" }]}
           >
             {depTime}
           </Text>
@@ -144,10 +133,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
         {/* Right: Arrival */}
         <View style={[styles.timeCol, { alignItems: "flex-end" }]}>
           <Text
-            style={[
-              styles.bigTimeText,
-              isDeparted && { color: "#6B7280" },
-            ]}
+            style={[styles.bigTimeText, isDeparted && { color: "#6B7280" }]}
           >
             {arrTime}
           </Text>
@@ -162,11 +148,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
 
       {/* Intermediate Stops Strip */}
       <View style={styles.stopsBox}>
-        <Navigation
-          size={11}
-          color="#6B7280"
-          style={{ marginRight: 4 }}
-        />
+        <Navigation size={11} color="#6B7280" style={{ marginRight: 4 }} />
         <Text style={styles.stopsBoxText} numberOfLines={1}>
           Lintas: {stops.join(" • ")}
         </Text>
@@ -175,11 +157,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
       {/* Next Departure Banner if Departed Today */}
       {isDeparted ? (
         <View style={styles.nextDepartureCard}>
-          <Calendar
-            size={13}
-            color="#4B5563"
-            style={{ marginRight: 6 }}
-          />
+          <Calendar size={13} color="#4B5563" style={{ marginRight: 6 }} />
           <Text style={styles.nextDepartureCardText}>
             Trip Hari Ini Selesai •{" "}
             <Text style={styles.nextDepartureCardBold}>
@@ -194,12 +172,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
       <View style={styles.cardFooter}>
         <View>
           <Text style={styles.fareLabel}>Harga per orang</Text>
-          <Text
-            style={[
-              styles.fareValue,
-              isDeparted && { color: "#6B7280" },
-            ]}
-          >
+          <Text style={[styles.fareValue, isDeparted && { color: "#6B7280" }]}>
             Rp {price}
           </Text>
         </View>
@@ -213,11 +186,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
             style={styles.tomorrowActionBtn}
           >
             <Text style={styles.tomorrowActionText}>Pesan Besok</Text>
-            <ArrowRight
-              size={13}
-              color="#FFFFFF"
-              style={{ marginLeft: 4 }}
-            />
+            <ArrowRight size={13} color="#FFFFFF" style={{ marginLeft: 4 }} />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
@@ -226,11 +195,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
             style={styles.bookActionBtn}
           >
             <Text style={styles.bookActionText}>Pilih Kursi</Text>
-            <ChevronRight
-              size={14}
-              color="#FFFFFF"
-              style={{ marginLeft: 3 }}
-            />
+            <ChevronRight size={14} color="#FFFFFF" style={{ marginLeft: 3 }} />
           </TouchableOpacity>
         )}
       </View>
