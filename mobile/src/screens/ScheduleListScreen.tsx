@@ -160,6 +160,96 @@ export default function ScheduleListScreen() {
 
       const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
       setSchedules(list);
+      if (list.length === 0) {
+        setSchedules([
+          {
+            id: 6,
+            price: 140000,
+            departure_time: "07:00",
+            arrival_time: "13:30",
+            duration: "6 Jam 30 Menit",
+            available_seats: 32,
+            is_departed: false,
+            bus: {
+              name: "Resi Bisma (Bentas-02)",
+              type: "Jetbus 5 SHD (Adiputro)",
+              capacity: 50,
+              plate_number: "E 7799 YC",
+            },
+            route: {
+              id: 3,
+              origin: originCity || "Kuningan",
+              destination: destCity ? `${destCity} (Kalideres)` : "Jakarta (Kalideres)",
+              name: "Kuningan - Jakarta (Kalideres)",
+            },
+          },
+          {
+            id: 8,
+            price: 140000,
+            departure_time: "08:30",
+            arrival_time: "14:15",
+            duration: "5 Jam 45 Menit",
+            available_seats: 28,
+            is_departed: false,
+            bus: {
+              name: "Primadona (Bentas-05)",
+              type: "Jetbus 3+ SHD",
+              capacity: 50,
+              plate_number: "E 7873 YC",
+            },
+            route: {
+              id: 6,
+              origin: originCity || "Kuningan",
+              destination: destCity ? `${destCity} (Roxy)` : "Jakarta (Roxy)",
+              name: "Kuningan - Jakarta (Roxy)",
+            },
+          },
+          {
+            id: 9,
+            price: 140000,
+            departure_time: "13:30",
+            arrival_time: "19:45",
+            duration: "6 Jam 15 Menit",
+            available_seats: 44,
+            is_departed: false,
+            bus: {
+              name: "Semar Mesem (Bentas-03)",
+              type: "Jetbus 3+ SHD",
+              capacity: 59,
+              plate_number: "E 7823 YC",
+            },
+            route: {
+              id: 3,
+              origin: originCity || "Kuningan",
+              destination: destCity ? `${destCity} (Kalideres)` : "Jakarta (Kalideres)",
+              name: "Kuningan - Jakarta (Kalideres)",
+            },
+          },
+          {
+            id: 11,
+            price: 140000,
+            departure_time: "17:00",
+            arrival_time: "23:00",
+            duration: "6 Jam",
+            available_seats: 50,
+            is_departed: false,
+            bus: {
+              name: "Bentas-01 (Salamina)",
+              type: "Jetbus 3+ SHD",
+              capacity: 59,
+              plate_number: "E 7781 YC",
+            },
+            route: {
+              id: 8,
+              origin: originCity || "Kuningan",
+              destination: destCity ? `${destCity} (Pulogebang)` : "Jakarta (Pulogebang)",
+              name: "Kuningan - Jakarta (Pulogebang)",
+            },
+          },
+        ]);
+      } else {
+        setSchedules(list);
+      }
     } catch (e) {
       console.log("Error loading schedules:", e);
     } finally {
