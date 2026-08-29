@@ -157,8 +157,6 @@ export default function ScheduleListScreen() {
   const route = useRoute();
   const params = (route.params as any) || {};
 
-  const originCity = params.origin || "Kuningan";
-  const destCity = params.destination || "Jakarta";
   const initialRouteId = useMemo(() => {
     if (!params.origin && !params.destination) return "all";
     const found = ROUTE_PRESETS.find(
@@ -213,113 +211,10 @@ export default function ScheduleListScreen() {
       if (currentDest) queryParams.destination = currentDest;
 
       const res = await apiClient
-        .get("/schedules", {
-          params: {
-            origin: originCity,
-            destination: destCity,
-            date: selectedDate,
-          },
-        })
         .get("/schedules", { params: queryParams })
         .catch(() => ({ data: [] }));
 
       const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      if (list.length === 0) {
-        setSchedules([
-          {
-            id: 6,
-            price: 140000,
-            departure_time: "07:00",
-            arrival_time: "13:30",
-            duration: "6 Jam 30 Menit",
-            available_seats: 32,
-            is_departed: false,
-            bus: {
-              name: "Resi Bisma (Bentas-02)",
-              type: "Jetbus 5 SHD (Adiputro)",
-              capacity: 50,
-              plate_number: "E 7799 YC",
-            },
-            route: {
-              id: 3,
-              origin: originCity || "Kuningan",
-              destination: destCity
-                ? `${destCity} (Kalideres)`
-                : "Jakarta (Kalideres)",
-              name: "Kuningan - Jakarta (Kalideres)",
-            },
-          },
-          {
-            id: 8,
-            price: 140000,
-            departure_time: "08:30",
-            arrival_time: "14:15",
-            duration: "5 Jam 45 Menit",
-            available_seats: 28,
-            is_departed: false,
-            bus: {
-              name: "Primadona (Bentas-05)",
-              type: "Jetbus 3+ SHD",
-              capacity: 50,
-              plate_number: "E 7873 YC",
-            },
-            route: {
-              id: 6,
-              origin: originCity || "Kuningan",
-              destination: destCity ? `${destCity} (Roxy)` : "Jakarta (Roxy)",
-              name: "Kuningan - Jakarta (Roxy)",
-            },
-          },
-          {
-            id: 9,
-            price: 140000,
-            departure_time: "13:30",
-            arrival_time: "19:45",
-            duration: "6 Jam 15 Menit",
-            available_seats: 44,
-            is_departed: false,
-            bus: {
-              name: "Semar Mesem (Bentas-03)",
-              type: "Jetbus 3+ SHD",
-              capacity: 59,
-              plate_number: "E 7823 YC",
-            },
-            route: {
-              id: 3,
-              origin: originCity || "Kuningan",
-              destination: destCity
-                ? `${destCity} (Kalideres)`
-                : "Jakarta (Kalideres)",
-              name: "Kuningan - Jakarta (Kalideres)",
-            },
-          },
-          {
-            id: 11,
-            price: 140000,
-            departure_time: "17:00",
-            arrival_time: "23:00",
-            duration: "6 Jam",
-            available_seats: 50,
-            is_departed: false,
-            bus: {
-              name: "Bentas-01 (Salamina)",
-              type: "Jetbus 3+ SHD",
-              capacity: 59,
-              plate_number: "E 7781 YC",
-            },
-            route: {
-              id: 8,
-              origin: originCity || "Kuningan",
-              destination: destCity
-                ? `${destCity} (Pulogebang)`
-                : "Jakarta (Pulogebang)",
-              name: "Kuningan - Jakarta (Pulogebang)",
-            },
-          },
-        ]);
-      } else {
-        setSchedules(list);
-      }
       setSchedules(list);
     } catch (e) {
       console.log("Error loading schedules:", e);
@@ -330,7 +225,6 @@ export default function ScheduleListScreen() {
 
   useEffect(() => {
     fetchSchedules();
-  }, [originCity, destCity, selectedDate]);
   }, [currentOrigin, currentDest, selectedDate]);
 
   const onRefresh = async () => {
@@ -435,7 +329,6 @@ export default function ScheduleListScreen() {
     (filters.availableOnly ? 1 : 0) +
     (filters.sortBy !== "earliest" ? 1 : 0);
 
-  const tomorrowOption = dateOptions[1] || dateOptions[0];
   const headerTitle = useMemo(() => {
     if (currentOrigin && currentDest) {
       return `${currentOrigin} → ${currentDest}`;
@@ -453,8 +346,6 @@ export default function ScheduleListScreen() {
     <View style={styles.container}>
       {/* Top Header */}
       <ScreenHeader
-        title={`${originCity} → ${destCity}`}
-        subtitle="Pilih Jadwal Keberangkatan"
         title={headerTitle}
         subtitle="Pilih Jadwal Keberangkatan Bus"
         showBack={navigation.canGoBack()}
@@ -682,10 +573,6 @@ export default function ScheduleListScreen() {
         ) : processedSchedules.length > 0 ? (
           processedSchedules.map((item, idx) => {
             const isDeparted = isScheduleDeparted(item);
-            const stops = getStopsPreview(
-              item.route?.origin || originCity,
-              item.route?.destination || destCity,
-            );
             const tomorrowOption = dateOptions[1] || dateOptions[0];
             const itemOrigin =
               item.route?.origin || currentOrigin || "Kuningan";
@@ -697,8 +584,6 @@ export default function ScheduleListScreen() {
               <ScheduleCard
                 key={item.id || idx}
                 item={item}
-                originCity={originCity}
-                destCity={destCity}
                 originCity={itemOrigin}
                 destCity={itemDest}
                 isDeparted={isDeparted}
@@ -761,6 +646,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 110,
+    width: "100%",
+    maxWidth: 680,
+    alignSelf: "center",
   },
   toolbarSection: {
     flexDirection: "row",

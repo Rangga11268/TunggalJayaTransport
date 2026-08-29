@@ -52,7 +52,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
   const duration = item.duration || "6 Jam";
   const nextDepartureText =
     item.next_departure_formatted ||
-    `Besok (${tomorrowOption.dayNum} ${tomorrowOption.monthName}) • ${depTime} WIB`;
+    `Besok, ${tomorrowOption.dayNum} ${tomorrowOption.monthName} 2026 • ${depTime} WIB`;
 
   const nameLower = (busName || "").toLowerCase();
   let thumbSource = require("../../../assets/images/resiBisma.webp");
@@ -70,22 +70,18 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
         <View style={styles.busInfoLeft}>
           <Image
             source={thumbSource}
-            style={[styles.busAvatar, isDeparted && { opacity: 0.55 }]}
-            style={[styles.busAvatar, isDeparted && { opacity: 0.7 }]}
+            style={[styles.busAvatar, isDeparted && { opacity: 0.65 }]}
             resizeMode="cover"
           />
-          <View>
-          <View style={{ flex: 1 }}>
+          <View style={styles.busMetaCol}>
             <Text
-              style={[styles.busNameText, isDeparted && { color: "#6B7280" }]}
-              style={[styles.busNameText, isDeparted && { color: "#374151" }]}
+              style={[styles.busNameText, isDeparted && styles.textMutedDark]}
               numberOfLines={1}
             >
               {busName}
             </Text>
-            <Text style={styles.busClassText}>
             <Text style={styles.busClassText} numberOfLines={1}>
-              {busType} • {capacity} Kursi (2-2)
+              {busType} • {capacity} Kursi
               {availableSeats !== undefined ? ` • Sisa ${availableSeats}` : ""}
             </Text>
           </View>
@@ -93,13 +89,12 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
 
         {isDeparted ? (
           <View style={styles.departedBadge}>
-            <Text style={styles.departedBadgeText}>BERANGKAT</Text>
             <Text style={styles.departedBadgeText}>SUDAH BERANGKAT</Text>
           </View>
         ) : (
           <View style={styles.ratingBadge}>
             <Star
-              size={10}
+              size={11}
               color="#D97706"
               fill="#D97706"
               style={{ marginRight: 3 }}
@@ -110,7 +105,6 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
       </View>
 
       {/* Main Departure Timeline Flow */}
-      <View style={styles.timelineContainer}>
       <View
         style={[
           styles.timelineContainer,
@@ -120,8 +114,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
         {/* Left: Departure */}
         <View style={styles.timeCol}>
           <Text
-            style={[styles.bigTimeText, isDeparted && { color: "#6B7280" }]}
-            style={[styles.bigTimeText, isDeparted && { color: "#4B5563" }]}
+            style={[styles.bigTimeText, isDeparted && styles.textMutedDark]}
           >
             {depTime}
           </Text>
@@ -130,34 +123,41 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
           </Text>
         </View>
 
-        {/* Middle: Duration & Route Line */}
+        {/* Middle: Duration & Route Line (Fluid & Flexible) */}
         <View style={styles.lineCol}>
-          <Text style={styles.durationText}>8j 00m</Text>
           <Text style={styles.durationText}>{duration}</Text>
           <View style={styles.dashedLineRow}>
             <View style={styles.lineDot} />
             <View style={styles.lineBar} />
             <Bus
               size={13}
-              color={isDeparted ? "#9CA3AF" : COLORS.brandBlue}
-              style={{ marginHorizontal: 4 }}
+              color={isDeparted ? "#94A3B8" : COLORS.brandBlue}
+              style={{ marginHorizontal: 3 }}
             />
             <View style={styles.lineBar} />
             <View style={styles.lineDot} />
           </View>
-          <Text style={styles.transitText}>Via Tol Cipali</Text>
+          <Text
+            style={[styles.transitText, isDeparted && styles.transitTextDeparted]}
+            numberOfLines={1}
+          >
+            Via Tol Cipali
+          </Text>
         </View>
 
         {/* Right: Arrival */}
-        <View style={[styles.timeCol, { alignItems: "flex-end" }]}>
+        <View style={[styles.timeCol, styles.timeColRight]}>
           <Text
-            style={[styles.bigTimeText, isDeparted && { color: "#6B7280" }]}
-            style={[styles.bigTimeText, isDeparted && { color: "#4B5563" }]}
+            style={[
+              styles.bigTimeText,
+              styles.timeRightText,
+              isDeparted && styles.textMutedDark,
+            ]}
           >
             {arrTime}
           </Text>
           <Text
-            style={[styles.terminalNameText, { textAlign: "right" }]}
+            style={[styles.terminalNameText, styles.timeRightText]}
             numberOfLines={1}
           >
             {destination}
@@ -167,38 +167,38 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
 
       {/* Intermediate Stops Strip */}
       <View style={styles.stopsBox}>
-        <Navigation size={11} color="#6B7280" style={{ marginRight: 4 }} />
-        <Navigation size={11} color="#475569" style={{ marginRight: 5 }} />
+        <Navigation
+          size={11}
+          color="#64748B"
+          style={{ marginRight: 6, flexShrink: 0 }}
+        />
         <Text style={styles.stopsBoxText} numberOfLines={1}>
           Lintas: {stops.join(" • ")}
         </Text>
       </View>
 
       {/* Next Departure Banner if Departed Today */}
-      {isDeparted ? (
       {isDeparted && (
         <View style={styles.nextDepartureCard}>
-          <Calendar size={13} color="#4B5563" style={{ marginRight: 6 }} />
-          <Text style={styles.nextDepartureCardText}>
-          <Calendar size={13} color="#B45309" style={{ marginRight: 6 }} />
+          <Calendar
+            size={13}
+            color="#B45309"
+            style={{ marginRight: 6, flexShrink: 0 }}
+          />
           <Text style={styles.nextDepartureCardText} numberOfLines={1}>
             Trip Hari Ini Selesai •{" "}
-            <Text style={styles.nextDepartureCardBold}>
-              Trip Berikutnya: Besok ({tomorrowOption.dayNum}{" "}
-              {tomorrowOption.monthName}) {depTime} WIB
-              {nextDepartureText}
-            </Text>
+            <Text style={styles.nextDepartureCardBold}>{nextDepartureText}</Text>
           </Text>
         </View>
-      ) : null}
       )}
 
       {/* Footer: Seat info & Action CTA */}
       <View style={styles.cardFooter}>
-        <View>
+        <View style={styles.fareInfoCol}>
           <Text style={styles.fareLabel}>Harga per orang</Text>
-          <Text style={[styles.fareValue, isDeparted && { color: "#6B7280" }]}>
-          <Text style={[styles.fareValue, isDeparted && { color: "#4B5563" }]}>
+          <Text
+            style={[styles.fareValue, isDeparted && styles.fareValueDeparted]}
+          >
             Rp {price}
           </Text>
         </View>
@@ -207,7 +207,6 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={() =>
-              onSelectTomorrow(tomorrowOption.dateStr, busName, depTime)
               onSelectTomorrow(
                 item.next_departure_date || tomorrowOption.dateStr,
                 busName,
@@ -217,7 +216,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
             style={styles.tomorrowActionBtn}
           >
             <Text style={styles.tomorrowActionText}>Pesan Besok</Text>
-            <ArrowRight size={13} color="#FFFFFF" style={{ marginLeft: 4 }} />
+            <ArrowRight size={13} color="#FFFFFF" style={{ marginLeft: 5 }} />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
@@ -241,78 +240,90 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#E2E8F0",
     ...Platform.select({
       ios: {
         shadowColor: "#0F172A",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.06,
-        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
       },
       android: {
-        elevation: 3,
+        elevation: 2,
       },
       web: {
-        boxShadow: "0 4px 16px rgba(15, 23, 42, 0.05)",
+        boxShadow: "0 2px 10px rgba(15, 23, 42, 0.04)",
       } as any,
     }),
   },
   ticketCardDeparted: {
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#FAFAFA",
     borderColor: "#E5E7EB",
   },
   cardHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 14,
+    marginBottom: 12,
   },
   busInfoLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    flex: 1,
+    marginRight: 8,
   },
   busAvatar: {
-    width: 36,
-    height: 36,
+    width: 38,
+    height: 38,
     borderRadius: 10,
+    marginRight: 10,
+    backgroundColor: "#F1F5F9",
+  },
+  busMetaCol: {
+    flex: 1,
   },
   busNameText: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
-    fontSize: 14,
-    color: "#111827",
+    fontSize: 13.5,
+    color: "#0F172A",
   },
   busClassText: {
     fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 11,
-    color: "#6B7280",
+    color: "#64748B",
     marginTop: 1,
   },
+  textMutedDark: {
+    color: "#475569",
+  },
   departedBadge: {
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#F1F5F9",
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#CBD5E1",
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 3.5,
     borderRadius: 6,
+    alignSelf: "center",
   },
   departedBadgeText: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
-    fontSize: 9.5,
-    color: "#9CA3AF",
-    letterSpacing: 0.5,
+    fontSize: 9,
+    color: "#64748B",
+    letterSpacing: 0.3,
   },
   ratingBadge: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFBEB",
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 3.5,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#FDE68A",
   },
   ratingBadgeText: {
     fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 10,
+    fontSize: 10.5,
     color: "#D97706",
   },
   timelineContainer: {
@@ -321,39 +332,49 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "#F8FAFC",
     borderRadius: 14,
-    padding: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
     marginBottom: 10,
   },
   timelineContainerDeparted: {
     backgroundColor: "#F1F5F9",
   },
   timeCol: {
-    flex: 1,
+    flex: 1.1,
+  },
+  timeColRight: {
+    alignItems: "flex-end",
+  },
+  timeRightText: {
+    textAlign: "right",
   },
   bigTimeText: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 16,
-    color: "#111827",
+    color: "#0F172A",
   },
   terminalNameText: {
-    fontFamily: "PlusJakartaSans_500Medium",
+    fontFamily: "PlusJakartaSans_600SemiBold",
     fontSize: 11,
-    color: "#6B7280",
+    color: "#64748B",
     marginTop: 2,
   },
   lineCol: {
+    flex: 1.3,
     alignItems: "center",
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
   },
   durationText: {
-    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 9.5,
-    color: "#9CA3AF",
+    color: "#94A3B8",
     marginBottom: 3,
   },
   dashedLineRow: {
     flexDirection: "row",
     alignItems: "center",
+    width: "100%",
+    justifyContent: "center",
   },
   lineDot: {
     width: 4,
@@ -362,9 +383,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#CBD5E1",
   },
   lineBar: {
-    width: 20,
+    flex: 1,
     height: 1.5,
     backgroundColor: "#E2E8F0",
+    maxWidth: 28,
   },
   transitText: {
     fontFamily: "PlusJakartaSans_700Bold",
@@ -372,22 +394,22 @@ const styles = StyleSheet.create({
     color: COLORS.brandBlue,
     marginTop: 3,
   },
+  transitTextDeparted: {
+    color: "#64748B",
+  },
   stopsBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F1F5F9",
     backgroundColor: "#F8FAFC",
     borderWidth: 1,
     borderColor: "#E2E8F0",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
-    marginBottom: 12,
     marginBottom: 10,
   },
   stopsBoxText: {
     fontFamily: "PlusJakartaSans_500Medium",
-    fontFamily: "PlusJakartaSans_600SemiBold",
     fontSize: 10.5,
     color: "#475569",
     flex: 1,
@@ -395,27 +417,22 @@ const styles = StyleSheet.create({
   nextDepartureCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F3F4F6",
     backgroundColor: "#FFFBEB",
     borderWidth: 1,
-    borderColor: "#E5E7EB",
     borderColor: "#FDE68A",
     paddingHorizontal: 10,
     paddingVertical: 7,
-    borderRadius: 10,
-    marginBottom: 12,
+    borderRadius: 8,
     marginBottom: 10,
   },
   nextDepartureCardText: {
     fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 10.5,
-    color: "#4B5563",
     color: "#92400E",
     flex: 1,
   },
   nextDepartureCardBold: {
     fontFamily: "PlusJakartaSans_700Bold",
-    color: "#1F2937",
     color: "#78350F",
   },
   cardFooter: {
@@ -426,32 +443,37 @@ const styles = StyleSheet.create({
     borderTopColor: "#F1F5F9",
     paddingTop: 12,
   },
+  fareInfoCol: {
+    flex: 1,
+    marginRight: 10,
+  },
   fareLabel: {
     fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 10,
-    color: "#9CA3AF",
+    color: "#94A3B8",
   },
   fareValue: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 16,
     color: COLORS.brandBlue,
   },
+  fareValueDeparted: {
+    color: "#0F172A",
+  },
   tomorrowActionBtn: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#475569",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
+    justifyContent: "center",
     backgroundColor: "#0F172A",
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 12,
+    minHeight: 38,
     ...Platform.select({
       ios: {
         shadowColor: "#0F172A",
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
+        shadowOpacity: 0.12,
         shadowRadius: 4,
       },
       android: {
@@ -467,15 +489,17 @@ const styles = StyleSheet.create({
   bookActionBtn: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: COLORS.brandBlue,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 12,
+    minHeight: 38,
     ...Platform.select({
       ios: {
         shadowColor: COLORS.brandBlue,
         shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.25,
+        shadowOpacity: 0.2,
         shadowRadius: 6,
       },
       android: {
@@ -485,7 +509,7 @@ const styles = StyleSheet.create({
   },
   bookActionText: {
     fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 12,
+    fontSize: 12.5,
     color: "#FFFFFF",
   },
 });
