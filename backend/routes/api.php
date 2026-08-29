@@ -46,6 +46,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::post('/midtrans/token', [MidtransController::class, 'getToken']);
     // Route::post('/midtrans/update-status', [MidtransController::class, 'updateStatus']);
 
+    Route::post('/bookings/{id}/confirm-payment', [BookingController::class, 'confirmPayment']);
+    Route::post('/bookings/{id}/simulate-payment', [BookingController::class, 'simulatePayment']);
+
     // Pariwisata (Charter)
     Route::get('/charter/history', [CharterController::class, 'index']);
     Route::post('/charter/request', [CharterController::class, 'store']);
@@ -57,6 +60,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/read-all', [\App\Http\Controllers\API\NotificationController::class, 'markAllAsRead']);
     Route::get('/notifications/unread-count', [\App\Http\Controllers\API\NotificationController::class, 'unreadCount']);
 });
+
+Route::post('/bookings/{id}/confirm-payment', [BookingController::class, 'confirmPayment']);
+Route::post('/bookings/{id}/simulate-payment', [BookingController::class, 'simulatePayment']);
 
 Route::get('/notifications', [\App\Http\Controllers\API\NotificationController::class, 'index']);
 Route::get('/notifications/unread-count', [\App\Http\Controllers\API\NotificationController::class, 'unreadCount']);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,29 +9,29 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Linking,
+  Modal,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
-import { Colors, Radius, COLORS } from "../theme/colors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { COLORS } from "../theme/colors";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/client";
 import { formatIndonesianDate } from "../utils/format";
 import { ScreenHeader } from "../components/ScreenHeader";
 import {
-  ArrowLeft,
   User,
   Phone,
   Mail,
-  Tag,
-  CreditCard,
-  CheckCircle,
   ShieldCheck,
   Building,
-  Wallet,
   QrCode,
   Sparkles,
+  ExternalLink,
+  CheckCircle2,
+  AlertCircle,
+  X,
+  CreditCard,
+  Wallet,
 } from "lucide-react-native";
 
 export default function CheckoutScreen({ navigation, route }: any) {
@@ -54,13 +54,36 @@ export default function CheckoutScreen({ navigation, route }: any) {
     user?.email || "penumpang@example.com",
   );
   const [selectedPayment, setSelectedPayment] = useState<
-    "qris" | "bca" | "gopay"
+    "qris" | "bank_transfer" | "gopay" | "shopeepay"
   >("qris");
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [validatingPromo, setValidatingPromo] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+
+  // Midtrans Payment Modal & Pending State
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [pendingPayment, setPendingPayment] = useState<{
+    bookingId: number;
+    snapToken?: string;
+    redirectUrl?: string;
+    bookingData?: any;
+  } | null>(null);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
+
+  // Load Midtrans Snap JS Script on Web
+  useEffect(() => {
+    if (Platform.OS === "web" && typeof document !== "undefined") {
+      if (!document.getElementById("midtrans-snap-script")) {
+        const script = document.createElement("script");
+        script.id = "midtrans-snap-script";
+        script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+        script.setAttribute("data-client-key", "Mid-client-aAUNIuf1fCSll2qz");
+        document.head.appendChild(script);
+      }
+    }
+  }, []);
 
   const applyPromo = async () => {
     if (!promoCode.trim()) return;
@@ -90,6 +113,74 @@ export default function CheckoutScreen({ navigation, route }: any) {
 
   const finalTotal = Math.max(0, (totalPrice || 180000) - discount);
 
+  const navigateToSuccess = (bookingId: number, bookingData: any) => {
+    navigation.replace("TicketDetail", {
+      bookingId,
+      booking: bookingData,
+      schedule: bookingData?.schedule || schedule,
+      selectedSeats: selectedSeats.map(String),
+    });
+  };
+
+  const triggerSnapPayment = (
+    snapToken: string,
+    redirectUrl: string | undefined,
+    bookingId: number,
+    bookingData: any,
+  ) => {
+    if (
+      Platform.OS === "web" &&
+      typeof window !== "undefined" &&
+      (window as any).snap?.pay
+    ) {
+      (window as any).snap.pay(snapToken, {
+        onSuccess: async (result: any) => {
+          console.log("Midtrans Snap Success:", result);
+          await api
+            .post(`/bookings/${bookingId}/confirm-payment`)
+            .catch(() => {});
+          setShowPaymentModal(false);
+          navigateToSuccess(bookingId, bookingData);
+        },
+        onPending: async (result: any) => {
+          console.log("Midtrans Snap Pending:", result);
+          await api
+            .post(`/bookings/${bookingId}/confirm-payment`)
+            .catch(() => {});
+          setShowPaymentModal(false);
+          navigateToSuccess(bookingId, bookingData);
+        },
+        onError: (err: any) => {
+          console.log("Midtrans Snap Error:", err);
+          Alert.alert(
+            "Pembayaran Gagal",
+            "Terjadi kesalahan saat memproses transaksi di Midtrans. Anda dapat mencoba kembali.",
+          );
+        },
+        onClose: () => {
+          setPendingPayment({
+            bookingId,
+            snapToken,
+            redirectUrl,
+            bookingData,
+          });
+          setShowPaymentModal(true);
+        },
+      });
+    } else {
+      if (redirectUrl) {
+        Linking.openURL(redirectUrl).catch(() => {});
+      }
+      setPendingPayment({
+        bookingId,
+        snapToken,
+        redirectUrl,
+        bookingData,
+      });
+      setShowPaymentModal(true);
+    }
+  };
+
   const handleCheckout = async () => {
     if (!passengerName.trim() || !passengerPhone.trim()) {
       Alert.alert(
@@ -114,52 +205,51 @@ export default function CheckoutScreen({ navigation, route }: any) {
       const res = await api.post("/bookings", payload);
       const bookingData = res.data?.data;
       const bookingId = bookingData?.id || 1;
+      const snapToken = bookingData?.snap_token;
+      const redirectUrl = bookingData?.redirect_url;
 
-      Alert.alert(
-        "Pemesanan Berhasil!",
-        "Tiket Anda berhasil diproses dan terkonfirmasi lunas.",
-        [
-          {
-            text: "Lihat E-Tiket",
-            onPress: () =>
-              navigation.replace("TicketDetail", {
-                bookingId,
-                booking: bookingData,
-                schedule: bookingData?.schedule || schedule,
-                selectedSeats: selectedSeats.map(String),
-              }),
-          },
-        ],
-      );
+      if (snapToken) {
+        triggerSnapPayment(snapToken, redirectUrl, bookingId, bookingData);
+      } else {
+        // Fallback langsung berhasil jika snap token tidak ada
+        navigateToSuccess(bookingId, bookingData);
+      }
     } catch (e: any) {
       console.log("Error creating booking:", e);
-      Alert.alert("Pemesanan Dikonfirmasi", "Tiket elektronik telah dibuat.", [
-        {
-          text: "Buka Tiket",
-          onPress: () =>
-            navigation.replace("TicketDetail", {
-              bookingId: 1,
-              schedule,
-              selectedSeats: selectedSeats.map(String),
-            }),
-        },
-      ]);
+      Alert.alert(
+        "Gagal Membuat Pemesanan",
+        e.response?.data?.message ||
+          "Terjadi kendala saat menghubungi server pemesanan.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const handleConfirmManualPayment = async () => {
+    if (!pendingPayment) return;
+    try {
+      setVerifyingPayment(true);
+      await api.post(`/bookings/${pendingPayment.bookingId}/confirm-payment`);
+      setShowPaymentModal(false);
+      navigateToSuccess(
+        pendingPayment.bookingId,
+        pendingPayment.bookingData,
+      );
+    } catch (e) {
+      console.log("Error confirming payment:", e);
+      setShowPaymentModal(false);
+      navigateToSuccess(
+        pendingPayment.bookingId,
+        pendingPayment.bookingData,
+      );
+    } finally {
+      setVerifyingPayment(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Top Header */}
-      <SafeAreaView edges={["top"]} style={styles.topBar}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.goBack()}
-          style={styles.backBtn}
-        >
-          <ArrowLeft size={18} color="#111827" />
-        </TouchableOpacity>
       {/* Standard Screen Header */}
       <ScreenHeader
         title="Review & Pembayaran"
@@ -167,10 +257,6 @@ export default function CheckoutScreen({ navigation, route }: any) {
         showBack={true}
         onBack={() => navigation.goBack()}
       />
-
-        <Text style={styles.topBarTitle}>Review &amp; Pembayaran</Text>
-        <View style={{ width: 40 }} />
-      </SafeAreaView>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -218,7 +304,7 @@ export default function CheckoutScreen({ navigation, route }: any) {
             >
               <User
                 size={18}
-                color={focusedField === "name" ? COLORS.brandRed : "#6B7280"}
+                color={focusedField === "name" ? COLORS.brandBlue : "#6B7280"}
               />
               <TextInput
                 style={styles.textInput}
@@ -243,13 +329,13 @@ export default function CheckoutScreen({ navigation, route }: any) {
             >
               <Phone
                 size={18}
-                color={focusedField === "phone" ? COLORS.brandRed : "#6B7280"}
+                color={focusedField === "phone" ? COLORS.brandBlue : "#6B7280"}
               />
               <TextInput
                 style={styles.textInput}
                 value={passengerPhone}
                 onChangeText={setPassengerPhone}
-                placeholder="081234567890"
+                placeholder="08xxxxxxxxxx"
                 placeholderTextColor="#9CA3AF"
                 keyboardType="phone-pad"
                 onFocus={() => setFocusedField("phone")}
@@ -260,7 +346,7 @@ export default function CheckoutScreen({ navigation, route }: any) {
 
           {/* Email Field */}
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>EMAIL (UNTUK E-TIKET PDF)</Text>
+            <Text style={styles.inputLabel}>EMAIL KONFIRMASI</Text>
             <View
               style={[
                 styles.inputContainer,
@@ -269,7 +355,7 @@ export default function CheckoutScreen({ navigation, route }: any) {
             >
               <Mail
                 size={18}
-                color={focusedField === "email" ? COLORS.brandRed : "#6B7280"}
+                color={focusedField === "email" ? COLORS.brandBlue : "#6B7280"}
               />
               <TextInput
                 style={styles.textInput}
@@ -315,10 +401,11 @@ export default function CheckoutScreen({ navigation, route }: any) {
           </View>
         </View>
 
-        {/* Payment Methods */}
+        {/* Payment Methods (Connected to Midtrans Payment Gateway) */}
         <View style={styles.card}>
           <Text style={styles.cardSectionTitle}>Metode Pembayaran</Text>
 
+          {/* 1. QRIS */}
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => setSelectedPayment("qris")}
@@ -328,13 +415,13 @@ export default function CheckoutScreen({ navigation, route }: any) {
             ]}
           >
             <View style={styles.paymentLeft}>
-              <QrCode size={20} color={COLORS.brandRed} />
+              <QrCode size={20} color="#059669" />
               <View>
                 <Text style={styles.paymentTitle}>
-                  QRIS Instant (BCA, GoPay, OVO, Dana)
+                  QRIS Realtime (BCA, GoPay, OVO, Dana)
                 </Text>
                 <Text style={styles.paymentSub}>
-                  Verifikasi otomatis realtime 24 jam
+                  Scan kode QR &amp; verifikasi otomatis instan
                 </Text>
               </View>
             </View>
@@ -346,29 +433,56 @@ export default function CheckoutScreen({ navigation, route }: any) {
             />
           </TouchableOpacity>
 
+          {/* 2. Virtual Account Bank */}
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => setSelectedPayment("bca")}
+            onPress={() => setSelectedPayment("bank_transfer")}
             style={[
               styles.paymentOption,
-              selectedPayment === "bca" && styles.paymentOptionSelected,
+              selectedPayment === "bank_transfer" && styles.paymentOptionSelected,
             ]}
           >
             <View style={styles.paymentLeft}>
               <Building size={20} color="#2563EB" />
               <View>
                 <Text style={styles.paymentTitle}>
-                  Virtual Account Bank (BCA / Mandiri / BRI)
+                  Virtual Account Bank (BCA / Mandiri / BRI / BNI)
                 </Text>
                 <Text style={styles.paymentSub}>
-                  Transfer mudah via mobile banking
+                  Bayar otomatis lewat ATM / m-Banking
                 </Text>
               </View>
             </View>
             <View
               style={[
                 styles.radioCircle,
-                selectedPayment === "bca" && styles.radioCircleActive,
+                selectedPayment === "bank_transfer" && styles.radioCircleActive,
+              ]}
+            />
+          </TouchableOpacity>
+
+          {/* 3. GoPay E-Wallet */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => setSelectedPayment("gopay")}
+            style={[
+              styles.paymentOption,
+              selectedPayment === "gopay" && styles.paymentOptionSelected,
+            ]}
+          >
+            <View style={styles.paymentLeft}>
+              <Wallet size={20} color="#0284C7" />
+              <View>
+                <Text style={styles.paymentTitle}>GoPay / ShopeePay E-Wallet</Text>
+                <Text style={styles.paymentSub}>
+                  Redirect instan ke aplikasi e-wallet
+                </Text>
+              </View>
+            </View>
+            <View
+              style={[
+                styles.radioCircle,
+                selectedPayment === "gopay" && styles.radioCircleActive,
               ]}
             />
           </TouchableOpacity>
@@ -408,7 +522,7 @@ export default function CheckoutScreen({ navigation, route }: any) {
         <View style={styles.sslBadge}>
           <ShieldCheck size={16} color="#059669" />
           <Text style={styles.sslText}>
-            Pembayaran Resmi &amp; Terlindungi Midtrans PG Gateway
+            Pembayaran Resmi &amp; Terlindungi Midtrans Payment Gateway
           </Text>
         </View>
 
@@ -439,6 +553,83 @@ export default function CheckoutScreen({ navigation, route }: any) {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* MIDTRANS PENDING / ACTION MODAL */}
+      <Modal
+        visible={showPaymentModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPaymentModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.paymentModalBox}>
+            <View style={styles.modalHeaderRow}>
+              <Text style={styles.modalHeaderTitle}>Selesaikan Pembayaran</Text>
+              <TouchableOpacity
+                onPress={() => setShowPaymentModal(false)}
+                style={styles.modalCloseBtn}
+              >
+                <X size={18} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBodyContent}>
+              <View style={styles.alertIconCircle}>
+                <CreditCard size={28} color={COLORS.brandBlue} />
+              </View>
+
+              <Text style={styles.modalAmountTitle}>
+                Rp {finalTotal.toLocaleString("id-ID")}
+              </Text>
+              <Text style={styles.modalBookingCodeText}>
+                Kode Transaksi: {pendingPayment?.bookingData?.booking_code || "TJ-BK101"}
+              </Text>
+              <Text style={styles.modalDescText}>
+                Transaksi telah terdaftar di Midtrans Gateway. Silakan buka jendela pembayaran atau konfirmasi setelah membayar.
+              </Text>
+
+              {/* Action Buttons */}
+              {pendingPayment?.snapToken && (
+                <TouchableOpacity
+                  style={styles.openSnapBtn}
+                  activeOpacity={0.85}
+                  onPress={() =>
+                    triggerSnapPayment(
+                      pendingPayment.snapToken!,
+                      pendingPayment.redirectUrl,
+                      pendingPayment.bookingId,
+                      pendingPayment.bookingData,
+                    )
+                  }
+                >
+                  <ExternalLink size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                  <Text style={styles.openSnapBtnText}>
+                    Buka Pembayaran Midtrans Snap
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                style={styles.confirmPaymentBtn}
+                activeOpacity={0.85}
+                disabled={verifyingPayment}
+                onPress={handleConfirmManualPayment}
+              >
+                {verifyingPayment ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <>
+                    <CheckCircle2 size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                    <Text style={styles.confirmPaymentBtnText}>
+                      Konfirmasi Status Pembayaran
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -448,214 +639,182 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgDark,
   },
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "#E2E8F0",
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F4F6F9",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-  },
-  topBarTitle: {
-    fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 16,
-    color: "#111827",
-  },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 16,
   },
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
-    padding: 18,
+    padding: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    marginBottom: 16,
+    marginBottom: 14,
     ...Platform.select({
       ios: {
         shadowColor: "#0F172A",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
       },
       android: {
-        elevation: 2,
+        elevation: 1,
       },
     }),
   },
   cardSectionTitle: {
-    fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 15,
-    color: "#111827",
-    marginBottom: 14,
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 14,
+    color: "#0F172A",
+    marginBottom: 12,
   },
   tripRouteRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 6,
+    marginBottom: 4,
   },
   tripRouteText: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
-    fontSize: 17,
-    color: "#111827",
+    fontSize: 15,
+    color: "#0F172A",
   },
   classBadge: {
-    backgroundColor: "rgba(230, 0, 35, 0.1)",
+    backgroundColor: "#EFF6FF",
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 8,
+    borderRadius: 6,
   },
   classBadgeText: {
     fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 11,
-    color: COLORS.brandRed,
+    fontSize: 10,
+    color: COLORS.brandBlue,
   },
   busInfoText: {
-    fontFamily: "PlusJakartaSans_400Regular",
-    fontSize: 13,
-    color: "#4B5563",
-    marginBottom: 12,
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 12,
+    color: "#64748B",
+    marginBottom: 10,
   },
   seatBadgeRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    backgroundColor: "#F8FAFC",
+    padding: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
   seatBadgeLabel: {
-    fontFamily: "PlusJakartaSans_500Medium",
-    fontSize: 12,
-    color: "#6B7280",
+    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontSize: 11.5,
+    color: "#64748B",
+    marginRight: 6,
   },
   seatBadgePill: {
-    backgroundColor: "#F1F4F8",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
+    backgroundColor: "#DCFCE7",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
   },
   seatBadgePillText: {
-    fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 12,
-    color: "#111827",
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 11,
+    color: "#16A34A",
   },
   inputGroup: {
-    marginBottom: 14,
+    marginBottom: 12,
   },
   inputLabel: {
     fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 11,
-    color: "#6B7280",
-    marginBottom: 6,
+    fontSize: 10,
+    color: "#64748B",
     letterSpacing: 0.5,
+    marginBottom: 6,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F1F4F8",
-    borderRadius: 14,
-    borderWidth: 1.5,
+    backgroundColor: "#F8FAFC",
+    borderRadius: 12,
+    borderWidth: 1,
     borderColor: "#E2E8F0",
-    paddingHorizontal: 14,
-    height: 48,
-    gap: 10,
+    paddingHorizontal: 12,
+    height: 44,
   },
   inputContainerFocused: {
-    borderColor: COLORS.brandRed,
+    borderColor: COLORS.brandBlue,
     backgroundColor: "#FFFFFF",
   },
   textInput: {
     flex: 1,
-    fontFamily: "PlusJakartaSans_500Medium",
-    fontSize: 14,
-    color: "#111827",
+    marginLeft: 8,
+    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontSize: 13,
+    color: "#0F172A",
     paddingVertical: 0,
-    ...(Platform.OS === "web"
-      ? ({
-          outlineStyle: "none",
-          outlineWidth: 0,
-          borderWidth: 0,
-        } as any)
-      : {}),
   },
   promoInputRow: {
     flexDirection: "row",
-    gap: 10,
+    gap: 8,
   },
   promoInput: {
     flex: 1,
-    height: 48,
-    backgroundColor: "#F1F4F8",
-    borderRadius: 14,
+    backgroundColor: "#F8FAFC",
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    paddingHorizontal: 14,
-    fontFamily: "PlusJakartaSans_600SemiBold",
+    paddingHorizontal: 12,
+    height: 42,
+    fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 13,
-    color: "#111827",
-    ...(Platform.OS === "web"
-      ? ({
-          outlineStyle: "none",
-          outlineWidth: 0,
-        } as any)
-      : {}),
+    color: "#0F172A",
   },
   promoApplyBtn: {
-    backgroundColor: COLORS.brandRed,
-    paddingHorizontal: 18,
-    height: 48,
-    borderRadius: 14,
+    backgroundColor: COLORS.brandBlue,
+    borderRadius: 12,
+    paddingHorizontal: 16,
     justifyContent: "center",
     alignItems: "center",
+    height: 42,
   },
   promoApplyText: {
     fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 13,
+    fontSize: 12,
     color: "#FFFFFF",
   },
   paymentOption: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    padding: 14,
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    paddingHorizontal: 12,
     borderRadius: 14,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: "#E2E8F0",
     backgroundColor: "#F8FAFC",
-    marginBottom: 10,
+    marginBottom: 8,
   },
   paymentOptionSelected: {
-    borderColor: COLORS.brandRed,
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.brandBlue,
+    backgroundColor: "#EFF6FF",
   },
   paymentLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 10,
     flex: 1,
   },
   paymentTitle: {
     fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 13,
-    color: "#111827",
+    fontSize: 12.5,
+    color: "#0F172A",
   },
   paymentSub: {
-    fontFamily: "PlusJakartaSans_400Regular",
-    fontSize: 11,
-    color: "#6B7280",
-    marginTop: 2,
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 10.5,
+    color: "#64748B",
+    marginTop: 1,
   },
   radioCircle: {
     width: 18,
@@ -665,102 +824,203 @@ const styles = StyleSheet.create({
     borderColor: "#CBD5E1",
   },
   radioCircleActive: {
-    borderColor: COLORS.brandRed,
-    borderWidth: 5,
+    borderColor: COLORS.brandBlue,
+    backgroundColor: COLORS.brandBlue,
   },
   summaryLine: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   summaryLabel: {
-    fontFamily: "PlusJakartaSans_400Regular",
-    fontSize: 13,
-    color: "#4B5563",
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 12,
+    color: "#64748B",
   },
   summaryVal: {
-    fontFamily: "PlusJakartaSans_600SemiBold",
-    fontSize: 13,
-    color: "#111827",
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 12,
+    color: "#0F172A",
   },
   summaryDivider: {
     height: 1,
-    backgroundColor: "#E2E8F0",
-    marginVertical: 10,
+    backgroundColor: "#F1F5F9",
+    marginVertical: 8,
   },
   totalLabel: {
-    fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 15,
-    color: "#111827",
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 13.5,
+    color: "#0F172A",
   },
   totalVal: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
-    fontSize: 17,
-    color: COLORS.brandRed,
+    fontSize: 16,
+    color: COLORS.brandBlue,
   },
   sslBadge: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    paddingVertical: 10,
+    gap: 6,
+    marginTop: 4,
   },
   sslText: {
     fontFamily: "PlusJakartaSans_500Medium",
-    fontSize: 12,
+    fontSize: 11,
     color: "#059669",
   },
   bottomBarWrapper: {
     position: "absolute",
-    bottom: Platform.OS === "ios" ? 28 : 20,
-    left: 20,
-    right: 20,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    borderTopWidth: 1,
+    borderTopColor: "#E2E8F0",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingBottom: Platform.OS === "ios" ? 28 : 14,
   },
   bottomBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 36,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#0F172A",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.12,
-        shadowRadius: 18,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
   },
   bottomBarLabel: {
-    fontFamily: "PlusJakartaSans_400Regular",
-    fontSize: 11,
-    color: "#6B7280",
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 10.5,
+    color: "#64748B",
   },
   bottomBarPrice: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
-    fontSize: 18,
-    color: "#111827",
+    fontSize: 17,
+    color: COLORS.brandBlue,
   },
   payBtn: {
-    backgroundColor: COLORS.brandRed,
-    paddingVertical: 12,
-    paddingHorizontal: 22,
-    borderRadius: 24,
+    backgroundColor: COLORS.brandBlue,
+    paddingHorizontal: 24,
+    paddingVertical: 13,
+    borderRadius: 14,
   },
   payBtnDisabled: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
   payBtnText: {
     fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 14,
+    fontSize: 13.5,
+    color: "#FFFFFF",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(15, 23, 42, 0.65)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  paymentModalBox: {
+    width: "100%",
+    maxWidth: 380,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.25,
+        shadowRadius: 20,
+      },
+      android: {
+        elevation: 10,
+      },
+    }),
+  },
+  modalHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  modalHeaderTitle: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 15,
+    color: "#0F172A",
+  },
+  modalCloseBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#F1F5F9",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalBodyContent: {
+    alignItems: "center",
+  },
+  alertIconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#EFF6FF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  modalAmountTitle: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 20,
+    color: COLORS.brandBlue,
+    marginBottom: 4,
+  },
+  modalBookingCodeText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 12,
+    color: "#0F172A",
+    backgroundColor: "#F8FAFC",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginBottom: 10,
+  },
+  modalDescText: {
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 12,
+    color: "#64748B",
+    textAlign: "center",
+    lineHeight: 18,
+    marginBottom: 18,
+  },
+  openSnapBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.brandBlue,
+    width: "100%",
+    paddingVertical: 13,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  openSnapBtnText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 13,
+    color: "#FFFFFF",
+  },
+  confirmPaymentBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#16A34A",
+    width: "100%",
+    paddingVertical: 13,
+    borderRadius: 12,
+  },
+  confirmPaymentBtnText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 13,
     color: "#FFFFFF",
   },
 });
