@@ -30,6 +30,13 @@ export const HomeTopBar: React.FC<HomeTopBarProps> = ({
   onOpenRewards,
   onLogin,
 }) => {
+  const getInitials = (name?: string) => {
+    if (!name) return "TJ";
+    const parts = name.trim().split(" ").filter(Boolean);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  };
+
   return (
     <SafeAreaView edges={["top"]} style={styles.safeHeader}>
       <View style={styles.headerBar}>
@@ -44,7 +51,9 @@ export const HomeTopBar: React.FC<HomeTopBarProps> = ({
           </View>
           <View style={styles.brandTextCol}>
             <Text style={styles.brandTitleText}>PO TUNGGAL JAYA</Text>
-            <Text style={styles.brandSubtitleText}>Transport &amp; Pariwisata</Text>
+            <Text style={styles.brandSubtitleText}>
+              Transport &amp; Pariwisata
+            </Text>
           </View>
         </View>
 
@@ -81,10 +90,18 @@ export const HomeTopBar: React.FC<HomeTopBarProps> = ({
               style={styles.avatarRing}
               accessibilityLabel="Profil Saya"
             >
-              <Image
-                source={require("../../../assets/images/bentas01.webp")}
-                style={styles.avatarImg}
-              />
+              {user.avatar || user.photo_url ? (
+                <Image
+                  source={{ uri: user.avatar || user.photo_url }}
+                  style={styles.avatarImg}
+                />
+              ) : (
+                <View style={styles.avatarInitialsBox}>
+                  <Text style={styles.avatarInitialsText}>
+                    {getInitials(user.name)}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -214,11 +231,25 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.brandBlue,
     overflow: "hidden",
-    backgroundColor: "#EFF6FF",
+    backgroundColor: COLORS.brandBlue,
+    justifyContent: "center",
+    alignItems: "center",
   },
   avatarImg: {
     width: "100%",
     height: "100%",
+  },
+  avatarInitialsBox: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: COLORS.brandBlue,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  avatarInitialsText: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 12,
+    color: "#FFFFFF",
   },
   headerLoginPill: {
     backgroundColor: COLORS.brandBlue,

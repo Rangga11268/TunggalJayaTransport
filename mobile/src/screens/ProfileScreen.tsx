@@ -104,6 +104,13 @@ export default function ProfileScreen({ navigation }: any) {
     );
   };
 
+  const getInitials = (name?: string) => {
+    if (!name) return "TJ";
+    const parts = name.trim().split(" ").filter(Boolean);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  };
+
   return (
     <View style={styles.container}>
       {/* Standard Screen Header */}
@@ -157,10 +164,18 @@ export default function ProfileScreen({ navigation }: any) {
 
             <View style={styles.userMainRow}>
               <View style={styles.avatarBox}>
-                <Image
-                  source={require("../../assets/images/bentas01.webp")}
-                  style={styles.avatarImg}
-                />
+                {user.avatar || user.photo_url ? (
+                  <Image
+                    source={{ uri: user.avatar || user.photo_url }}
+                    style={styles.avatarImg}
+                  />
+                ) : (
+                  <View style={styles.avatarInitialsBox}>
+                    <Text style={styles.avatarInitialsText}>
+                      {getInitials(user.name)}
+                    </Text>
+                  </View>
+                )}
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
                 <Text style={styles.userName}>
@@ -463,9 +478,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    width: "100%",
-    maxWidth: 680,
-    alignSelf: "center",
   },
   guestCard: {
     backgroundColor: "#FFFFFF",
@@ -585,10 +597,25 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#93C5FD",
     overflow: "hidden",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   avatarImg: {
     width: "100%",
     height: "100%",
+  },
+  avatarInitialsBox: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  avatarInitialsText: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 18,
+    color: "#FFFFFF",
   },
   userName: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
