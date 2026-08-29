@@ -389,6 +389,84 @@ export const PromoVoucherIcon: React.FC<IconProps> = ({ size = 52 }) => {
 };
 
 /**
+ * 4.1. Rich Vector SVG for TJ Rewards & Loyalitas
+ * Golden Amber VIP Gift Box with Royal Ribbon & Star Sparkles
+ */
+export const RewardsLoyaltyIcon: React.FC<IconProps> = ({ size = 52 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <Defs>
+        <LinearGradient id="rewardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#F59E0B" stopOpacity="0.22" />
+          <Stop offset="100%" stopColor="#D97706" stopOpacity="0.06" />
+        </LinearGradient>
+        <LinearGradient id="boxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#FDE68A" />
+          <Stop offset="50%" stopColor="#F59E0B" />
+          <Stop offset="100%" stopColor="#D97706" />
+        </LinearGradient>
+        <LinearGradient id="lidGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#FEF3C7" />
+          <Stop offset="100%" stopColor="#F59E0B" />
+        </LinearGradient>
+        <LinearGradient
+          id="rewardRibbonGrad"
+          x1="0%"
+          y1="0%"
+          x2="100%"
+          y2="100%"
+        >
+          <Stop offset="0%" stopColor="#EF4444" />
+          <Stop offset="100%" stopColor="#DC2626" />
+        </LinearGradient>
+      </Defs>
+
+      {/* Backdrop Glow Circle */}
+      <Circle cx="32" cy="32" r="30" fill="url(#rewardBg)" />
+
+      {/* Gift Box Base */}
+      <Rect x="16" y="26" width="32" height="26" rx="5" fill="url(#boxGrad)" />
+
+      {/* Vertical Ribbon on Box */}
+      <Rect x="29" y="26" width="6" height="26" fill="url(#rewardRibbonGrad)" />
+
+      {/* Horizontal Ribbon on Box */}
+      <Rect x="16" y="37" width="32" height="5" fill="url(#rewardRibbonGrad)" />
+
+      {/* Gift Box Lid */}
+      <Rect x="13" y="20" width="38" height="8" rx="3" fill="url(#lidGrad)" />
+      {/* Lid Ribbon */}
+      <Rect x="29" y="20" width="6" height="8" fill="url(#rewardRibbonGrad)" />
+
+      {/* Top Ribbon Bows */}
+      {/* Left Bow Loop */}
+      <Path
+        d="M32 20 C28 13 19 13 22 19 C23 21 28 20 32 20 Z"
+        fill="url(#rewardRibbonGrad)"
+      />
+      {/* Right Bow Loop */}
+      <Path
+        d="M32 20 C36 13 45 13 42 19 C41 21 36 20 32 20 Z"
+        fill="url(#rewardRibbonGrad)"
+      />
+      {/* Center Ribbon Knot */}
+      <Circle cx="32" cy="20" r="3" fill="#B91C1C" />
+
+      {/* Sparkles Accents */}
+      <Path
+        d="M48 13 L49.5 16.5 L53 18 L49.5 19.5 L48 23 L46.5 19.5 L43 18 L46.5 16.5 Z"
+        fill="#F59E0B"
+      />
+      <Path
+        d="M15 17 L16 19.5 L18.5 20.5 L16 21.5 L15 24 L14 21.5 L11.5 20.5 L14 19.5 Z"
+        fill="#FBBF24"
+      />
+      <Circle cx="50" cy="46" r="2" fill="#F59E0B" />
+    </Svg>
+  );
+};
+
+/**
  * 5. Rich Vector SVG for Suspensi Udara (Air Suspension)
  */
 export const AirSuspensionIcon: React.FC<IconProps> = ({ size = 44 }) => {
@@ -926,29 +1004,54 @@ export const FaqLuggageBagIcon: React.FC<IconProps> = ({ size = 36 }) => {
 };
 
 /**
- * 18. Official QRIS Payment Brand Vector SVG Icon
+ * 18. Official QRIS National Payment Standard Brand Vector SVG Icon
  */
-export const OfficialQrisBrandIcon: React.FC<{ size?: number; style?: any }> = ({
-  size = 38,
-  style,
-}) => {
+export const OfficialQrisBrandIcon: React.FC<{
+  size?: number;
+  style?: any;
+}> = ({ size = 42, style }) => {
   return (
-    <Svg width={size} height={size} viewBox="0 0 44 44" fill="none" style={style}>
-      <Rect width="44" height="44" rx="12" fill="#F0FDF4" stroke="#BBF7D0" strokeWidth="1" />
-      {/* Outer QR Frame */}
-      <Rect x="8" y="8" width="28" height="28" rx="4" fill="#FFFFFF" stroke="#16A34A" strokeWidth="1.5" />
-      {/* Top-Left Finder */}
-      <Rect x="11" y="11" width="7" height="7" rx="1.5" fill="#16A34A" />
-      <Rect x="13" y="13" width="3" height="3" fill="#FFFFFF" />
-      {/* Top-Right Finder */}
-      <Rect x="26" y="11" width="7" height="7" rx="1.5" fill="#16A34A" />
-      <Rect x="28" y="13" width="3" height="3" fill="#FFFFFF" />
-      {/* Bottom-Left Finder */}
-      <Rect x="11" y="26" width="7" height="7" rx="1.5" fill="#16A34A" />
-      <Rect x="13" y="28" width="3" height="3" fill="#FFFFFF" />
-      {/* Center QRIS Red Badge Accent */}
-      <Rect x="20" y="20" width="8" height="8" rx="2" fill="#EF4444" />
-      <Path d="M22 24 L24 22 L26 24" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    <Svg
+      width={size * 1.3}
+      height={size}
+      viewBox="0 0 56 42"
+      fill="none"
+      style={style}
+    >
+      {/* Background Card */}
+      <Rect
+        x="1"
+        y="1"
+        width="54"
+        height="40"
+        rx="8"
+        fill="#FFFFFF"
+        stroke="#E2E8F0"
+        strokeWidth="1.2"
+      />
+      {/* Official QRIS Top-Left Red Corner Chevron */}
+      <Path d="M 5 5 H 18 L 14 11 H 5 Z" fill="#EF4444" />
+      {/* Official QRIS Typography */}
+      {/* Q */}
+      <Path
+        d="M 7 15 H 17 V 29 H 7 Z M 10 18 V 26 H 14 V 18 Z"
+        fill="#0F172A"
+      />
+      <Path d="M 13 25 L 18 31 H 14 L 11 27 Z" fill="#0F172A" />
+      {/* R */}
+      <Path
+        d="M 20 15 H 28 C 30 15 31 16 31 18 C 31 20 30 21 28 21 L 31 31 H 27.5 L 24.8 21.5 H 23 V 31 H 20 Z M 23 18 V 19.5 H 27 C 27.5 19.5 28 19 28 18.5 C 28 18 27.5 18 27 18 Z"
+        fill="#0F172A"
+      />
+      {/* I */}
+      <Path d="M 33 15 H 36 V 31 H 33 Z" fill="#0F172A" />
+      {/* S */}
+      <Path
+        d="M 46 17 L 43.5 18.5 C 43 17.5 42 17 40.5 17 C 39 17 38.2 17.8 38.2 18.8 C 38.2 20 39.5 20.6 41.5 21.3 C 44.5 22.3 46.5 23.5 46.5 26.5 C 46.5 29.5 44 31.5 40.5 31.5 C 37 31.5 35 29.5 34.2 27.8 L 36.8 26.2 C 37.3 27.5 38.6 28.8 40.5 28.8 C 42 28.8 43.2 28 43.2 26.8 C 43.2 25.5 42 24.8 39.8 24.1 C 37 23.1 35 21.8 35 19 C 35 16.5 37.2 14.5 40.5 14.5 C 43.2 14.5 45.2 15.5 46 17 Z"
+        fill="#0F172A"
+      />
+      {/* Red National Standard Bottom Stripe */}
+      <Rect x="6" y="34" width="44" height="2.5" rx="1" fill="#EF4444" />
     </Svg>
   );
 };
@@ -956,60 +1059,332 @@ export const OfficialQrisBrandIcon: React.FC<{ size?: number; style?: any }> = (
 /**
  * 19. Official Bank Virtual Account Brand Vector SVG Icon
  */
-export const OfficialBankVaBrandIcon: React.FC<{ size?: number; style?: any }> = ({
-  size = 38,
-  style,
-}) => {
+export const OfficialBankVaBrandIcon: React.FC<{
+  size?: number;
+  style?: any;
+}> = ({ size = 42, style }) => {
   return (
-    <Svg width={size} height={size} viewBox="0 0 44 44" fill="none" style={style}>
-      <Defs>
-        <LinearGradient id="vaBankGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <Stop offset="0%" stopColor="#2563EB" />
-          <Stop offset="100%" stopColor="#1E40AF" />
-        </LinearGradient>
-      </Defs>
-      <Rect width="44" height="44" rx="12" fill="#EFF6FF" stroke="#BFDBFE" strokeWidth="1" />
-      {/* Bank Building Card Graphic */}
-      <Path d="M11 17 L22 10 L33 17 H11 Z" fill="url(#vaBankGrad)" />
-      {/* Columns */}
-      <Rect x="13" y="19" width="3" height="11" rx="1" fill="#2563EB" />
-      <Rect x="18.5" y="19" width="3" height="11" rx="1" fill="#2563EB" />
-      <Rect x="24" y="19" width="3" height="11" rx="1" fill="#2563EB" />
-      <Rect x="29.5" y="19" width="3" height="11" rx="1" fill="#2563EB" />
-      {/* Base */}
-      <Rect x="10" y="31" width="24" height="3" rx="1" fill="url(#vaBankGrad)" />
-      {/* Star/Chip Indicator */}
-      <Circle cx="22" cy="15" r="1.5" fill="#FEF08A" />
+    <Svg
+      width={size * 1.3}
+      height={size}
+      viewBox="0 0 56 42"
+      fill="none"
+      style={style}
+    >
+      {/* Background Card */}
+      <Rect
+        x="1"
+        y="1"
+        width="54"
+        height="40"
+        rx="8"
+        fill="#0F3875"
+        stroke="#1E40AF"
+        strokeWidth="1.2"
+      />
+      {/* Bank Card Stripe Accent */}
+      <Rect x="1" y="8" width="54" height="6" fill="#0A2550" />
+      {/* Golden Chip */}
+      <Rect
+        x="7"
+        y="18"
+        width="10"
+        height="8"
+        rx="2"
+        fill="#FBBF24"
+        stroke="#F59E0B"
+        strokeWidth="0.8"
+      />
+      <Path d="M7 22 H17 M12 18 V26" stroke="#D97706" strokeWidth="0.6" />
+      {/* VA Badge Text */}
+      <Rect x="30" y="19" width="18" height="12" rx="4" fill="#2563EB" />
+      {/* V */}
+      <Path
+        d="M34 23 L36.5 28 L39 23"
+        stroke="#FFFFFF"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* A */}
+      <Path
+        d="M41 28 L43.5 23 L46 28 M42 26.5 H45"
+        stroke="#FFFFFF"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </Svg>
   );
 };
 
 /**
- * 20. Official E-Wallet (GoPay / ShopeePay) Brand Vector SVG Icon
+ * 20. Official E-Wallet (GoPay & ShopeePay) Brand Vector SVG Icon
  */
-export const OfficialEwalletBrandIcon: React.FC<{ size?: number; style?: any }> = ({
-  size = 38,
-  style,
-}) => {
+export const OfficialEwalletBrandIcon: React.FC<{
+  size?: number;
+  style?: any;
+}> = ({ size = 42, style }) => {
   return (
-    <Svg width={size} height={size} viewBox="0 0 44 44" fill="none" style={style}>
-      <Defs>
-        <LinearGradient id="gopayGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <Stop offset="0%" stopColor="#00AED6" />
-          <Stop offset="100%" stopColor="#007799" />
-        </LinearGradient>
-      </Defs>
-      <Rect width="44" height="44" rx="12" fill="#F0F9FF" stroke="#BAE6FD" strokeWidth="1" />
-      {/* Wallet Body */}
-      <Rect x="9" y="13" width="26" height="18" rx="4" fill="url(#gopayGrad)" />
-      {/* Top Flap */}
-      <Path d="M9 17 H35" stroke="#FFFFFF" strokeWidth="1.5" opacity="0.4" />
-      {/* ShopeePay / GoPay Coin Clasp */}
-      <Rect x="25" y="18" width="10" height="8" rx="3" fill="#EE4D2D" stroke="#FFFFFF" strokeWidth="1" />
-      <Circle cx="30" cy="22" r="1.5" fill="#FFFFFF" />
-      {/* Balance Dots */}
-      <Circle cx="15" cy="23" r="1.5" fill="#FFFFFF" opacity="0.8" />
-      <Circle cx="19" cy="23" r="1.5" fill="#FFFFFF" opacity="0.8" />
+    <Svg
+      width={size * 1.3}
+      height={size}
+      viewBox="0 0 56 42"
+      fill="none"
+      style={style}
+    >
+      {/* Background Card */}
+      <Rect
+        x="1"
+        y="1"
+        width="54"
+        height="40"
+        rx="8"
+        fill="#F8FAFC"
+        stroke="#E2E8F0"
+        strokeWidth="1.2"
+      />
+      {/* GoPay Cyan Brand Circle */}
+      <Circle cx="19" cy="21" r="11" fill="#00AED6" />
+      <Circle cx="19" cy="21" r="5.5" fill="#F8FAFC" />
+      <Circle cx="21" cy="21" r="2.2" fill="#00AED6" />
+      {/* ShopeePay Orange Brand Circle */}
+      <Circle cx="37" cy="21" r="11" fill="#EE4D2D" />
+      {/* Shopee 'S' Bag Graphic */}
+      <Path
+        d="M 39 19.5 C 39 18.5 38 18 37 18 C 36 18 35.5 18.5 35.5 19.2 C 35.5 20.5 38.5 20.8 38.5 22.5 C 38.5 24 37 24.5 36 24.5 C 34.8 24.5 34 23.8 34 23 L 35.2 22.2 C 35.4 22.8 35.8 23.3 36.3 23.3 C 36.8 23.3 37.2 23 37.2 22.5 C 37.2 21.5 34.5 21.2 34.5 19.5 C 34.5 18 35.8 17 37.2 17 C 38.5 17 39.5 17.8 39.8 18.8 Z"
+        fill="#FFFFFF"
+      />
     </Svg>
   );
 };
+
+/**
+ * 21. Rich Vector SVG for Kursi VIP / Executive Leather Seats
+ */
+export const ExecutiveLeatherSeatsIcon: React.FC<IconProps> = ({
+  size = 44,
+}) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <Defs>
+        <LinearGradient id="seatBg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#ECFDF5" />
+          <Stop offset="100%" stopColor="#D1FAE5" />
+        </LinearGradient>
+        <LinearGradient id="seatBody" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#10B981" />
+          <Stop offset="100%" stopColor="#047857" />
+        </LinearGradient>
+      </Defs>
+      <Circle cx="32" cy="32" r="30" fill="url(#seatBg)" />
+      {/* Headrest */}
+      <Rect
+        x="23"
+        y="12"
+        width="18"
+        height="9"
+        rx="4.5"
+        fill="url(#seatBody)"
+      />
+      <Rect x="25" y="14" width="14" height="2" rx="1" fill="#A7F3D0" />
+      {/* Backrest */}
+      <Rect x="19" y="23" width="26" height="20" rx="6" fill="url(#seatBody)" />
+      {/* Backrest Cushion Lines */}
+      <Rect x="23" y="26" width="18" height="14" rx="3" fill="#065F46" />
+      {/* Armrests */}
+      <Rect x="14" y="32" width="5" height="14" rx="2.5" fill="#047857" />
+      <Rect x="45" y="32" width="5" height="14" rx="2.5" fill="#047857" />
+      {/* Seat Cushion Base */}
+      <Rect x="17" y="42" width="30" height="8" rx="4" fill="url(#seatBody)" />
+      {/* Legrest support */}
+      <Rect x="22" y="50" width="20" height="4" rx="2" fill="#065F46" />
+    </Svg>
+  );
+};
+
+/**
+ * 22. Rich Vector SVG for In-App Alert: Success (Emerald Glowing Check Shield)
+ */
+export const AlertSuccessSvg: React.FC<{ size?: number }> = ({ size = 56 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <Defs>
+        <LinearGradient id="sucGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#10B981" stopOpacity="0.2" />
+          <Stop offset="100%" stopColor="#059669" stopOpacity="0.04" />
+        </LinearGradient>
+        <LinearGradient id="sucShield" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#34D399" />
+          <Stop offset="100%" stopColor="#059669" />
+        </LinearGradient>
+      </Defs>
+      <Circle cx="32" cy="32" r="30" fill="url(#sucGlow)" />
+      <Circle cx="32" cy="32" r="22" fill="url(#sucShield)" />
+      {/* Inner Checkmark */}
+      <Path
+        d="M23 32.5 L29 38.5 L41 26.5"
+        stroke="#FFFFFF"
+        strokeWidth="3.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Sparkle Accents */}
+      <Path
+        d="M48 14 L49.5 17.5 L53 19 L49.5 20.5 L48 24 L46.5 20.5 L43 19 L46.5 17.5 Z"
+        fill="#10B981"
+      />
+      <Circle cx="15" cy="46" r="2" fill="#34D399" />
+    </Svg>
+  );
+};
+
+/**
+ * 23. Rich Vector SVG for In-App Alert: Error / Danger (Ruby Alert Shield)
+ */
+export const AlertErrorSvg: React.FC<{ size?: number }> = ({ size = 56 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <Defs>
+        <LinearGradient id="errGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#EF4444" stopOpacity="0.2" />
+          <Stop offset="100%" stopColor="#B91C1C" stopOpacity="0.04" />
+        </LinearGradient>
+        <LinearGradient id="errShield" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#F87171" />
+          <Stop offset="100%" stopColor="#DC2626" />
+        </LinearGradient>
+      </Defs>
+      <Circle cx="32" cy="32" r="30" fill="url(#errGlow)" />
+      <Circle cx="32" cy="32" r="22" fill="url(#errShield)" />
+      {/* Cross mark */}
+      <Path
+        d="M24 24 L40 40 M40 24 L24 40"
+        stroke="#FFFFFF"
+        strokeWidth="3.8"
+        strokeLinecap="round"
+      />
+      {/* Warning Dots */}
+      <Circle cx="49" cy="17" r="2" fill="#EF4444" />
+      <Circle cx="15" cy="45" r="2" fill="#F87171" />
+    </Svg>
+  );
+};
+
+/**
+ * 24. Rich Vector SVG for In-App Alert: Warning (Golden Amber Triangle)
+ */
+export const AlertWarningSvg: React.FC<{ size?: number }> = ({ size = 56 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <Defs>
+        <LinearGradient id="warnGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#F59E0B" stopOpacity="0.2" />
+          <Stop offset="100%" stopColor="#D97706" stopOpacity="0.04" />
+        </LinearGradient>
+        <LinearGradient id="warnTri" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#FBBF24" />
+          <Stop offset="100%" stopColor="#D97706" />
+        </LinearGradient>
+      </Defs>
+      <Circle cx="32" cy="32" r="30" fill="url(#warnGlow)" />
+      {/* Rounded Triangle */}
+      <Path
+        d="M32 14 C33.5 14 34.8 14.8 35.6 16.2 L49.6 40.2 C51.2 43 49.2 46.5 46 46.5 H18 C14.8 46.5 12.8 43 14.4 40.2 L28.4 16.2 C29.2 14.8 30.5 14 32 14 Z"
+        fill="url(#warnTri)"
+      />
+      {/* Exclamation Bar */}
+      <Rect x="30" y="24" width="4" height="12" rx="2" fill="#FFFFFF" />
+      {/* Exclamation Dot */}
+      <Circle cx="32" cy="40.5" r="2" fill="#FFFFFF" />
+    </Svg>
+  );
+};
+
+/**
+ * 25. Rich Vector SVG for In-App Alert: Info (Sapphire Blue Info Pin)
+ */
+export const AlertInfoSvg: React.FC<{ size?: number }> = ({ size = 56 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <Defs>
+        <LinearGradient id="infoGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#3B82F6" stopOpacity="0.2" />
+          <Stop offset="100%" stopColor="#1D4ED8" stopOpacity="0.04" />
+        </LinearGradient>
+        <LinearGradient id="infoCircle" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#60A5FA" />
+          <Stop offset="100%" stopColor="#2563EB" />
+        </LinearGradient>
+      </Defs>
+      <Circle cx="32" cy="32" r="30" fill="url(#infoGlow)" />
+      <Circle cx="32" cy="32" r="22" fill="url(#infoCircle)" />
+      {/* Info Dot */}
+      <Circle cx="32" cy="24" r="2.5" fill="#FFFFFF" />
+      {/* Info Stem */}
+      <Rect x="30" y="29.5" width="4" height="13" rx="2" fill="#FFFFFF" />
+    </Svg>
+  );
+};
+
+/**
+ * 26. Rich Vector SVG for In-App Alert: Confirm (Royal Blue Interactive Star Shield)
+ */
+export const AlertConfirmSvg: React.FC<{ size?: number }> = ({ size = 56 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <Defs>
+        <LinearGradient id="confGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#0284C7" stopOpacity="0.2" />
+          <Stop offset="100%" stopColor="#0369A1" stopOpacity="0.04" />
+        </LinearGradient>
+        <LinearGradient id="confCircle" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#38BDF8" />
+          <Stop offset="100%" stopColor="#0284C7" />
+        </LinearGradient>
+      </Defs>
+      <Circle cx="32" cy="32" r="30" fill="url(#confGlow)" />
+      <Circle cx="32" cy="32" r="22" fill="url(#confCircle)" />
+      {/* Question mark shape */}
+      <Path
+        d="M27 26 C27 23 29 21 32 21 C35 21 37 23 37 25.5 C37 28 35.5 29.5 33.5 30.5 C32.5 31 32 32 32 33.5"
+        stroke="#FFFFFF"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+      />
+      <Circle cx="32" cy="39.5" r="2" fill="#FFFFFF" />
+      {/* Sparkles */}
+      <Path
+        d="M49 14 L50.5 17.5 L54 19 L50.5 20.5 L49 24 L47.5 20.5 L44 19 L47.5 17.5 Z"
+        fill="#38BDF8"
+      />
+    </Svg>
+  );
+};
+
+/**
+ * 27. Official Vector SVG for Google Sign-In
+ */
+export const GoogleAuthIcon: React.FC<{ size?: number }> = ({ size = 20 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+        fill="#4285F4"
+      />
+      <Path
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+        fill="#34A853"
+      />
+      <Path
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+        fill="#FBBC05"
+      />
+      <Path
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+        fill="#EA4335"
+      />
+    </Svg>
+  );
+};
+

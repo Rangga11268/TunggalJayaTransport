@@ -105,3 +105,55 @@ export function formatCharterDateRange(
 
   return `${formatIndonesianDate(startDateStr)} - ${formatIndonesianDate(endDateStr)}`;
 }
+
+/**
+ * Formats a departure/arrival time string or ISO UTC datetime to Indonesian Time (WIB, Asia/Jakarta)
+ * Handles ISO with UTC "2000-01-01T00:00:00.000000Z" -> "07:00"
+ * Handles "2000-01-01 07:00:00" -> "07:00"
+ * Handles "07:00:00" -> "07:00"
+ */
+export function formatIndonesianTime(
+  timeStr: string | null | undefined,
+  fallback = "07:00",
+): string {
+  if (!timeStr) return fallback;
+
+  // 1. If ISO string with Z (UTC timezone, e.g. "2000-01-01T00:00:00.000000Z")
+  if (
+    typeof timeStr === "string" &&
+    (timeStr.includes("Z") || (timeStr.includes("T") && timeStr.endsWith("Z")))
+  ) {
+    const d = new Date(timeStr);
+    if (!isNaN(d.getTime())) {
+      // In JS, getHours() returns local browser time (which in Indonesia is UTC+7)
+      // Or to be 100% deterministic for Asia/Jakarta (UTC+7):
+      const utcHours = d.getUTCHours();
+      const utcMinutes = d.getUTCMinutes();
+      const wibHours = (utcHours + 7) % 24;
+      return `${wibHours.toString().padStart(2, "0")}:${utcMinutes.toString().padStart(2, "0")}`;
+    }
+  }
+
+  // 2. If standard ISO without Z "2000-01-01T07:00:00"
+  if (typeof timeStr === "string" && timeStr.includes("T")) {
+    const timePart = timeStr.split("T")[1];
+    if (timePart && timePart.length >= 5) {
+      return timePart.substring(0, 5);
+    }
+  }
+
+  // 3. If MySQL/Postgres date string "2000-01-01 07:00:00"
+  if (typeof timeStr === "string" && timeStr.includes(" ")) {
+    const timePart = timeStr.split(" ")[1];
+    if (timePart && timePart.length >= 5) {
+      return timePart.substring(0, 5);
+    }
+  }
+
+  // 4. If plain time "07:00:00" or "07:00"
+  if (typeof timeStr === "string" && /^\d{2}:\d{2}/.test(timeStr)) {
+    return timeStr.substring(0, 5);
+  }
+
+  return String(timeStr).substring(0, 5) || fallback;
+}
