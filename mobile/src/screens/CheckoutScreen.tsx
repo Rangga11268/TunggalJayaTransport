@@ -347,6 +347,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
+    width: "100%",
+    maxWidth: 680,
+    alignSelf: "center",
   },
   bottomBarWrapper: {
     position: "absolute",
@@ -377,6 +380,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    width: "100%",
+    maxWidth: 680,
+    alignSelf: "center",
   },
   bottomBarLabel: {
     fontFamily: "PlusJakartaSans_500Medium",

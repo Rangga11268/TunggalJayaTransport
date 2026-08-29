@@ -96,13 +96,17 @@ export default function TicketDetailScreen({ navigation, route }: any) {
     booking?.booking_date || booking?.created_at || "2026-08-30",
     false,
   );
+  const dateShort = formatIndonesianDate(
+    booking?.booking_date || booking?.created_at || "2026-08-30",
+    true,
+  );
   const totalPrice = Number(
     booking?.total_price || booking?.total_amount || 260000,
   ).toLocaleString("id-ID");
   const seatsText =
     selectedSeats.length > 0
       ? selectedSeats.join(", ")
-      : booking?.seat_numbers || "1A, 1B";
+      : booking?.seat_numbers || "1";
 
   const onShare = async () => {
     try {
@@ -147,14 +151,14 @@ export default function TicketDetailScreen({ navigation, route }: any) {
           <View style={styles.passHeader}>
             <View style={styles.passBrand}>
               <View style={styles.webStubBadge}>
-                <Text style={styles.webStubBadgeText}>E - TICKET BUS</Text>
+                <Text style={styles.webStubBadgeText}>E - TICKET</Text>
               </View>
-              <View>
-                <Text style={styles.passBrandTitle}>
+              <View style={{ flexShrink: 1 }}>
+                <Text style={styles.passBrandTitle} numberOfLines={1}>
                   Tunggal Jaya Transport
                 </Text>
-                <Text style={styles.passBrandSub}>
-                  Official Passenger Boarding Pass
+                <Text style={styles.passBrandSub} numberOfLines={1}>
+                  Official Boarding Pass
                 </Text>
               </View>
             </View>
@@ -172,7 +176,9 @@ export default function TicketDetailScreen({ navigation, route }: any) {
           <View style={styles.routeHighlightBox}>
             <View style={styles.routeCityBox}>
               <Text style={styles.routeCityLabel}>DARI</Text>
-              <Text style={styles.routeCityName}>{origin}</Text>
+              <Text style={styles.routeCityName} numberOfLines={1}>
+                {origin}
+              </Text>
               <Text style={styles.routeTime}>{depTime} WIB</Text>
             </View>
 
@@ -192,7 +198,12 @@ export default function TicketDetailScreen({ navigation, route }: any) {
 
             <View style={[styles.routeCityBox, { alignItems: "flex-end" }]}>
               <Text style={styles.routeCityLabel}>TUJUAN</Text>
-              <Text style={styles.routeCityName}>{destination}</Text>
+              <Text
+                style={[styles.routeCityName, { textAlign: "right" }]}
+                numberOfLines={1}
+              >
+                {destination}
+              </Text>
               <Text style={styles.routeTime}>{arrTime} WIB</Text>
             </View>
           </View>
@@ -228,7 +239,7 @@ export default function TicketDetailScreen({ navigation, route }: any) {
               <Text style={styles.detailLabel}>DATE • TIME</Text>
               <View style={styles.detailBox}>
                 <Text style={styles.detailValue} numberOfLines={1}>
-                  {date} • {depTime}
+                  {dateShort} • {depTime}
                 </Text>
               </View>
             </View>
@@ -351,6 +362,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
+    width: "100%",
+    maxWidth: 560,
+    alignSelf: "center",
   },
   boardingPass: {
     backgroundColor: "#FFFFFF",
@@ -369,55 +383,64 @@ const styles = StyleSheet.create({
       android: {
         elevation: 4,
       },
+      web: {
+        boxShadow: "0 4px 16px rgba(15, 23, 42, 0.06)",
+      } as any,
     }),
   },
   passHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     backgroundColor: "#F8FAFC",
     borderBottomWidth: 1,
     borderBottomColor: "#E2E8F0",
+    gap: 8,
   },
   passBrand: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 8,
+    flex: 1,
   },
   webStubBadge: {
     backgroundColor: "#10207A",
-    paddingHorizontal: 7,
-    paddingVertical: 3.5,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
     borderRadius: 5,
   },
   webStubBadgeText: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
-    fontSize: 9.5,
+    fontSize: 9,
     color: "#FFFFFF",
     letterSpacing: 0.5,
   },
   passBrandTitle: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
-    fontSize: 13,
+    fontSize: 12.5,
     color: "#111827",
   },
   passBrandSub: {
     fontFamily: "PlusJakartaSans_500Medium",
-    fontSize: 10,
+    fontSize: 9.5,
     color: "#6B7280",
   },
   confirmedBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(5, 150, 105, 0.1)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    backgroundColor: "#ECFDF5",
+    borderWidth: 1,
+    borderColor: "#A7F3D0",
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 6,
+    flexShrink: 0,
   },
   confirmedText: {
     fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 10.5,
+    fontSize: 9.5,
     color: "#059669",
   },
   routeHighlightBox: {

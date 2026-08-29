@@ -261,6 +261,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 16,
+    width: "100%",
+    maxWidth: 680,
+    alignSelf: "center",
   },
   heroBanner: {
     borderRadius: 22,

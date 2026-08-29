@@ -336,6 +336,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 40,
+    width: "100%",
+    maxWidth: 480,
+    alignSelf: "center",
   },
   topBar: {
     flexDirection: "row",

@@ -61,7 +61,6 @@ export default function BookingHistoryScreen() {
       setLoading(true);
       const [resBookings, resCharters] = await Promise.all([
         api.get("/bookings").catch(() => ({ data: [] })),
-        api.get("/charter/my-requests").catch(() => ({ data: [] })),
         api
           .get("/charter/history")
           .catch(() => api.get("/charter/my-requests"))
@@ -687,6 +686,9 @@ const styles = StyleSheet.create({
   scrollList: {
     paddingHorizontal: 16,
     paddingTop: 14,
+    width: "100%",
+    maxWidth: 680,
+    alignSelf: "center",
   },
   centerBox: {
     paddingVertical: 60,

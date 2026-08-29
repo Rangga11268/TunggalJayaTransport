@@ -94,8 +94,7 @@ export default function ScheduleDetailScreen() {
   }
 
   const busName = schedule?.bus?.name || "Resi Bisma";
-  const busType =
-    schedule?.bus?.bus_type || schedule?.bus?.type || "Executive";
+  const busType = schedule?.bus?.bus_type || schedule?.bus?.type || "Executive";
   const plateNumber = schedule?.bus?.plate_number || "E 7777 TJ";
   const capacity = schedule?.bus?.capacity || 50;
   const origin = schedule?.route?.origin || "Jakarta";
@@ -587,6 +586,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 16,
+    width: "100%",
+    maxWidth: 680,
+    alignSelf: "center",
   },
   tabsRow: {
     flexDirection: "row",
@@ -649,24 +651,26 @@ const styles = StyleSheet.create({
   specsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
+    gap: 12,
   },
   specBox: {
-    width: "47%",
-    backgroundColor: "#F1F4F8",
-    borderRadius: 12,
+    width: "48%",
+    backgroundColor: "#F8FAFC",
     padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
   specLabel: {
-    fontFamily: "PlusJakartaSans_400Regular",
+    fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 11,
     color: "#6B7280",
-    marginBottom: 4,
   },
   specValue: {
     fontFamily: "PlusJakartaSans_700Bold",
-    fontSize: 14,
+    fontSize: 13,
     color: "#111827",
+    marginTop: 2,
   },
   timelineWrapper: {
     paddingLeft: 4,
