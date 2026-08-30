@@ -22,6 +22,8 @@
     },
     "web": {
       "favicon": "./assets/logo/logoNoBg.png"
-    }
+    },
+    "plugins": ["expo-font"],
+    "newArchEnabled": true
   }
 }

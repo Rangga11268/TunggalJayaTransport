@@ -68,9 +68,9 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const linking: LinkingOptions<RootStackParamList> = {
   prefixes: [
-    typeof window !== "undefined"
+    Platform.OS === "web" && typeof window !== "undefined" && window?.location
       ? window.location.origin
-      : "http://localhost:8081",
+      : "tunggaljaya://",
     "http://localhost:8081",
     "http://localhost:19006",
     "tunggaljaya://",
@@ -93,12 +93,12 @@ const linking: LinkingOptions<RootStackParamList> = {
       Schedules: "all-schedules",
       ScheduleList: "schedule-list",
       ScheduleDetail: "schedule/:scheduleId",
-      SeatSelection: "seats/:scheduleId",
+      SeatSelection: "seat-selection",
       Checkout: "checkout",
       TicketDetail: "ticket/:bookingId",
       BookingHistory: "my-tickets",
       Charter: "charter",
-      Promo: "promos",
+      Promo: "promo",
       Rewards: "rewards",
       Help: "help-center",
       Profile: "my-profile",
@@ -128,11 +128,14 @@ export default function RootNavigator() {
   const { user } = useAuth();
 
   // On Web, if user is on specific page, do not force Splash as initial
-  const isWeb = Platform.OS === "web" && typeof window !== "undefined";
+  const isWeb =
+    Platform.OS === "web" &&
+    typeof window !== "undefined" &&
+    Boolean(window?.location);
   const hasSpecificPath =
     isWeb &&
-    window.location.pathname !== "/" &&
-    window.location.pathname !== "/splash";
+    window?.location?.pathname !== "/" &&
+    window?.location?.pathname !== "/splash";
 
   const getInitialRoute = (): keyof RootStackParamList => {
     if (hasSpecificPath) {
@@ -169,6 +172,8 @@ export default function RootNavigator() {
         <Stack.Screen name="Charter" component={CharterScreen} />
         <Stack.Screen name="Promo" component={PromoScreen} />
         <Stack.Screen name="Rewards" component={RewardsScreen} />
+        <Stack.Screen name="Help" component={HelpScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
