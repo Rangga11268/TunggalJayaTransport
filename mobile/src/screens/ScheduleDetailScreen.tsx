@@ -9,11 +9,15 @@ import {
   Dimensions,
   Platform,
   ActivityIndicator,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   ArrowLeft,
   Star,
@@ -31,9 +35,15 @@ import {
   Armchair,
   Sparkles,
   Share2,
+  PlusCircle,
+  X,
+  Send,
+  ThumbsUp,
 } from "lucide-react-native";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { COLORS } from "../theme/colors";
+import { useCustomAlert } from "../context/AlertContext";
+import { useAuth } from "../context/AuthContext";
 import apiClient from "../api/client";
 import { formatIndonesianTime } from "../utils/format";
 
@@ -41,20 +51,92 @@ const { width } = Dimensions.get("window");
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
+interface ReviewItem {
+  id: string;
+  name: string;
+  score: number;
+  date: string;
+  text: string;
+  isUser?: boolean;
+}
+
+const DEFAULT_REVIEWS: ReviewItem[] = [
+  {
+    id: "rev-1",
+    name: "Bambang Setyadi",
+    score: 5,
+    date: "2 hari yang lalu",
+    text: "Unit armada sangat bersih dan wangi, AC dingin mantap, suspensi udara empuk banget tidak bikin mual di tol Cipali!",
+  },
+  {
+    id: "rev-2",
+    name: "Siti Rahmawati",
+    score: 5,
+    date: "1 minggu yang lalu",
+    text: "Driver bawa busnya sangat tenang, aman, dan tepat waktu sampai di Terminal Kuningan. Sangat direkomendasikan!",
+  },
+  {
+    id: "rev-3",
+    name: "Dwi Prasetyo",
+    score: 4,
+    date: "2 minggu yang lalu",
+    text: "Kursi leg rest luas dan colokan USB berfungsi dengan baik untuk charger HP sepanjang jalan. Sangat puas.",
+  },
+  {
+    id: "rev-4",
+    name: "Ahmad Fauzi",
+    score: 5,
+    date: "3 minggu yang lalu",
+    text: "Kru bus ramah dan sigap membantu bagasi. Rehat servis makan prasmanan juga enak dan bersih.",
+  },
+];
+
 export default function ScheduleDetailScreen() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<any>();
   const { scheduleId, date } = route.params || { scheduleId: 1 };
+  const { user } = useAuth();
+  const { showSuccess, showError, showInfo } = useCustomAlert();
 
   const [activeTab, setActiveTab] = useState<"deals" | "details" | "reviews">(
+  const [activeTab, setActiveTab] = useState<"details" | "deals" | "reviews">(
     "details",
   );
   const [schedule, setSchedule] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // Reviews and rating state
+  const [reviews, setReviews] = useState<ReviewItem[]>(DEFAULT_REVIEWS);
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [newRating, setNewRating] = useState(5);
+  const [reviewerName, setReviewerName] = useState(user?.name || "");
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+
   useEffect(() => {
     fetchDetail();
+    loadPersistedReviews();
   }, [scheduleId, date]);
+
+  useEffect(() => {
+    if (user?.name && !reviewerName) {
+      setReviewerName(user.name);
+    }
+  }, [user]);
+
+  const loadPersistedReviews = async () => {
+    try {
+      const stored = await AsyncStorage.getItem(`@bus_reviews_${scheduleId}`);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setReviews([...parsed, ...DEFAULT_REVIEWS]);
+        }
+      }
+    } catch (e) {
+      console.log("Error loading persisted reviews:", e);
+    }
+  };
 
   const fetchDetail = async () => {
     try {
@@ -79,10 +161,80 @@ export default function ScheduleDetailScreen() {
     }
   };
 
+  const calculateAverageRating = () => {
+    if (reviews.length === 0) return "4.8";
+    const sum = reviews.reduce((acc, curr) => acc + curr.score, 0);
+    return (sum / reviews.length).toFixed(1);
+  };
+
+  const handleOpenReviewModal = () => {
+    setReviewerName(user?.name || reviewerName || "");
+    setNewRating(5);
+    setReviewComment("");
+    setReviewModalVisible(true);
+  };
+
+  const handleSubmitReview = async () => {
+    const trimmedName = (reviewerName || user?.name || "").trim();
+    const trimmedComment = reviewComment.trim();
+
+    if (!trimmedName) {
+      showError("Nama Diperlukan", "Silakan masukkan nama Anda sebelum mengirim ulasan.");
+      return;
+    }
+
+    if (!trimmedComment) {
+      showError(
+        "Ulasan Masih Kosong",
+        "Silakan tuliskan beberapa kata tentang pengalaman perjalanan Anda.",
+      );
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+
+      const newReviewItem: ReviewItem = {
+        id: `user-rev-${Date.now()}`,
+        name: trimmedName,
+        score: newRating,
+        date: "Hari ini (Terverifikasi)",
+        text: trimmedComment,
+        isUser: true,
+      };
+
+      const updated = [newReviewItem, ...reviews.filter((r) => !r.isUser)];
+      setReviews(updated);
+
+      // Save user review to AsyncStorage
+      const userReviews = updated.filter((r) => r.isUser);
+      await AsyncStorage.setItem(
+        `@bus_reviews_${scheduleId}`,
+        JSON.stringify(userReviews),
+      );
+
+      setReviewModalVisible(false);
+      setReviewComment("");
+      showSuccess(
+        "Ulasan Berhasil Dikirim! ⭐",
+        "Terima kasih atas rating dan ulasan Anda. Masukan Anda sangat berharga bagi peningkatan layanan PO Tunggal Jaya.",
+      );
+    } catch (e) {
+      console.log("Error saving review:", e);
+      showError("Gagal Mengirim", "Terjadi kendala saat menyimpan ulasan Anda.");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const averageRating = calculateAverageRating();
+  const totalReviewCount = 9600 + reviews.filter((r) => r.isUser).length;
+
   const tabs = [
     { id: "details", label: "Spesifikasi", icon: FileText },
     { id: "deals", label: "Promo & Tarif", icon: Tag },
     { id: "reviews", label: "Ulasan (4.8)", icon: MessageSquare },
+    { id: "reviews", label: `Ulasan (${averageRating})`, icon: MessageSquare },
   ];
 
   if (loading) {
@@ -114,6 +266,23 @@ export default function ScheduleDetailScreen() {
     return require("../../assets/images/resiBisma.webp");
   };
 
+  const getRatingSentiment = (star: number) => {
+    switch (star) {
+      case 5:
+        return "5 Bintang • Sangat Puas & Nyaman ⭐⭐⭐⭐⭐";
+      case 4:
+        return "4 Bintang • Puas & Bagus ⭐⭐⭐⭐";
+      case 3:
+        return "3 Bintang • Cukup Baik ⭐⭐⭐";
+      case 2:
+        return "2 Bintang • Kurang Memuaskan ⭐⭐";
+      case 1:
+        return "1 Bintang • Perlu Perbaikan ⭐";
+      default:
+        return "Beri Nilai Bintang";
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Full-width Top Hero Photo */}
@@ -128,6 +297,7 @@ export default function ScheduleDetailScreen() {
             "rgba(17, 24, 39, 0.4)",
             "transparent",
             "rgba(17, 24, 39, 0.9)",
+            "rgba(17, 24, 39, 0.95)",
           ]}
           locations={[0, 0.35, 1]}
           style={styles.heroGradient}
@@ -157,6 +327,10 @@ export default function ScheduleDetailScreen() {
               </View>
               <Text style={styles.routeHeaderTitle}>{busName}</Text>
               <Text style={styles.routeHeaderSub}>
+              <Text style={styles.routeHeaderTitle} numberOfLines={1}>
+                {busName}
+              </Text>
+              <Text style={styles.routeHeaderSub} numberOfLines={1}>
                 {origin} ↔ {destination}
               </Text>
             </View>
@@ -165,6 +339,10 @@ export default function ScheduleDetailScreen() {
               <View style={styles.starsRow}>
                 <Star size={13} color="#FFB800" fill="#FFB800" />
                 <Text style={styles.starsText}>4.8 (9.6k)</Text>
+                <Star size={12} color="#FFB800" fill="#FFB800" />
+                <Text style={styles.starsText}>
+                  {averageRating} ({((totalReviewCount) / 1000).toFixed(1)}k)
+                </Text>
               </View>
               <Text style={styles.routeHeaderPrice}>
                 Rp {price}{" "}
@@ -181,6 +359,13 @@ export default function ScheduleDetailScreen() {
       >
         {/* Tab Switcher Pills */}
         <View style={styles.tabsRow}>
+        {/* Horizontal Tab Switcher Pills */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsScrollContent}
+          style={styles.tabsScrollView}
+        >
           {tabs.map((t) => {
             const isActive = activeTab === t.id;
             const IconComp = t.icon;
@@ -209,6 +394,7 @@ export default function ScheduleDetailScreen() {
             );
           })}
         </View>
+        </ScrollView>
 
         {/* Tab 1: Spesifikasi Detail Unit */}
         {activeTab === "details" && (
@@ -249,6 +435,7 @@ export default function ScheduleDetailScreen() {
                     </Text>
                     <Text style={styles.timelineSub}>
                       Check-in 30 menit sebelum keberangkatan
+                      Titik Kumpul &amp; Boarding Penumpang
                     </Text>
                   </View>
                 </View>
@@ -257,13 +444,16 @@ export default function ScheduleDetailScreen() {
 
                 <View style={styles.timelineItem}>
                   <View style={styles.timelineDot} />
+                  <View style={styles.timelineDotDest} />
                   <View style={styles.timelineInfo}>
                     <Text style={styles.timelineTime}>{arrTime} WIB</Text>
                     <Text style={styles.timelinePlace}>
                       Terminal Kedatangan {destination}
+                      Terminal Tujuan {destination}
                     </Text>
                     <Text style={styles.timelineSub}>
                       Estimasi kedatangan tepat waktu
+                      Kedatangan Akhir Penumpang
                     </Text>
                   </View>
                 </View>
@@ -273,6 +463,7 @@ export default function ScheduleDetailScreen() {
             {/* Facilities Card */}
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Fasilitas Kabin Premium</Text>
+              <Text style={styles.cardTitle}>Fasilitas Armada Termasuk</Text>
               <View style={styles.facilitiesGrid}>
                 <View style={styles.facilityRow}>
                   <CheckCircle size={16} color={COLORS.brandRed} />
@@ -310,6 +501,51 @@ export default function ScheduleDetailScreen() {
                     Free Snack &amp; Air Mineral Botol
                   </Text>
                 </View>
+                {[
+                  {
+                    icon: Armchair,
+                    label: "Reclining Seat",
+                    desc: "Kursi empuk + leg rest",
+                  },
+                  {
+                    icon: Wifi,
+                    label: "Free High-Speed Wi-Fi",
+                    desc: "Internet stabil",
+                  },
+                  {
+                    icon: Tv,
+                    label: "Audio Video on Demand",
+                    desc: "Hiburan TV sentral",
+                  },
+                  {
+                    icon: Coffee,
+                    label: "Servis Makan Gratis",
+                    desc: "1x prasmanan lezat",
+                  },
+                  {
+                    icon: ShieldCheck,
+                    label: "Air Suspension",
+                    desc: "Suspensi udara lembut",
+                  },
+                  {
+                    icon: CheckCircle,
+                    label: "Port USB Charger",
+                    desc: "Di setiap baris kursi",
+                  },
+                ].map((fac, idx) => {
+                  const FacIcon = fac.icon;
+                  return (
+                    <View key={idx} style={styles.facilityItem}>
+                      <View style={styles.facilityIconCircle}>
+                        <FacIcon size={18} color={COLORS.brandRed} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.facilityName}>{fac.label}</Text>
+                        <Text style={styles.facilityDesc}>{fac.desc}</Text>
+                      </View>
+                    </View>
+                  );
+                })}
               </View>
             </View>
 
@@ -333,20 +569,24 @@ export default function ScheduleDetailScreen() {
         )}
 
         {/* Tab 2: Deals & Tarif */}
+        {/* Tab 2: Deals & Promo */}
         {activeTab === "deals" && (
           <View style={styles.sectionContainer}>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>
                 Penawaran &amp; Diskon Tersedia
               </Text>
+              <Text style={styles.cardTitle}>Promo &amp; Penawaran Aktif</Text>
               <View style={styles.dealItem}>
                 <View style={styles.dealIconBox}>
                   <Tag size={18} color={COLORS.brandRed} />
                 </View>
                 <View style={styles.dealContent}>
                   <Text style={styles.dealTitle}>Kupon Early Bird 10%</Text>
+                  <Text style={styles.dealTitle}>Diskon Member VIP 10%</Text>
                   <Text style={styles.dealDesc}>
                     Gunakan kode{" "}
+                    Gunakan kode kupon{" "}
                     <Text
                       style={{
                         color: COLORS.brandRed,
@@ -368,6 +608,7 @@ export default function ScheduleDetailScreen() {
                   <Text style={styles.dealTitle}>Cashback TJ Poin</Text>
                   <Text style={styles.dealDesc}>
                     Dapatkan 5.000 TJ Poin untuk setiap pemesanan tiket.
+                    Dapatkan +5.000 TJ Poin untuk setiap pemesanan tiket resmi.
                   </Text>
                 </View>
               </View>
@@ -376,8 +617,10 @@ export default function ScheduleDetailScreen() {
         )}
 
         {/* Tab 3: Reviews */}
+        {/* Tab 3: Rating & Reviews */}
         {activeTab === "reviews" && (
           <View style={styles.sectionContainer}>
+            {/* Overview Card */}
             <View style={styles.reviewsOverview}>
               <Text style={styles.reviewScoreBig}>4.8</Text>
               <View>
@@ -389,14 +632,38 @@ export default function ScheduleDetailScreen() {
                     marginBottom: 2,
                   }}
                 >
+              <View style={styles.reviewScoreBox}>
+                <Text style={styles.reviewScoreBig}>{averageRating}</Text>
+                <View style={{ flexDirection: "row", gap: 3, marginTop: 4 }}>
                   {[1, 2, 3, 4, 5].map((s) => (
                     <Star key={s} size={14} color="#D97706" fill="#D97706" />
+                    <Star
+                      key={s}
+                      size={14}
+                      color="#D97706"
+                      fill={
+                        s <= Math.round(Number(averageRating))
+                          ? "#D97706"
+                          : "transparent"
+                      }
+                    />
                   ))}
                 </View>
                 <Text style={styles.reviewScoreCount}>
                   Berdasarkan 9.600+ ulasan penumpang
+                  Berdasarkan {totalReviewCount.toLocaleString("id-ID")}+ ulasan
                 </Text>
               </View>
+
+              {/* Write Review Button */}
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={handleOpenReviewModal}
+                style={styles.writeReviewBtn}
+              >
+                <PlusCircle size={16} color="#FFFFFF" />
+                <Text style={styles.writeReviewBtnText}>Tulis Ulasan</Text>
+              </TouchableOpacity>
             </View>
 
             {[
@@ -420,22 +687,55 @@ export default function ScheduleDetailScreen() {
               },
             ].map((rev, i) => (
               <View key={i} style={styles.reviewCard}>
+            {/* Review Cards List */}
+            {reviews.map((rev) => (
+              <View
+                key={rev.id}
+                style={[
+                  styles.reviewCard,
+                  rev.isUser && styles.reviewCardUserHighlight,
+                ]}
+              >
                 <View style={styles.reviewCardHeader}>
                   <Text style={styles.reviewCardAuthor}>{rev.name}</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                    <View style={styles.reviewerAvatarBadge}>
+                      <Text style={styles.reviewerAvatarText}>
+                        {rev.name.substring(0, 2).toUpperCase()}
+                      </Text>
+                    </View>
+                    <View>
+                      <Text style={styles.reviewCardAuthor}>{rev.name}</Text>
+                      {rev.isUser && (
+                        <View style={styles.userVerifiedBadge}>
+                          <ThumbsUp size={10} color="#059669" />
+                          <Text style={styles.userVerifiedText}>Ulasan Anda</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
                   <Text style={styles.reviewCardDate}>{rev.date}</Text>
                 </View>
+
                 <View
                   style={{ flexDirection: "row", gap: 2, marginVertical: 4 }}
+                  style={{
+                    flexDirection: "row",
+                    gap: 3,
+                    marginVertical: 8,
+                  }}
                 >
                   {[1, 2, 3, 4, 5].map((s) => (
                     <Star
                       key={s}
                       size={12}
+                      size={13}
                       color={s <= rev.score ? "#D97706" : "#E2E8F0"}
                       fill={s <= rev.score ? "#D97706" : "transparent"}
                     />
                   ))}
                 </View>
+
                 <Text style={styles.reviewCardText}>{rev.text}</Text>
               </View>
             ))}
@@ -447,6 +747,7 @@ export default function ScheduleDetailScreen() {
       </ScrollView>
 
       {/* Floating Bottom Red Action Bar (Phone 3 Mockup) */}
+      {/* Floating Bottom Red Action Bar */}
       <View style={styles.bottomBarWrapper} pointerEvents="box-none">
         <View style={styles.bottomBarContainer}>
           <View style={styles.bottomBarLeft}>
@@ -455,6 +756,7 @@ export default function ScheduleDetailScreen() {
             </View>
             <View>
               <Text style={styles.bottomSeatLabel}>1 Seat • {busType}</Text>
+              <Text style={styles.bottomSeatLabel}>1 Kursi • {busType}</Text>
               <Text style={styles.bottomPriceValue}>Rp {price}</Text>
             </View>
           </View>
@@ -475,6 +777,121 @@ export default function ScheduleDetailScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* MODAL TULIS ULASAN & RATING */}
+      <Modal
+        visible={reviewModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setReviewModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.modalBackdrop}
+        >
+          <View style={styles.modalCard}>
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <View>
+                <Text style={styles.modalTitle}>Beri Rating &amp; Ulasan</Text>
+                <Text style={styles.modalSub}>
+                  Armada: {busName} ({busType})
+                </Text>
+              </View>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => setReviewModalVisible(false)}
+                style={styles.closeModalBtn}
+              >
+                <X size={18} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {/* Star Rating Selector */}
+              <View style={styles.starRatingBox}>
+                <Text style={styles.starSelectLabel}>
+                  Berapa bintang untuk armada ini?
+                </Text>
+                <View style={styles.starInteractiveRow}>
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const isFilled = star <= newRating;
+                    return (
+                      <TouchableOpacity
+                        key={star}
+                        activeOpacity={0.7}
+                        onPress={() => setNewRating(star)}
+                        style={styles.starTouchItem}
+                      >
+                        <Star
+                          size={32}
+                          color={isFilled ? "#D97706" : "#CBD5E1"}
+                          fill={isFilled ? "#F59E0B" : "transparent"}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <Text style={styles.sentimentText}>
+                  {getRatingSentiment(newRating)}
+                </Text>
+              </View>
+
+              {/* Passenger Name Input */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Nama Penumpang</Text>
+                <TextInput
+                  placeholder="Masukkan nama Anda..."
+                  placeholderTextColor="#94A3B8"
+                  value={reviewerName}
+                  onChangeText={setReviewerName}
+                  style={styles.textInput}
+                />
+              </View>
+
+              {/* Review Description */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Ulasan Perjalanan Anda</Text>
+                <TextInput
+                  placeholder="Ceritakan kenyamanan bus, pelayanan kru, kebersihan, atau ketepatan waktu..."
+                  placeholderTextColor="#94A3B8"
+                  value={reviewComment}
+                  onChangeText={setReviewComment}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                  style={[styles.textInput, styles.textAreaInput]}
+                />
+              </View>
+
+              {/* Submit Button */}
+              <TouchableOpacity
+                activeOpacity={0.85}
+                disabled={submittingReview}
+                onPress={handleSubmitReview}
+                style={[
+                  styles.submitReviewBtn,
+                  submittingReview && { opacity: 0.6 },
+                ]}
+              >
+                {submittingReview ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <>
+                    <Send size={16} color="#FFFFFF" style={{ marginRight: 8 }} />
+                    <Text style={styles.submitReviewBtnText}>
+                      Kirim Ulasan &amp; Rating
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
@@ -528,8 +945,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
+    gap: 10,
   },
   routeHeaderLeft: {},
+  routeHeaderLeft: {
+    flex: 1,
+    minWidth: 0,
+    paddingRight: 6,
+  },
   badgeLine: {
     alignSelf: "flex-start",
     backgroundColor: COLORS.brandRed,
@@ -546,17 +969,20 @@ const styles = StyleSheet.create({
   routeHeaderTitle: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 22,
+    fontSize: 20,
     color: "#FFFFFF",
     letterSpacing: -0.3,
   },
   routeHeaderSub: {
     fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 13,
+    fontSize: 12.5,
     color: "rgba(255, 255, 255, 0.85)",
     marginTop: 2,
   },
   routeHeaderRight: {
     alignItems: "flex-end",
+    flexShrink: 0,
   },
   starsRow: {
     flexDirection: "row",
@@ -576,24 +1002,33 @@ const styles = StyleSheet.create({
   routeHeaderPrice: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 18,
+    fontSize: 16.5,
     color: "#FFFFFF",
   },
   routeHeaderPriceSub: {
     fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 12,
     color: "rgba(255, 255, 255, 0.8)",
+    fontSize: 11.5,
+    color: "rgba(255, 255, 255, 0.85)",
   },
   scrollContent: {
     paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 16,
     width: "100%",
     maxWidth: 680,
     alignSelf: "center",
   },
   tabsRow: {
+  tabsScrollView: {
+    marginBottom: 16,
+  },
+  tabsScrollContent: {
     flexDirection: "row",
     gap: 10,
     marginBottom: 20,
+    paddingRight: 16,
   },
   tabPill: {
     flexDirection: "row",
@@ -660,31 +1095,53 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#E2E8F0",
+    borderColor: "#F1F5F9",
   },
   specLabel: {
     fontFamily: "PlusJakartaSans_500Medium",
     fontSize: 11,
+    fontFamily: "PlusJakartaSans_400Regular",
+    fontSize: 12,
     color: "#6B7280",
+    marginBottom: 2,
   },
   specValue: {
     fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 13,
+    fontSize: 14,
     color: "#111827",
     marginTop: 2,
   },
   timelineWrapper: {
     paddingLeft: 4,
+    position: "relative",
+    paddingLeft: 10,
+  },
+  timelineLine: {
+    position: "absolute",
+    top: 24,
+    bottom: 24,
+    left: 17,
+    width: 2,
+    backgroundColor: "#E2E8F0",
   },
   timelineItem: {
     flexDirection: "row",
+    alignItems: "flex-start",
     gap: 14,
     alignItems: "flex-start",
+    marginVertical: 8,
   },
   timelineDotActive: {
     width: 14,
     height: 14,
     borderRadius: 7,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: COLORS.brandRed,
+    borderWidth: 3,
+    borderColor: "#FECACA",
     marginTop: 2,
   },
   timelineDot: {
@@ -692,6 +1149,13 @@ const styles = StyleSheet.create({
     height: 14,
     borderRadius: 7,
     backgroundColor: COLORS.accentGold,
+  timelineDotDest: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: "#059669",
+    borderWidth: 3,
+    borderColor: "#A7F3D0",
     marginTop: 2,
   },
   timelineLine: {
@@ -707,6 +1171,8 @@ const styles = StyleSheet.create({
   timelineTime: {
     fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 13,
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 14,
     color: "#111827",
   },
   timelinePlace: {
@@ -714,17 +1180,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#111827",
     marginTop: 2,
+    fontSize: 13,
+    color: "#374151",
+    marginTop: 1,
   },
   timelineSub: {
     fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 11,
     color: "#6B7280",
     marginTop: 2,
+    fontSize: 11.5,
+    color: "#9CA3AF",
+    marginTop: 1,
   },
   facilitiesGrid: {
     gap: 10,
+    gap: 12,
   },
   facilityRow: {
+  facilityItem: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
@@ -738,12 +1212,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    backgroundColor: "#F8FAFC",
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
   },
   crewAvatar: {
     width: 44,
     height: 44,
     borderRadius: 22,
     backgroundColor: "#EEF2F6",
+  facilityIconCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: "rgba(220, 38, 38, 0.08)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -751,25 +1235,33 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   crewName: {
+  facilityName: {
     fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 14,
+    fontSize: 13.5,
     color: "#111827",
   },
   crewSub: {
+  facilityDesc: {
     fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 12,
+    fontSize: 11.5,
     color: "#6B7280",
     marginTop: 2,
+    marginTop: 1,
   },
   dealItem: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    padding: 14,
+    borderRadius: 14,
     backgroundColor: "#F8FAFC",
     borderWidth: 1,
     borderColor: "#E2E8F0",
     padding: 14,
     borderRadius: 14,
+    borderColor: "#F1F5F9",
     marginBottom: 10,
   },
   dealIconBox: {
@@ -777,6 +1269,10 @@ const styles = StyleSheet.create({
     height: 38,
     borderRadius: 19,
     backgroundColor: "rgba(230, 0, 35, 0.1)",
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: "rgba(220, 38, 38, 0.08)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -798,15 +1294,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
+    justifyContent: "space-between",
     backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 18,
+    padding: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
+  },
+  reviewScoreBox: {
+    flex: 1,
   },
   reviewScoreBig: {
     fontFamily: "PlusJakartaSans_800ExtraBold",
     fontSize: 36,
+    fontSize: 32,
     color: "#111827",
   },
   reviewScoreStars: {
@@ -816,8 +1318,24 @@ const styles = StyleSheet.create({
   reviewScoreCount: {
     fontFamily: "PlusJakartaSans_400Regular",
     fontSize: 12,
+    fontSize: 11.5,
     color: "#6B7280",
     marginTop: 2,
+    marginTop: 4,
+  },
+  writeReviewBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: COLORS.brandRed,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  writeReviewBtnText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 12.5,
+    color: "#FFFFFF",
   },
   reviewCard: {
     backgroundColor: "#FFFFFF",
@@ -826,15 +1344,47 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
+  reviewCardUserHighlight: {
+    borderColor: "#BFDBFE",
+    backgroundColor: "#F8FAFC",
+  },
   reviewCardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 4,
+    alignItems: "center",
+  },
+  reviewerAvatarBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#EFF6FF",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#DBEAFE",
+  },
+  reviewerAvatarText: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 11,
+    color: "#2563EB",
   },
   reviewCardAuthor: {
     fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 14,
+    fontSize: 13.5,
     color: "#111827",
+  },
+  userVerifiedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    marginTop: 1,
+  },
+  userVerifiedText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 10,
+    color: "#059669",
   },
   reviewCardDate: {
     fontFamily: "PlusJakartaSans_400Regular",
@@ -857,6 +1407,11 @@ const styles = StyleSheet.create({
     bottom: Platform.OS === "ios" ? 28 : 20,
     left: 20,
     right: 20,
+    left: 16,
+    right: 16,
+    width: "100%",
+    maxWidth: 680,
+    alignSelf: "center",
   },
   bottomBarContainer: {
     flexDirection: "row",
@@ -912,5 +1467,110 @@ const styles = StyleSheet.create({
     fontFamily: "PlusJakartaSans_700Bold",
     fontSize: 13,
     color: COLORS.brandRed,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(15, 23, 42, 0.7)",
+    justifyContent: "flex-end",
+  },
+  modalCard: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    maxHeight: "85%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  modalTitle: {
+    fontFamily: "PlusJakartaSans_800ExtraBold",
+    fontSize: 17,
+    color: "#1E293B",
+  },
+  modalSub: {
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 12,
+    color: "#64748B",
+    marginTop: 2,
+  },
+  closeModalBtn: {
+    padding: 6,
+    backgroundColor: "#F1F5F9",
+    borderRadius: 12,
+  },
+  starRatingBox: {
+    alignItems: "center",
+    backgroundColor: "#F8FAFC",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  starSelectLabel: {
+    fontFamily: "PlusJakartaSans_600SemiBold",
+    fontSize: 13,
+    color: "#334155",
+    marginBottom: 10,
+  },
+  starInteractiveRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginVertical: 4,
+  },
+  starTouchItem: {
+    padding: 4,
+  },
+  sentimentText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 12,
+    color: "#D97706",
+    marginTop: 8,
+  },
+  inputGroup: {
+    marginBottom: 14,
+  },
+  inputLabel: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 12.5,
+    color: "#334155",
+    marginBottom: 6,
+  },
+  textInput: {
+    backgroundColor: "#F8FAFC",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontFamily: "PlusJakartaSans_500Medium",
+    fontSize: 13,
+    color: "#1E293B",
+  },
+  textAreaInput: {
+    height: 90,
+    textAlignVertical: "top",
+  },
+  submitReviewBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.brandRed,
+    paddingVertical: 14,
+    borderRadius: 14,
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  submitReviewBtnText: {
+    fontFamily: "PlusJakartaSans_700Bold",
+    fontSize: 14,
+    color: "#FFFFFF",
   },
 });
