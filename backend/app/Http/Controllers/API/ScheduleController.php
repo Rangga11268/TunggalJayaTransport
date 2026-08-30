@@ -25,15 +25,11 @@ class ScheduleController extends Controller
                     ->whereDate('booking_date', $searchDate);
             }], 'number_of_seats');
 
-        if ($origin) {
-            $query->whereHas('route', fn($q) => $q->where('origin', $origin));
         if ($origin && $origin !== 'Semua' && $origin !== 'all') {
             $cleanOrigin = trim(explode('(', $origin)[0]);
             $query->whereHas('route', fn($q) => $q->where('origin', 'like', "%{$cleanOrigin}%"));
         }
 
-        if ($destination) {
-            $query->whereHas('route', fn($q) => $q->where('destination', $destination));
         if ($destination && $destination !== 'Semua' && $destination !== 'all') {
             $cleanDest = trim(explode('(', $destination)[0]);
             $query->whereHas('route', fn($q) => $q->where('destination', 'like', "%{$cleanDest}%"));
